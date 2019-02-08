@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="../static/css/index.css">
+</head>
+<body>
+<main>
+    <header class="edp-header">
+        <div class="burger">
+            <button class="js-toggle-menu-button" type="button" data-toggle="collapse">
+                <span class="opened">&#10006;</span>
+                <span class="closed"></span>
+            </button>
+        </div>
+        <div class="logo">
+            <img src="../static/img/epam-logo-full-color-pms-colors.png" alt="epam">
+        </div>
+        <h2>Epam Delivery Platform</h2>
+    </header>
+    <section class="content d-flex">
+        <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
+            <nav class="navbar navbar-expand navbar-dark bg-dark flex-column flex-row align-items-start p-0">
+                <div class="navbar-collapse">
+                    <ul class="flex-column flex-row navbar-nav w-100 justify-content-between">
+                        <li class="nav-item color-light">
+                            <a class="nav-link pl-0" href="#">
+                                <i class="icon-dashboard"></i>
+                                <span class="link-name">
+                                    DASHBOARD
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link pl-0" href="#">
+                                <i class="icon-continuous_delivery"></i>
+                                <span class="link-name">
+                                CONTINUOUS DELIVERY
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link pl-0" href="#">
+                                <i class="icon-apps"></i>
+                                <span class="link-name">
+                                    APPLICATIONS
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link pl-0" href="#">
+                                <i class="icon-services"></i>
+                                <span class="link-name">
+                                SERVICES
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link pl-0" href="#">
+                                <i class="icon-autotest"></i>
+                                <span class="link-name">
+                                AUTOTESTS
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+        <div class="flex-fill pl-3 pr-3 wrapper">
+            <div class="d-flex edp-controls">
+                <div class="flex-fill">
+                    <h1>Applications</h1>
+                </div>
+                <div class="flex-fill">
+                    <div class="float-right">
+                        <button class="btn btn-success">ADD APPLICATION</button>
+                    </div>
+                </div>
+            </div>
+            <table class="table edp-table">
+                <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Language</th>
+                    <th scope="col">Build Tool</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <a href="#">
+                            Name of Java application
+                        </a>
+                    </td>
+                    <td>Java</td>
+                    <td>Maven</td>
+                    <td>
+                        <button class="delete" data-toggle="modal" data-target="#exampleModal">
+                            <i class="icon-trashcan"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="#">
+                            Name of Javascript application
+                        </a>
+                    </td>
+                    <td>Javascript</td>
+                    <td>NPM</td>
+                    <td>
+                            <button class="delete" data-toggle="modal" data-target="#exampleModal">
+                                <i class="icon-trashcan"></i>
+                            </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="#">
+                            One More Application
+
+                        </a>
+                    </td>
+                    <td>Java</td>
+                    <td>Maven</td>
+                    <td>
+                            <button class="delete" data-toggle="modal" data-target="#exampleModal">
+                                <i class="icon-trashcan"></i>
+                            </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <footer class="edp-footer">
+        <div class="copy">
+            <p>© 2018 EPAM Systems, Inc. </p>
+            <p> All Rights Reserved.</p>
+        </div>
+    </footer>
+</main>
+<div class="modal fade" tabindex="-1" role="dialog" id="exampleModal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>You are going to delete application.
+                    If you are sure enter name of application:
+                </p>
+                <form action="">
+                    <div class="form-group">
+                        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                               placeholder="Enter name">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../static/js/jquery-3.3.1.js"></script>
+<script src="../static/js/popper.js"></script>
+<script src="../static/js/bootstrap.js"></script>
+<script src="../static/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+package: edp-admin-console
+import:
+  - package: github.com/astaxie/beego
+    version: ^1.10.1
+  - package: golang.org/x/oauth2
+  - package: github.com/coreos/go-oidc
+    version: v2.0.0
+  - package: github.com/satori/go.uuid
+    version: v1.2.0

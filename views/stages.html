@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="../static/css/index.css">
+</head>
+<body>
+<main>
+    <header class="edp-header">
+        <div class="burger">
+            <button class="js-toggle-menu-button" type="button" data-toggle="collapse">
+                <span class="opened">&#10006;</span>
+                <span class="closed"></span>
+            </button>
+        </div>
+        <div class="logo">
+            <img src="../static/img/epam-logo-full-color-pms-colors.png" alt="epam">
+        </div>
+        <h2>Epam Delivery Platform</h2>
+    </header>
+    <section class="content d-flex">
+        <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
+            <nav class="navbar navbar-expand navbar-dark bg-dark flex-column flex-row align-items-start p-0">
+                <div class="navbar-collapse">
+                    <ul class="flex-column flex-row navbar-nav w-100 justify-content-between">
+                        <li class="nav-item color-light">
+                            <a class="nav-link pl-0" href="#">
+                                <i class="icon-dashboard"></i>
+                                <span class="link-name">
+                                    DASHBOARD
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link pl-0" href="#">
+                                <i class="icon-continuous_delivery"></i>
+                                <span class="link-name">
+                                CONTINUOUS DELIVERY
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link pl-0" href="/admin/applications">
+                                <i class="icon-apps"></i>
+                                <span class="link-name">
+                                    APPLICATIONS
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link pl-0" href="#">
+                                <i class="icon-services"></i>
+                                <span class="link-name">
+                                SERVICES
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link pl-0" href="#">
+                                <i class="icon-autotest"></i>
+                                <span class="link-name">
+                                AUTOTESTS
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+        <div class="flex-fill wrapper stages">
+            <div class="stages-header pl-4 pr-4">
+                <div class="d-flex edp-controls">
+                    <div class="flex-fill">
+                        <h1>Continuous Delivery Pipeline</h1>
+                    </div>
+                    <div class="flex-fill">
+                        <div class="float-right">
+                            <button class="btn btn-success">ADD STAGE</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flow-row">
+                    <div class="branch-col"></div>
+                    <div class="step-col">
+                        <a href="#">
+                            <div class="step-name active">
+                                <p>
+                                    BUILD
+                                </p>
+                                <div class="step-name-controls">
+                                    <span class="oi" data-glyph="chevron-right"></span>
+                                    <div class="step-name-controls-wrap">
+                                        <button><span class="oi" data-glyph="pencil"></span></button>
+                                        <button><i class="icon-trashcan"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="step-pipeline">
+                            <div class="step-pipeline-circle"></div>
+                        </div>
+                    </div>
+                    <div class="step-col">
+                        <a href="#">
+                            <div class="step-name">
+                                <p>
+                                    SIT
+                                </p>
+                                <div class="step-name-controls">
+                                    <span class="oi" data-glyph="chevron-right"></span>
+                                    <div class="step-name-controls-wrap">
+                                        <button><span class="oi" data-glyph="pencil"></span></button>
+                                        <button><i class="icon-trashcan"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="step-pipeline">
+                            <div class="step-pipeline-circle"></div>
+                        </div>
+                    </div>
+                    <div class="step-col">
+                        <a href="#">
+                            <div class="step-name">
+                                <p>
+                                    QA
+                                </p>
+                                <div class="step-name-controls">
+                                    <span class="oi" data-glyph="chevron-right"></span>
+                                    <div class="step-name-controls-wrap">
+                                        <button><span class="oi" data-glyph="pencil"></span></button>
+                                        <button><i class="icon-trashcan"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="step-pipeline">
+                            <div class="step-pipeline-circle"></div>
+                        </div>
+                    </div>
+                    <div class="step-col">
+                        <a href="#">
+                            <div class="step-name">
+                                <p>
+                                    Perf
+                                </p>
+                                <div class="step-name-controls">
+                                    <span class="oi" data-glyph="chevron-right"></span>
+                                    <div class="step-name-controls-wrap">
+                                        <button><span class="oi" data-glyph="pencil"></span></button>
+                                        <button><i class="icon-trashcan"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="step-pipeline">
+                            <div class="step-pipeline-circle"></div>
+                        </div>
+                    </div>
+                    <div class="step-col">
+                        <a href="#">
+                            <div class="step-name">
+                                <p>
+                                    UAT
+                                </p>
+                                <div class="step-name-controls">
+                                    <span class="oi" data-glyph="chevron-right"></span>
+                                    <div class="step-name-controls-wrap">
+                                        <button><span class="oi" data-glyph="pencil"></span></button>
+                                        <button><i class="icon-trashcan"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="step-pipeline">
+                            <div class="step-pipeline-circle"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="stages-results pl-4 pr-4">
+                <div class="d-flex branch-row">
+                    <div class="branch-col">Master</div>
+                    <div class="step-col">
+                        <div class="step-status">
+                            <div class="info">
+                                <div class="text">
+                                    <a href="#">
+                                        <span>
+                                    Demo-master-build 2
+                                        </span>
+                                    </a>
+                                    <small>
+                                        <i class="status-icon pass-85"></i> 5 of 40 tests failed
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="quality-gate">
+                                <div class="text">
+                                    QG
+                                    <div class="oi" data-glyph="spreadsheet"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-col">
+                        <div class="step-status">
+                            <div class="info">
+                                <div class="text">
+                                    <a href="">
+                                        <span>
+                                            Demo-master-sit 2
+                                        </span>
+                                    </a>
+                                    <small>
+                                        <i class="status-icon pass-60"></i> 17 of 40 tests failed
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="quality-gate">
+                                <div class="text">
+                                    QG
+                                    <div class="oi" data-glyph="spreadsheet"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-col">
+                        <div class="step-status">
+                            <div class="info">
+                                <div class="text">
+                                    <a href="">
+                                                                         <span>
+                                    Demo-master-qa 2
+                                </span>
+                                    </a>
+
+                                    <small>
+                                        <i class="status-icon pass-75"></i>7 of 40 tests failed
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="quality-gate">
+                                <div class="text">
+                                    QG
+                                    <div class="oi" data-glyph="spreadsheet"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-col">
+                        <div class="step-status">
+                            <div class="info">
+                                <div class="text">
+                                    <a href="">
+                                                                     <span>
+                                    Demo-master-perf 2
+                                </span>
+                                    </a>
+
+                                    <small>
+                                        <i class="status-icon pass-100"></i>All tests passed
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="quality-gate">
+                                <div class="text">
+                                    QG
+                                    <div class="oi" data-glyph="spreadsheet"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-col">
+                        <div class="step-status">
+                            <div class="info">
+                                <div class="text">
+                                    <a href="">
+                                        <span>
+                                    Demo-master-uat 2
+                                        </span>
+                                    </a>
+                                    <small>
+                                        <i class="status-icon pass-65"></i>15 of 40 tests failed
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="quality-gate">
+                                <div class="text">
+                                    QG
+                                    <div class="oi" data-glyph="spreadsheet"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex branch-row">
+                    <div class="branch-col">Release</div>
+                    <div class="step-col">
+                        <div class="step-status">
+                            <div class="info">
+                                <div class="text">
+                                    <a href="">
+                                                                         <span>
+                                    Demo-release-build 1
+                                </span>
+                                    </a>
+                                    <small>
+                                        <i class="status-icon pass-85"></i> 2 of 40 tests failed
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="quality-gate">
+                                <div class="text">
+                                    QG
+                                    <div class="oi" data-glyph="spreadsheet"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-col">
+                        <div class="step-status">
+                            <div class="info">
+                                <div class="text">
+                                    <a href="">
+                                                                         <span>
+                                   Demo-release-sit 2
+                                </span>
+                                    </a>
+
+                                    <small>
+                                        <i class="status-icon pass-50"></i> 22 0f 40 tests failed
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="quality-gate">
+                                <div class="text">
+                                    QG
+                                    <div class="oi" data-glyph="spreadsheet"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-col">
+                        <div class="step-status">
+                            <div class="info">
+                                <div class="text">
+                                    <a href="">
+                                                                         <span>
+                                    Demo-release-qa 1
+                                </span>
+                                    </a>
+                                    <small>
+                                        <i class="status-icon pass-75"></i>10 of 40 tests failed
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="quality-gate">
+                                <div class="text">
+                                    QG
+                                    <div class="oi" data-glyph="spreadsheet"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-col">
+                        <div class="step-status">
+                            <div class="info">
+                                <div class="text">
+                                    <a href="">
+                                                                         <span>
+                                    Demo-release-perf 1
+                                </span>
+                                    </a>
+                                    <small>
+                                        <i class="status-icon pass-0"></i>All tests failed
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="quality-gate">
+                                <div class="text">
+                                    QG
+                                    <div class="oi" data-glyph="spreadsheet"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-col">
+                        <div class="step-status">
+                            <div class="info">
+                                <div class="text">
+                                    <a href="">
+                                       <span>
+                                        Demo-release-uat 1
+                                        </span>
+                                    </a>
+                                    <small>
+                                        <i class="status-icon pass-100"></i>All tests passed
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="quality-gate">
+                                <div class="text">
+                                    QG
+                                    <div class="oi" data-glyph="spreadsheet"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex branch-row">
+                    <div class="branch-col">Feature-12</div>
+                    <div class="step-col">
+                        <div class="step-status">
+                            <div class="info">
+                                <div class="text">
+                                    <a href="">
+                                  <span>
+                                    Feature-12-build
+                                </span>
+                                    </a>
+                                    <small>
+                                        <i class="status-icon pass-85"></i> 5 of 40 tests failed
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="quality-gate">
+                                <div class="text">
+                                    QG
+                                    <div class="oi" data-glyph="spreadsheet"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-col">
+                        <div class="step-status">
+                            <div class="info">
+                                <div class="text">
+                                    <a href="">
+                                        <span>
+                                    Feature-12-sit
+                                        </span>
+                                    </a>
+                                    <small>
+                                        <i class="status-icon pass-60"></i> 17 of 40 tests failed
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="quality-gate">
+                                <div class="text">
+                                    QG
+                                    <div class="oi" data-glyph="spreadsheet"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-col">
+                    </div>
+                    <div class="step-col">
+                    </div>
+                    <div class="step-col">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="edp-footer">
+        <div class="copy">
+            <p>© 2018 EPAM Systems, Inc. </p>
+            <p> All Rights Reserved.</p>
+        </div>
+    </footer>
+</main>
+<script src="../static/js/jquery-3.3.1.js"></script>
+<script src="../static/js/popper.js"></script>
+<script src="../static/js/bootstrap.js"></script>
+<script src="../static/js/main.js"></script>
+</body>
+</html>
