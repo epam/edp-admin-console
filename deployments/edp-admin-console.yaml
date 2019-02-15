@@ -167,6 +167,8 @@ objects:
                   value: "admin"
                 - name: PG_PASSWORD
                   value: "admin"
+                - name: PG_PORT
+                  value: "5432"
               terminationMessagePath: /dev/termination-log
               terminationMessagePolicy: File
           dnsPolicy: ClusterFirst

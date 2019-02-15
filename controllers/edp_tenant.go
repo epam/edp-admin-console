@@ -4,6 +4,7 @@ import (
 	"edp-admin-console/service"
 	"github.com/astaxie/beego"
 	"net/http"
+	"strings"
 )
 
 type EDPTenantController struct {
@@ -21,10 +22,17 @@ func (this *EDPTenantController) GetEDPTenants() {
 
 	this.Data["InputURL"] = this.Ctx.Input.URL()
 	this.Data["EDPTenants"] = edpTenants
-	this.TplName = "edp_tenants.tpl"
+	this.TplName = "edp_tenants.html"
 }
 
 func (this *EDPTenantController) GetEDPComponents() {
+	resourceAccess := this.Ctx.Input.Session("resource_access").(map[string][]string)
+	edpTenants, err := this.EDPTenantService.GetEDPTenants(resourceAccess)
+	if err != nil {
+		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	edpTenantName := this.GetString(":name")
 	components := this.EDPTenantService.GetEDPComponents(edpTenantName)
 	version, err := this.EDPTenantService.GetEDPVersionByName(edpTenantName)
@@ -33,8 +41,10 @@ func (this *EDPTenantController) GetEDPComponents() {
 		return
 	}
 
+	this.Data["InputURL"] = strings.TrimSuffix(this.Ctx.Input.URL(), "/"+edpTenantName)
 	this.Data["EDPTenantName"] = edpTenantName
 	this.Data["EDPVersion"] = version
 	this.Data["EDPComponents"] = components
-	this.TplName = "edp_components.tpl"
+	this.Data["EDPTenants"] = edpTenants
+	this.TplName = "edp_components.html"
 }

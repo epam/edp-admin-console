@@ -11,42 +11,23 @@
 <body>
 <main>
     <header class="edp-header">
-        <div class="burger">
-            <button class="js-toggle-menu-button" type="button" data-toggle="collapse">
-                <span class="opened">&#10006;</span>
-                <span class="closed"></span>
-            </button>
-        </div>
         <div class="logo">
             <img src="../static/img/epam-logo-full-color-pms-colors.png" alt="epam">
         </div>
         <h2>Epam Delivery Platform</h2>
     </header>
     <section class="content d-flex">
-        <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
-            <nav class="navbar navbar-expand navbar-dark bg-dark flex-column flex-row align-items-start p-0">
-                <div class="navbar-collapse">
-                    <div class="dropdown">
-                      <button class="dropbtn">Select EDP instance</button>
-                      <div class="dropdown-content">
-                        {{range $k, $v := .EDPTenants}}
-                            <a href="{{$.InputURL}}/{{$v.Name}}">{{$v.Name}}</a>
-                        {{end}}
-                      </div>
-                    </div>
-                </div>
-            </nav>
-        </aside>
         <div class="flex-fill pl-4 pr-4 wrapper">
 
             <div>
-                <table class="table">
-                    <thead>
+                {{if .EDPTenants}}
+                    <table class="table">
+                        <thead>
                         <tr>
-                            <th>EDP instances</th>
+                            <th>EDP tenants</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         {{range $k, $v := .EDPTenants}}
                             <tr>
                                 <td>
@@ -54,8 +35,14 @@
                                 </td>
                             </tr>
                         {{end}}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                {{else}}
+                    <div class="no-tenant">
+                        <h1>Looks like you don't have permissions to the installed EDP tenants.</h1>
+                        <p>Please, contact EDP support team to share installed tenant or install new one.</p>
+                    </div>
+                {{end}}
             </div>
         </div>
     </section>

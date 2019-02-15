@@ -1,7 +1,6 @@
 .dropbtn {
-    background-color: #d1d1d1;
+    background-color: #464547;
     color: white;
-    padding: 16px;
     font-size: 16px;
     border: none;
 }
@@ -36,11 +35,81 @@
 }
 
 .dropdown:hover .dropbtn {
-    background-color: #d1d1d1;
+    background-color: #838284;
+}
+
+#dropdownMenuButton p {
+    margin-top: 5px;
 }
 
 .table {
     width: 100%;
     border: 1px solid #d1d1d1;
     margin-top: 20px;
+}
+
+.form-group {
+    background-color: #464547;
+    display: flex;
+    margin-bottom: 0rem;
+    border-bottom: 1px solid #050505;
+}
+
+.burger {
+    margin-top: 5px;
+}
+
+.burger button.collapsed {
+    background-color: #464547;
+}
+
+.arrow.down {
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    margin-left: 1em;
+}
+
+.down {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.border-nav {
+    border-right-color: #050505;
+    border-right-style: solid;
+    border-right-width: 1px;
+    height: 100%;
+    position: relative;
+    width: 100%;
+    min-height: 1px;
+    padding-right: 25px;
+    padding-left: 11px;
+}
+
+.no-tenant {
+    font-size: 1.5rem;
+    margin-bottom: 0.875rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.no-tenant p {
+    font-size: 1.25rem;
+    margin-bottom: 0;
+    color: #222222;
+}
+
+.no-tenant {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 5.125rem;
+    font-family: "MuseoSans", sans-serif;
+    margin: 10%;
 }

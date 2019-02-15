@@ -20,8 +20,13 @@ var (
 )
 
 func (edpService EDPTenantService) GetEDPTenants(resourceAccess map[string][]string) ([]*models.EDPTenant, error) {
-	adminClients := getAdminClientsWithoutSuffix(resourceAccess)
-	edpSpecs, err := edpService.EDPTenantRep.GetAllEDPTenantsByNames(adminClients)
+	edpTenantNames := getEdpTenantNamesWithoutSuffix(resourceAccess)
+	if edpTenantNames == nil {
+		log.Println("There aren't edp tenants to display.")
+		return nil, nil
+	}
+
+	edpSpecs, err := edpService.EDPTenantRep.GetAllEDPTenantsByNames(edpTenantNames)
 	if err != nil {
 		log.Printf("Couldn't get all EDP specifications. Reason: %v\n", err)
 		return nil, err
@@ -48,11 +53,12 @@ func (edpService EDPTenantService) GetEDPComponents(edpTenantName string) map[st
 	return compWithLinks
 }
 
-func getAdminClientsWithoutSuffix(resourceAccess map[string][]string) []string {
+func getEdpTenantNamesWithoutSuffix(resourceAccess map[string][]string) []string {
 	var edpTenants []string
+	suffix := "-edp"
 	for key, value := range resourceAccess {
-		if util.Contains(value, beego.AppConfig.String("adminRole")) {
-			edpTenants = append(edpTenants, strings.TrimSuffix(key, "-edp"))
+		if strings.HasSuffix(key, suffix) && util.Contains(value, beego.AppConfig.String("adminRole")) {
+			edpTenants = append(edpTenants, strings.TrimSuffix(key, suffix))
 		}
 	}
 	return edpTenants

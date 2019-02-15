@@ -7,10 +7,12 @@ import (
 	"edp-admin-console/repository"
 	"edp-admin-console/service"
 	"github.com/astaxie/beego"
+	"log"
 )
 
 func init() {
 	/*START init context required for app*/
+	log.Printf("Start application in %s mode...", beego.AppConfig.String("runmode"))
 	context.InitDb()
 	context.InitAuth()
 	edpRepository := repository.EDPTenantRep{}
