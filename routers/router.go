@@ -4,6 +4,7 @@ import (
 	"edp-admin-console/context"
 	"edp-admin-console/controllers"
 	"edp-admin-console/filters"
+	"edp-admin-console/k8s"
 	"edp-admin-console/repository"
 	"edp-admin-console/service"
 	"github.com/astaxie/beego"
@@ -17,6 +18,7 @@ func init() {
 	context.InitAuth()
 	edpRepository := repository.EDPTenantRep{}
 	edpService := service.EDPTenantService{EDPTenantRep: edpRepository}
+	appService := service.ApplicationService{CrdClient: k8s.GetClient()}
 	/*END*/
 
 	/*START security routing*/
@@ -38,7 +40,7 @@ func init() {
 	beego.Router("/admin/application/create", &controllers.MainController{}, "get:GetCreateApplicationPage")
 	ns := beego.NewNamespace("/api/v1",
 		beego.NSNamespace("/application",
-			beego.NSRouter("/create", &controllers.AppController{}, "post:CreateApplication"),
+			beego.NSRouter("/create", &controllers.AppController{AppService: appService}, "post:CreateApplication"),
 		),
 	)
 	beego.AddNamespace(ns)

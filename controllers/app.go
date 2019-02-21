@@ -2,16 +2,19 @@ package controllers
 
 import (
 	"edp-admin-console/models"
+	"edp-admin-console/service"
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
 	"github.com/satori/go.uuid"
+	"log"
 	"net/http"
 )
 
 type AppController struct {
 	beego.Controller
+	AppService service.ApplicationService
 }
 
 type ErrMsg struct {
@@ -27,14 +30,25 @@ func (this *AppController) CreateApplication() {
 		return
 	}
 
+	log.Printf("Received data from client to create crd: %s", app)
+
 	errMsg := validRequestData(err, app)
 	if errMsg != (ErrMsg{}) {
 		http.Error(this.Ctx.ResponseWriter, errMsg.Message, errMsg.StatusCode)
 		return
 	}
 
-	//TODO change with call service layout
 	id := uuid.NewV4().String()
+
+	createdObject, err := this.AppService.CreateApp(app)
+
+	if err != nil {
+		log.Println("Failed to create custom resource: " + err.Error())
+		http.Error(this.Ctx.ResponseWriter, "Failed to create custom resource: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Custom object is saved into k8s: %s", createdObject)
 
 	location := fmt.Sprintf("%s/%s", this.Ctx.Input.URL(), id)
 	this.Ctx.ResponseWriter.WriteHeader(200)
