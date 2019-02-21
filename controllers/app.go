@@ -19,7 +19,7 @@ type ErrMsg struct {
 	StatusCode int
 }
 
-func (this *AppController) CreateApp() {
+func (this *AppController) CreateApplication() {
 	var app models.App
 	err := json.NewDecoder(this.Ctx.Request.Body).Decode(&app)
 	if err != nil {

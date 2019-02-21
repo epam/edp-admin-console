@@ -10,10 +10,10 @@ func (this *MainController) Index() {
 	this.TplName = "index.html"
 }
 
-func (this *MainController) Applications() {
-	this.TplName = "applications.html"
+func (this *MainController) GetApplicationPage() {
+	this.TplName = "application.html"
 }
 
-func (this *MainController) AddingApplication() {
-	this.TplName = "addingApplication.html"
+func (this *MainController) GetCreateApplicationPage() {
+	this.TplName = "create_application.html"
 }
