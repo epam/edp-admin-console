@@ -7,12 +7,13 @@ import:
   version: v2.0.0
 - package: github.com/satori/go.uuid
   version: v1.2.0
-- package: k8s.io/client-go
-  version: v10.0.0
-- package: k8s.io/apimachinery
 - package: gopkg.in/yaml.v2
   version: v2.2.2
 - package: github.com/googleapis/gnostic
   version: v0.2.0
   subpackages:
   - OpenAPIv2
+- package: github.com/openshift/api
+  version: release-3.9
+- package: gopkg.in/src-d/go-git.v4
+  version: v4.10.0
