@@ -16,9 +16,11 @@ func init() {
 	log.Printf("Start application in %s mode...", beego.AppConfig.String("runmode"))
 	context.InitDb()
 	context.InitAuth()
+
+	clients := k8s.CreateOpenShiftClients()
 	edpRepository := repository.EDPTenantRep{}
-	edpService := service.EDPTenantService{EDPTenantRep: edpRepository}
-	appService := service.ApplicationService{CrdClient: k8s.GetClient()}
+	edpService := service.EDPTenantService{EDPTenantRep: edpRepository, Clients: clients}
+	appService := service.ApplicationService{Clients: clients}
 	/*END*/
 
 	/*START security routing*/
@@ -39,6 +41,7 @@ func init() {
 	beego.Router("/admin/application", &controllers.MainController{}, "get:GetApplicationPage")
 	beego.Router("/admin/application/create", &controllers.MainController{}, "get:GetCreateApplicationPage")
 	ns := beego.NewNamespace("/api/v1",
+		beego.NSRouter("/get/vcs", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetVcsIntegrationValue"),
 		beego.NSNamespace("/application",
 			beego.NSRouter("/create", &controllers.AppController{AppService: appService}, "post:CreateApplication"),
 		),

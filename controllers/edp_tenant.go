@@ -48,3 +48,15 @@ func (this *EDPTenantController) GetEDPComponents() {
 	this.Data["EDPTenants"] = edpTenants
 	this.TplName = "edp_components.html"
 }
+
+func (this *EDPTenantController) GetVcsIntegrationValue() {
+	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue()
+
+	if err != nil {
+		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	this.Data["json"] = isVcsEnabled
+	this.ServeJSON()
+}

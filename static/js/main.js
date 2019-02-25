@@ -74,6 +74,17 @@ $(function () {
         });
     }();
 
+    $(document).ready(function () {
+        _sendGetRequest('/api/v1/get/vcs',
+            function (isVcsEnabled) {
+                if (isVcsEnabled) {
+                    $('.vcs-block').removeClass('hide-element');
+                }
+            }, function (resp) {
+                console.log(resp);
+            });
+    });
+
     $('[data-toggle="tooltip"]').tooltip();
 
     $('#strategy').change(function () {

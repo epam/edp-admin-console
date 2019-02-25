@@ -61,7 +61,11 @@ func (in *BusinessApplicationList) DeepCopyObject() runtime.Object {
 
 func (in *BusinessApplicationSpec) DeepCopyInto(out *BusinessApplicationSpec) {
 	*out = *in
-	out.Git = in.Git
+	if in.Repository != nil {
+		in, out := &in.Repository, &out.Repository
+		*out = new(Repository)
+		**out = **in
+	}
 	if in.Route != nil {
 		in, out := &in.Route, &out.Route
 		*out = new(Route)
@@ -112,16 +116,16 @@ func (in *Database) DeepCopy() *Database {
 	return out
 }
 
-func (in *Git) DeepCopyInto(out *Git) {
+func (in *Repository) DeepCopyInto(out *Repository) {
 	*out = *in
 	return
 }
 
-func (in *Git) DeepCopy() *Git {
+func (in *Repository) DeepCopy() *Repository {
 	if in == nil {
 		return nil
 	}
-	out := new(Git)
+	out := new(Repository)
 	in.DeepCopyInto(out)
 	return out
 }
