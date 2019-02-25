@@ -1,11 +1,11 @@
 $(function () {
     var CONST = {
-        GIT_URL_REGEXP: /(?:git|ssh|https?|git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/,
+        GIT_URL_REGEXP: /(?:^git|^ssh|^https?|^git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/,
         APP_NAME_REGEXP: /^[a-z][a-z0-9-.]+[a-z]$/,
         REPO_PASS_REGEXP: /\w/,
         REPO_LOGIN_REGEXP: /\w/,
         ROUTE_SITE_REGEXP: /\w/,
-        ROUTE_PATH_REGEXP: /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})/,
+        ROUTE_PATH_REGEXP: /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/,
         DB_CAPACITY_REGEXP: /\w/,
         DB_PERSISTENCE_STORAGE_REGEXP: /\w/
     };
@@ -22,6 +22,12 @@ $(function () {
         },
         validateRepositoryLogin: function () {
             return CONST.REPO_LOGIN_REGEXP.test($(this).val());
+        },
+        validateVcsLogin: function () {
+            return CONST.REPO_LOGIN_REGEXP.test($(this).val());
+        },
+        validateVcsPassword: function () {
+            return CONST.REPO_PASS_REGEXP.test($(this).val());
         },
         validateRouteSite: function () {
             return CONST.ROUTE_SITE_REGEXP.test($(this).val());
@@ -116,97 +122,6 @@ $(function () {
         });
     });
 
-    /*handles main block on button submit*/
-    $('.main-info-submit').click(function (e) {
-        var $cardBody = $(this).closest('.card-body');
-        var isLangChosen = false;
-        $.each($cardBody.find('#subFormWrapper input'), function () {
-            if ($(this).is(':checked')) {
-                isLangChosen = true;
-            }
-        });
-
-        var $oneBlock = $(this).closest('#collapseOne')
-        if (!isLangChosen) {
-            e.stopPropagation();
-            $oneBlock.find('.card-body .invalid-feedback').show();
-            $oneBlock.prev('.card-header').addClass('invalid').removeClass('success');
-        } else {
-            $oneBlock.find('.card-body .invalid-feedback').hide();
-            $oneBlock.prev('.card-header').removeClass('invalid').addClass('success');
-        }
-    });
-
-    /*handles repo block on button submit*/
-    $('.repo-submit').click(function (e) {
-        var $cardBody = $(this).closest('.card-body');
-        $.each($cardBody.find('div.form-group:not(.hide-element) input'), function () {
-            if ($(this).attr('id') === 'gitRepoUrl') {
-                _validateInput.bind(this)(validationCallbacks.validateGitRepositoryUrl);
-            }
-            if ($(this).attr('id') === 'nameOfApp') {
-                _validateInput.bind(this)(validationCallbacks.validateNameOfApplication);
-            }
-            if ($(this).attr('id') === 'repoPassword') {
-                _validateInput.bind(this)(validationCallbacks.validateRepositoryPassword);
-            }
-            if ($(this).attr('id') === 'repoLogin') {
-                _validateInput.bind(this)(validationCallbacks.validateRepositoryLogin);
-            }
-        });
-
-        toggleValidClassOnAccordionTab.bind(this)('#collapseTwo', e);
-    });
-
-    /*handles route block on button submit*/
-    $('.route-submit').click(function (e) {
-        var $cardBody = $(this).closest('.card-body');
-        if ($('#needRoute').is(':checked')) {
-            $.each($cardBody.find('div.form-group:not(.hide-element) input'), function () {
-                if ($(this).attr('id') === 'routeSite') {
-                    _validateInput.bind(this)(validationCallbacks.validateRouteSite);
-                }
-                if ($(this).attr('id') === 'routePath') {
-                    _validateInput.bind(this)(validationCallbacks.validateRoutePath);
-                }
-            });
-        }
-
-        toggleValidClassOnAccordionTab.bind(this)('#collapseThree', e);
-    });
-
-    /*handles db block on button submit and sends request to add application*/
-    $('.db-submit.create-application-submit').click(function (e) {
-        var $cardBody = $(this).closest('.card-body');
-        if ($('#needDb').is(':checked')) {
-            $.each($cardBody.find('div.form-group:not(.hide-element) input'), function () {
-                if ($(this).attr('id') === 'dbCapacity') {
-                    _validateInput.bind(this)(validationCallbacks.validateDbCapacity);
-                }
-                if ($(this).attr('id') === 'dbPersitantStorage') {
-                    _validateInput.bind(this)(validationCallbacks.validateDbPersistentStorage);
-                }
-            });
-        }
-
-        $('.main-info-submit').trigger('click');
-        $('.repo-submit').trigger('click');
-        $('.route-submit').trigger('click');
-        $('#accordionCreateApplication .card').addClass('collapse')
-        toggleValidClassOnAccordionTab.bind(this)('#collapseFour', e);
-
-        if (isFormValid()) {
-            var formData = $('#createAppForm').serializeArray();
-            var json = buildPayloadToCreateApplication(formData);
-
-            _sendPostRequest(json, function () {
-                console.log('Application data is sent to server.');
-            }, function () {
-                console.log('An error has occurred on server side.');
-            });
-        }
-    });
-
     $('#strategy').change(function () {
         if (this.value === 'clone') {
             $(".repo-url, .private-repo").removeClass('hide-element');
@@ -263,15 +178,41 @@ $(function () {
             }
         });
 
+        var isFrameworkChosen = false;
+        $.each($cardBody.find('.form__input-wrapper .form-subsection input'), function () {
+            if ($(this).is(':checked')) {
+                isFrameworkChosen = true;
+            }
+        });
+
+        var $appName = $('#nameOfApp');
+        _validateInput.bind($appName)(validationCallbacks.validateNameOfApplication);
+
         var $oneBlock = $(this).closest('#collapseOne')
         if (!isLangChosen) {
             e.stopPropagation();
-            $oneBlock.find('.card-body .invalid-feedback').show();
-            $oneBlock.prev('.card-header').addClass('invalid').removeClass('success');
+            $oneBlock.find('.card-body .invalid-feedback.appLangError').show();
+            $oneBlock.prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
         } else {
-            $oneBlock.find('.card-body .invalid-feedback').hide();
-            $oneBlock.prev('.card-header').removeClass('invalid').addClass('success');
+            $oneBlock.find('.card-body .invalid-feedback.appLangError').hide();
+            $oneBlock.prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
         }
+        if (isLangChosen && !isFrameworkChosen) {
+            e.stopPropagation();
+            $oneBlock.find('.card-body .invalid-feedback.frameworkError').show();
+            $oneBlock.prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
+        } else if (isLangChosen && isFrameworkChosen) {
+            $oneBlock.find('.card-body .invalid-feedback.frameworkError').hide();
+            $oneBlock.prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
+        }
+
+        if ($appName.hasClass('is-invalid')) {
+            $oneBlock.prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
+        } else {
+            $oneBlock.prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
+        }
+
+        toggleValidClassOnAccordionTab.bind(this)('#collapseOne', e);
     });
 
     /*handles repo block on button submit*/
@@ -280,9 +221,6 @@ $(function () {
         $.each($cardBody.find('div.form-group:not(.hide-element) input'), function () {
             if ($(this).attr('id') === 'gitRepoUrl') {
                 _validateInput.bind(this)(validationCallbacks.validateGitRepositoryUrl);
-            }
-            if ($(this).attr('id') === 'nameOfApp') {
-                _validateInput.bind(this)(validationCallbacks.validateNameOfApplication);
             }
             if ($(this).attr('id') === 'repoPassword') {
                 _validateInput.bind(this)(validationCallbacks.validateRepositoryPassword);
@@ -293,6 +231,21 @@ $(function () {
         });
 
         toggleValidClassOnAccordionTab.bind(this)('#collapseTwo', e);
+    });
+
+    /*handles vcs block on button submit*/
+    $('.vcs-submit').click(function (e) {
+        var $cardBody = $(this).closest('.card-body');
+        $.each($cardBody.find('div.form-group:not(.hide-element) input'), function () {
+            if ($(this).attr('id') === 'vcsLogin') {
+                _validateInput.bind(this)(validationCallbacks.validateVcsLogin);
+            }
+            if ($(this).attr('id') === 'vcsPassword') {
+                _validateInput.bind(this)(validationCallbacks.validateVcsPassword);
+            }
+        });
+
+        toggleValidClassOnAccordionTab.bind(this)('#collapseThree', e);
     });
 
     /*handles route block on button submit*/
@@ -309,11 +262,11 @@ $(function () {
             });
         }
 
-        toggleValidClassOnAccordionTab.bind(this)('#collapseThree', e);
+        toggleValidClassOnAccordionTab.bind(this)('#collapseFour', e);
     });
 
     /*handles db block on button submit and sends request to add application*/
-    $('.db-submit.add-application-submit').click(function (e) {
+    $('.db-submit.create-application-submit').click(function (e) {
         var $cardBody = $(this).closest('.card-body');
         if ($('#needDb').is(':checked')) {
             $.each($cardBody.find('div.form-group:not(.hide-element) input'), function () {
@@ -327,30 +280,64 @@ $(function () {
         }
 
         $('.main-info-submit').trigger('click');
+        $('.vcs-submit').trigger('click');
         $('.repo-submit').trigger('click');
         $('.route-submit').trigger('click');
-        $('#accordionAddApplication .card').addClass('collapse')
-        toggleValidClassOnAccordionTab.bind(this)('#collapseFour', e);
+        toggleValidClassOnAccordionTab.bind(this)('#collapseFive', e);
 
         if (isFormValid()) {
-            var formData = $('#addAppForm').serializeArray();
-            var json = buildPayloadToCreateApplication(formData);
+            var $confTable = $('#confirmationPopup').find('.modal-body .confirmation-data');
+            setConfirmationData($('#createAppForm').serializeArray(), $confTable);
 
-            _sendPostRequest(json, function () {
-                console.log('Application data is sent to server.');
-            }, function () {
-                console.log('An error has occurred on server side.');
-            });
+            $('#confirmationPopup').modal('show');
         }
     });
 
-    /*todo remade button to href*/
-    $('div button.create-application.btn-success').click(function () {
-        window.location.href = '/admin/application/create'
+    $('.create-application').click(function () {
+        var json = buildPayloadToCreateApplication($('#createAppForm').serializeArray());
+        $('#confirmationPopup').modal('hide');
+        _sendPostRequest(json, function () {
+            $('#successPopup').modal('show');
+        }, function () {
+            $('#errorPopup').modal('show');
+        });
     });
+
 });
 
 /*service functions*/
+
+function setConfirmationData(json, $confTable) {
+    $confTable.empty();
+    $confTable.append($('<tr>')).append('Application language:' + getValueByName(json, 'appLang'));
+    $confTable.append($('<tr>')).append('Framework:' + getValueByName(json, 'framework'));
+    $confTable.append($('<tr>')).append('Build tool:' + getValueByName(json, 'buildTool'));
+    $confTable.append($('<tr>')).append('Strategy:' + getValueByName(json, 'strategy'));
+    $confTable.append($('<tr>')).append('Application name' + getValueByName(json, 'nameOfApp'));
+
+    if (json['strategy'] === 'clone') {
+        $confTable.append($('<tr>')).append('Git url:' + getValueByName(json, 'gitRepoUrl'));
+        if (isArrayContainName(json, 'isRepoPrivate')) {
+            $confTable.append($('<tr>')).append('Git login:' + getValueByName(json, 'repoLogin'));
+        }
+    }
+
+    if (isArrayContainName(json, 'vcsLogin') && isArrayContainName(json, 'vcsPassword')) {
+        $confTable.append($('<tr>')).append('Vcs login:' + getValueByName(json, 'vcsLogin'));
+    }
+
+    if (isArrayContainName(json, 'needRoute')) {
+        $confTable.append($('<tr>')).append('Route site:' + getValueByName(json, 'routeSite'));
+        $confTable.append($('<tr>')).append('Route path:' + getValueByName(json, 'routePath'));
+    }
+
+    if (isArrayContainName(json, 'needDb')) {
+        $confTable.append($('<tr>')).append('Database:' + getValueByName(json, 'database'));
+        $confTable.append($('<tr>')).append('Database version:' + getValueByName(json, 'dbVersion'));
+        $confTable.append($('<tr>')).append('Database capacity:' + getValueByName(json, 'dbCapacity') + getValueByName(json, 'capacityExt'));
+        $confTable.append($('<tr>')).append('Database persistent storage:' + getValueByName(json, 'dbPersistentStorage'));
+    }
+}
 
 function buildPayloadToCreateApplication(formData) {
     var appJson = {
@@ -362,14 +349,22 @@ function buildPayloadToCreateApplication(formData) {
     };
 
     if (appJson['strategy'] === 'clone') {
-        appJson['git'] = {
+        appJson['repository'] = {
             url: getValueByName(formData, 'gitRepoUrl'),
         };
 
         if (isArrayContainName(formData, 'isRepoPrivate')) {
-            appJson['git']['login'] = getValueByName(formData, 'repoLogin');
-            appJson['git']['password'] = getValueByName(formData, 'repoPassword');
+            appJson['repository']['login'] = getValueByName(formData, 'repoLogin');
+            appJson['repository']['password'] = getValueByName(formData, 'repoPassword');
         }
+
+    }
+
+    if (isArrayContainName(formData, 'vcsLogin') && isArrayContainName(formData, 'vcsPassword')) {
+        appJson['vcs'] = {
+            login: getValueByName(formData, 'vcsLogin'),
+            password: getValueByName(formData, 'vcsPassword'),
+        };
     }
 
     if (isArrayContainName(formData, 'needRoute')) {
@@ -383,8 +378,8 @@ function buildPayloadToCreateApplication(formData) {
         appJson['database'] = {
             kind: getValueByName(formData, 'database'),
             version: getValueByName(formData, 'dbVersion'),
-            capacity: getValueByName(formData, 'dbCapacity'),
-            storage: getValueByName(formData, 'dbPersitantStorage')
+            capacity: getValueByName(formData, 'dbCapacity') + getValueByName(formData, 'capacityExt'),
+            storage: getValueByName(formData, 'dbPersistentStorage')
         };
     }
 
@@ -407,9 +402,9 @@ function toggleValidClassOnAccordionTab(tabId, event) {
     var $nonValidInputs = $(this).closest('.card-body').find('div.form-group:not(.hide-element)').find('input.is-invalid');
     if ($nonValidInputs.length > 0) {
         event.stopPropagation();
-        $(this).closest(tabId).prev('.card-header').addClass('invalid').removeClass('success');
+        $(this).closest(tabId).prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
     } else {
-        $(this).closest(tabId).prev('.card-header').removeClass('invalid').addClass('success');
+        $(this).closest(tabId).prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
     }
 }
 
@@ -452,6 +447,19 @@ function _sendPostRequest(data, successCallback, failCallback) {
         },
         fail: function () {
             failCallback();
+        }
+    });
+}
+
+function _sendGetRequest(url, successCallback, failCallback) {
+    $.ajax({
+        url: url,
+        contentType: "application/json",
+        success: function (resp) {
+            successCallback(resp);
+        },
+        fail: function (resp) {
+            failCallback(resp);
         }
     });
 }

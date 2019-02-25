@@ -1,3 +1,19 @@
 .hide-element {
     display: none;
 }
+
+.storage-capacity {
+    width: 80%;
+}
+
+.storage-capacity-ext {
+    width: 20%;
+    display: block;
+}
+
+.edp-form .card-header.collapsed.error:after {
+    content: '\0021';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%); }

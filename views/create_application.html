@@ -91,6 +91,14 @@
                         <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
                              data-parent="#accordionCreateApplication">
                             <div class="card-body">
+                                <div class="form-group app-name">
+                                    <label for="nameOfApp">Name of application</label>
+                                    <input name="nameOfApp" type="text" class="form-control" id="nameOfApp"
+                                           placeholder="Enter application name">
+                                    <div class="invalid-feedback">
+                                        Please specify application name with following format: example, example.com or example-com
+                                    </div>
+                                </div>
                                 <p>Select application type</p>
                                 <div class="form__input-wrapper">
                                     <fieldset id="subFormWrapper">
@@ -179,8 +187,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="invalid-feedback">
+                                <div class="invalid-feedback appLangError">
                                     Please select application type.
+                                </div>
+                                <div class="invalid-feedback frameworkError">
+                                    Please select framework.
                                 </div>
                                 <div class="form-group">
                                     <div class="js-form-subsection form-subsection formSubsection1">
@@ -284,14 +295,6 @@
                                         Please specify password to clone repository.
                                     </div>
                                 </div>
-                                <div class="form-group app-name">
-                                    <label for="nameOfApp">Name of application</label>
-                                    <input name="nameOfApp" type="text" class="form-control" id="nameOfApp"
-                                           placeholder="Enter application name">
-                                    <div class="invalid-feedback">
-                                        Incorrect application name.
-                                    </div>
-                                </div>
                                 <button type="button" class="repo-submit edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
                                         data-target="#collapseThree" aria-expanded="false"
@@ -301,17 +304,54 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card">
+                    <div class="card vcs-block hide-element">
                         <div class="card-header collapsed" id="headingThree" data-toggle="collapse"
-                             data-target="#collapseThree" aria-expanded="false"
-                             aria-controls="collapseThree">
+                             data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button">
+                                    Vcs info
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree"
+                             data-parent="#accordionCreateApplication">
+                            <div class="card-body">
+                                <div class="form-group vcs-login">
+                                    <label for="vcsLogin">Vcs login</label>
+                                    <input name="vcsLogin" type="text" class="form-control" id="vcsLogin"
+                                           placeholder="Enter vcs login">
+                                    <div class="invalid-feedback">
+                                        Please specify vsc login.
+                                    </div>
+                                </div>
+                                <div class="form-group vcs-password">
+                                    <label for="vcsPassword">Vcs password</label>
+                                    <input name="vcsPassword" type="password" class="form-control" id="vcsPassword"
+                                           placeholder="Enter vcs password">
+                                    <div class="invalid-feedback">
+                                        Please specify vsc password.
+                                    </div>
+                                </div>
+                                <button type="button" class="vcs-submit edp-submit-form-btn btn btn-primary"
+                                        data-toggle="collapse"
+                                        data-target="#collapseFour" aria-expanded="false"
+                                        aria-controls="collapseThree"
+                                >PROCEED TO ROUTE
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header collapsed" id="headingFour" data-toggle="collapse"
+                             data-target="#collapseFour" aria-expanded="false"
+                             aria-controls="collapseFour">
                             <h5 class="mb-0">
                                 <button class="btn btn-link collapsed" type="button">
                                     Route
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapseThree" class="collapse route" aria-labelledby="headingThree"
+                        <div id="collapseFour" class="collapse route" aria-labelledby="headingFour"
                              data-parent="#accordionCreateApplication">
                             <div class="card-body">
                                 <div class="form-check">
@@ -340,28 +380,29 @@
                                     <input name="routePath" type="text" class="form-control" id="routePath"
                                            placeholder="Enter route path ">
                                     <div class="invalid-feedback">
-                                        Please specify correct route path.
+                                        Please specify route path with following format:
+                                        http(s)://example.com/example/path
                                     </div>
                                 </div>
                                 <button type="button" class="route-submit edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
-                                        data-target="#collapseFour" aria-expanded="false"
-                                        aria-controls="collapseTwo"
+                                        data-target="#collapseFive" aria-expanded="false"
+                                        aria-controls="collapseFour"
                                 >PROCEED TO DATABASE
                                 </button>
                             </div>
                         </div>
                     </div>
                     <div class="card">
-                        <div class="card-header collapsed" id="headingFour" data-toggle="collapse"
-                             data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                        <div class="card-header collapsed" id="headingFive" data-toggle="collapse"
+                             data-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
                             <h5 class="mb-0">
                                 <button class="btn btn-link collapsed" type="button">
                                     DataBase
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapseFour" class="collapse dataBase" aria-labelledby="headingFour"
+                        <div id="collapseFive" class="collapse dataBase" aria-labelledby="headingFive"
                              data-parent="#accordionCreateApplication">
                             <div class="card-body">
                                 <div class="form-check">
@@ -394,20 +435,31 @@
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                                               title="Tooltip on top"></span>
                                     </label>
-                                    <input name="dbCapacity" type="text" class="form-control"
+                                    <input name="dbCapacity" type="number" class="form-control storage-capacity"
                                            id="dbCapacity" placeholder="Enter database capacity">
+                                    <select class="capacity-ext form-control storage-capacity-ext" name="capacityExt">
+                                        <option disabled="disabled">Binary units</option>
+                                        <option value="MiB" >MiB</option>
+                                        <option value="GiB">GiB</option>
+                                        <option value="TiB">TiB</option>
+                                        <option disabled="disabled">Decimal units</option>
+                                        <option value="MB">MB</option>
+                                        <option value="GB">GB</option>
+                                        <option value="TB">TB</option>
+                                    </select>
                                     <div class="invalid-feedback">
                                         Please specify database capacity.
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="dbPersitantStorage">Persistent storage
+                                    <label for="dbPersistentStorage">Persistent storage
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                                               title="Tooltip on top"></span>
                                     </label>
-                                    <input name="dbPersitantStorage" type="text" class="form-control"
-                                           id="dbPersitantStorage" placeholder="Enter persistent storage">
+                                    <select class="form-control" id="dbPersistentStorage" name="dbPersistentStorage">
+                                        <option value="efs">efs</option>
+                                    </select>
                                     <div class="invalid-feedback">
                                         Please specify persistent storage.
                                     </div>
@@ -416,7 +468,7 @@
                                         class="db-submit create-application-submit edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
                                         aria-expanded="false"
-                                        aria-controls="collapseTwo collapseThree">CREATE APPLICATION
+                                        aria-controls="">CREATE APPLICATION
                                 </button>
                             </div>
                         </div>
@@ -431,6 +483,67 @@
             <p> All Rights Reserved.</p>
         </div>
     </footer>
+
+    <!-- Modal confirmation -->
+    <div class="modal fade" id="confirmationPopup" tabindex="-1" role="dialog" aria-labelledby="confirmationPopupLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationPopupLabel">Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="confirmation-data"></table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="create-application btn btn-primary">Create application</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal success -->
+    <div class="modal fade" id="successPopup" tabindex="-1" role="dialog" aria-labelledby="successPopupLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successPopupLabel">Success</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Application is successfully added.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Okay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal error -->
+    <div class="modal fade" id="errorPopup" tabindex="-1" role="dialog" aria-labelledby="errorPopupLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="errorLabel">Error</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    An error has occurred on server side.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Okay</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 <script src="/static/js/jquery-3.3.1.js"></script>
 <script src="/static/js/popper.js"></script>
