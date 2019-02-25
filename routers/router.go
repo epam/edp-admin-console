@@ -21,6 +21,7 @@ func init() {
 	edpRepository := repository.EDPTenantRep{}
 	edpService := service.EDPTenantService{EDPTenantRep: edpRepository, Clients: clients}
 	appService := service.ApplicationService{Clients: clients}
+	clusterService := service.ClusterService{Clients: clients}
 	/*END*/
 
 	/*START security routing*/
@@ -38,11 +39,12 @@ func init() {
 	beego.Router(`/admin/edp/:name`, &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPComponents")
 	/*END*/
 
-	beego.Router("/admin/application", &controllers.MainController{}, "get:GetApplicationPage")
-	beego.Router("/admin/application/create", &controllers.MainController{}, "get:GetCreateApplicationPage")
+	beego.Router("/admin/:name/application", &controllers.MainController{}, "get:GetApplicationPage")
+	beego.Router("/admin/:name/application/create", &controllers.MainController{}, "get:GetCreateApplicationPage")
 	ns := beego.NewNamespace("/api/v1",
-		beego.NSRouter("/get/vcs", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetVcsIntegrationValue"),
-		beego.NSNamespace("/application",
+		beego.NSRouter("/:name/vcs", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetVcsIntegrationValue"),
+		beego.NSRouter("/storage", &controllers.ClusterController{ClusterService: clusterService}, "get:GetAllStorageClasses"),
+		beego.NSNamespace("/:name/application",
 			beego.NSRouter("/create", &controllers.AppController{AppService: appService}, "post:CreateApplication"),
 		),
 	)

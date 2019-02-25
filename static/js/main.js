@@ -75,7 +75,7 @@ $(function () {
     }();
 
     $(document).ready(function () {
-        _sendGetRequest('/api/v1/get/vcs',
+        _sendGetRequest('/api/v1/' + getTenantName() + '/vcs/',
             function (isVcsEnabled) {
                 if (isVcsEnabled) {
                     $('.vcs-block').removeClass('hide-element');
@@ -83,6 +83,16 @@ $(function () {
             }, function (resp) {
                 console.log(resp);
             });
+        _sendGetRequest('/api/v1/storage',
+            function (storageClasses) {
+                var $select = $('#dbPersistentStorage');
+
+                $.each(storageClasses, function () {
+                    $select.append('<option value="' + this.toString() + '">' + this.toString() + '</option>');
+                });
+            }, function (resp) {
+                console.log(resp);
+            })
     });
 
     $('[data-toggle="tooltip"]').tooltip();
@@ -449,7 +459,7 @@ function toggleFields() {
 
 function _sendPostRequest(data, successCallback, failCallback) {
     $.ajax({
-        url: '/api/v1/application/create',
+        url: '/api/v1/' + getTenantName() + '/application/create',
         contentType: "application/json",
         type: "POST",
         data: JSON.stringify(data),
@@ -473,4 +483,12 @@ function _sendGetRequest(url, successCallback, failCallback) {
             failCallback(resp);
         }
     });
+}
+
+function getTenantName() {
+    var segments = window.location.pathname.split('/');
+    if (segments && segments[2]) {
+        return segments[2];
+    }
+    console.error('Couldn\'t get edp name from url.');
 }

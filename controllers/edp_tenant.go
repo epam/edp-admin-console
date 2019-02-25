@@ -42,6 +42,7 @@ func (this *EDPTenantController) GetEDPComponents() {
 	}
 
 	this.Data["InputURL"] = strings.TrimSuffix(this.Ctx.Input.URL(), "/"+edpTenantName)
+	this.Data["LinkToApplications"] = "/admin/" + edpTenantName + "/application/"
 	this.Data["EDPTenantName"] = edpTenantName
 	this.Data["EDPVersion"] = version
 	this.Data["EDPComponents"] = components
@@ -50,7 +51,7 @@ func (this *EDPTenantController) GetEDPComponents() {
 }
 
 func (this *EDPTenantController) GetVcsIntegrationValue() {
-	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue()
+	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue(this.GetString(":name"))
 
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)

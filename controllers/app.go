@@ -40,7 +40,7 @@ func (this *AppController) CreateApplication() {
 
 	id := uuid.NewV4().String()
 
-	createdObject, err := this.AppService.CreateApp(app)
+	createdObject, err := this.AppService.CreateApp(app, this.GetString(":name"))
 
 	if err != nil {
 		log.Println("Failed to create custom resource: " + err.Error())

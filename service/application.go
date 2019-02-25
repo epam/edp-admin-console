@@ -11,9 +11,10 @@ type ApplicationService struct {
 	Clients k8s.ClientSet
 }
 
-func (this ApplicationService) CreateApp(app models.App) (k8s.BusinessApplication, error) {
-	clientset := this.Clients.ApplicationClient
+func (this ApplicationService) CreateApp(app models.App, edpName string) (k8s.BusinessApplication, error) {
+	appClient := this.Clients.ApplicationClient
 	spec := convertData(app)
+	namespace := edpName + "-edp-cicd"
 
 	crd := &k8s.BusinessApplication{
 		TypeMeta: metav1.TypeMeta{
@@ -22,14 +23,14 @@ func (this ApplicationService) CreateApp(app models.App) (k8s.BusinessApplicatio
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      app.Name,
-			Namespace: "anton-test-edp-k8s",
+			Namespace: namespace,
 		},
 		Spec:   spec,
 		Status: k8s.BusinessApplicationStatus{},
 	}
 
 	result := &k8s.BusinessApplication{}
-	err := clientset.Post().Namespace("anton-test-edp-k8s").Resource("businessapplications").Body(crd).Do().Into(result)
+	err := appClient.Post().Namespace(namespace).Resource("businessapplications").Body(crd).Do().Into(result)
 
 	if err != nil {
 		log.Printf("An error has occurred during creating object in k8s: %s", err)

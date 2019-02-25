@@ -5,7 +5,7 @@
     <title>Title</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="../static/css/index.css">
+    <link rel="stylesheet" href="/static/css/index.css">
 </head>
 <body>
 <main>
@@ -77,8 +77,8 @@
                 </div>
                 <div class="flex-fill">
                     <div class="float-right">
-                        <a href="/admin/application/create">
-                            <button class="create-application btn btn-success">CREATE APPLICATION</button>
+                        <a href="{{ .CreateApplication }}">
+                            <button class="btn btn-success">CREATE APPLICATION</button>
                         </a>
                     </div>
                 </div>
@@ -174,9 +174,8 @@
         </div>
     </div>
 </div>
-<script src="../static/js/jquery-3.3.1.js"></script>
-<script src="../static/js/popper.js"></script>
-<script src="../static/js/bootstrap.js"></script>
-<script src="../static/js/main.js"></script>
+<script src="/static/js/jquery-3.3.1.js"></script>
+<script src="/static/js/popper.js"></script>
+<script src="/static/js/bootstrap.js"></script>
 </body>
 </html>

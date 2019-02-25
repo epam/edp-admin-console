@@ -6,6 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	coreV1Client "k8s.io/client-go/kubernetes/typed/core/v1"
+	storageV1Client "k8s.io/client-go/kubernetes/typed/storage/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"log"
@@ -16,7 +17,7 @@ var SchemeGroupVersion = schema.GroupVersion{Group: "edp.epam.com", Version: "v1
 
 type ClientSet struct {
 	CoreClient        *coreV1Client.CoreV1Client
-	StorageClient     *rest.RESTClient
+	StorageClient     *storageV1Client.StorageV1Client
 	ApplicationClient *rest.RESTClient
 }
 
@@ -40,9 +41,15 @@ func CreateOpenShiftClients() ClientSet {
 		panic(err)
 	}
 
+	storageClient, err := getStorageClient()
+	if err != nil {
+		log.Printf("An error has occurred while getting custom resource client: %s", err)
+		panic(err)
+	}
+
 	return ClientSet{
 		CoreClient:        coreClient,
-		StorageClient:     nil,
+		StorageClient:     storageClient,
 		ApplicationClient: crClient,
 	}
 }
@@ -53,6 +60,18 @@ func getCoreClient() (*coreV1Client.CoreV1Client, error) {
 		return nil, err
 	}
 	coreClient, err := coreV1Client.NewForConfig(restConfig)
+	if err != nil {
+		return nil, err
+	}
+	return coreClient, nil
+}
+
+func getStorageClient() (*storageV1Client.StorageV1Client, error) {
+	restConfig, err := k8sConfig.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+	coreClient, err := storageV1Client.NewForConfig(restConfig)
 	if err != nil {
 		return nil, err
 	}

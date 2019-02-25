@@ -11,6 +11,7 @@ func (this *MainController) Index() {
 }
 
 func (this *MainController) GetApplicationPage() {
+	this.Data["CreateApplication"] = "/admin/" + this.GetString(":name") + "/application/create"
 	this.TplName = "application.html"
 }
 

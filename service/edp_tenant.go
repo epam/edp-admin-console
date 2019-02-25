@@ -57,10 +57,11 @@ func (edpService EDPTenantService) GetEDPComponents(edpTenantName string) map[st
 	return compWithLinks
 }
 
-func (this EDPTenantService) GetVcsIntegrationValue() (bool, error) {
-	clientset := this.Clients.CoreClient
+func (edpService EDPTenantService) GetVcsIntegrationValue(edpName string) (bool, error) {
+	coreClient := edpService.Clients.CoreClient
+	namespace := edpName + "-edp-cicd"
 
-	res, err := clientset.ConfigMaps(beego.AppConfig.String("namespace")).Get("user-settings", metav1.GetOptions{})
+	res, err := coreClient.ConfigMaps(namespace).Get("user-settings", metav1.GetOptions{})
 
 	if err != nil {
 		log.Printf("An error has occurred while getting user settings: %s", err)
