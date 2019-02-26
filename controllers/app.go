@@ -30,10 +30,8 @@ func (this *AppController) CreateApplication() {
 		return
 	}
 
-	log.Printf("Received data from client to create crd: %s", app)
-
-	errMsg := validRequestData(err, app)
-	if errMsg != (ErrMsg{}) {
+	errMsg := validRequestData(app)
+	if errMsg != nil {
 		http.Error(this.Ctx.ResponseWriter, errMsg.Message, errMsg.StatusCode)
 		return
 	}
@@ -55,16 +53,45 @@ func (this *AppController) CreateApplication() {
 	this.Ctx.Output.Header("Location", location)
 }
 
-func validRequestData(err error, addApp models.App) ErrMsg {
+func validRequestData(addApp models.App) *ErrMsg {
 	valid := validation.Validation{}
-	b, err := valid.Valid(addApp)
-	if err != nil {
-		return ErrMsg{err.Error(), http.StatusInternalServerError}
+	var resErr error
+
+	_, err := valid.Valid(addApp)
+	resErr = err
+
+	if addApp.Repository != nil {
+		_, err := valid.Valid(addApp.Repository)
+		resErr = err
 	}
-	if !b {
-		return ErrMsg{string(createErrorResponseBody(valid)), http.StatusBadRequest}
+
+	if addApp.Route != nil {
+		_, err := valid.Valid(addApp.Route)
+		resErr = err
+
 	}
-	return ErrMsg{}
+
+	if addApp.Vcs != nil {
+		_, err := valid.Valid(addApp.Vcs)
+		resErr = err
+
+	}
+
+	if addApp.Database != nil {
+		_, err := valid.Valid(addApp.Database)
+		resErr = err
+
+	}
+
+	if resErr != nil {
+		return &ErrMsg{"An error has occurred while validating application's form fields.", http.StatusInternalServerError}
+	}
+
+	if valid.Errors == nil {
+		return nil
+	}
+
+	return &ErrMsg{string(createErrorResponseBody(valid)), http.StatusBadRequest}
 }
 
 func createErrorResponseBody(valid validation.Validation) []byte {

@@ -92,14 +92,20 @@
                              data-parent="#accordionCreateApplication">
                             <div class="card-body">
                                 <div class="form-group app-name">
-                                    <label for="nameOfApp">Name of application</label>
+                                    <label for="nameOfApp">Name of application
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Please specify application name with following format: example, example.com or example-com"></span>
+                                    </label>
                                     <input name="nameOfApp" type="text" class="form-control" id="nameOfApp"
                                            placeholder="Enter application name">
                                     <div class="invalid-feedback">
-                                        Please specify application name with following format: example, example.com or example-com
+                                        Please fill correct field.
                                     </div>
                                 </div>
-                                <p>Select application type</p>
+                                <p>Select application type
+                                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                          title="You must select one of the framework."></span>
+                                </p>
                                 <div class="form__input-wrapper">
                                     <fieldset id="subFormWrapper">
                                         <div class="d-flex">
@@ -139,7 +145,7 @@
                                         <div class="form__input-wrapper  with-circle"><span
                                                     class="form__input-heading"></span>
                                             <div class="form__radio-btn-wrapper">
-                                                <input name="framework" type="radio" class="form__radio-btn"
+                                                <input name="framework" type="radio" class="form__radio-btn framework"
                                                        id="framework-SpringBoot" value="SpringBoot">
                                                 <label
                                                         class="form__radio-label" for="framework-SpringBoot">
@@ -156,7 +162,7 @@
                                         <div class="form__input-wrapper with-circle"><span
                                                     class="form__input-heading"></span>
                                             <div class="form__radio-btn-wrapper">
-                                                <input name="framework" type="radio" class="form__radio-btn"
+                                                <input name="framework" type="radio" class="form__radio-btn framework"
                                                        id="framework-react" value="React">
                                                 <label
                                                         class="form__radio-label" for="framework-react">
@@ -173,7 +179,7 @@
                                         <div class="form__input-wrapper with-circle"><span
                                                     class="form__input-heading"></span>
                                             <div class="form__radio-btn-wrapper">
-                                                <input name="framework" type="radio" class="form__radio-btn"
+                                                <input name="framework" type="radio" class="form__radio-btn framework"
                                                        id="framework-dotNet" value="DotNetCore">
                                                 <label
                                                         class="form__radio-label" for="framework-dotNet">
@@ -197,7 +203,7 @@
                                     <div class="js-form-subsection form-subsection formSubsection1">
                                         <label for="buildTool">Select build tool
                                             <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Tooltip on top"></span>
+                                                  title="You must select of the build tools."></span>
                                         </label>
                                         <select class="form-control" name="buildTool">
                                             <option>Maven</option>
@@ -207,7 +213,7 @@
                                     <div class="js-form-subsection form-subsection formSubsection2">
                                         <label for="buildTool">Select build tool
                                             <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Tooltip on top"></span>
+                                                  title="You must select of the build tools."></span>
                                         </label>
                                         <select class="form-control" name="buildTool">
                                             <option>NPM</option>
@@ -216,7 +222,7 @@
                                     <div class="js-form-subsection form-subsection formSubsection3">
                                         <label for="buildTool">Select build tool
                                             <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Tooltip on top"></span>
+                                                  title="You must select of the build tools."></span>
                                         </label>
                                         <select class="form-control" name="buildTool">
                                             <option>dotnet</option>
@@ -247,7 +253,7 @@
                                 <div class="form-group">
                                     <label for="strategy">Strategy of adding repository
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Tooltip on top"></span>
+                                              title="Select copy to copy your existing repository or create to initialize new repository."></span>
                                     </label>
                                     <select class="form-control" id="strategy" name="strategy">
                                         <option value="create">Create</option>
@@ -257,13 +263,12 @@
                                 <div class="form-group repo-url hide-element">
                                     <label for="gitRepoUrl">Git repository url
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Tooltip on top"></span>
+                                              title="Please specify url to public repository with following format: http(s)://git.sample.com/sample.git"></span>
                                     </label>
                                     <input name="gitRepoUrl" type="text" class="form-control" id="gitRepoUrl"
                                            placeholder="http(s)://git.sample.com/sample.git">
                                     <div class="invalid-feedback">
-                                        Please specify url to public repository with following format:
-                                        http(s)://git.sample.com/sample.git
+                                        Specify URL to existing repository.
                                     </div>
                                 </div>
                                 <div class="form-check private-repo hide-element">
@@ -375,13 +380,12 @@
                                 <div class="form-group">
                                     <label for="route">Path
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Tooltip on top"></span>
+                                              title="Please specify route path with following format: http(s)://example.com/example/path"></span>
                                     </label>
                                     <input name="routePath" type="text" class="form-control" id="routePath"
                                            placeholder="Enter route path ">
                                     <div class="invalid-feedback">
-                                        Please specify route path with following format:
-                                        http(s)://example.com/example/path
+                                        Please specify correct url.
                                     </div>
                                 </div>
                                 <button type="button" class="route-submit edp-submit-form-btn btn btn-primary"
@@ -415,7 +419,7 @@
                                 <div class="form-group">
                                     <label for="database">Database
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Tooltip on top"></span>
+                                              title="Select database you wish to use."></span>
                                     </label>
                                     <select class="form-control" id="database" name="database">
                                         <option>PostgreSQL</option>
@@ -424,7 +428,7 @@
                                 <div class="form-group">
                                     <label for="dbVersion">Version
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Tooltip on top"></span>
+                                              title="Select version of database you wish to use."></span>
                                     </label>
                                     <select class="form-control" id="dbVersion" name="dbVersion">
                                         <option>postgre:9.6</option>
@@ -433,7 +437,7 @@
                                 <div class="form-group">
                                     <label for="dbCapacity">Capacity
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Tooltip on top"></span>
+                                              title="Specify capacity of database."></span>
                                     </label>
                                     <input name="dbCapacity" type="number" class="form-control storage-capacity"
                                            id="dbCapacity" placeholder="Enter database capacity">
@@ -455,7 +459,7 @@
                                 <div class="form-group">
                                     <label for="dbPersistentStorage">Persistent storage
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Tooltip on top"></span>
+                                              title="Specify one of the Openshift's storages."></span>
                                     </label>
                                     <select class="form-control" id="dbPersistentStorage" name="dbPersistentStorage">
                                     </select>

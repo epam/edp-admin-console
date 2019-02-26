@@ -130,53 +130,8 @@ $(function () {
     /*disables other build tools that doesnt related to selected language*/
     /*todo think about better approach*/
     $('#collapseOne .card-body .form__input-wrapper #subFormWrapper .form__radio-btn-wrapper .form__radio-btn').click(function () {
-        $(this).parents('.card-body').find('.invalid-feedback').hide()
-        var $target = $(this).data('target');
-        $target = $target.substring(1, $target.length);
-
-        $.each($(this).parents('.card-body').find('.form-group .form-subsection'), function () {
-            if (!$(this).hasClass($target)) {
-                $(this).find('select').attr('disabled', true);
-            } else {
-                $(this).find('select').removeAttr('disabled');
-            }
-        });
-    });
-
-    $('#strategy').change(function () {
-        if (this.value === 'clone') {
-            $(".repo-url, .private-repo").removeClass('hide-element');
-            if ($('#isRepoPrivate').is(':checked')) {
-                $('.repoLogin, .repoPassword').removeClass('hide-element');
-            }
-        } else {
-            $(".repo-url, .private-repo").addClass('hide-element');
-            $('.repoLogin, .repoPassword').addClass('hide-element');
-        }
-    });
-
-    $('#isRepoPrivate').change(function () {
-        if ($(this).is(':checked')) {
-            $('.repoLogin, .repoPassword').removeClass('hide-element');
-        } else {
-            $('.repoLogin, .repoPassword').addClass('hide-element');
-        }
-    });
-
-    /*hides and removes validate classes from optional fields (all route and database)*/
-    $('#needRoute, #needDb').change(function () {
-        toggleFields.bind(this)();
-
-        $.each($(this).closest('.card-body').find('div.form-group:not(.hide-element) input'), function () {
-            $(this).removeClass('is-invalid');
-            $(this).next('.invalid-feedback').hide();
-        });
-    });
-
-    /*disables other build tools that doesnt related to selected language*/
-    /*todo think about better approach*/
-    $('#collapseOne .card-body .form__input-wrapper #subFormWrapper .form__radio-btn-wrapper .form__radio-btn').click(function () {
-        $(this).parents('.card-body').find('.invalid-feedback').hide()
+        $(this).parents('.card-body').find('.appLangError').hide();
+        $('.framework').prop('checked', false);
         var $target = $(this).data('target');
         $target = $target.substring(1, $target.length);
 
