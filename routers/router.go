@@ -44,6 +44,7 @@ func init() {
 	ns := beego.NewNamespace("/api/v1",
 		beego.NSRouter("/:name/vcs", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetVcsIntegrationValue"),
 		beego.NSRouter("/storage", &controllers.ClusterController{ClusterService: clusterService}, "get:GetAllStorageClasses"),
+		beego.NSRouter("/repository", &controllers.RepositoryController{}, "post:IsGitRepoAvailable"),
 		beego.NSNamespace("/:name/application",
 			beego.NSRouter("/create", &controllers.AppController{AppService: appService}, "post:CreateApplication"),
 		),

@@ -114,6 +114,9 @@ $(function () {
             $('.repoLogin, .repoPassword').removeClass('hide-element');
         } else {
             $('.repoLogin, .repoPassword').addClass('hide-element');
+            $('.repoLogin, .repoPassword').find('.invalid-feedback').hide();
+            $('.repoLogin, .repoPassword').find('input').removeClass('is-invalid');
+
         }
     });
 
@@ -193,7 +196,71 @@ $(function () {
 
     /*handles repo block on button submit*/
     $('.repo-submit').click(function (e) {
+        $('.repo-validation .invalid-feedback.git-repo').hide();
         var $cardBody = $(this).closest('.card-body');
+
+        if ($('#strategy').val() === 'clone') {
+            e.stopPropagation();
+            if ($('#gitRepoUrl').val()) {
+                var json = {};
+                if ($('#isRepoPrivate').is(':checked')) {
+                    json.url = $('#gitRepoUrl').val();
+                    json.login = $('#repoLogin').val();
+                    json.password = $('#repoPassword').val();
+
+                    _sendPostRequest.bind(this)('/api/v1/repository', json, function (isAvailable) {
+                        if (isAvailable) {
+                            $('#gitRepoUrl').removeClass('is-invalid');
+                            $('#repoLogin').removeClass('is-invalid');
+                            $('#repoPassword').removeClass('is-invalid');
+
+                            $(this).closest('#collapseTwo').prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
+                            $('.repo-validation .invalid-feedback.git-creds').hide();
+
+                            $('#headingThree').trigger('click');
+                            $('#headingTwo').trigger('click');
+                        } else {
+                            $('#gitRepoUrl').addClass('is-invalid');
+                            $('#repoLogin').addClass('is-invalid');
+                            $('#repoPassword').addClass('is-invalid');
+
+                            $(this).closest('#collapseTwo').prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
+                            $('.repo-validation .invalid-feedback.git-creds').show();
+                        }
+                    }.bind(this), function () {
+                        console.error('An error has occurred while checking existing repository.');
+                    });
+                } else {
+                    json.url = $('#gitRepoUrl').val();
+
+                    _sendPostRequest.bind(this)('/api/v1/repository', json, function (isAvailable) {
+                        if (isAvailable) {
+                            $('#gitRepoUrl').removeClass('is-invalid');
+                            $('#repoLogin').removeClass('is-invalid');
+                            $('#repoPassword').removeClass('is-invalid');
+
+                            $(this).closest('#collapseTwo').prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
+                            $('.repo-validation .invalid-feedback.git-repo').hide();
+
+                            $('#headingThree').trigger('click');
+                            $('#headingTwo').trigger('click');
+                        } else {
+                            $('#gitRepoUrl').addClass('is-invalid');
+
+                            if (json.login) {
+                                $('#repoLogin').addClass('is-invalid');
+                                $('#repoPassword').addClass('is-invalid');
+                            }
+                            $('.repo-validation .invalid-feedback.git-repo').show();
+                            $(this).closest('#collapseTwo').prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
+                        }
+                    }.bind(this), function () {
+                        console.error('An error has occurred while checking existing repository.');
+                    });
+                }
+            }
+        }
+
         $.each($cardBody.find('div.form-group:not(.hide-element) input'), function () {
             if ($(this).attr('id') === 'gitRepoUrl') {
                 _validateInput.bind(this)(validationCallbacks.validateGitRepositoryUrl);
@@ -272,7 +339,7 @@ $(function () {
     $('.create-application').click(function () {
         var json = buildPayloadToCreateApplication($('#createAppForm').serializeArray());
         $('#confirmationPopup').modal('hide');
-        _sendPostRequest(json, function () {
+        _sendPostRequest('/api/v1/' + getTenantName() + '/application/create', json, function () {
             $('#successPopup').modal('show');
         }, function () {
             $('#errorPopup').modal('show');
@@ -412,14 +479,14 @@ function toggleFields() {
     }
 }
 
-function _sendPostRequest(data, successCallback, failCallback) {
+function _sendPostRequest(url, data, successCallback, failCallback) {
     $.ajax({
-        url: '/api/v1/' + getTenantName() + '/application/create',
+        url: url,
         contentType: "application/json",
         type: "POST",
         data: JSON.stringify(data),
-        success: function () {
-            successCallback();
+        success: function (resp) {
+            successCallback(resp);
         },
         fail: function () {
             failCallback();
