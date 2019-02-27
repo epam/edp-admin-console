@@ -65,6 +65,10 @@ func convertData(app models.App) k8s.BusinessApplicationSpec {
 		Name:      app.Name,
 	}
 
+	if app.MultiModule {
+		spec.Framework = app.Framework + "-multimodule"
+	}
+
 	if app.Repository != nil {
 		spec.Repository = &k8s.Repository{
 			Url: app.Repository.Url,

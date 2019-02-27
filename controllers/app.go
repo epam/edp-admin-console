@@ -79,14 +79,15 @@ func validRequestData(addApp models.App) *ErrMsg {
 
 	if addApp.Repository != nil {
 		_, err := valid.Valid(addApp.Repository)
+
+		isAvailable := util.IsGitRepoAvailable(addApp.Repository.Url, addApp.Repository.Login, addApp.Repository.Password)
+
+		if !isAvailable {
+			err := &validation.Error{Key: "repository", Message: "Repository doesn't exist or invalid login and password."}
+			valid.Errors = append(valid.Errors, err)
+		}
+
 		resErr = err
-	}
-
-	isAvailable := util.IsGitRepoAvailable(addApp.Repository.Url, addApp.Repository.Login, addApp.Repository.Password)
-
-	if !isAvailable {
-		err := &validation.Error{Key: "repository", Message: "Repository doesn't exist or invalid login and password."}
-		valid.Errors = append(valid.Errors, err)
 	}
 
 	if addApp.Route != nil {

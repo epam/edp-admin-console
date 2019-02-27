@@ -205,9 +205,9 @@
                                             <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                                                   title="You must select of the build tools."></span>
                                         </label>
-                                        <select class="form-control" name="buildTool">
-                                            <option>Maven</option>
+                                        <select class="form-control java-build-tools" name="buildTool">
                                             <option>Gradle</option>
+                                            <option>Maven</option>
                                         </select>
                                     </div>
                                     <div class="js-form-subsection form-subsection formSubsection2">
@@ -228,6 +228,13 @@
                                             <option>dotnet</option>
                                         </select>
                                     </div>
+                                </div>
+                                <div class="form-check multi-module hide-element">
+                                    <input class="form-check-input" type="checkbox" value="true" id="multiModule"
+                                           name="isMultiModule">
+                                    <label class="form-check-label" for="isMultiModule">
+                                        Is application multi module
+                                    </label>
                                 </div>
                                 <button type="button" class="main-info-submit edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
@@ -447,18 +454,20 @@
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                                               title="Specify capacity of database."></span>
                                     </label>
-                                    <input name="dbCapacity" type="number" class="form-control storage-capacity"
-                                           id="dbCapacity" placeholder="Enter database capacity">
-                                    <select class="capacity-ext form-control storage-capacity-ext" name="capacityExt">
-                                        <option disabled="disabled">Binary units</option>
-                                        <option value="MiB" >MiB</option>
-                                        <option value="GiB">GiB</option>
-                                        <option value="TiB">TiB</option>
-                                        <option disabled="disabled">Decimal units</option>
-                                        <option value="MB">MB</option>
-                                        <option value="GB">GB</option>
-                                        <option value="TB">TB</option>
-                                    </select>
+                                    <div class="d-flex">
+                                        <input name="dbCapacity" type="number" class="form-control storage-capacity"
+                                               id="dbCapacity" placeholder="Enter database capacity">
+                                        <select class="capacity-ext form-control storage-capacity-ext" name="capacityExt">
+                                            <option disabled="disabled">Binary units</option>
+                                            <option value="MiB" >MiB</option>
+                                            <option value="GiB">GiB</option>
+                                            <option value="TiB">TiB</option>
+                                            <option disabled="disabled">Decimal units</option>
+                                            <option value="MB">MB</option>
+                                            <option value="GB">GB</option>
+                                            <option value="TB">TB</option>
+                                        </select>
+                                    </div>
                                     <div class="invalid-feedback">
                                         Please specify database capacity.
                                     </div>

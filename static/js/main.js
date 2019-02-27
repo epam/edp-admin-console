@@ -130,6 +130,14 @@ $(function () {
         });
     });
 
+    $('.java-build-tools').change(function () {
+        if (this.value === 'Maven') {
+            $('.multi-module').removeClass('hide-element');
+        } else {
+            $('.multi-module').addClass('hide-element');
+        }
+    });
+
     /*disables other build tools that doesnt related to selected language*/
     /*todo think about better approach*/
     $('#collapseOne .card-body .form__input-wrapper #subFormWrapper .form__radio-btn-wrapper .form__radio-btn').click(function () {
@@ -355,6 +363,11 @@ function setConfirmationData(json, $confTable) {
     $confTable.append($('<tr>')).append('Application language:' + getValueByName(json, 'appLang'));
     $confTable.append($('<tr>')).append('Framework:' + getValueByName(json, 'framework'));
     $confTable.append($('<tr>')).append('Build tool:' + getValueByName(json, 'buildTool'));
+
+    if(isArrayContainName(json, 'isMultiModule')) {
+        $confTable.append($('<tr>')).append('Is multi module:' + true);
+    }
+
     $confTable.append($('<tr>')).append('Strategy:' + getValueByName(json, 'strategy'));
     $confTable.append($('<tr>')).append('Application name' + getValueByName(json, 'nameOfApp'));
 
@@ -388,8 +401,12 @@ function buildPayloadToCreateApplication(formData) {
         framework: getValueByName(formData, 'framework'),
         buildTool: getValueByName(formData, 'buildTool'),
         strategy: getValueByName(formData, 'strategy'),
-        name: getValueByName(formData, 'nameOfApp')
+        name: getValueByName(formData, 'nameOfApp'),
     };
+
+    if(isArrayContainName(formData, 'isMultiModule')) {
+        appJson.multiModule = JSON.parse(getValueByName(formData, 'isMultiModule'));
+    }
 
     if (appJson['strategy'] === 'clone') {
         appJson['repository'] = {
