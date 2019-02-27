@@ -20,7 +20,7 @@ type EDPTenantService struct {
 
 var (
 	edpComponentNames = []string{"Jenkins", "Gerrit", "Sonar", "Nexus", "Cockpit"}
-	wildcard          = beego.AppConfig.String("wildcard")
+	wildcard          = beego.AppConfig.String("dnsWildcard")
 )
 
 func (edpService EDPTenantService) GetEDPTenants(resourceAccess map[string][]string) ([]*models.EDPTenant, error) {
