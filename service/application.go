@@ -19,7 +19,9 @@ package service
 import (
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
+	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	coreV1Client "k8s.io/client-go/kubernetes/typed/core/v1"
 	"log"
 )
 
@@ -27,8 +29,9 @@ type ApplicationService struct {
 	Clients k8s.ClientSet
 }
 
-func (this ApplicationService) CreateApp(app models.App, edpName string) (k8s.BusinessApplication, error) {
+func (this ApplicationService) CreateApp(app models.App, edpName string) (*k8s.BusinessApplication, error) {
 	appClient := this.Clients.ApplicationClient
+	coreClient := this.Clients.CoreClient
 	spec := convertData(app)
 	namespace := edpName + "-edp-cicd"
 
@@ -49,11 +52,60 @@ func (this ApplicationService) CreateApp(app models.App, edpName string) (k8s.Bu
 	err := appClient.Post().Namespace(namespace).Resource("businessapplications").Body(crd).Do().Into(result)
 
 	if err != nil {
-		log.Printf("An error has occurred during creating object in k8s: %s", err)
-		return k8s.BusinessApplication{}, err
+		log.Printf("An error has occurred while creating object in k8s: %s", err)
+		return &k8s.BusinessApplication{}, err
 	}
 
-	return *result, nil
+	err = createClusterSecrets(namespace, app, coreClient)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func createSecret(namespace string, secret *v1.Secret, coreClient *coreV1Client.CoreV1Client) (*v1.Secret, error) {
+	createdSecret, err := coreClient.Secrets(namespace).Create(secret)
+	if err != nil {
+		log.Printf("An error has occurred while saving secret: %s", err)
+		return &v1.Secret{}, err
+	}
+	return createdSecret, nil
+}
+
+func createClusterSecrets(namespace string, app models.App, coreClient *coreV1Client.CoreV1Client) error {
+	tempRepoSecret := getSecret("repository-application-"+app.Name+"-temp", app.Repository.Login, app.Repository.Password)
+	repositorySecret, err := createSecret(namespace, tempRepoSecret, coreClient)
+
+	if err != nil {
+		log.Printf("An error has occurred while creating repository secret: %s", err)
+		return err
+	}
+	log.Printf("Repository secret was created: %s", repositorySecret)
+
+	tempVcsSecret := getSecret("vcs-autouser-application-"+app.Name+"-temp", app.Vcs.Login, app.Vcs.Password)
+	vcsSecret, err := createSecret(namespace, tempVcsSecret, coreClient)
+
+	if err != nil {
+		log.Printf("An error has occurred while creating vcs secret: %s", err)
+		return err
+	}
+	log.Printf("Vcs secret was created: %s", vcsSecret)
+
+	return nil
+}
+
+func getSecret(name string, username string, password string) *v1.Secret {
+	return &v1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: name,
+		},
+		StringData: map[string]string{
+			"username": username,
+			"password": password,
+		},
+	}
 }
 
 func convertData(app models.App) k8s.BusinessApplicationSpec {

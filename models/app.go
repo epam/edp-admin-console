@@ -30,24 +30,24 @@ type App struct {
 }
 
 type Repository struct {
-	Url      string `json:"url,omitempty" valid:"Match(/(?:^git|^ssh|^https?|^git@[-\\w.]+):(\\/\\/)?(.*?)(\\.git)(\\/?|\\#[-\\d\\w._]+?)$/)"`
-	Login    string `json:"login,omitempty"`
-	Password string `json:"password,omitempty"`
+	Url      string `json:"url,omitempty" valid:"Required;Match(/(?:^git|^ssh|^https?|^git@[-\\w.]+):(\\/\\/)?(.*?)(\\.git)(\\/?|\\#[-\\d\\w._]+?)$/)"`
+	Login    string `json:"login,omitempty" valid:"Required"`
+	Password string `json:"password,omitempty" valid:"Required"`
 }
 
 type Vcs struct {
-	Login    string `json:"login,omitempty"`
-	Password string `json:"password,omitempty"`
+	Login    string `json:"login,omitempty" valid:"Required"`
+	Password string `json:"password,omitempty" valid:"Required"`
 }
 
 type Route struct {
-	Site string `json:"site,omitempty"`
-	Path string `json:"path,omitempty" valid:"Match(/^(?:http(s)?:\\/\\/)?[\\w.-]+(?:\\.[\\w\\.-]+)+[\\w\\-\\._~:/?#[\\]@!\\$&'\\(\\)\\*\\+,;=.]+$/)"`
+	Site string `json:"site,omitempty" valid:"Required"`
+	Path string `json:"path,omitempty" valid:"Required;Match(/^(?:http(s)?:\\/\\/)?[\\w.-]+(?:\\.[\\w\\.-]+)+[\\w\\-\\._~:/?#[\\]@!\\$&'\\(\\)\\*\\+,;=.]+$/)"`
 }
 
 type Database struct {
-	Kind     string `json:"kind,omitempty"`
-	Version  string `json:"version,omitempty"`
-	Capacity string `json:"capacity,omitempty"`
-	Storage  string `json:"storage,omitempty"`
+	Kind     string `json:"kind,omitempty" valid:"Required"`
+	Version  string `json:"version,omitempty" valid:"Required"`
+	Capacity string `json:"capacity,omitempty" valid:"Required"`
+	Storage  string `json:"storage,omitempty" valid:"Required"`
 }
