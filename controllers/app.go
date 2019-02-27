@@ -19,6 +19,7 @@ package controllers
 import (
 	"edp-admin-console/models"
 	"edp-admin-console/service"
+	"edp-admin-console/util"
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
@@ -57,7 +58,7 @@ func (this *AppController) CreateApplication() {
 	createdObject, err := this.AppService.CreateApp(app, this.GetString(":name"))
 
 	if err != nil {
-		log.Println("Failed to create custom resource: " + err.Error())
+		log.Printf("Failed to create custom resource: %s", err.Error())
 		http.Error(this.Ctx.ResponseWriter, "Failed to create custom resource: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -81,22 +82,26 @@ func validRequestData(addApp models.App) *ErrMsg {
 		resErr = err
 	}
 
+	isAvailable := util.IsGitRepoAvailable(addApp.Repository.Url, addApp.Repository.Login, addApp.Repository.Password)
+
+	if !isAvailable {
+		err := &validation.Error{Key: "repository", Message: "Repository doesn't exist or invalid login and password."}
+		valid.Errors = append(valid.Errors, err)
+	}
+
 	if addApp.Route != nil {
 		_, err := valid.Valid(addApp.Route)
 		resErr = err
-
 	}
 
 	if addApp.Vcs != nil {
 		_, err := valid.Valid(addApp.Vcs)
 		resErr = err
-
 	}
 
 	if addApp.Database != nil {
 		_, err := valid.Valid(addApp.Database)
 		resErr = err
-
 	}
 
 	if resErr != nil {
