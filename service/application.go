@@ -44,8 +44,10 @@ func (this ApplicationService) CreateApp(app models.App, edpName string) (*k8s.B
 			Name:      app.Name,
 			Namespace: namespace,
 		},
-		Spec:   spec,
-		Status: k8s.BusinessApplicationStatus{},
+		Spec: spec,
+		Status: k8s.BusinessApplicationStatus{
+			Status: "initialized",
+		},
 	}
 
 	result := &k8s.BusinessApplication{}
