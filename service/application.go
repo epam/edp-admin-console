@@ -51,18 +51,18 @@ func (this ApplicationService) CreateApp(app models.App, edpName string) (*k8s.B
 		},
 	}
 
+	err := createTempSecrets(namespace, app, coreClient)
+
+	if err != nil {
+		return nil, err
+	}
+
 	result := &k8s.BusinessApplication{}
-	err := appClient.Post().Namespace(namespace).Resource("businessapplications").Body(crd).Do().Into(result)
+	err = appClient.Post().Namespace(namespace).Resource("businessapplications").Body(crd).Do().Into(result)
 
 	if err != nil {
 		log.Printf("An error has occurred while creating object in k8s: %s", err)
 		return &k8s.BusinessApplication{}, err
-	}
-
-	err = createTempSecrets(namespace, app, coreClient)
-
-	if err != nil {
-		return nil, err
 	}
 
 	return result, nil
