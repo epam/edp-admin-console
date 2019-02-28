@@ -55,10 +55,11 @@ func (this *AppController) CreateApplication() {
 
 	id := uuid.NewV4().String()
 
-	createdObject, err := this.AppService.CreateApp(app, this.GetString(":name"))
+	edpTenantName := this.GetString(":name")
+	createdObject, err := this.AppService.CreateApp(app, edpTenantName)
 
 	if err != nil {
-		log.Printf("Failed to create custom resource: %s", err.Error())
+		log.Printf("Failed to create custom resource in %s namespace: %s", edpTenantName, err.Error())
 		http.Error(this.Ctx.ResponseWriter, "Failed to create custom resource: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
