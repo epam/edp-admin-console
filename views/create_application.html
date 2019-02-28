@@ -504,21 +504,30 @@
     </footer>
 
     <!-- Modal confirmation -->
-    <div class="modal fade" id="confirmationPopup" tabindex="-1" role="dialog" aria-labelledby="confirmationPopupLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal fade" id="confirmationPopup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmationPopupLabel">Confirmation</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <h5 class="modal-title" id="exampleModalLabel">CONFIRMATION</h5>
+                    <button id="btn-cross-close" type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <table class="confirmation-data"></table>
+                    Are you sure you want to install EDP Tenant?
+                    <p/>
+                    <table id="window-table" class="table table-bordered">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Parameter</th>
+                            <th scope="col">Value</th>
+                        </tr>
+                        </thead>
+                    </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="create-application btn btn-primary">Create application</button>
+                    <button id="btn-modal-close" type="button" class="btn btn-secondary btn-modal-close" data-dismiss="modal">CLOSE</button>
+                    <button id="create-application" type="button" class="edp-submit-form-btn btn btn-primary">INSTALL EDP TENANT</button>
                 </div>
             </div>
         </div>
