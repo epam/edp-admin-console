@@ -79,6 +79,9 @@ $(function () {
             function (isVcsEnabled) {
                 if (isVcsEnabled) {
                     $('.vcs-block').removeClass('hide-element');
+                    $('.main-info-submit').text('PROCEED TO VCS INFO')
+                } else {
+                    $('.main-info-submit').attr('data-target', '#collapseFour');
                 }
             }, function (resp) {
                 console.log(resp);
@@ -357,6 +360,7 @@ $(function () {
         $('.vcs-submit').trigger('click');
         $('.repo-submit').trigger('click');
         $('.route-submit').trigger('click');
+
         toggleValidClassOnAccordionTab.bind(this)('#collapseFive', e);
 
         if (isFormValid()) {
@@ -549,8 +553,8 @@ function _sendPostRequest(url, data, successCallback, failCallback) {
         success: function (resp) {
             successCallback(resp);
         },
-        fail: function () {
-            failCallback();
+        error: function (resp) {
+            failCallback(resp);
         }
     });
 }
@@ -562,9 +566,9 @@ function _sendGetRequest(url, successCallback, failCallback) {
         success: function (resp) {
             successCallback(resp);
         },
-        fail: function (resp) {
+        error: function (resp) {
             failCallback(resp);
-        }
+        },
     });
 }
 
