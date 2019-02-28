@@ -35,7 +35,7 @@ type EDPTenantService struct {
 }
 
 var (
-	edpComponentNames = []string{"Jenkins", "Gerrit", "Sonar", "Nexus", "Cockpit"}
+	edpComponentNames = []string{"Jenkins", "Gerrit", "Sonar", "Nexus", "EDP-Cockpit"}
 	wildcard          = beego.AppConfig.String("dnsWildcard")
 )
 
@@ -67,8 +67,7 @@ func (edpService EDPTenantService) GetEDPVersionByName(edpTenantName string) (st
 func (edpService EDPTenantService) GetEDPComponents(edpTenantName string) map[string]string {
 	var compWithLinks = make(map[string]string, len(edpComponentNames))
 	for _, val := range edpComponentNames {
-		link := fmt.Sprintf("https://%s-%s-edp-cicd.%s", strings.ToLower(val), edpTenantName, wildcard)
-		compWithLinks[val] = link
+		compWithLinks[val] = fmt.Sprintf("https://%s-%s-edp-cicd.%s", strings.ToLower(val), edpTenantName, wildcard)
 	}
 	return compWithLinks
 }
