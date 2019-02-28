@@ -31,8 +31,8 @@ type App struct {
 
 type Repository struct {
 	Url      string `json:"url,omitempty" valid:"Required;Match(/(?:^git|^ssh|^https?|^git@[-\\w.]+):(\\/\\/)?(.*?)(\\.git)(\\/?|\\#[-\\d\\w._]+?)$/)"`
-	Login    string `json:"login,omitempty" valid:"Required"`
-	Password string `json:"password,omitempty" valid:"Required"`
+	Login    string `json:"login,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 type Vcs struct {

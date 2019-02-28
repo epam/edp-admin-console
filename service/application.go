@@ -19,6 +19,7 @@ package service
 import (
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
+	"fmt"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	coreV1Client "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -58,7 +59,7 @@ func (this ApplicationService) CreateApp(app models.App, edpName string) (*k8s.B
 		return &k8s.BusinessApplication{}, err
 	}
 
-	err = createClusterSecrets(namespace, app, coreClient)
+	err = createTempSecrets(namespace, app, coreClient)
 
 	if err != nil {
 		return nil, err
@@ -76,24 +77,30 @@ func createSecret(namespace string, secret *v1.Secret, coreClient *coreV1Client.
 	return createdSecret, nil
 }
 
-func createClusterSecrets(namespace string, app models.App, coreClient *coreV1Client.CoreV1Client) error {
-	tempRepoSecret := getSecret("repository-application-"+app.Name+"-temp", app.Repository.Login, app.Repository.Password)
-	repositorySecret, err := createSecret(namespace, tempRepoSecret, coreClient)
+func createTempSecrets(namespace string, app models.App, coreClient *coreV1Client.CoreV1Client) error {
+	if app.Repository != nil && (app.Repository.Login != "" && app.Repository.Password != "") {
+		repoSecretName := fmt.Sprintf("repository-application-%s-temp", app.Name)
+		tempRepoSecret := getSecret(repoSecretName, app.Repository.Login, app.Repository.Password)
+		repositorySecret, err := createSecret(namespace, tempRepoSecret, coreClient)
 
-	if err != nil {
-		log.Printf("An error has occurred while creating repository secret: %s", err)
-		return err
+		if err != nil {
+			log.Printf("An error has occurred while creating repository secret: %s", err)
+			return err
+		}
+		log.Printf("Repository secret was created: %s", repositorySecret)
 	}
-	log.Printf("Repository secret was created: %s", repositorySecret)
 
-	tempVcsSecret := getSecret("vcs-autouser-application-"+app.Name+"-temp", app.Vcs.Login, app.Vcs.Password)
-	vcsSecret, err := createSecret(namespace, tempVcsSecret, coreClient)
+	if app.Vcs != nil {
+		vcsSecretName := fmt.Sprintf("vcs-autouser-application-%s-temp", app.Name)
+		tempVcsSecret := getSecret(vcsSecretName, app.Vcs.Login, app.Vcs.Password)
+		vcsSecret, err := createSecret(namespace, tempVcsSecret, coreClient)
 
-	if err != nil {
-		log.Printf("An error has occurred while creating vcs secret: %s", err)
-		return err
+		if err != nil {
+			log.Printf("An error has occurred while creating vcs secret: %s", err)
+			return err
+		}
+		log.Printf("Vcs secret was created: %s", vcsSecret)
 	}
-	log.Printf("Vcs secret was created: %s", vcsSecret)
 
 	return nil
 }
