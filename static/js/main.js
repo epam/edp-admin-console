@@ -4,8 +4,8 @@ $(function () {
         APP_NAME_REGEXP: /^[a-z]+(-+[a-z0-9]+)*$/,
         REPO_PASS_REGEXP: /\w/,
         REPO_LOGIN_REGEXP: /\w/,
-        ROUTE_SITE_REGEXP: /\w/,
-        ROUTE_PATH_REGEXP: /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/,
+        ROUTE_SITE_REGEXP: /^[a-z][a-z0-9-.]+[a-z]$/,
+        ROUTE_PATH_REGEXP: /^\/.*$/,
         DB_CAPACITY_REGEXP: /\w/,
         DB_PERSISTENCE_STORAGE_REGEXP: /\w/
     };
@@ -370,11 +370,11 @@ $(function () {
     $('.create-application').click(function () {
         var json = buildPayloadToCreateApplication($('#createAppForm').serializeArray());
         $('#confirmationPopup').modal('hide');
-        _sendPostRequest('/api/v1/' + getTenantName() + '/application/create', json, function () {
+        /*_sendPostRequest('/api/v1/' + getTenantName() + '/application/create', json, function () {
             $('#successPopup').modal('show');
         }, function () {
             $('#errorPopup').modal('show');
-        });
+        });*/
     });
 
 });
