@@ -40,7 +40,7 @@ var (
 )
 
 func (edpService EDPTenantService) GetEDPTenants(resourceAccess map[string][]string) ([]*models.EDPTenant, error) {
-	edpTenantNames := getEdpTenantNamesWithoutSuffix(resourceAccess)
+	edpTenantNames := filterEdpTenantNamesWithoutSuffixWithCurrentRoles(resourceAccess)
 	if edpTenantNames == nil {
 		log.Println("There aren't edp tenants to display.")
 		return nil, nil
@@ -100,11 +100,12 @@ func (edpService EDPTenantService) GetVcsIntegrationValue(edpName string) (bool,
 	return result, nil
 }
 
-func getEdpTenantNamesWithoutSuffix(resourceAccess map[string][]string) []string {
+func filterEdpTenantNamesWithoutSuffixWithCurrentRoles(resourceAccess map[string][]string) []string {
 	var edpTenants []string
 	suffix := "-edp"
 	for key, value := range resourceAccess {
-		if strings.HasSuffix(key, suffix) && util.Contains(value, beego.AppConfig.String("adminRole")) {
+		if strings.HasSuffix(key, suffix) &&
+			(util.Contains(value, beego.AppConfig.String("adminRole")) || util.Contains(value, beego.AppConfig.String("developerRole"))) {
 			edpTenants = append(edpTenants, strings.TrimSuffix(key, suffix))
 		}
 	}

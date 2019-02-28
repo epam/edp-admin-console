@@ -19,9 +19,7 @@ package filters
 import (
 	ctx "context"
 	appCtx "edp-admin-console/context"
-	"edp-admin-console/util"
 	"encoding/json"
-	"github.com/astaxie/beego"
 	bgCtx "github.com/astaxie/beego/context"
 	"github.com/coreos/go-oidc"
 	"github.com/satori/go.uuid"
@@ -50,19 +48,6 @@ func AuthFilter(context *bgCtx.Context) {
 	resourceRoles := getResourceAccessValues(context, idToken)
 	log.Printf("ResourceAccess %s has been retrieved from the token", resourceRoles)
 	context.Output.Session("resource_access", resourceRoles)
-}
-
-func CheckEDPTenantRole(context *bgCtx.Context) {
-	edpName := context.Input.Param(":name")
-
-	resourceAccess := context.Input.Session("resource_access").(map[string][]string)
-	if val, ok := resourceAccess[edpName+"-edp"]; ok {
-		if !util.Contains(val, beego.AppConfig.String("adminRole")) {
-			http.Error(context.ResponseWriter, "Forbidden.", http.StatusForbidden)
-		}
-	} else {
-		http.Error(context.ResponseWriter, "Resource doesn't exist.", http.StatusNotFound)
-	}
 }
 
 func getRealmRoles(context *bgCtx.Context, token *oidc.IDToken) []string {

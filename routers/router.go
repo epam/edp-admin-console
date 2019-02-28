@@ -43,7 +43,9 @@ func init() {
 	/*START security routing*/
 	beego.Router("/auth/callback", &controllers.AuthController{}, "get:Callback")
 	beego.InsertFilter("/admin/*", beego.BeforeRouter, filters.AuthFilter)
-	beego.InsertFilter("/admin/edp/:name/overview", beego.BeforeRouter, filters.CheckEDPTenantRole)
+	beego.InsertFilter("/api/v1/edp/*", beego.BeforeRouter, filters.AuthRestFilter)
+	beego.InsertFilter("/admin/edp/:name/*", beego.BeforeRouter, filters.RoleAccessControlFilter)
+	beego.InsertFilter("/api/v1/edp/:name/*", beego.BeforeRouter, filters.RoleAccessControlFilter)
 	/*END*/
 
 	/*START general routing*/
