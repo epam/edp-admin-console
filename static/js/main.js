@@ -175,31 +175,31 @@ $(function () {
         var $appName = $('#nameOfApp');
         _validateInput.bind($appName)(validationCallbacks.validateNameOfApplication);
 
-        var $oneBlock = $(this).closest('#collapseOne')
+        var $mainBlock = $(this).closest('#collapseTwo')
         if (!isLangChosen) {
             e.stopPropagation();
-            $oneBlock.find('.card-body .invalid-feedback.appLangError').show();
-            $oneBlock.prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
+            $mainBlock.find('.card-body .invalid-feedback.appLangError').show();
+            $mainBlock.prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
         } else {
-            $oneBlock.find('.card-body .invalid-feedback.appLangError').hide();
-            $oneBlock.prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
+            $mainBlock.find('.card-body .invalid-feedback.appLangError').hide();
+            $mainBlock.prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
         }
         if (isLangChosen && !isFrameworkChosen) {
             e.stopPropagation();
-            $oneBlock.find('.card-body .invalid-feedback.frameworkError').show();
-            $oneBlock.prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
+            $mainBlock.find('.card-body .invalid-feedback.frameworkError').show();
+            $mainBlock.prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
         } else if (isLangChosen && isFrameworkChosen) {
-            $oneBlock.find('.card-body .invalid-feedback.frameworkError').hide();
-            $oneBlock.prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
+            $mainBlock.find('.card-body .invalid-feedback.frameworkError').hide();
+            $mainBlock.prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
         }
 
         if ($appName.hasClass('is-invalid')) {
-            $oneBlock.prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
+            $mainBlock.prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
         } else {
-            $oneBlock.prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
+            $mainBlock.prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
         }
 
-        toggleValidClassOnAccordionTab.bind(this)('#collapseOne', e);
+        toggleValidClassOnAccordionTab.bind(this)('#collapseTwo', e);
     });
 
     /*handles repo block on button submit*/
@@ -216,23 +216,46 @@ $(function () {
                     json.login = $('#repoLogin').val();
                     json.password = $('#repoPassword').val();
 
+                    if (!json.login || !json.password) {
+                        var $login = $('#repoLogin');
+                        var $password = $('#repoPassword');
+                        if (!json.login) {
+                            $login.addClass('is-invalid');
+                            $login.next('.invalid-feedback').show();
+                            $(this).closest('#collapseOne').prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
+                        } else {
+                            $login.removeClass('is-invalid');
+                            $login.next('.invalid-feedback').hide();
+                        }
+
+                        if (!json.password) {
+                            $password.addClass('is-invalid');
+                            $password.next('.invalid-feedback').show();
+                            $(this).closest('#collapseOne').prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
+                        } else {
+                            $password.removeClass('is-invalid');
+                            $password.next('.invalid-feedback').hide();
+                        }
+                        return;
+                    }
+
                     _sendPostRequest.bind(this)('/api/v1/repository', json, function (isAvailable) {
                         if (isAvailable) {
                             $('#gitRepoUrl').removeClass('is-invalid');
                             $('#repoLogin').removeClass('is-invalid');
                             $('#repoPassword').removeClass('is-invalid');
 
-                            $(this).closest('#collapseTwo').prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
+                            $(this).closest('#collapseOne').prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
                             $('.repo-validation .invalid-feedback.git-creds').hide();
 
-                            $('#headingThree').trigger('click');
                             $('#headingTwo').trigger('click');
+                            $('#headingOne').trigger('click');
                         } else {
                             $('#gitRepoUrl').addClass('is-invalid');
                             $('#repoLogin').addClass('is-invalid');
                             $('#repoPassword').addClass('is-invalid');
 
-                            $(this).closest('#collapseTwo').prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
+                            $(this).closest('#collapseOne').prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
                             $('.repo-validation .invalid-feedback.git-creds').show();
                         }
                     }.bind(this), function () {
@@ -247,11 +270,11 @@ $(function () {
                             $('#repoLogin').removeClass('is-invalid');
                             $('#repoPassword').removeClass('is-invalid');
 
-                            $(this).closest('#collapseTwo').prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
+                            $(this).closest('#collapseOne').prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
                             $('.repo-validation .invalid-feedback.git-repo').hide();
 
-                            $('#headingThree').trigger('click');
                             $('#headingTwo').trigger('click');
+                            $('#headingOne').trigger('click');
                         } else {
                             $('#gitRepoUrl').addClass('is-invalid');
 
@@ -260,7 +283,7 @@ $(function () {
                                 $('#repoPassword').addClass('is-invalid');
                             }
                             $('.repo-validation .invalid-feedback.git-repo').show();
-                            $(this).closest('#collapseTwo').prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
+                            $(this).closest('#collapseOne').prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
                         }
                     }.bind(this), function () {
                         console.error('An error has occurred while checking existing repository.');
@@ -281,7 +304,7 @@ $(function () {
             }
         });
 
-        toggleValidClassOnAccordionTab.bind(this)('#collapseTwo', e);
+        toggleValidClassOnAccordionTab.bind(this)('#collapseOne', e);
     });
 
     /*handles vcs block on button submit*/

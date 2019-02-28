@@ -81,13 +81,92 @@
                         <div class="card-header" id="headingOne" data-toggle="collapse"
                              data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                             <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button">
+                                    Repository info
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                             data-parent="#accordionCreateApplication">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="strategy">Strategy of adding repository
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Select copy to copy your existing repository or create to initialize new repository."></span>
+                                    </label>
+                                    <select class="form-control" id="strategy" name="strategy">
+                                        <option value="create">Create</option>
+                                        <option value="clone">Clone</option>
+                                    </select>
+                                </div>
+                                <div class="form-group repo-url hide-element">
+                                    <label for="gitRepoUrl">Git repository url
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Please specify url to public repository with following format: http(s)://git.sample.com/sample.git"></span>
+                                    </label>
+                                    <input name="gitRepoUrl" type="text" class="form-control" id="gitRepoUrl"
+                                           placeholder="http(s)://git.sample.com/sample.git">
+                                    <div class="invalid-feedback">
+                                        Specify URL to existing repository.
+                                    </div>
+                                    <div class="repo-validation">
+                                        <div class="invalid-feedback git-repo">
+                                            Current repository doesn't exist.
+                                        </div>
+                                        <div class="invalid-feedback git-creds">
+                                            Invalid Url, login or password.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-check private-repo hide-element">
+                                    <input class="form-check-input" type="checkbox" value="" id="isRepoPrivate"
+                                           name="isRepoPrivate">
+                                    <label class="form-check-label" for="isRepoPrivate">
+                                        Is repository private?
+                                    </label>
+                                </div>
+                                <div class="form-group repoLogin hide-element">
+                                    <label for="site">Repository login
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Tooltip on top"></span>
+                                    </label>
+                                    <input name="repoLogin" type="text" class="form-control" id="repoLogin"
+                                           placeholder="Enter repository login ">
+                                    <div class="invalid-feedback">
+                                        Please specify user to clone repository. User should have read role.
+                                    </div>
+                                </div>
+                                <div class="form-group repoPassword hide-element">
+                                    <label for="site">Repository password
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Tooltip on top"></span>
+                                    </label>
+                                    <input name="repoPassword" type="password" class="form-control" id="repoPassword"
+                                           placeholder="Enter repository password ">
+                                    <div class="invalid-feedback">
+                                        Please specify password to clone repository.
+                                    </div>
+                                </div>
+                                <button type="button" class="repo-submit edp-submit-form-btn btn btn-primary"
+                                        data-toggle="collapse"
+                                        data-target="#collapseTwo" aria-expanded="false"
+                                        aria-controls="collapseOne"
+                                >PROCEED TO REPOSITORY INFO
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
+                             data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            <h5 class="mb-0">
                                 <button class="btn btn-link" type="button">
                                     Main info
                                 </button>
                             </h5>
                         </div>
 
-                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
                              data-parent="#accordionCreateApplication">
                             <div class="card-body">
                                 <div class="form-group app-name">
@@ -236,85 +315,6 @@
                                     </label>
                                 </div>
                                 <button type="button" class="main-info-submit edp-submit-form-btn btn btn-primary"
-                                        data-toggle="collapse"
-                                        data-target="#collapseTwo" aria-expanded="false"
-                                        aria-controls="collapseTwo"
-                                >PROCEED TO REPOSITORY INFO
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
-                             data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link collapsed" type="button">
-                                    Repository info
-                                </button>
-                            </h5>
-                        </div>
-                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
-                             data-parent="#accordionCreateApplication">
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <label for="strategy">Strategy of adding repository
-                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Select copy to copy your existing repository or create to initialize new repository."></span>
-                                    </label>
-                                    <select class="form-control" id="strategy" name="strategy">
-                                        <option value="create">Create</option>
-                                        <option value="clone">Clone</option>
-                                    </select>
-                                </div>
-                                <div class="form-group repo-url hide-element">
-                                    <label for="gitRepoUrl">Git repository url
-                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Please specify url to public repository with following format: http(s)://git.sample.com/sample.git"></span>
-                                    </label>
-                                    <input name="gitRepoUrl" type="text" class="form-control" id="gitRepoUrl"
-                                           placeholder="http(s)://git.sample.com/sample.git">
-                                    <div class="invalid-feedback">
-                                        Specify URL to existing repository.
-                                    </div>
-                                    <div class="repo-validation">
-                                        <div class="invalid-feedback git-repo">
-                                            Current repository doesn't exist.
-                                        </div>
-                                        <div class="invalid-feedback git-creds">
-                                            Invalid Url, login or password.
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-check private-repo hide-element">
-                                    <input class="form-check-input" type="checkbox" value="" id="isRepoPrivate"
-                                           name="isRepoPrivate">
-                                    <label class="form-check-label" for="isRepoPrivate">
-                                        Is repository private?
-                                    </label>
-                                </div>
-                                <div class="form-group repoLogin hide-element">
-                                    <label for="site">Repository login
-                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Tooltip on top"></span>
-                                    </label>
-                                    <input name="repoLogin" type="text" class="form-control" id="repoLogin"
-                                           placeholder="Enter repository login ">
-                                    <div class="invalid-feedback">
-                                        Please specify user to clone repository. User should have read role.
-                                    </div>
-                                </div>
-                                <div class="form-group repoPassword hide-element">
-                                    <label for="site">Repository password
-                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Tooltip on top"></span>
-                                    </label>
-                                    <input name="repoPassword" type="password" class="form-control" id="repoPassword"
-                                           placeholder="Enter repository password ">
-                                    <div class="invalid-feedback">
-                                        Please specify password to clone repository.
-                                    </div>
-                                </div>
-                                <button type="button" class="repo-submit edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
                                         data-target="#collapseThree" aria-expanded="false"
                                         aria-controls="collapseTwo"
