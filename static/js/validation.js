@@ -236,7 +236,7 @@ function isRepoBlockValid() {
                 }
 
                 if (isLoginValid && isPasswordValid) {
-                    _sendPostRequest.bind(this)(false, '/api/v1/repository', {
+                    _sendPostRequest.bind(this)(false, '/api/v1/repository/available', {
                         url: $repoUrl.val(),
                         login: $repoLogin.val(),
                         password: $repoPassword.val()
@@ -253,7 +253,7 @@ function isRepoBlockValid() {
                     });
                 }
             } else {
-                _sendPostRequest.bind(this)(false, '/api/v1/repository', {url: $repoUrl.val()}, function (isAvailable) {
+                _sendPostRequest.bind(this)(false, '/api/v1/repository/available', {url: $repoUrl.val()}, function (isAvailable) {
                     if (!isAvailable) {
                         $gitRepoMsg.show();
                         $repoUrl.addClass('is-invalid');

@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"edp-admin-console/service"
+	"fmt"
 	"github.com/astaxie/beego"
 	"net/http"
 	"strings"
@@ -58,7 +59,8 @@ func (this *EDPTenantController) GetEDPComponents() {
 	}
 
 	this.Data["InputURL"] = strings.TrimSuffix(this.Ctx.Input.URL(), "/"+edpTenantName)
-	this.Data["LinkToApplications"] = "/admin/" + edpTenantName + "/application/"
+	appLink := fmt.Sprintf("/admin/edp/%s/application/overview/", edpTenantName)
+	this.Data["LinkToApplications"] = appLink
 	this.Data["EDPTenantName"] = edpTenantName
 	this.Data["EDPVersion"] = version
 	this.Data["EDPComponents"] = components

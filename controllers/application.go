@@ -29,7 +29,7 @@ import (
 	"net/http"
 )
 
-type AppController struct {
+type AppRestController struct {
 	beego.Controller
 	AppService service.ApplicationService
 }
@@ -39,7 +39,7 @@ type ErrMsg struct {
 	StatusCode int
 }
 
-func (this *AppController) CreateApplication() {
+func (this *AppRestController) CreateApplication() {
 	var app models.App
 	err := json.NewDecoder(this.Ctx.Request.Body).Decode(&app)
 	if err != nil {

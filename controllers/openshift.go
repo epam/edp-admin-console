@@ -22,12 +22,12 @@ import (
 	"net/http"
 )
 
-type ClusterController struct {
+type OpenshiftRestController struct {
 	beego.Controller
 	ClusterService service.ClusterService
 }
 
-func (this *ClusterController) GetAllStorageClasses() {
+func (this *OpenshiftRestController) GetAllStorageClasses() {
 	storageClasses, err := this.ClusterService.GetAllStorageClasses()
 
 	if err != nil {

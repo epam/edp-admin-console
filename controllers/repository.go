@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-type RepositoryController struct {
+type RepositoryRestController struct {
 	beego.Controller
 	AppService service.ApplicationService
 }
@@ -20,7 +20,7 @@ type RepoData struct {
 	Password string `json:"password,omitempty"`
 }
 
-func (this *RepositoryController) IsGitRepoAvailable() {
+func (this *RepositoryRestController) IsGitRepoAvailable() {
 	var repo RepoData
 	err := json.NewDecoder(this.Ctx.Request.Body).Decode(&repo)
 	if err != nil {

@@ -16,7 +16,10 @@
 
 package controllers
 
-import "github.com/astaxie/beego"
+import (
+	"fmt"
+	"github.com/astaxie/beego"
+)
 
 type MainController struct {
 	beego.Controller
@@ -27,7 +30,8 @@ func (this *MainController) Index() {
 }
 
 func (this *MainController) GetApplicationPage() {
-	this.Data["CreateApplication"] = "/admin/" + this.GetString(":name") + "/application/create"
+	createAppLink := fmt.Sprintf("/admin/edp/%s/application/create", this.GetString(":name"))
+	this.Data["CreateApplication"] = createAppLink
 	this.TplName = "application.html"
 }
 

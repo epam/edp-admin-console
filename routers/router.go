@@ -43,7 +43,7 @@ func init() {
 	/*START security routing*/
 	beego.Router("/auth/callback", &controllers.AuthController{}, "get:Callback")
 	beego.InsertFilter("/admin/*", beego.BeforeRouter, filters.AuthFilter)
-	beego.InsertFilter(`/admin/edp/:name`, beego.BeforeRouter, filters.CheckEDPTenantRole)
+	beego.InsertFilter("/admin/edp/:name/overview", beego.BeforeRouter, filters.CheckEDPTenantRole)
 	/*END*/
 
 	/*START general routing*/
@@ -51,20 +51,25 @@ func init() {
 	/*END*/
 
 	/*START edp routing*/
-	beego.Router("/admin/edp", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPTenants")
-	beego.Router(`/admin/edp/:name`, &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPComponents")
+	beego.Router("/admin/edp/overview", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPTenants")
+	beego.Router("/admin/edp/:name/overview", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPComponents")
 	/*END*/
 
-	beego.Router("/admin/:name/application", &controllers.MainController{}, "get:GetApplicationPage")
-	beego.Router("/admin/:name/application/create", &controllers.MainController{}, "get:GetCreateApplicationPage")
-	ns := beego.NewNamespace("/api/v1",
+	beego.Router("/admin/edp/:name/application/overview", &controllers.MainController{}, "get:GetApplicationPage")
+	beego.Router("/admin/edp/:name/application/create", &controllers.MainController{}, "get:GetCreateApplicationPage")
+
+	/*START rest api*/
+	restrictedApi := beego.NewNamespace("/api/v1/edp",
 		beego.NSRouter("/:name/vcs", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetVcsIntegrationValue"),
-		beego.NSRouter("/storage", &controllers.ClusterController{ClusterService: clusterService}, "get:GetAllStorageClasses"),
-		beego.NSRouter("/repository", &controllers.RepositoryController{}, "post:IsGitRepoAvailable"),
-		beego.NSNamespace("/:name/application",
-			beego.NSRouter("/create", &controllers.AppController{AppService: appService}, "post:CreateApplication"),
-		),
+		beego.NSRouter("/:name/application", &controllers.AppRestController{AppService: appService}, "post:CreateApplication"),
 	)
-	beego.AddNamespace(ns)
+	beego.AddNamespace(restrictedApi)
+
+	notRestrictedApi := beego.NewNamespace("/api/v1",
+		beego.NSRouter("/storage-class", &controllers.OpenshiftRestController{ClusterService: clusterService}, "get:GetAllStorageClasses"),
+		beego.NSRouter("/repository/available", &controllers.RepositoryRestController{}, "post:IsGitRepoAvailable"),
+	)
+	beego.AddNamespace(notRestrictedApi)
+	/*END*/
 
 }

@@ -32,7 +32,7 @@ $(function () {
     }();
 
     $(document).ready(function () {
-        _sendGetRequest('/api/v1/' + getTenantName() + '/vcs/',
+        _sendGetRequest('/api/v1/edp/' + getTenantName() + '/vcs/',
             function (isVcsEnabled) {
                 if (isVcsEnabled) {
                     $('.vcs-block').removeClass('hide-element');
@@ -43,7 +43,7 @@ $(function () {
             }, function (resp) {
                 console.log(resp);
             });
-        _sendGetRequest('/api/v1/storage',
+        _sendGetRequest('/api/v1/storage-class',
             function (storageClasses) {
                 var $select = $('#dbPersistentStorage');
 
@@ -100,7 +100,7 @@ $(function () {
 
     /*disables other build tools that doesnt related to selected language*/
     /*todo think about better approach*/
-    $('#collapseOne .card-body .form__input-wrapper #subFormWrapper .form__radio-btn-wrapper .form__radio-btn').click(function () {
+    $('#collapseTwo .card-body .form__input-wrapper #subFormWrapper .form__radio-btn-wrapper .form__radio-btn').click(function () {
         $(this).parents('.card-body').find('.appLangError').hide();
         $('.framework').prop('checked', false);
         var $target = $(this).data('target');
@@ -119,18 +119,14 @@ $(function () {
         var json = buildPayloadToCreateApplication($('#createAppForm').serializeArray());
         $('#confirmationPopup').modal('hide');
         $(".window-table-body").remove();
-        _sendPostRequest(true, '/api/v1/' + getTenantName() + '/application/create', json, function () {
+        _sendPostRequest(true, '/api/v1/edp/' + getTenantName() + '/application', json, function () {
             $('#successPopup').modal('show');
         }, function () {
             $('#errorPopup').modal('show');
         });
     });
 
-    $("#btn-cross-close").click(function () {
-        $(".window-table-body").remove();
-    });
-
-    $("#btn-modal-close").click(function () {
+    $("#btn-cross-close, #btn-modal-close").click(function () {
         $(".window-table-body").remove();
     });
 
@@ -297,8 +293,8 @@ function _sendGetRequest(url, successCallback, failCallback) {
 
 function getTenantName() {
     var segments = window.location.pathname.split('/');
-    if (segments && segments[2]) {
-        return segments[2];
+    if (segments && segments[3]) {
+        return segments[3];
     }
     console.error('Couldn\'t get edp name from url.');
 }

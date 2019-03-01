@@ -53,5 +53,5 @@ func (this *AuthController) Callback() {
 
 	this.Ctx.Output.Session("token", token)
 	log.Println("Token has been saved to the session")
-	this.Redirect("/admin/edp", 302)
+	this.Redirect("/admin/edp/overview", 302)
 }
