@@ -1,47 +1,4 @@
 $(function () {
-    var CONST = {
-        GIT_URL_REGEXP: /(?:^git|^ssh|^https?|^git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/,
-        APP_NAME_REGEXP: /^[a-z]+(-+[a-z0-9]+)*$/,
-        REPO_PASS_REGEXP: /\w/,
-        REPO_LOGIN_REGEXP: /\w/,
-        ROUTE_SITE_REGEXP: /^[a-z][a-z0-9-.]+[a-z]$/,
-        ROUTE_PATH_REGEXP: /^\/.*$/,
-        DB_CAPACITY_REGEXP: /\w/,
-        DB_PERSISTENCE_STORAGE_REGEXP: /\w/
-    };
-
-    var validationCallbacks = {
-        validateGitRepositoryUrl: function () {
-            return CONST.GIT_URL_REGEXP.test($(this).val());
-        },
-        validateNameOfApplication: function () {
-            return CONST.APP_NAME_REGEXP.test($(this).val());
-        },
-        validateRepositoryPassword: function () {
-            return CONST.REPO_PASS_REGEXP.test($(this).val());
-        },
-        validateRepositoryLogin: function () {
-            return CONST.REPO_LOGIN_REGEXP.test($(this).val());
-        },
-        validateVcsLogin: function () {
-            return CONST.REPO_LOGIN_REGEXP.test($(this).val());
-        },
-        validateVcsPassword: function () {
-            return CONST.REPO_PASS_REGEXP.test($(this).val());
-        },
-        validateRouteSite: function () {
-            return CONST.ROUTE_SITE_REGEXP.test($(this).val());
-        },
-        validateRoutePath: function () {
-            return CONST.ROUTE_PATH_REGEXP.test($(this).val());
-        },
-        validateDbCapacity: function () {
-            return CONST.DB_CAPACITY_REGEXP.test($(this).val());
-        },
-        validateDbPersistentStorage: function () {
-            return CONST.DB_PERSISTENCE_STORAGE_REGEXP.test($(this).val());
-        }
-    };
 
     !function () {
         var $menuBtn = $('.js-toggle-menu-button');
@@ -158,226 +115,23 @@ $(function () {
         });
     });
 
-    /*handles main block on button submit*/
-    $('.main-info-submit').click(function (e) {
-        var $cardBody = $(this).closest('.card-body');
-        var isLangChosen = false;
-        $.each($cardBody.find('#subFormWrapper input'), function () {
-            if ($(this).is(':checked')) {
-                isLangChosen = true;
-            }
-        });
-
-        var isFrameworkChosen = false;
-        $.each($cardBody.find('.form__input-wrapper .form-subsection input'), function () {
-            if ($(this).is(':checked')) {
-                isFrameworkChosen = true;
-            }
-        });
-
-        var $appName = $('#nameOfApp');
-        _validateInput.bind($appName)(validationCallbacks.validateNameOfApplication);
-
-        var $mainBlock = $(this).closest('#collapseTwo')
-        if (!isLangChosen) {
-            e.stopPropagation();
-            $mainBlock.find('.card-body .invalid-feedback.appLangError').show();
-            $mainBlock.prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
-        } else {
-            $mainBlock.find('.card-body .invalid-feedback.appLangError').hide();
-            $mainBlock.prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
-        }
-        if (isLangChosen && !isFrameworkChosen) {
-            e.stopPropagation();
-            $mainBlock.find('.card-body .invalid-feedback.frameworkError').show();
-            $mainBlock.prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
-        } else if (isLangChosen && isFrameworkChosen) {
-            $mainBlock.find('.card-body .invalid-feedback.frameworkError').hide();
-            $mainBlock.prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
-        }
-
-        if ($appName.hasClass('is-invalid')) {
-            $mainBlock.prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
-        } else {
-            $mainBlock.prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
-        }
-
-        toggleValidClassOnAccordionTab.bind(this)('#collapseTwo', e);
-    });
-
-    /*handles repo block on button submit*/
-    $('.repo-submit').click(function (e) {
-        $('.repo-validation .invalid-feedback.git-repo').hide();
-        var $cardBody = $(this).closest('.card-body');
-
-        if ($('#strategy').val() === 'clone') {
-            e.stopPropagation();
-            if ($('#gitRepoUrl').val()) {
-                var json = {};
-                if ($('#isRepoPrivate').is(':checked')) {
-                    json.url = $('#gitRepoUrl').val();
-                    json.login = $('#repoLogin').val();
-                    json.password = $('#repoPassword').val();
-
-                    if (!json.login || !json.password) {
-                        var $login = $('#repoLogin');
-                        var $password = $('#repoPassword');
-                        if (!json.login) {
-                            $login.addClass('is-invalid');
-                            $login.next('.invalid-feedback').show();
-                            $(this).closest('#collapseOne').prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
-                        } else {
-                            $login.removeClass('is-invalid');
-                            $login.next('.invalid-feedback').hide();
-                        }
-
-                        if (!json.password) {
-                            $password.addClass('is-invalid');
-                            $password.next('.invalid-feedback').show();
-                            $(this).closest('#collapseOne').prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
-                        } else {
-                            $password.removeClass('is-invalid');
-                            $password.next('.invalid-feedback').hide();
-                        }
-                        return;
-                    }
-
-                    _sendPostRequest.bind(this)('/api/v1/repository', json, function (isAvailable) {
-                        if (isAvailable) {
-                            $('#gitRepoUrl').removeClass('is-invalid');
-                            $('#repoLogin').removeClass('is-invalid');
-                            $('#repoPassword').removeClass('is-invalid');
-
-                            $(this).closest('#collapseOne').prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
-                            $('.repo-validation .invalid-feedback.git-creds').hide();
-
-                            $('#headingTwo').trigger('click');
-                            $('#headingOne').trigger('click');
-                        } else {
-                            $('#gitRepoUrl').addClass('is-invalid');
-                            $('#repoLogin').addClass('is-invalid');
-                            $('#repoPassword').addClass('is-invalid');
-
-                            $(this).closest('#collapseOne').prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
-                            $('.repo-validation .invalid-feedback.git-creds').show();
-                        }
-                    }.bind(this), function () {
-                        console.error('An error has occurred while checking existing repository.');
-                    });
-                } else {
-                    json.url = $('#gitRepoUrl').val();
-
-                    _sendPostRequest.bind(this)('/api/v1/repository', json, function (isAvailable) {
-                        if (isAvailable) {
-                            $('#gitRepoUrl').removeClass('is-invalid');
-                            $('#repoLogin').removeClass('is-invalid');
-                            $('#repoPassword').removeClass('is-invalid');
-
-                            $(this).closest('#collapseOne').prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
-                            $('.repo-validation .invalid-feedback.git-repo').hide();
-
-                            $('#headingTwo').trigger('click');
-                            $('#headingOne').trigger('click');
-                        } else {
-                            $('#gitRepoUrl').addClass('is-invalid');
-
-                            if (json.login) {
-                                $('#repoLogin').addClass('is-invalid');
-                                $('#repoPassword').addClass('is-invalid');
-                            }
-                            $('.repo-validation .invalid-feedback.git-repo').show();
-                            $(this).closest('#collapseOne').prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
-                        }
-                    }.bind(this), function () {
-                        console.error('An error has occurred while checking existing repository.');
-                    });
-                }
-            }
-        }
-
-        $.each($cardBody.find('div.form-group:not(.hide-element) input'), function () {
-            if ($(this).attr('id') === 'gitRepoUrl') {
-                _validateInput.bind(this)(validationCallbacks.validateGitRepositoryUrl);
-            }
-            if ($(this).attr('id') === 'repoPassword') {
-                _validateInput.bind(this)(validationCallbacks.validateRepositoryPassword);
-            }
-            if ($(this).attr('id') === 'repoLogin') {
-                _validateInput.bind(this)(validationCallbacks.validateRepositoryLogin);
-            }
-        });
-
-        toggleValidClassOnAccordionTab.bind(this)('#collapseOne', e);
-    });
-
-    /*handles vcs block on button submit*/
-    $('.vcs-submit').click(function (e) {
-        var $cardBody = $(this).closest('.card-body');
-        $.each($cardBody.find('div.form-group:not(.hide-element) input'), function () {
-            if ($(this).attr('id') === 'vcsLogin') {
-                _validateInput.bind(this)(validationCallbacks.validateVcsLogin);
-            }
-            if ($(this).attr('id') === 'vcsPassword') {
-                _validateInput.bind(this)(validationCallbacks.validateVcsPassword);
-            }
-        });
-
-        toggleValidClassOnAccordionTab.bind(this)('#collapseThree', e);
-    });
-
-    /*handles route block on button submit*/
-    $('.route-submit').click(function (e) {
-        var $cardBody = $(this).closest('.card-body');
-        if ($('#needRoute').is(':checked')) {
-            $.each($cardBody.find('div.form-group:not(.hide-element) input'), function () {
-                if ($(this).attr('id') === 'routeSite') {
-                    _validateInput.bind(this)(validationCallbacks.validateRouteSite);
-                }
-                if ($(this).attr('id') === 'routePath') {
-                    _validateInput.bind(this)(validationCallbacks.validateRoutePath);
-                }
-            });
-        }
-
-        toggleValidClassOnAccordionTab.bind(this)('#collapseFour', e);
-    });
-
-    /*handles db block on button submit and sends request to add application*/
-    $('.db-submit.create-application-submit').click(function (e) {
-        var $cardBody = $(this).closest('.card-body');
-        if ($('#needDb').is(':checked')) {
-            $.each($cardBody.find('div.form-group:not(.hide-element) input'), function () {
-                if ($(this).attr('id') === 'dbCapacity') {
-                    _validateInput.bind(this)(validationCallbacks.validateDbCapacity);
-                }
-                if ($(this).attr('id') === 'dbPersitantStorage') {
-                    _validateInput.bind(this)(validationCallbacks.validateDbPersistentStorage);
-                }
-            });
-        }
-
-        $('.main-info-submit').trigger('click');
-        $('.vcs-submit').trigger('click');
-        $('.repo-submit').trigger('click');
-        $('.route-submit').trigger('click');
-
-        toggleValidClassOnAccordionTab.bind(this)('#collapseFive', e);
-
-        if (isFormValid()) {
-            createTableWithValue($('#createAppForm').serializeArray());
-
-            $('#confirmationPopup').modal('show');
-        }
-    });
-
     $('#create-application').click(function () {
         var json = buildPayloadToCreateApplication($('#createAppForm').serializeArray());
         $('#confirmationPopup').modal('hide');
-        _sendPostRequest('/api/v1/' + getTenantName() + '/application/create', json, function () {
+        $(".window-table-body").remove();
+        _sendPostRequest(true, '/api/v1/' + getTenantName() + '/application/create', json, function () {
             $('#successPopup').modal('show');
         }, function () {
             $('#errorPopup').modal('show');
         });
+    });
+
+    $("#btn-cross-close").click(function () {
+        $(".window-table-body").remove();
+    });
+
+    $("#btn-modal-close").click(function () {
+        $(".window-table-body").remove();
     });
 
 });
@@ -385,17 +139,16 @@ $(function () {
 /*service functions*/
 
 function createTableWithValue($formData) {
-    $('#window-table-body').empty();
-    var isVcsEnabled = isArrayContainName($formData, 'vcsLogin') && isArrayContainName($formData, 'vcsPassword');
+    var isVcsEnabled = !$('.vcs-block').hasClass('hide-element');
     var isNeedRoute = isArrayContainName($formData, 'needRoute');
     var isNeedDb = isArrayContainName($formData, 'needDb');
     var isStrategyClone = getValueByName($formData, 'strategy') === "clone";
     var isRepositoryPrivate = isArrayContainName($formData, 'isRepoPrivate');
-    var vcsIntegrationEnabled = isVcsEnabled ? "&#10004;" : "&#10008;";
+    var vcsIntegrationEnabled =  isVcsEnabled ? "&#10004;" : "&#10008;";
     var isAppMultiModule = isArrayContainName($formData, 'isMultiModule') ? "&#10004;" : "&#10008;";
     var table = $("#window-table");
 
-    $('<tbody id="window-table-body">' +
+    $('<tbody class="window-table-body">' +
         '<tr><td>EDP Name</td><td>' + getValueByName($formData, 'nameOfApp') + '</td></tr>' +
         '<tr><td>Application language</td><td>' + getValueByName($formData, 'appLang') + '</td></tr>' +
         '<tr><td>Framework</td><td>' + getValueByName($formData, 'framework') + '</td></tr>' +
@@ -434,13 +187,6 @@ function createTableWithValue($formData) {
             '<tr><td>Persistent storage</td><td>' + getValueByName($formData, 'dbPersistentStorage') + '</td></tr>').appendTo(table)
     }
 
-    $("#btn-cross-close").click(function () {
-        $("#window-table-body").remove();
-    });
-
-    $("#btn-modal-close").click(function () {
-        $("#window-table-body").remove();
-    });
 }
 
 function buildPayloadToCreateApplication(formData) {
@@ -502,30 +248,6 @@ function isArrayContainName(array, name) {
     return array.find(x => x.name === name)
 }
 
-function isFormValid() {
-    return !($('#accordionCreateApplication').find('.card .card-header.invalid').length > 0);
-}
-
-function toggleValidClassOnAccordionTab(tabId, event) {
-    var $nonValidInputs = $(this).closest('.card-body').find('div.form-group:not(.hide-element)').find('input.is-invalid');
-    if ($nonValidInputs.length > 0) {
-        event.stopPropagation();
-        $(this).closest(tabId).prev('.card-header').addClass('invalid').removeClass('success').addClass('error');
-    } else {
-        $(this).closest(tabId).prev('.card-header').removeClass('invalid').addClass('success').removeClass('error');
-    }
-}
-
-function _validateInput(validateCallback) {
-    if (!validateCallback.bind(this)()) {
-        $(this).next('.invalid-feedback').show();
-        $(this).addClass('is-invalid');
-    } else {
-        $(this).next('.invalid-feedback').hide();
-        $(this).removeClass('is-invalid');
-    }
-}
-
 function toggleFields() {
     var toggleInputs = function (bool) {
         $.each($(this).closest('.card-body').find('input, select'), function () {
@@ -544,12 +266,13 @@ function toggleFields() {
     }
 }
 
-function _sendPostRequest(url, data, successCallback, failCallback) {
+function _sendPostRequest(async, url, data, successCallback, failCallback) {
     $.ajax({
         url: url,
         contentType: "application/json",
         type: "POST",
         data: JSON.stringify(data),
+        async: async,
         success: function (resp) {
             successCallback(resp);
         },
