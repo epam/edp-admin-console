@@ -63,21 +63,22 @@
         </aside>
         <div class="flex-fill pl-4 pr-4 wrapper">
 
-            <div>
+            <div style="margin-top: 10px">
+                <p style="font-weight:bold;">{{ .EDPTenantName }} {{ .EDPVersion }}</p>
                 <table class="table">
-                    <thead>
-                    <tr>
-                        <th>{{ .EDPTenantName }} {{ .EDPVersion }}</th>
-                    </tr>
-                    </thead>
                     <tbody>
-                    {{ range $k, $v := .EDPComponents }}
-                        <tr>
-                            <td>
-                                <a href="{{ $v }}">{{ $k }}</a>
-                            </td>
-                        </tr>
-                    {{end}}
+                        {{ range $k, $v := .EDPComponents }}
+                            <tr>
+                                <td width="25px">
+                                    <a href="{{ $v }}">
+                                        <img src="/static/img/{{$k}}.png" alt="{{$k}}" height="45" width="{{if eq "Jenkins" $k}} 35 {{else}} 42 {{end}}">
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{{ $v }}">{{ $k }}</a>
+                                </td>
+                            </tr>
+                        {{end}}
                     </tbody>
                 </table>
             </div>
