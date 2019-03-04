@@ -316,14 +316,15 @@
                                 </div>
                                 <button type="button" class="main-info-submit edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
-                                        data-target="#collapseThree" aria-expanded="false"
-                                        aria-controls="collapseTwo"
-                                >PROCEED TO ROUTE
+                                        data-target="{{if .IsVcsEnabled}}#collapseThree{{else}}#collapseFour{{end}}"
+                                        aria-expanded="false"
+                                        aria-controls="collapseTwo">{{if .IsVcsEnabled}}PROCEED TO VCS INFO{{else}}PROCEED TO ROUTE{{end}}
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div class="card vcs-block hide-element">
+                    {{if .IsVcsEnabled}}
+                    <div class="card vcs-block">
                         <div class="card-header collapsed" id="headingThree" data-toggle="collapse"
                              data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                             <h5 class="mb-0">
@@ -360,6 +361,7 @@
                             </div>
                         </div>
                     </div>
+                    {{end}}
                     <div class="card route-block">
                         <div class="card-header collapsed" id="headingFour" data-toggle="collapse"
                              data-target="#collapseFour" aria-expanded="false"

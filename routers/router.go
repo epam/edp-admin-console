@@ -58,7 +58,7 @@ func init() {
 	/*END*/
 
 	beego.Router("/admin/edp/:name/application/overview", &controllers.MainController{}, "get:GetApplicationPage")
-	beego.Router("/admin/edp/:name/application/create", &controllers.MainController{}, "get:GetCreateApplicationPage")
+	beego.Router("/admin/edp/:name/application/create", &controllers.MainController{EDPTenantService: edpService}, "get:GetCreateApplicationPage")
 
 	/*START rest api*/
 	restrictedApi := beego.NewNamespace("/api/v1/edp",

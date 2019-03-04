@@ -17,12 +17,15 @@
 package controllers
 
 import (
+	"edp-admin-console/service"
 	"fmt"
 	"github.com/astaxie/beego"
+	"net/http"
 )
 
 type MainController struct {
 	beego.Controller
+	EDPTenantService service.EDPTenantService
 }
 
 func (this *MainController) Index() {
@@ -36,5 +39,13 @@ func (this *MainController) GetApplicationPage() {
 }
 
 func (this *MainController) GetCreateApplicationPage() {
+	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue(this.GetString(":name"))
+
+	if err != nil {
+		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	this.Data["IsVcsEnabled"] = isVcsEnabled
 	this.TplName = "create_application.html"
 }

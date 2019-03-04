@@ -32,17 +32,6 @@ $(function () {
     }();
 
     $(document).ready(function () {
-        _sendGetRequest('/api/v1/edp/' + getTenantName() + '/vcs/',
-            function (isVcsEnabled) {
-                if (isVcsEnabled) {
-                    $('.vcs-block').removeClass('hide-element');
-                    $('.main-info-submit').text('PROCEED TO VCS INFO')
-                } else {
-                    $('.main-info-submit').attr('data-target', '#collapseFour');
-                }
-            }, function (resp) {
-                console.log(resp);
-            });
         _sendGetRequest('/api/v1/storage-class',
             function (storageClasses) {
                 var $select = $('#dbPersistentStorage');
@@ -135,7 +124,7 @@ $(function () {
 /*service functions*/
 
 function createTableWithValue($formData) {
-    var isVcsEnabled = !$('.vcs-block').hasClass('hide-element');
+    var isVcsEnabled = $('.vcs-block').length !== 0;
     var isNeedRoute = isArrayContainName($formData, 'needRoute');
     var isNeedDb = isArrayContainName($formData, 'needDb');
     var isStrategyClone = getValueByName($formData, 'strategy') === "clone";
