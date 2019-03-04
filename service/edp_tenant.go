@@ -30,7 +30,7 @@ import (
 )
 
 type EDPTenantService struct {
-	EDPTenantRep repository.EDPTenantRep
+	EDPTenantRep repository.EDPTenantRepository
 	Clients      k8s.ClientSet
 }
 
@@ -39,14 +39,14 @@ var (
 	wildcard          = beego.AppConfig.String("dnsWildcard")
 )
 
-func (edpService EDPTenantService) GetEDPTenants(resourceAccess map[string][]string) ([]*models.EDPTenant, error) {
+func (this EDPTenantService) GetEDPTenants(resourceAccess map[string][]string) ([]*models.EDPTenant, error) {
 	edpTenantNames := filterEdpTenantNamesWithoutSuffixWithCurrentRoles(resourceAccess)
 	if edpTenantNames == nil {
 		log.Println("There aren't edp tenants to display.")
 		return nil, nil
 	}
 
-	edpSpecs, err := edpService.EDPTenantRep.GetAllEDPTenantsByNames(edpTenantNames)
+	edpSpecs, err := this.EDPTenantRep.GetAllEDPTenantsByNames(edpTenantNames)
 	if err != nil {
 		log.Printf("Couldn't get all EDP specifications. Reason: %v\n", err)
 		return nil, err
@@ -55,13 +55,22 @@ func (edpService EDPTenantService) GetEDPTenants(resourceAccess map[string][]str
 	return edpSpecs, nil
 }
 
-func (edpService EDPTenantService) GetEDPVersionByName(edpTenantName string) (string, error) {
-	version, err := edpService.EDPTenantRep.GetEdpVersionByName(edpTenantName)
+func (this EDPTenantService) GetEDPVersionByName(edpTenantName string) (string, error) {
+	version, err := this.EDPTenantRep.GetEdpVersionByName(edpTenantName)
 	if err != nil {
 		log.Printf("An error has occurred while getting version of %s EDP.", edpTenantName)
 		return "", err
 	}
 	return version, nil
+}
+
+func (this EDPTenantService) GetTenantByName(edpName string) (*models.EDPTenant, error) {
+	edpTenant, err := this.EDPTenantRep.GetTenantByName(edpName)
+	if err != nil {
+		log.Printf("An error has occurred while getting tenant by %s name.", edpName)
+		return nil, err
+	}
+	return edpTenant, nil
 }
 
 func (edpService EDPTenantService) GetEDPComponents(edpTenantName string) map[string]string {
@@ -72,8 +81,8 @@ func (edpService EDPTenantService) GetEDPComponents(edpTenantName string) map[st
 	return compWithLinks
 }
 
-func (edpService EDPTenantService) GetVcsIntegrationValue(edpName string) (bool, error) {
-	coreClient := edpService.Clients.CoreClient
+func (this EDPTenantService) GetVcsIntegrationValue(edpName string) (bool, error) {
+	coreClient := this.Clients.CoreClient
 	namespace := edpName + "-edp-cicd"
 
 	res, err := coreClient.ConfigMaps(namespace).Get("user-settings", metav1.GetOptions{})

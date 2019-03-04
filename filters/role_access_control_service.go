@@ -16,19 +16,20 @@ func init() {
 		"GET /admin/edp/{edpName}/application/create":   {administrator},
 		"GET /api/v1/edp/{edpName}/vcs":                 {administrator, developer},
 		"POST /api/v1/edp/{edpName}/application":        {administrator},
+		"GET /api/v1/edp/{edpName}":                     {administrator, developer},
 	}
 }
 
 func IsPageAvailable(method string, uri string, contextRoles []string) bool {
 	roles := roles[fmt.Sprintf("%s %s", method, uri)]
 
-	if roles == nil || intersection(contextRoles, roles) == nil {
+	if roles == nil || getIntersectionOfRoles(contextRoles, roles) == nil {
 		return false
 	}
 	return true
 }
 
-func intersection(a, b []string) (c []string) {
+func getIntersectionOfRoles(a, b []string) (c []string) {
 	m := make(map[string]bool)
 
 	for _, item := range a {

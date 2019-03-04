@@ -23,10 +23,10 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-type EDPTenantRep struct {
+type EDPTenantRepository struct {
 }
 
-func (this EDPTenantRep) GetAllEDPTenantsByNames(adminClients []string) ([]*models.EDPTenant, error) {
+func (this EDPTenantRepository) GetAllEDPTenantsByNames(adminClients []string) ([]*models.EDPTenant, error) {
 	var edpTenants []*models.EDPTenant
 	o := orm.NewOrm()
 	_, err := o.QueryTable(new(models.EDPTenant)).Filter("name__in", adminClients).All(&edpTenants, "name", "version")
@@ -36,7 +36,7 @@ func (this EDPTenantRep) GetAllEDPTenantsByNames(adminClients []string) ([]*mode
 	return edpTenants, nil
 }
 
-func (this EDPTenantRep) GetEdpVersionByName(edpName string) (string, error) {
+func (this EDPTenantRepository) GetEdpVersionByName(edpName string) (string, error) {
 	var edp models.EDPTenant
 	o := orm.NewOrm()
 	err := o.QueryTable(new(models.EDPTenant)).Filter("name__istartswith", edpName).One(&edp, "name", "version")
@@ -47,4 +47,14 @@ func (this EDPTenantRep) GetEdpVersionByName(edpName string) (string, error) {
 		return "", errors.New(fmt.Sprintf("Couldn't find EDP version for %s.", edpName))
 	}
 	return edp.Version, nil
+}
+
+func (this EDPTenantRepository) GetTenantByName(edpName string) (*models.EDPTenant, error) {
+	var edpTenant models.EDPTenant
+	o := orm.NewOrm()
+	err := o.QueryTable(new(models.EDPTenant)).Filter("name", edpName).One(&edpTenant)
+	if err != nil {
+		return nil, err
+	}
+	return &edpTenant, nil
 }
