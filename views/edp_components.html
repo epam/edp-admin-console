@@ -36,7 +36,7 @@
                     </button>
                     <div class="dropdown-content" aria-labelledby="dropdownMenuButton">
                         {{range $k, $v := .EDPTenants}}
-                            <a href="{{$.InputURL}}/{{$v.Name}}">{{$v.Name}}</a>
+                            <a href="/admin/edp/{{$v.Name}}/overview">{{$v.Name}}</a>
                         {{end}}
                     </div>
                 </div>

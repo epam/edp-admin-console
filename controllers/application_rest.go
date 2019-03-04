@@ -49,7 +49,8 @@ func (this *ApplicationRestController) CreateApplication() {
 
 	errMsg := validRequestData(app)
 	if errMsg != nil {
-		http.Error(this.Ctx.ResponseWriter, errMsg.Message, errMsg.StatusCode)
+		log.Printf("Failed to validate request data: %s", errMsg.Message)
+		http.Error(this.Ctx.ResponseWriter, errMsg.Message, http.StatusBadRequest)
 		return
 	}
 
@@ -59,7 +60,6 @@ func (this *ApplicationRestController) CreateApplication() {
 	createdObject, err := this.AppService.CreateApp(app, edpTenantName)
 
 	if err != nil {
-		log.Printf("Failed to create custom resource in %s namespace: %s", edpTenantName, err.Error())
 		http.Error(this.Ctx.ResponseWriter, "Failed to create custom resource: "+err.Error(), http.StatusInternalServerError)
 		return
 	}

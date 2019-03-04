@@ -31,7 +31,18 @@ type ApplicationController struct {
 	EDPTenantService service.EDPTenantService
 }
 
+func (this *ApplicationController) GetApplicationPage() {
+	flash := beego.ReadFromRequest(&this.Controller)
+	if flash.Data["success"] != "" {
+		this.Data["Success"] = true
+	}
+
+	this.Data["CreateApplication"] = fmt.Sprintf("/admin/edp/%s/application/create", this.GetString(":name"))
+	this.TplName = "application.html"
+}
+
 func (this *ApplicationController) GetCreateApplicationPage() {
+	flash := beego.ReadFromRequest(&this.Controller)
 	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue(this.GetString(":name"))
 
 	if err != nil {
@@ -39,6 +50,9 @@ func (this *ApplicationController) GetCreateApplicationPage() {
 		return
 	}
 
+	if flash.Data["error"] != "" {
+		this.Data["Error"] = flash.Data["error"]
+	}
 	this.Data["IsVcsEnabled"] = isVcsEnabled
 	createApplicationLink := fmt.Sprintf("/admin/edp/%s/application", this.GetString(":name"))
 	this.Data["CreateApplicationLink"] = createApplicationLink
@@ -46,25 +60,42 @@ func (this *ApplicationController) GetCreateApplicationPage() {
 }
 
 func (this *ApplicationController) CreateApplication() {
+	flash := beego.NewFlash()
+	edpTenantName := this.GetString(":name")
 	app := extractRequestData(this)
 	errMsg := validRequestData(app)
 	if errMsg != nil {
-		http.Error(this.Ctx.ResponseWriter, errMsg.Message, http.StatusBadRequest)
+		log.Printf("Failed to validate request data: %s", errMsg.Message)
+		flash.Error(errMsg.Message)
+		flash.Store(&this.Controller)
+		this.Redirect("/admin/edp/"+edpTenantName+"/application/create", 302)
 		return
 	}
 
-	edpTenantName := this.GetString(":name")
+	application, err := this.AppService.GetApplicationFromEdpByName(edpTenantName, app.Name)
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
+	if application != nil {
+		flash.Error("Application name is already exists.")
+		flash.Store(&this.Controller)
+		this.Redirect("/admin/edp/"+edpTenantName+"/application/create", 302)
+		return
+	}
+
 	createdObject, err := this.AppService.CreateApp(app, edpTenantName)
 
 	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, "Failed to create custom resource: "+err.Error(), http.StatusInternalServerError)
+		this.Abort("500")
 		return
 	}
 
-	log.Printf("Custom object is saved into k8s: %s", createdObject)
-
-	appLink := fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
-	this.Redirect(appLink, 302)
+	log.Printf("Application object is saved into k8s: %s", createdObject)
+	flash.Success("Application object is created.")
+	flash.Store(&this.Controller)
+	this.Redirect(fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName), 302)
 }
 
 func extractRequestData(this *ApplicationController) models.App {

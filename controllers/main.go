@@ -17,7 +17,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/astaxie/beego"
 )
 
@@ -27,10 +26,4 @@ type MainController struct {
 
 func (this *MainController) Index() {
 	this.TplName = "index.html"
-}
-
-func (this *MainController) GetApplicationPage() {
-	createAppLink := fmt.Sprintf("/admin/edp/%s/application/create", this.GetString(":name"))
-	this.Data["CreateApplication"] = createAppLink
-	this.TplName = "application.html"
 }

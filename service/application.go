@@ -21,6 +21,7 @@ import (
 	"edp-admin-console/models"
 	"fmt"
 	"k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	coreV1Client "k8s.io/client-go/kubernetes/typed/core/v1"
 	"log"
@@ -63,6 +64,26 @@ func (this ApplicationService) CreateApp(app models.App, edpName string) (*k8s.B
 	if err != nil {
 		log.Printf("An error has occurred while creating object in k8s: %s", err)
 		return &k8s.BusinessApplication{}, err
+	}
+
+	return result, nil
+}
+
+func (this ApplicationService) GetApplicationFromEdpByName(edpName string, appName string) (*k8s.BusinessApplication, error) {
+	appClient := this.Clients.ApplicationClient
+	namespace := edpName + "-edp-cicd"
+
+	result := &k8s.BusinessApplication{}
+	err := appClient.Get().Namespace(namespace).Resource("businessapplications").Name(appName).Do().Into(result)
+
+	if k8serrors.IsNotFound(err) {
+		log.Printf("Current resourse %s doesn't exist.", appName)
+		return nil, nil
+	}
+
+	if err != nil {
+		log.Printf("An error has occurred while gettting object from k8s: %s", err)
+		return nil, err
 	}
 
 	return result, nil

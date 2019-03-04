@@ -32,7 +32,7 @@ $(function () {
     }();
 
     $(document).ready(function () {
-        _sendGetRequest('/api/v1/storage-class',
+        _sendGetRequest(true,'/api/v1/storage-class',
             function (storageClasses) {
                 var $select = $('#dbPersistentStorage');
 
@@ -262,10 +262,11 @@ function _sendPostRequest(async, url, data, successCallback, failCallback) {
     });
 }
 
-function _sendGetRequest(url, successCallback, failCallback) {
+function _sendGetRequest(async, url, successCallback, failCallback) {
     $.ajax({
         url: url,
         contentType: "application/json",
+        async: async,
         success: function (resp) {
             successCallback(resp);
         },
@@ -273,12 +274,4 @@ function _sendGetRequest(url, successCallback, failCallback) {
             failCallback(resp);
         },
     });
-}
-
-function getTenantName() {
-    var segments = window.location.pathname.split('/');
-    if (segments && segments[3]) {
-        return segments[3];
-    }
-    console.error('Couldn\'t get edp name from url.');
 }

@@ -49,7 +49,7 @@ func init() {
 	adminEdpNamespace := beego.NewNamespace("/admin/edp",
 		beego.NSRouter("/overview", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPTenants"),
 		beego.NSRouter("/:name/overview", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPComponents"),
-		beego.NSRouter("/:name/application/overview", &controllers.MainController{}, "get:GetApplicationPage"),
+		beego.NSRouter("/:name/application/overview", &controllers.ApplicationController{}, "get:GetApplicationPage"),
 		beego.NSRouter("/:name/application/create", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "get:GetCreateApplicationPage"),
 		beego.NSRouter("/:name/application", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "post:CreateApplication"),
 	)

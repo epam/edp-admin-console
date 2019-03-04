@@ -76,6 +76,13 @@
             <form class="edp-form" id="createAppForm" method="post" action="{{ .CreateApplicationLink }}">
                 <h1>ADDING APPLICATION</h1>
                 <p>After adding application you will get project in Gerrit and code review and build pipelines in Jenkins</p>
+
+                {{ if .Error }}
+                    <div class="form-error">
+                        <p>{{ .Error }}</p>
+                    </div>
+                {{ end }}
+
                 <div class="accordion" id="accordionCreateApplication">
                     <div class="card repo-block">
                         <div class="card-header" id="headingOne" data-toggle="collapse"
@@ -176,8 +183,15 @@
                                     </label>
                                     <input name="nameOfApp" type="text" class="form-control" id="nameOfApp"
                                            placeholder="Enter application name">
-                                    <div class="invalid-feedback">
-                                        Project names may only contain lower-case letters, numbers, and dashes. They may not start or end with a dash.
+                                    <div class="app-name-validation">
+                                        <div class="invalid-feedback regex-error">
+                                            Project names may only contain lower-case letters, numbers, and dashes. They may not start or end with a dash.
+                                        </div>
+                                    </div>
+                                    <div class="app-name-duplicate-validation">
+                                        <div class="invalid-feedback duplicate-msg">
+                                            Current application is already exists.
+                                        </div>
                                     </div>
                                 </div>
                                 <p>Select application type
@@ -530,46 +544,6 @@
                 <div class="modal-footer">
                     <button id="btn-modal-close" type="button" class="btn btn-secondary btn-modal-close" data-dismiss="modal">CLOSE</button>
                     <button id="create-application" type="button" class="edp-submit-form-btn btn btn-primary">INSTALL EDP TENANT</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal success -->
-    <div class="modal fade" id="successPopup" tabindex="-1" role="dialog" aria-labelledby="successPopupLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="successPopupLabel">Success</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Provisioning has been started.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Okay</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal error -->
-    <div class="modal fade" id="errorPopup" tabindex="-1" role="dialog" aria-labelledby="errorPopupLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="errorLabel">Error</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    An error has occurred on server side.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Okay</button>
                 </div>
             </div>
         </div>

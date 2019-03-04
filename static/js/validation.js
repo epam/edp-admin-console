@@ -275,9 +275,11 @@ function isMainBlockValid() {
     let isFrameworkChosen;
     let $appName = $mainBlock.find('#nameOfApp');
     let isAppNameValid = validate.applicationName($appName.val());
-    let appNameMsg = $appName.next('.invalid-feedback');
+    let appNameMsg = $appName.parents('.app-name').find('.app-name-validation .regex-error');
+    let appDuplicateMsg = $appName.parents('.app-name').find('.app-name-duplicate-validation .duplicate-msg');
     let refresh = function refreshErrors() {
         appNameMsg.hide();
+        appDuplicateMsg.hide();
         $('.appLangError').hide();
         $('.frameworkError').hide();
         $appName.removeClass('is-invalid');
@@ -392,4 +394,13 @@ function blockIsValid($block) {
         .removeClass('invalid')
         .addClass('success')
         .removeClass('error');
+}
+
+
+function getTenantName() {
+    var segments = window.location.pathname.split('/');
+    if (segments && segments[3]) {
+        return segments[3];
+    }
+    console.error('Couldn\'t get edp name from url.');
 }
