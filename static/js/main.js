@@ -105,14 +105,9 @@ $(function () {
     });
 
     $('#create-application').click(function () {
-        var json = buildPayloadToCreateApplication($('#createAppForm').serializeArray());
+        $('#createAppForm').submit();
         $('#confirmationPopup').modal('hide');
         $(".window-table-body").remove();
-        _sendPostRequest(true, '/api/v1/edp/' + getTenantName() + '/application', json, function () {
-            $('#successPopup').modal('show');
-        }, function () {
-            $('#errorPopup').modal('show');
-        });
     });
 
     $("#btn-cross-close, #btn-modal-close").click(function () {

@@ -14,9 +14,11 @@ func init() {
 		"GET /admin/edp/{edpName}/overview":             {administrator, developer},
 		"GET /admin/edp/{edpName}/application/overview": {administrator, developer},
 		"GET /admin/edp/{edpName}/application/create":   {administrator},
-		"GET /api/v1/edp/{edpName}/vcs":                 {administrator, developer},
-		"POST /api/v1/edp/{edpName}/application":        {administrator},
-		"GET /api/v1/edp/{edpName}":                     {administrator, developer},
+		"POST /admin/edp/{edpName}/application":         {administrator},
+
+		"GET /api/v1/edp/{edpName}/vcs":          {administrator, developer},
+		"GET /api/v1/edp/{edpName}":              {administrator, developer},
+		"POST /api/v1/edp/{edpName}/application": {administrator},
 	}
 }
 

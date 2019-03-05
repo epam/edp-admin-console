@@ -19,121 +19,106 @@ package controllers
 import (
 	"edp-admin-console/models"
 	"edp-admin-console/service"
-	"edp-admin-console/util"
-	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/validation"
-	"github.com/satori/go.uuid"
 	"log"
 	"net/http"
 )
 
-type AppRestController struct {
+type ApplicationController struct {
 	beego.Controller
-	AppService service.ApplicationService
+	AppService       service.ApplicationService
+	EDPTenantService service.EDPTenantService
 }
 
-type ErrMsg struct {
-	Message    string
-	StatusCode int
-}
+func (this *ApplicationController) GetCreateApplicationPage() {
+	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue(this.GetString(":name"))
 
-func (this *AppRestController) CreateApplication() {
-	var app models.App
-	err := json.NewDecoder(this.Ctx.Request.Body).Decode(&app)
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	this.Data["IsVcsEnabled"] = isVcsEnabled
+	createApplicationLink := fmt.Sprintf("/admin/edp/%s/application", this.GetString(":name"))
+	this.Data["CreateApplicationLink"] = createApplicationLink
+	this.TplName = "create_application.html"
+}
+
+func (this *ApplicationController) CreateApplication() {
+	app := extractRequestData(this)
 	errMsg := validRequestData(app)
 	if errMsg != nil {
-		http.Error(this.Ctx.ResponseWriter, errMsg.Message, errMsg.StatusCode)
+		http.Error(this.Ctx.ResponseWriter, errMsg.Message, http.StatusBadRequest)
 		return
 	}
-
-	id := uuid.NewV4().String()
 
 	edpTenantName := this.GetString(":name")
 	createdObject, err := this.AppService.CreateApp(app, edpTenantName)
 
 	if err != nil {
-		log.Printf("Failed to create custom resource in %s namespace: %s", edpTenantName, err.Error())
 		http.Error(this.Ctx.ResponseWriter, "Failed to create custom resource: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	log.Printf("Custom object is saved into k8s: %s", createdObject)
 
-	location := fmt.Sprintf("%s/%s", this.Ctx.Input.URL(), id)
-	this.Ctx.ResponseWriter.WriteHeader(200)
-	this.Ctx.Output.Header("Location", location)
+	appLink := fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
+	this.Redirect(appLink, 302)
 }
 
-func validRequestData(addApp models.App) *ErrMsg {
-	valid := validation.Validation{}
-	var resErr error
+func extractRequestData(this *ApplicationController) models.App {
+	app := models.App{
+		Lang:      this.GetString("appLang"),
+		Framework: this.GetString("framework"),
+		BuildTool: this.GetString("buildTool"),
+		Strategy:  this.GetString("strategy"),
+		Name:      this.GetString("nameOfApp"),
+	}
 
-	_, err := valid.Valid(addApp)
-	resErr = err
+	isMultiModule, _ := this.GetBool("isMultiModule", false)
+	if isMultiModule {
+		app.Framework = app.Framework + "-multimodule"
+	}
 
-	if addApp.Repository != nil {
-		_, err := valid.Valid(addApp.Repository)
-
-		isAvailable := util.IsGitRepoAvailable(addApp.Repository.Url, addApp.Repository.Login, addApp.Repository.Password)
-
-		if !isAvailable {
-			err := &validation.Error{Key: "repository", Message: "Repository doesn't exist or invalid login and password."}
-			valid.Errors = append(valid.Errors, err)
+	repoUrl := this.GetString("gitRepoUrl")
+	if repoUrl != "" {
+		app.Repository = &models.Repository{
+			Url: repoUrl,
 		}
 
-		resErr = err
+		isRepoPrivate, _ := this.GetBool("isRepoPrivate", false)
+		if isRepoPrivate {
+			app.Repository.Login = this.GetString("repoLogin")
+			app.Repository.Password = this.GetString("repoPassword")
+		}
 	}
 
-	if addApp.Route != nil {
-		_, err := valid.Valid(addApp.Route)
-		resErr = err
+	vcsLogin := this.GetString("vcsLogin")
+	vcsPassword := this.GetString("vcsPassword")
+	if vcsLogin != "" && vcsPassword != "" {
+		app.Vcs = &models.Vcs{
+			Login:    vcsLogin,
+			Password: vcsPassword,
+		}
 	}
 
-	if addApp.Vcs != nil {
-		_, err := valid.Valid(addApp.Vcs)
-		resErr = err
+	needRoute, _ := this.GetBool("needRoute", false)
+	if needRoute {
+		app.Route = &models.Route{
+			Site: this.GetString("routeSite"),
+			Path: this.GetString("routePath"),
+		}
 	}
 
-	if addApp.Database != nil {
-		_, err := valid.Valid(addApp.Database)
-		resErr = err
+	needDb, _ := this.GetBool("needDb", false)
+	if needDb {
+		app.Database = &models.Database{
+			Kind:     this.GetString("database"),
+			Version:  this.GetString("dbVersion"),
+			Capacity: this.GetString("dbCapacity") + this.GetString("capacityExt"),
+			Storage:  this.GetString("dbPersistentStorage"),
+		}
 	}
-
-	if resErr != nil {
-		return &ErrMsg{"An error has occurred while validating application's form fields.", http.StatusInternalServerError}
-	}
-
-	if valid.Errors == nil {
-		return nil
-	}
-
-	return &ErrMsg{string(createErrorResponseBody(valid)), http.StatusBadRequest}
-}
-
-func createErrorResponseBody(valid validation.Validation) []byte {
-	errJson, _ := json.Marshal(extractErrors(valid))
-	errResponse := struct {
-		Message string
-		Content string
-	}{
-		"Body of request are not valid.",
-		string(errJson),
-	}
-	response, _ := json.Marshal(errResponse)
-	return response
-}
-
-func extractErrors(valid validation.Validation) []string {
-	var errMap []string
-	for _, err := range valid.Errors {
-		errMap = append(errMap, fmt.Sprintf("Validation failed on %s: %s", err.Key, err.Message))
-	}
-	return errMap
+	return app
 }

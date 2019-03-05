@@ -27,7 +27,7 @@ import (
 )
 
 func AuthRestFilter(context *bgCtx.Context) {
-	log.Println("Start auth filter..")
+	log.Println("Start auth rest filter..")
 	token := context.Input.Header("Authorization")
 	if token == "" {
 		log.Println("There are no token in the session")
@@ -45,7 +45,7 @@ func AuthRestFilter(context *bgCtx.Context) {
 	idToken, err := appCtx.GetAuthConfig().Verifier.Verify(ctx.Background(), token)
 	if err != nil {
 		log.Printf("Token presented in the session is not valid")
-		http.Error(context.ResponseWriter, "Internal Error", http.StatusInternalServerError)
+		http.Error(context.ResponseWriter, "Token presented in the session is not valid", http.StatusInternalServerError)
 		return
 	}
 
