@@ -93,49 +93,29 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>
-                        <a href="#">
-                            Name of Java application
-                        </a>
-                    </td>
-                    <td>Java</td>
-                    <td>Maven</td>
-                    <td>
-                        <button class="delete" data-toggle="modal" data-target="#exampleModal">
-                            <i class="icon-trashcan"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="#">
-                            Name of Javascript application
-                        </a>
-                    </td>
-                    <td>Javascript</td>
-                    <td>NPM</td>
-                    <td>
-                            <button class="delete" data-toggle="modal" data-target="#exampleModal">
-                                <i class="icon-trashcan"></i>
-                            </button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="#">
-                            One More Application
 
-                        </a>
-                    </td>
-                    <td>Java</td>
-                    <td>Maven</td>
-                    <td>
+                {{range .Applications}}
+                    <tr>
+                        <td>
+                            <a href="/admin/edp/{{$.EdpTenantName}}/application/{{.Name}}/overview">
+                                {{.Name}}
+                            </a>
+                        </td>
+                        {{range $k, $v := .BeProperty}}
+                            {{if eq $v.Property "language"}}
+                                <td>{{$v.Value}}</td>
+                            {{end}}
+                            {{if eq $v.Property "buildTool"}}
+                                <td>{{$v.Value}}</td>
+                            {{end}}
+                        {{end}}
+                        <td>
                             <button class="delete" data-toggle="modal" data-target="#exampleModal">
                                 <i class="icon-trashcan"></i>
                             </button>
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
+                {{end}}
                 </tbody>
             </table>
         </div>

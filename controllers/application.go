@@ -45,6 +45,7 @@ func (this *ApplicationController) GetApplicationsOverviewPage() {
 	}
 
 	this.Data["CreateApplication"] = fmt.Sprintf("/admin/edp/%s/application/create", this.GetString(":name"))
+	this.Data["EdpTenantName"] = edpTenantName
 	this.Data["Applications"] = applications
 	this.TplName = "application.html"
 }
