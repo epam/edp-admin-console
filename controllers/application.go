@@ -60,7 +60,8 @@ func (this *ApplicationController) GetApplicationOverviewPage() {
 	}
 
 	this.Data["Application"] = application
-	this.TplName = ""
+	this.Data["ApplicationsLink"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
+	this.TplName = "application_overview.html"
 }
 
 func (this *ApplicationController) GetCreateApplicationPage() {
@@ -90,7 +91,7 @@ func (this *ApplicationController) CreateApplication() {
 		log.Printf("Failed to validate request data: %s", errMsg.Message)
 		flash.Error(errMsg.Message)
 		flash.Store(&this.Controller)
-		this.Redirect("/admin/edp/"+edpTenantName+"/application/create", 302)
+		this.Redirect(fmt.Sprintf("/admin/edp/%s/application/create", edpTenantName), 302)
 		return
 	}
 
@@ -104,7 +105,7 @@ func (this *ApplicationController) CreateApplication() {
 	if applicationCr != nil || application != nil {
 		flash.Error("Application name is already exists.")
 		flash.Store(&this.Controller)
-		this.Redirect("/admin/edp/"+edpTenantName+"/application/create", 302)
+		this.Redirect(fmt.Sprintf("/admin/edp/%s/application/create", edpTenantName), 302)
 		return
 	}
 

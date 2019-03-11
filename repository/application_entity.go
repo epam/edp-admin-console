@@ -102,7 +102,7 @@ func (this ApplicationEntityRepository) GetApplication(appName string, edpName s
 			Message:        row["message"].(string),
 		}
 
-		if row["strategy"].(string) == "clone" {
+		if row["git_url"] != nil {
 			application.GitUrl = row["git_url"].(string)
 		}
 
