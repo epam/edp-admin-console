@@ -33,8 +33,9 @@ func init() {
 	context.InitAuth()
 	clients := k8s.CreateOpenShiftClients()
 	edpRepository := repository.EDPTenantRepository{}
+	appRepository := repository.ApplicationEntityRepository{}
 	edpService := service.EDPTenantService{EDPTenantRep: edpRepository, Clients: clients}
-	appService := service.ApplicationService{Clients: clients}
+	appService := service.ApplicationService{Clients: clients, ApplicationRepository: appRepository}
 	clusterService := service.ClusterService{Clients: clients}
 
 	beego.Router("/auth/callback", &controllers.AuthController{}, "get:Callback")
@@ -49,7 +50,8 @@ func init() {
 	adminEdpNamespace := beego.NewNamespace("/admin/edp",
 		beego.NSRouter("/overview", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPTenants"),
 		beego.NSRouter("/:name/overview", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPComponents"),
-		beego.NSRouter("/:name/application/overview", &controllers.ApplicationController{}, "get:GetApplicationPage"),
+		beego.NSRouter("/:name/application/overview", &controllers.ApplicationController{}, "get:GetApplicationsOverviewPage"),
+		beego.NSRouter("/:name/application/:appName/overview", &controllers.ApplicationController{}, "get:GetApplicationOverviewPage"),
 		beego.NSRouter("/:name/application/create", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "get:GetCreateApplicationPage"),
 		beego.NSRouter("/:name/application", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "post:CreateApplication"),
 	)

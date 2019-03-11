@@ -26,7 +26,8 @@ import (
 )
 
 func InitDb() {
-	orm.RegisterModel(new(models.EDPTenant))
+	orm.RegisterModel(new(models.EDPTenant), new(models.BusinessEntity),
+		new(models.BeStatus), new(models.StatusesList), new(models.BeProperties))
 	err := orm.RegisterDriver("postgres", orm.DRPostgres)
 	checkErr(err)
 

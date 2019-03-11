@@ -19,6 +19,7 @@ package service
 import (
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
+	"edp-admin-console/repository"
 	"fmt"
 	"k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -28,7 +29,8 @@ import (
 )
 
 type ApplicationService struct {
-	Clients k8s.ClientSet
+	Clients               k8s.ClientSet
+	ApplicationRepository repository.ApplicationEntityRepository
 }
 
 func (this ApplicationService) CreateApp(app models.App, edpName string) (*k8s.BusinessApplication, error) {
@@ -69,7 +71,7 @@ func (this ApplicationService) CreateApp(app models.App, edpName string) (*k8s.B
 	return result, nil
 }
 
-func (this ApplicationService) GetApplicationFromEdpByName(edpName string, appName string) (*k8s.BusinessApplication, error) {
+func (this ApplicationService) GetApplicationCR(appName string, edpName string) (*k8s.BusinessApplication, error) {
 	appClient := this.Clients.ApplicationClient
 	namespace := edpName + "-edp-cicd"
 
@@ -82,11 +84,30 @@ func (this ApplicationService) GetApplicationFromEdpByName(edpName string, appNa
 	}
 
 	if err != nil {
-		log.Printf("An error has occurred while gettting object from k8s: %s", err)
+		log.Printf("An error has occurred while getting object from k8s: %s", err)
 		return nil, err
 	}
 
 	return result, nil
+}
+
+func (this ApplicationService) GetAllApplications(edpName string) ([]models.BusinessEntity, error) {
+	applications, err := this.ApplicationRepository.GetAllApplications(edpName)
+	if err != nil {
+		log.Printf("An error has occurred while getting application objects from database: %s", err)
+		return nil, err
+	}
+	return applications, nil
+}
+
+func (this ApplicationService) GetApplication(appName string, edpName string) (*models.BusinessEntity, error) {
+	application, err := this.ApplicationRepository.GetApplication(appName, edpName)
+	if err != nil {
+		log.Printf("An error has occurred while getting application object %s from database: %s", appName, err)
+		return nil, err
+	}
+
+	return application, nil
 }
 
 func createSecret(namespace string, secret *v1.Secret, coreClient *coreV1Client.CoreV1Client) (*v1.Secret, error) {

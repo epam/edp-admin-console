@@ -31,14 +31,35 @@ type ApplicationController struct {
 	EDPTenantService service.EDPTenantService
 }
 
-func (this *ApplicationController) GetApplicationPage() {
+func (this *ApplicationController) GetApplicationsOverviewPage() {
 	flash := beego.ReadFromRequest(&this.Controller)
 	if flash.Data["success"] != "" {
 		this.Data["Success"] = true
 	}
 
+	edpTenantName := this.GetString(":name")
+	applications, err := this.AppService.GetAllApplications(edpTenantName)
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
 	this.Data["CreateApplication"] = fmt.Sprintf("/admin/edp/%s/application/create", this.GetString(":name"))
+	this.Data["Applications"] = applications
 	this.TplName = "application.html"
+}
+
+func (this *ApplicationController) GetApplicationOverviewPage() {
+	edpTenantName := this.GetString(":name")
+	appName := this.GetString(":appName")
+	application, err := this.AppService.GetApplication(appName, edpTenantName)
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
+	this.Data["Application"] = application
+	this.TplName = ""
 }
 
 func (this *ApplicationController) GetCreateApplicationPage() {
@@ -72,13 +93,14 @@ func (this *ApplicationController) CreateApplication() {
 		return
 	}
 
-	application, err := this.AppService.GetApplicationFromEdpByName(edpTenantName, app.Name)
+	applicationCr, err := this.AppService.GetApplicationCR(app.Name, edpTenantName)
 	if err != nil {
 		this.Abort("500")
 		return
 	}
 
-	if application != nil {
+	application, err := this.AppService.GetApplication(app.Name, edpTenantName)
+	if applicationCr != nil || application != nil {
 		flash.Error("Application name is already exists.")
 		flash.Store(&this.Controller)
 		this.Redirect("/admin/edp/"+edpTenantName+"/application/create", 302)
