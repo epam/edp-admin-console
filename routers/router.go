@@ -61,6 +61,7 @@ func init() {
 		beego.NSRouter("/:name", &controllers.EdpRestController{EDPTenantService: edpService}, "get:GetTenantByName"),
 		beego.NSRouter("/:name/application", &controllers.ApplicationRestController{AppService: appService}, "post:CreateApplication"),
 		beego.NSRouter("/:name/application", &controllers.ApplicationRestController{AppService: appService}, "get:GetApplications"),
+		beego.NSRouter("/:name/application/:appName", &controllers.ApplicationRestController{AppService: appService}, "get:GetApplication"),
 		beego.NSRouter("/:name/vcs", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetVcsIntegrationValue"),
 	)
 	beego.AddNamespace(apiV1EdpNamespace)

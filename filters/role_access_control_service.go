@@ -17,10 +17,11 @@ func init() {
 		"GET /admin/edp/([^/]*)/application/([^/]*)/overview$": {administrator, developer},
 		"POST /admin/edp/([^/]*)/application$":                 {administrator},
 
-		"GET /api/v1/edp/([^/]*)/vcs$":          {administrator, developer},
-		"GET /api/v1/edp/([^/]*)$":              {administrator, developer},
-		"GET /api/v1/edp/([^/]*)/application$":  {administrator, developer},
-		"POST /api/v1/edp/([^/]*)/application$": {administrator},
+		"GET /api/v1/edp/([^/]*)/vcs$":                 {administrator, developer},
+		"GET /api/v1/edp/([^/]*)$":                     {administrator, developer},
+		"GET /api/v1/edp/([^/]*)/application$":         {administrator, developer},
+		"GET /api/v1/edp/([^/]*)/application/([^/]*)$": {administrator, developer},
+		"POST /api/v1/edp/([^/]*)/application$":        {administrator},
 	}
 }
 

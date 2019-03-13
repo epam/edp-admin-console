@@ -51,6 +51,25 @@ func (this *ApplicationRestController) GetApplications() {
 	this.ServeJSON()
 }
 
+func (this *ApplicationRestController) GetApplication() {
+	edpTenantName := this.GetString(":name")
+	appName := this.GetString(":appName")
+	application, err := this.AppService.GetApplication(appName, edpTenantName)
+	if err != nil {
+		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if application == nil {
+		nonAppMsg := fmt.Sprintf("Please check application name. It seems there're not %s application.", appName)
+		http.Error(this.Ctx.ResponseWriter, nonAppMsg, http.StatusBadRequest)
+		return
+	}
+
+	this.Data["json"] = application
+	this.ServeJSON()
+}
+
 func (this *ApplicationRestController) CreateApplication() {
 	var app models.App
 	err := json.NewDecoder(this.Ctx.Request.Body).Decode(&app)
