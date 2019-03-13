@@ -101,14 +101,8 @@
                                 {{.Name}}
                             </a>
                         </td>
-                        {{range $k, $v := .BeProperty}}
-                            {{if eq $v.Property "language"}}
-                                <td>{{$v.Value}}</td>
-                            {{end}}
-                            {{if eq $v.Property "buildTool"}}
-                                <td>{{$v.Value}}</td>
-                            {{end}}
-                        {{end}}
+                        <td>{{.Language}}</td>
+                        <td>{{.BuildTool}}</td>
                         <td>
                             <button class="delete" data-toggle="modal" data-target="#exampleModal">
                                 <i class="icon-trashcan"></i>

@@ -91,7 +91,7 @@ func (this ApplicationService) GetApplicationCR(appName string, edpName string) 
 	return result, nil
 }
 
-func (this ApplicationService) GetAllApplications(edpName string) ([]models.BusinessEntity, error) {
+func (this ApplicationService) GetAllApplications(edpName string) ([]models.Application, error) {
 	applications, err := this.ApplicationRepository.GetAllApplications(edpName)
 	if err != nil {
 		log.Printf("An error has occurred while getting application objects from database: %s", err)
@@ -100,7 +100,7 @@ func (this ApplicationService) GetAllApplications(edpName string) ([]models.Busi
 	return applications, nil
 }
 
-func (this ApplicationService) GetApplication(appName string, edpName string) (*models.BusinessEntity, error) {
+func (this ApplicationService) GetApplication(appName string, edpName string) (*models.ApplicationInfo, error) {
 	application, err := this.ApplicationRepository.GetApplication(appName, edpName)
 	if err != nil {
 		log.Printf("An error has occurred while getting application object %s from database: %s", appName, err)

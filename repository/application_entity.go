@@ -24,59 +24,99 @@ import (
 type ApplicationEntityRepository struct {
 }
 
-func (this ApplicationEntityRepository) GetAllApplications(edpName string) ([]models.BusinessEntity, error) {
+func (this ApplicationEntityRepository) GetAllApplications(edpName string) ([]models.Application, error) {
 	o := orm.NewOrm()
-	var applications []models.BusinessEntity
+	var applications []models.Application
+	var maps []orm.Params
 
-	_, err := o.QueryTable(new(models.BusinessEntity)).Filter("tenant", edpName).All(&applications)
+	_, err := o.Raw("SELECT name,"+
+		" min(value) FILTER (WHERE property = 'language') AS language,"+
+		" min(value) FILTER (WHERE property = 'buildTool') AS buildTool"+
+		" FROM business_entity"+
+		" LEFT JOIN be_properties ON business_entity.id = be_properties.be_id"+
+		" WHERE tenant=?"+
+		" GROUP BY name", edpName).Values(&maps)
+
 	if err != nil {
 		return nil, err
 	}
 
-	for i, el := range applications {
-		_, err := o.LoadRelated(&el, "BeStatus")
-		if err != nil {
-			return nil, err
-		}
-		_, err = o.LoadRelated(&el, "BeProperty")
-		if err != nil {
-			return nil, err
-		}
-		for k, status := range el.BeStatus {
-			_, err := o.LoadRelated(status, "StatusesList")
-			if err != nil {
-				return nil, err
-			}
-			el.BeStatus[k] = status
-		}
-		applications[i] = el
+	if maps == nil {
+		return nil, nil
+	}
+
+	for _, row := range maps {
+		applications = append(applications, models.Application{
+			Name:      row["name"].(string),
+			Language:  row["language"].(string),
+			BuildTool: row["buildtool"].(string),
+		})
 	}
 	return applications, nil
 }
 
-func (this ApplicationEntityRepository) GetApplication(appName string, edpName string) (*models.BusinessEntity, error) {
+func (this ApplicationEntityRepository) GetApplication(appName string, edpName string) (*models.ApplicationInfo, error) {
 	o := orm.NewOrm()
-	var application models.BusinessEntity
+	var application models.ApplicationInfo
+	var maps []orm.Params
 
-	_, err := o.QueryTable(new(models.BusinessEntity)).Filter("name", appName).Filter("tenant", edpName).All(&application)
+	_, err := o.Raw("SELECT business_entity.id,tenant,user_name,message,last_time_update,status_name, bs.be_id,name,delition,be_type,"+
+		"max(value) FILTER (WHERE property = 'language') AS language,"+
+		" max(value) FILTER (WHERE property = 'buildTool') AS buildTool,"+
+		" max(value) FILTER (WHERE property = 'framework') AS framework,"+
+		" max(value) FILTER (WHERE property = 'strategy') AS strategy,"+
+		" max(value) FILTER (WHERE property = 'git_url') AS git_url,"+
+		" max(value) FILTER (WHERE property = 'route_site') AS route_site,"+
+		" max(value) FILTER (WHERE property = 'route_path') AS route_path, "+
+		" max(value) FILTER (WHERE property = 'db_kind') AS db_kind,"+
+		" max(value) FILTER (WHERE property = 'db_version') AS db_version,"+
+		" max(value) FILTER (WHERE property = 'db_capacity') AS db_capacity,"+
+		" max(value) FILTER (WHERE property = 'db_storage') AS db_storage"+
+		" FROM business_entity"+
+		" LEFT JOIN be_properties ON business_entity.id = be_properties.be_id"+
+		" LEFT JOIN be_status as bs ON business_entity.id = bs.be_id "+
+		" LEFT JOIN statuses_list as sl ON bs.status = sl.status_id WHERE business_entity.name = ? AND business_entity.tenant=?"+
+		" GROUP BY business_entity.id,tenant,user_name,message,last_time_update,status_name, bs.be_id,name,delition,be_type order by last_time_update DESC limit(1)", appName, edpName).Values(&maps)
+
 	if err != nil {
 		return nil, err
 	}
-	_, err = o.LoadRelated(&application, "BeStatus")
-	if err != nil {
-		return nil, err
+
+	if maps == nil {
+		return nil, nil
 	}
-	_, err = o.LoadRelated(&application, "BeProperty")
-	if err != nil {
-		return nil, err
-	}
-	for k, status := range application.BeStatus {
-		_, err := o.LoadRelated(status, "StatusesList")
-		if err != nil {
-			return nil, err
+
+	for _, row := range maps {
+		application = models.ApplicationInfo{
+			Name:           row["name"].(string),
+			Tenant:         row["tenant"].(string),
+			DelitionTime:   row["delition"].(string),
+			Type:           row["be_type"].(string),
+			Status:         row["status_name"].(string),
+			Language:       row["language"].(string),
+			BuildTool:      row["buildtool"].(string),
+			Framework:      row["framework"].(string),
+			Strategy:       row["strategy"].(string),
+			LastTimeUpdate: row["last_time_update"].(string),
+			UserName:       row["user_name"].(string),
+			Message:        row["message"].(string),
 		}
-		application.BeStatus[k] = status
-	}
 
+		if row["strategy"].(string) == "clone" {
+			application.GitUrl = row["git_url"].(string)
+		}
+
+		if row["route_site"] != nil && row["route_path"] != nil {
+			application.RouteSite = row["route_site"].(string)
+			application.RoutePath = row["route_path"].(string)
+		}
+
+		if row["db_kind"] != nil && row["db_version"] != nil && row["db_capacity"] != nil && row["db_storage"] != nil {
+			application.DbKind = row["db_kind"].(string)
+			application.DbVersion = row["db_version"].(string)
+			application.DbCapacity = row["db_capacity"].(string)
+			application.DbStorage = row["db_storage"].(string)
+		}
+	}
 	return &application, nil
 }
