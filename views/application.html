@@ -6,6 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/css/application-overview.css">
 </head>
 <body>
 <main>
@@ -71,6 +72,7 @@
             </nav>
         </aside>
         <div class="flex-fill pl-3 pr-3 wrapper">
+            {{if .Applications}}
             <div class="d-flex edp-controls">
                 <div class="flex-fill">
                     <h1>Applications</h1>
@@ -112,6 +114,14 @@
                 {{end}}
                 </tbody>
             </table>
+            {{else}}
+                <div class="no-tenant no-app-message">
+                    <h1>Looks like there're not any applications.</h1>
+                    <a href="{{ .CreateApplication }}">
+                        <button class="btn btn-success">CREATE APPLICATION</button>
+                    </a>
+                </div>
+            {{end}}
         </div>
     </section>
     <footer class="edp-footer">
