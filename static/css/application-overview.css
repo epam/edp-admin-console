@@ -1,3 +1,9 @@
 .flex-fill.sub-header h1 {
     font-size: 1.5rem;
 }
+
+.no-app-message {
+    width: 50%;
+    margin: 10% auto auto;
+    text-align: center;
+}
