@@ -44,6 +44,8 @@ func InitDb() {
 	log.Printf("Connection to %s:%s database is established.", pgHost, pgPort)
 	err = orm.RunSyncdb("default", false, true)
 	checkErr(err)
+
+	TryToCreateTables()
 }
 
 func checkErr(err error) {
