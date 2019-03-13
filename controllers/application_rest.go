@@ -39,6 +39,18 @@ type ErrMsg struct {
 	StatusCode int
 }
 
+func (this *ApplicationRestController) GetApplications() {
+	edpTenantName := this.GetString(":name")
+	applications, err := this.AppService.GetAllApplications(edpTenantName)
+	if err != nil {
+		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	this.Data["json"] = applications
+	this.ServeJSON()
+}
+
 func (this *ApplicationRestController) CreateApplication() {
 	var app models.App
 	err := json.NewDecoder(this.Ctx.Request.Body).Decode(&app)
