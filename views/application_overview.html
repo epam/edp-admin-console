@@ -22,6 +22,7 @@
         </div>
         <h2>Epam Delivery Platform</h2>
     </header>
+
     <section class="content d-flex">
         <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
             <nav class="navbar navbar-expand navbar-dark bg-dark flex-column flex-row align-items-start p-0">
@@ -71,121 +72,166 @@
                 </div>
             </nav>
         </aside>
-        <div class="flex-fill pl-3 pr-3 wrapper">
-            <div class="d-flex edp-controls">
-                <div class="flex-fill">
-                    <h1>{{.Application.Name}} application</h1>
+        <div class="flex-fill pl-4 pr-4 wrapper">
+
+            <div class="edp-form" id="createAppForm">
+                <h1>{{.Application.Name}} application</h1>
+
+                <div class="accordion" id="accordionCreateApplication">
+                    <div class="card repo-block">
+                        <div class="card-header" id="headingOne" data-toggle="collapse"
+                             data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button">
+                                    Main info
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                             data-parent="#accordionCreateApplication">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <table class="edp-table">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Tenant</th>
+                                            <th scope="col">Type</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>{{.Application.Name}}</td>
+                                            <td>{{.Application.Tenant}}</td>
+                                            <td>{{.Application.Type}}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card main-block">
+                        <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
+                             data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" type="button">
+                                    Properties info
+                                </button>
+                            </h5>
+                        </div>
+
+                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
+                             data-parent="#accordionCreateApplication">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <table class="edp-table">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">Property</th>
+                                            <th scope="col">Value</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>Language</td>
+                                            <td>{{.Application.Language}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BuildTool</td>
+                                            <td>{{.Application.BuildTool}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Framework</td>
+                                            <td>{{.Application.Framework}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Strategy</td>
+                                            <td>{{.Application.Strategy}}</td>
+                                        </tr>
+                                        {{if .Application.GitUrl }}
+                                            <tr>
+                                                <td>Git Url</td>
+                                                <td>{{.Application.GitUrl}}</td>
+                                            </tr>
+                                        {{end}}
+                                        {{if and .Application.RouteSite .Application.RoutePath }}
+                                            <tr>
+                                                <td>Route Site</td>
+                                                <td>{{.Application.RouteSite}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Route Path</td>
+                                                <td>{{.Application.RoutePath}}</td>
+                                            </tr>
+                                        {{end}}
+                                        {{if and .Application.DbKind .Application.DbVersion .Application.DbCapacity .Application.DbStorage }}
+                                            <tr>
+                                                <td>Db Kind</td>
+                                                <td>{{.Application.DbKind}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Db Version</td>
+                                                <td>{{.Application.DbVersion}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Db Capacity</td>
+                                                <td>{{.Application.DbCapacity}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Db Storage</td>
+                                                <td>{{.Application.DbStorage}}</td>
+                                            </tr>
+                                        {{end}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card route-block">
+                        <div class="card-header collapsed" id="headingFour" data-toggle="collapse"
+                             data-target="#collapseFour" aria-expanded="false"
+                             aria-controls="collapseFour">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button">
+                                    Status info
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseFour" class="collapse route" aria-labelledby="headingFour"
+                             data-parent="#accordionCreateApplication">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <table class="edp-table">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">Message</th>
+                                            <th scope="col">LastTimeUpdate</th>
+                                            <th scope="col">UserName</th>
+                                            <th scope="col">Status</th>
+                                            <th scope="col">Available</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>{{.Application.Message}}</td>
+                                            <td>{{.Application.LastTimeUpdate}}</td>
+                                            <td>{{.Application.UserName}}</td>
+                                            <td>{{.Application.Status}}</td>
+                                            <td>{{.Application.Available}}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="flex-fill sub-header">
-                <h1>Main:</h1>
-            </div>
-            <table class="edp-table">
-                <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Tenant</th>
-                    <th scope="col">Delition time</th>
-                    <th scope="col">Type</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>{{.Application.Name}}</td>
-                    <td>{{.Application.Tenant}}</td>
-                    <td>{{.Application.DelitionTime}}</td>
-                    <td>{{.Application.Type}}</td>
-                </tr>
-                </tbody>
-            </table>
-
-            <div class="flex-fill sub-header">
-                <h1>Properties:</h1>
-            </div>
-            <table class="edp-table">
-                <thead>
-                <tr>
-                    <th scope="col">Property</th>
-                    <th scope="col">Value</th>
-                </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Language</td>
-                        <td>{{.Application.Language}}</td>
-                    </tr>
-                    <tr>
-                        <td>BuildTool</td>
-                        <td>{{.Application.BuildTool}}</td>
-                    </tr>
-                    <tr>
-                        <td>Framework</td>
-                        <td>{{.Application.Framework}}</td>
-                    </tr>
-                    <tr>
-                        <td>Strategy</td>
-                        <td>{{.Application.Strategy}}</td>
-                    </tr>
-                    {{if .Application.GitUrl }}
-                    <tr>
-                        <td>Git Url</td>
-                        <td>{{.Application.GitUrl}}</td>
-                    </tr>
-                    {{end}}
-                    {{if and .Application.RouteSite .Application.RoutePath }}
-                        <tr>
-                            <td>Route Site</td>
-                            <td>{{.Application.RouteSite}}</td>
-                        </tr>
-                        <tr>
-                            <td>Route Path</td>
-                            <td>{{.Application.RoutePath}}</td>
-                        </tr>
-                    {{end}}
-                    {{if and .Application.DbKind .Application.DbVersion .Application.DbCapacity .Application.DbStorage }}
-                        <tr>
-                            <td>Db Kind</td>
-                            <td>{{.Application.DbKind}}</td>
-                        </tr>
-                        <tr>
-                            <td>Db Version</td>
-                            <td>{{.Application.DbVersion}}</td>
-                        </tr>
-                        <tr>
-                            <td>Db Capacity</td>
-                            <td>{{.Application.DbCapacity}}</td>
-                        </tr>
-                        <tr>
-                            <td>Db Storage</td>
-                            <td>{{.Application.DbStorage}}</td>
-                        </tr>
-                    {{end}}
-                </tbody>
-            </table>
-
-            <div class="flex-fill sub-header">
-                <h1>Status:</h1>
-            </div>
-            <table class="edp-table">
-                <thead>
-                <tr>
-                    <th scope="col">Message</th>
-                    <th scope="col">LastTimeUpdate</th>
-                    <th scope="col">UserName</th>
-                    <th scope="col">Status</th>
-                </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>{{.Application.Message}}</td>
-                        <td>{{.Application.LastTimeUpdate}}</td>
-                        <td>{{.Application.UserName}}</td>
-                        <td>{{.Application.Status}}</td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
     </section>
+
     <footer class="edp-footer">
         <div class="copy">
             <p>© 2018 EPAM Systems, Inc. </p>
@@ -193,54 +239,7 @@
         </div>
     </footer>
 
-    <!-- Modal success -->
-    <div class="modal fade" id="successPopup" tabindex="-1" role="dialog" aria-labelledby="successPopupLabel" aria-hidden="true" data-display="{{ if .Success }}true{{ else }}false{{ end }}">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="successPopupLabel">Success</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Provisioning has been started.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">OK</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </main>
-
-    <div class="modal fade" tabindex="-1" role="dialog" id="exampleModal">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirm Deletion</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>You are going to delete application.
-                        If you are sure enter name of application:
-                    </p>
-                    <form action="">
-                        <div class="form-group">
-                            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
-                                   placeholder="Enter name">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger">Delete</button>
-                </div>
-            </div>
-    </div>
 </div>
 <script src="/static/js/jquery-3.3.1.js"></script>
 <script src="/static/js/popper.js"></script>

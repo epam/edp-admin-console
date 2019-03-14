@@ -19,6 +19,8 @@ package repository
 import (
 	"edp-admin-console/models"
 	"github.com/astaxie/beego/orm"
+	"strconv"
+	"time"
 )
 
 type ApplicationEntityRepository struct {
@@ -34,7 +36,7 @@ func (this ApplicationEntityRepository) GetAllApplications(edpName string) ([]mo
 		" min(value) FILTER (WHERE property = 'buildTool') AS buildTool"+
 		" FROM business_entity"+
 		" LEFT JOIN be_properties ON business_entity.id = be_properties.be_id"+
-		" WHERE tenant=?"+
+		" WHERE tenant=? AND delition = 0"+
 		" GROUP BY name", edpName).Values(&maps)
 
 	if err != nil {
@@ -60,7 +62,7 @@ func (this ApplicationEntityRepository) GetApplication(appName string, edpName s
 	var application models.ApplicationInfo
 	var maps []orm.Params
 
-	_, err := o.Raw("SELECT business_entity.id,tenant,user_name,message,last_time_update,status_name, bs.be_id,name,delition,be_type,"+
+	_, err := o.Raw("SELECT business_entity.id,tenant,user_name,available,message,last_time_update,status_name, bs.be_id,name,delition,be_type,"+
 		"max(value) FILTER (WHERE property = 'language') AS language,"+
 		" max(value) FILTER (WHERE property = 'buildTool') AS buildTool,"+
 		" max(value) FILTER (WHERE property = 'framework') AS framework,"+
@@ -75,8 +77,8 @@ func (this ApplicationEntityRepository) GetApplication(appName string, edpName s
 		" FROM business_entity"+
 		" LEFT JOIN be_properties ON business_entity.id = be_properties.be_id"+
 		" LEFT JOIN be_status as bs ON business_entity.id = bs.be_id "+
-		" LEFT JOIN statuses_list as sl ON bs.status = sl.status_id WHERE business_entity.name = ? AND business_entity.tenant=?"+
-		" GROUP BY business_entity.id,tenant,user_name,message,last_time_update,status_name, bs.be_id,name,delition,be_type order by last_time_update DESC limit(1)", appName, edpName).Values(&maps)
+		" LEFT JOIN statuses_list as sl ON bs.status = sl.status_id WHERE business_entity.name = ? AND business_entity.tenant=? AND business_entity.delition=0"+
+		" GROUP BY business_entity.id,tenant,user_name,available,message,last_time_update,status_name, bs.be_id,name,delition,be_type order by last_time_update DESC limit(1)", appName, edpName).Values(&maps)
 
 	if err != nil {
 		return nil, err
@@ -88,26 +90,33 @@ func (this ApplicationEntityRepository) GetApplication(appName string, edpName s
 
 	for _, row := range maps {
 		application = models.ApplicationInfo{
-			Name:           row["name"].(string),
-			Tenant:         row["tenant"].(string),
-			DelitionTime:   row["delition"].(string),
-			Type:           row["be_type"].(string),
-			Status:         row["status_name"].(string),
-			Language:       row["language"].(string),
-			BuildTool:      row["buildtool"].(string),
-			Framework:      row["framework"].(string),
-			Strategy:       row["strategy"].(string),
-			LastTimeUpdate: row["last_time_update"].(string),
-			UserName:       row["user_name"].(string),
-			Message:        row["message"].(string),
+			Name:      row["name"].(string),
+			Tenant:    row["tenant"].(string),
+			Type:      row["be_type"].(string),
+			Status:    row["status_name"].(string),
+			Language:  row["language"].(string),
+			BuildTool: row["buildtool"].(string),
+			Framework: row["framework"].(string),
+			Strategy:  row["strategy"].(string),
+			UserName:  row["user_name"].(string),
+			Message:   row["message"].(string),
 		}
+
+		application.DelitionTime = formatUnixTimestamp(row["delition"].(string))
+		application.LastTimeUpdate = formatUnixTimestamp(row["last_time_update"].(string))
+
+		available, _ := strconv.ParseBool(row["available"].(string))
+		application.Available = available
 
 		if row["git_url"] != nil {
 			application.GitUrl = row["git_url"].(string)
 		}
 
-		if row["route_site"] != nil && row["route_path"] != nil {
+		if row["route_site"] != nil {
 			application.RouteSite = row["route_site"].(string)
+		}
+
+		if row["route_path"] != nil {
 			application.RoutePath = row["route_path"].(string)
 		}
 
@@ -119,4 +128,9 @@ func (this ApplicationEntityRepository) GetApplication(appName string, edpName s
 		}
 	}
 	return &application, nil
+}
+
+func formatUnixTimestamp(timestamp string) string {
+	tempTime, _ := strconv.ParseInt(timestamp, 10, 64)
+	return time.Unix(tempTime, 0).Format("2006-01-02 15:04:05")
 }

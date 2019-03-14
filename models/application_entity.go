@@ -41,5 +41,6 @@ type ApplicationInfo struct {
 	Status         string
 	LastTimeUpdate string
 	UserName       string
+	Available      bool
 	Message        string
 }
