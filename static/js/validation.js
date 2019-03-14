@@ -136,7 +136,7 @@ let $dbBlock = $('.db-block');
 
 let CONST = {
     GIT_URL_REGEXP: /(?:^git|^ssh|^https?|^git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/,
-    APP_NAME_REGEXP: /^[a-z]+(-+[a-z0-9]+)*$/,
+    APP_NAME_REGEXP: /^[a-z][a-z0-9]([-a-z0-9]*[a-z0-9])$/,
     REPO_PASS_REGEXP: /\w/,
     REPO_LOGIN_REGEXP: /\w/,
     ROUTE_SITE_REGEXP: /^[a-z][a-z0-9-.]+[a-z]$/,
