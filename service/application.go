@@ -181,7 +181,9 @@ func convertData(app models.App) k8s.BusinessApplicationSpec {
 	if app.Route != nil {
 		spec.Route = &k8s.Route{
 			Site: app.Route.Site,
-			Path: app.Route.Path,
+		}
+		if len(app.Route.Path) > 0 {
+			spec.Route.Path = app.Route.Path
 		}
 	}
 

@@ -42,7 +42,7 @@ type Vcs struct {
 
 type Route struct {
 	Site string `json:"site,omitempty" valid:"Required;Match(/^[a-z][a-z0-9-.]+[a-z]$/)"`
-	Path string `json:"path,omitempty" valid:"Required;Match(/^\\/.*$/)"`
+	Path string `json:"path,omitempty" valid:"Match(/^\\/.*$/)"`
 }
 
 type Database struct {

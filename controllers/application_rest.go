@@ -123,8 +123,13 @@ func validRequestData(addApp models.App) *ErrMsg {
 	}
 
 	if addApp.Route != nil {
-		_, err := valid.Valid(addApp.Route)
-		resErr = err
+		if len(addApp.Route.Path) > 0 {
+			_, err := valid.Valid(addApp.Route)
+			resErr = err
+		} else {
+			_, err := valid.Valid(addApp.Route.Site)
+			resErr = err
+		}
 	}
 
 	if addApp.Vcs != nil {

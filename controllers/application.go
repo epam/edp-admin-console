@@ -162,7 +162,9 @@ func extractRequestData(this *ApplicationController) models.App {
 	if needRoute {
 		app.Route = &models.Route{
 			Site: this.GetString("routeSite"),
-			Path: this.GetString("routePath"),
+		}
+		if len(this.GetString("routePath")) > 0 {
+			app.Route.Path = this.GetString("routePath")
 		}
 	}
 

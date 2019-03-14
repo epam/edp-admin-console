@@ -351,11 +351,15 @@ function isRouteBlockValid() {
             $routeSite.addClass('is-invalid');
         }
 
-        let isPathValid = validate.routePath($routePath.val());
-        if (!isPathValid) {
-            $passwordMsg.show();
-            $routePath.addClass('is-invalid');
+        let isPathValid = true;
+        if ($routePath.val()) {
+            isPathValid = validate.routePath($routePath.val());
+            if (!isPathValid) {
+                $passwordMsg.show();
+                $routePath.addClass('is-invalid');
+            }
         }
+
         return isSiteValid && isPathValid;
     }
     return true;

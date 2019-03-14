@@ -155,8 +155,11 @@ function createTableWithValue($formData) {
 
     if (isNeedRoute) {
         $('<tr><td class="font-weight-bold text-center" colspan="2">ROUTE</td></tr>' +
-            '<tr><td>Route site</td><td>' + getValueByName($formData, 'routeSite') + '</td></tr>' +
-            '<tr><td>Route path</td><td>' + getValueByName($formData, 'routePath') + '</td></tr>').appendTo(table)
+            '<tr><td>Route site</td><td>' + getValueByName($formData, 'routeSite') + '</td></tr>').appendTo(table);
+
+        if (getValueByName($formData, 'routePath')) {
+            $('<tr><td>Route path</td><td>' + getValueByName($formData, 'routePath') + '</td></tr>').appendTo(table)
+        }
     }
 
     if (isNeedDb) {
@@ -167,57 +170,6 @@ function createTableWithValue($formData) {
             '<tr><td>Persistent storage</td><td>' + getValueByName($formData, 'dbPersistentStorage') + '</td></tr>').appendTo(table)
     }
 
-}
-
-function buildPayloadToCreateApplication(formData) {
-    var appJson = {
-        lang: getValueByName(formData, 'appLang'),
-        framework: getValueByName(formData, 'framework'),
-        buildTool: getValueByName(formData, 'buildTool'),
-        strategy: getValueByName(formData, 'strategy'),
-        name: getValueByName(formData, 'nameOfApp'),
-    };
-
-    if(isArrayContainName(formData, 'isMultiModule')) {
-        appJson.multiModule = JSON.parse(getValueByName(formData, 'isMultiModule'));
-    }
-
-    if (appJson['strategy'] === 'clone') {
-        appJson['repository'] = {
-            url: getValueByName(formData, 'gitRepoUrl'),
-        };
-
-        if (isArrayContainName(formData, 'isRepoPrivate')) {
-            appJson['repository']['login'] = getValueByName(formData, 'repoLogin');
-            appJson['repository']['password'] = getValueByName(formData, 'repoPassword');
-        }
-
-    }
-
-    if (isArrayContainName(formData, 'vcsLogin') && isArrayContainName(formData, 'vcsPassword')) {
-        appJson['vcs'] = {
-            login: getValueByName(formData, 'vcsLogin'),
-            password: getValueByName(formData, 'vcsPassword'),
-        };
-    }
-
-    if (isArrayContainName(formData, 'needRoute')) {
-        appJson['route'] = {
-            site: getValueByName(formData, 'routeSite'),
-            path: getValueByName(formData, 'routePath')
-        };
-    }
-
-    if (isArrayContainName(formData, 'needDb')) {
-        appJson['database'] = {
-            kind: getValueByName(formData, 'database'),
-            version: getValueByName(formData, 'dbVersion'),
-            capacity: getValueByName(formData, 'dbCapacity') + getValueByName(formData, 'capacityExt'),
-            storage: getValueByName(formData, 'dbPersistentStorage')
-        };
-    }
-
-    return appJson;
 }
 
 function getValueByName(array, name) {
