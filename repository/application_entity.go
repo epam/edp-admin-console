@@ -33,7 +33,7 @@ func (this ApplicationEntityRepository) GetAllApplications(edpName string) ([]mo
 
 	_, err := o.Raw("SELECT name,"+
 		" min(value) FILTER (WHERE property = 'language') AS language,"+
-		" min(value) FILTER (WHERE property = 'buildTool') AS buildTool"+
+		" min(value) FILTER (WHERE property = 'build_tool') AS build_tool"+
 		" FROM business_entity"+
 		" LEFT JOIN be_properties ON business_entity.id = be_properties.be_id"+
 		" WHERE tenant=? AND delition = 0"+
@@ -51,7 +51,7 @@ func (this ApplicationEntityRepository) GetAllApplications(edpName string) ([]mo
 		applications = append(applications, models.Application{
 			Name:      row["name"].(string),
 			Language:  row["language"].(string),
-			BuildTool: row["buildtool"].(string),
+			BuildTool: row["build_tool"].(string),
 		})
 	}
 	return applications, nil
@@ -64,7 +64,7 @@ func (this ApplicationEntityRepository) GetApplication(appName string, edpName s
 
 	_, err := o.Raw("SELECT business_entity.id,tenant,user_name,available,message,last_time_update,status_name, bs.be_id,name,delition,be_type,"+
 		"max(value) FILTER (WHERE property = 'language') AS language,"+
-		" max(value) FILTER (WHERE property = 'buildTool') AS buildTool,"+
+		" max(value) FILTER (WHERE property = 'build_tool') AS build_tool,"+
 		" max(value) FILTER (WHERE property = 'framework') AS framework,"+
 		" max(value) FILTER (WHERE property = 'strategy') AS strategy,"+
 		" max(value) FILTER (WHERE property = 'git_url') AS git_url,"+
@@ -95,7 +95,7 @@ func (this ApplicationEntityRepository) GetApplication(appName string, edpName s
 			Type:      row["be_type"].(string),
 			Status:    row["status_name"].(string),
 			Language:  row["language"].(string),
-			BuildTool: row["buildtool"].(string),
+			BuildTool: row["build_tool"].(string),
 			Framework: row["framework"].(string),
 			Strategy:  row["strategy"].(string),
 			UserName:  row["user_name"].(string),
