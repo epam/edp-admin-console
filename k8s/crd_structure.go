@@ -49,9 +49,9 @@ type Database struct {
 
 // +k8s:openapi-gen=true
 type BusinessApplicationStatus struct {
-	Available       bool
-	LastTimeUpdated string
-	Status          string
+	Available       bool   `json:"available"`
+	LastTimeUpdated string `json:"last_time_updated"`
+	Status          string `json:"status"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
