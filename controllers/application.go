@@ -102,6 +102,11 @@ func (this *ApplicationController) CreateApplication() {
 	}
 
 	application, err := this.AppService.GetApplication(app.Name, edpTenantName)
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
 	if applicationCr != nil || application != nil {
 		flash.Error("Application name is already exists.")
 		flash.Store(&this.Controller)

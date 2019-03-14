@@ -71,6 +71,7 @@ func (this *ApplicationRestController) GetApplication() {
 }
 
 func (this *ApplicationRestController) CreateApplication() {
+	edpTenantName := this.GetString(":name")
 	var app models.App
 	err := json.NewDecoder(this.Ctx.Request.Body).Decode(&app)
 	if err != nil {
@@ -85,9 +86,23 @@ func (this *ApplicationRestController) CreateApplication() {
 		return
 	}
 
-	id := uuid.NewV4().String()
+	applicationCr, err := this.AppService.GetApplicationCR(app.Name, edpTenantName)
+	if err != nil {
+		http.Error(this.Ctx.ResponseWriter, "Failed to get custom resource from cluster: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	edpTenantName := this.GetString(":name")
+	application, err := this.AppService.GetApplication(app.Name, edpTenantName)
+	if err != nil {
+		http.Error(this.Ctx.ResponseWriter, "Failed to get custom resource from database: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if applicationCr != nil || application != nil {
+		http.Error(this.Ctx.ResponseWriter, "Application name is already exists.", http.StatusBadRequest)
+		return
+	}
+
 	createdObject, err := this.AppService.CreateApp(app, edpTenantName)
 
 	if err != nil {
@@ -97,7 +112,7 @@ func (this *ApplicationRestController) CreateApplication() {
 
 	log.Printf("Custom object is saved into k8s: %s", createdObject)
 
-	location := fmt.Sprintf("%s/%s", this.Ctx.Input.URL(), id)
+	location := fmt.Sprintf("%s/%s", this.Ctx.Input.URL(), uuid.NewV4().String())
 	this.Ctx.ResponseWriter.WriteHeader(200)
 	this.Ctx.Output.Header("Location", location)
 }

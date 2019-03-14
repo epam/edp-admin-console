@@ -26,6 +26,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	coreV1Client "k8s.io/client-go/kubernetes/typed/core/v1"
 	"log"
+	"time"
 )
 
 type ApplicationService struct {
@@ -50,7 +51,9 @@ func (this ApplicationService) CreateApp(app models.App, edpName string) (*k8s.B
 		},
 		Spec: spec,
 		Status: k8s.BusinessApplicationStatus{
-			Status: "initialized",
+			Available:       false,
+			LastTimeUpdated: time.Now().Format("2006-01-02T15:04:05Z"),
+			Status:          "initialized",
 		},
 	}
 
