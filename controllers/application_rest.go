@@ -27,6 +27,8 @@ import (
 	"github.com/satori/go.uuid"
 	"log"
 	"net/http"
+	"regexp"
+	"strings"
 )
 
 type ApplicationRestController struct {
@@ -85,6 +87,7 @@ func (this *ApplicationRestController) CreateApplication() {
 		http.Error(this.Ctx.ResponseWriter, errMsg.Message, http.StatusBadRequest)
 		return
 	}
+	logRequestData(app)
 
 	applicationCr, err := this.AppService.GetApplicationCR(app.Name, edpTenantName)
 	if err != nil {
@@ -142,8 +145,7 @@ func validRequestData(addApp models.App) *ErrMsg {
 			_, err := valid.Valid(addApp.Route)
 			resErr = err
 		} else {
-			_, err := valid.Valid(addApp.Route.Site)
-			resErr = err
+			valid.Match(addApp.Route.Site, regexp.MustCompile("^[a-z][a-z0-9-.]+[a-z]$"), "Route.Site.Match")
 		}
 	}
 
@@ -158,7 +160,7 @@ func validRequestData(addApp models.App) *ErrMsg {
 	}
 
 	if resErr != nil {
-		return &ErrMsg{"An error has occurred while validating application's form fields.", http.StatusInternalServerError}
+		return &ErrMsg{"An internal error has occurred on server while validating application's form fields.", http.StatusInternalServerError}
 	}
 
 	if valid.Errors == nil {
@@ -187,4 +189,28 @@ func extractErrors(valid validation.Validation) []string {
 		errMap = append(errMap, fmt.Sprintf("Validation failed on %s: %s", err.Key, err.Message))
 	}
 	return errMap
+}
+
+func logRequestData(app models.App) {
+	var result strings.Builder
+	result.WriteString(fmt.Sprintf("Request data to create CR is valid. name=%s, strategy=%s, lang=%s, buildTool=%s, multiModule=%s, framework=%s",
+		app.Name, app.Strategy, app.Lang, app.BuildTool, app.MultiModule, app.Framework))
+
+	if app.Repository != nil {
+		result.WriteString(fmt.Sprintf(", repositoryUrl=%s, repositoryLogin=%s", app.Repository.Url, app.Repository.Login))
+	}
+
+	if app.Vcs != nil {
+		result.WriteString(fmt.Sprintf(", vcsLogin=%s", app.Vcs.Login))
+	}
+
+	if app.Route != nil {
+		result.WriteString(fmt.Sprintf(", routeSite=%s, routePath=%s", app.Route.Site, app.Route.Path))
+	}
+
+	if app.Database != nil {
+		result.WriteString(fmt.Sprintf(", dbKind=%s, dbМersion=%s, dbCapacity=%s, dbStorage=%s", app.Database.Kind, app.Database.Version, app.Database.Capacity, app.Database.Storage))
+	}
+
+	log.Println(result.String())
 }

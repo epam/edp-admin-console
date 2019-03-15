@@ -35,6 +35,7 @@ type ApplicationService struct {
 }
 
 func (this ApplicationService) CreateApp(app models.App, edpName string) (*k8s.BusinessApplication, error) {
+	log.Println("Start creating CR...")
 	appClient := this.Clients.ApplicationClient
 	coreClient := this.Clients.CoreClient
 	spec := convertData(app)
@@ -100,6 +101,8 @@ func (this ApplicationService) GetAllApplications(edpName string) ([]models.Appl
 		log.Printf("An error has occurred while getting application objects from database: %s", err)
 		return nil, err
 	}
+	log.Printf("Fetched applications. Count: {%s}. Rows: {%s}", len(applications), applications)
+
 	return applications, nil
 }
 
@@ -109,6 +112,7 @@ func (this ApplicationService) GetApplication(appName string, edpName string) (*
 		log.Printf("An error has occurred while getting application object %s from database: %s", appName, err)
 		return nil, err
 	}
+	log.Printf("Fetched application info: {%s}", application)
 
 	return application, nil
 }

@@ -94,6 +94,7 @@ func (this *ApplicationController) CreateApplication() {
 		this.Redirect(fmt.Sprintf("/admin/edp/%s/application/create", edpTenantName), 302)
 		return
 	}
+	logRequestData(app)
 
 	applicationCr, err := this.AppService.GetApplicationCR(app.Name, edpTenantName)
 	if err != nil {
