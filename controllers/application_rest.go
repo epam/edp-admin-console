@@ -145,7 +145,7 @@ func validRequestData(addApp models.App) *ErrMsg {
 			_, err := valid.Valid(addApp.Route)
 			resErr = err
 		} else {
-			valid.Match(addApp.Route.Site, regexp.MustCompile("^[a-z][a-z0-9-.]+[a-z]$"), "Route.Site.Match")
+			valid.Match(addApp.Route.Site, regexp.MustCompile("^[a-z][a-z0-9-]*[a-z0-9]$"), "Route.Site.Match")
 		}
 	}
 

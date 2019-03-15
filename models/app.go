@@ -17,7 +17,7 @@
 package models
 
 type App struct {
-	Name        string      `json:"name" valid:"Required;Match(/^[a-z][a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
+	Name        string      `json:"name" valid:"Required;Match(/^[a-z][a-z0-9-]*[a-z0-9]$/)"`
 	Strategy    string      `json:"strategy" valid:"Required"`
 	Lang        string      `json:"lang" valid:"Required"`
 	BuildTool   string      `json:"buildTool" valid:"Required"`
@@ -41,7 +41,7 @@ type Vcs struct {
 }
 
 type Route struct {
-	Site string `json:"site,omitempty" valid:"Required;Match(/^[a-z][a-z0-9-.]+[a-z]$/)"`
+	Site string `json:"site,omitempty" valid:"Required;Match(/^[a-z][a-z0-9-]*[a-z0-9]$/)"`
 	Path string `json:"path,omitempty" valid:"Match(/^\\/.*$/)"`
 }
 
