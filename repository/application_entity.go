@@ -23,7 +23,13 @@ import (
 	"time"
 )
 
+type IApplicationEntityRepository interface {
+	GetAllApplications(edpName string) ([]models.Application, error)
+	GetApplication(appName string, edpName string) (*models.ApplicationInfo, error)
+}
+
 type ApplicationEntityRepository struct {
+	IApplicationEntityRepository
 }
 
 func (this ApplicationEntityRepository) GetAllApplications(edpName string) ([]models.Application, error) {

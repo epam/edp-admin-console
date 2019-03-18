@@ -30,8 +30,8 @@ import (
 )
 
 type ApplicationService struct {
-	Clients               k8s.ClientSet
-	ApplicationRepository repository.ApplicationEntityRepository
+	Clients                k8s.ClientSet
+	IApplicationRepository repository.IApplicationEntityRepository
 }
 
 func (this ApplicationService) CreateApp(app models.App, edpName string) (*k8s.BusinessApplication, error) {
@@ -95,24 +95,24 @@ func (this ApplicationService) GetApplicationCR(appName string, edpName string) 
 	return result, nil
 }
 
-func (this ApplicationService) GetAllApplications(edpName string) ([]models.Application, error) {
-	applications, err := this.ApplicationRepository.GetAllApplications(edpName)
+func (this *ApplicationService) GetAllApplications(edpName string) ([]models.Application, error) {
+	applications, err := this.IApplicationRepository.GetAllApplications(edpName)
 	if err != nil {
 		log.Printf("An error has occurred while getting application objects from database: %s", err)
 		return nil, err
 	}
-	log.Printf("Fetched applications. Count: {%s}. Rows: {%s}", len(applications), applications)
+	log.Printf("Fetched applications. Count: {%s}. Rows: {%s}", string(len(applications)), applications)
 
 	return applications, nil
 }
 
 func (this ApplicationService) GetApplication(appName string, edpName string) (*models.ApplicationInfo, error) {
-	application, err := this.ApplicationRepository.GetApplication(appName, edpName)
+	application, err := this.IApplicationRepository.GetApplication(appName, edpName)
 	if err != nil {
 		log.Printf("An error has occurred while getting application object %s from database: %s", appName, err)
 		return nil, err
 	}
-	log.Printf("Fetched application info: {%s}", application)
+	log.Printf("Fetched application info: {%+v}", application)
 
 	return application, nil
 }

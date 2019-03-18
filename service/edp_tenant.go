@@ -30,8 +30,8 @@ import (
 )
 
 type EDPTenantService struct {
-	EDPTenantRep repository.EDPTenantRepository
-	Clients      k8s.ClientSet
+	IEDPTenantRep repository.IEDPTenantRepository
+	Clients       k8s.ClientSet
 }
 
 var (
@@ -46,7 +46,7 @@ func (this EDPTenantService) GetEDPTenants(resourceAccess map[string][]string) (
 		return nil, nil
 	}
 
-	edpSpecs, err := this.EDPTenantRep.GetAllEDPTenantsByNames(edpTenantNames)
+	edpSpecs, err := this.IEDPTenantRep.GetAllEDPTenantsByNames(edpTenantNames)
 	if err != nil {
 		log.Printf("Couldn't get all EDP specifications. Reason: %v\n", err)
 		return nil, err
@@ -56,7 +56,7 @@ func (this EDPTenantService) GetEDPTenants(resourceAccess map[string][]string) (
 }
 
 func (this EDPTenantService) GetEDPVersionByName(edpTenantName string) (string, error) {
-	version, err := this.EDPTenantRep.GetEdpVersionByName(edpTenantName)
+	version, err := this.IEDPTenantRep.GetEdpVersionByName(edpTenantName)
 	if err != nil {
 		log.Printf("An error has occurred while getting version of %s EDP.", edpTenantName)
 		return "", err
@@ -65,7 +65,7 @@ func (this EDPTenantService) GetEDPVersionByName(edpTenantName string) (string, 
 }
 
 func (this EDPTenantService) GetTenantByName(edpName string) (*models.EDPTenant, error) {
-	edpTenant, err := this.EDPTenantRep.GetTenantByName(edpName)
+	edpTenant, err := this.IEDPTenantRep.GetTenantByName(edpName)
 	if err != nil {
 		log.Printf("An error has occurred while getting tenant by %s name.", edpName)
 		return nil, err

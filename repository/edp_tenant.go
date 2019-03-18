@@ -23,6 +23,12 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+type IEDPTenantRepository interface {
+	GetAllEDPTenantsByNames(adminClients []string) ([]*models.EDPTenant, error)
+	GetEdpVersionByName(edpName string) (string, error)
+	GetTenantByName(edpName string) (*models.EDPTenant, error)
+}
+
 type EDPTenantRepository struct {
 }
 
