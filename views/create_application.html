@@ -74,8 +74,14 @@
         <div class="flex-fill pl-4 pr-4 wrapper">
 
             <form class="edp-form" id="createAppForm" method="post" action="{{ .CreateApplicationLink }}">
-                <h1>ADDING APPLICATION</h1>
-                <p>After adding application you will get project in Gerrit and code review and build pipelines in Jenkins</p>
+                <h1>Add the application to receive:</h1>
+                <p>
+                    <ul>
+                        <li>Gerrit Project</li>
+                        <li>Code Review</li>
+                        <li>Jenkins Pipelines</li>
+                    </ul>
+                </p>
 
                 {{ if .Error }}
                     <div class="form-error">
@@ -89,7 +95,7 @@
                              data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                             <h5 class="mb-0">
                                 <button class="btn btn-link collapsed" type="button">
-                                    Repository info
+                                    Codebase Info
                                 </button>
                             </h5>
                         </div>
@@ -97,9 +103,9 @@
                              data-parent="#accordionCreateApplication">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="strategy">Strategy of adding repository
+                                    <label for="strategy">Codebase integration strategy
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Select copy to copy your existing repository or create to initialize new repository."></span>
+                                              title="Select the existing codebase for reproduction or create new codebase."></span>
                                     </label>
                                     <select class="form-control" id="strategy" name="strategy">
                                         <option value="create">Create</option>
@@ -109,12 +115,12 @@
                                 <div class="form-group repo-url hide-element">
                                     <label for="gitRepoUrl">Git repository url
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Please specify url to repository with following format: http(s)://git.sample.com/sample.git"></span>
+                                              title="Please specify URL to Codebase in the following format: http(s)://git.sample.com/sample.git"></span>
                                     </label>
                                     <input name="gitRepoUrl" type="text" class="form-control" id="gitRepoUrl"
                                            placeholder="http(s)://git.sample.com/sample.git">
                                     <div class="invalid-feedback">
-                                        Please specify url to repository with following format: http(s)://git.sample.com/sample.git
+                                        Please specify URL to Codebase in the following format: http(s)://git.sample.com/sample.git
                                     </div>
                                     <div class="repo-validation">
                                         <div class="invalid-feedback git-repo-error">
@@ -129,7 +135,7 @@
                                     <input class="form-check-input" type="checkbox" value="true" id="isRepoPrivate"
                                            name="isRepoPrivate">
                                     <label class="form-check-label" for="isRepoPrivate">
-                                        Is repository private?
+                                        Codebase requires authentication
                                     </label>
                                 </div>
                                 <div class="form-group repoLogin hide-element">
@@ -177,15 +183,15 @@
                              data-parent="#accordionCreateApplication">
                             <div class="card-body">
                                 <div class="form-group app-name">
-                                    <label for="nameOfApp">Name of application
+                                    <label for="nameOfApp">Application Name
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Application names may only contain lower-case letters, numbers, and dashes. They may not start or end with a dash. Min 2 characters."></span>
+                                              title="Project name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters."></span>
                                     </label>
                                     <input name="nameOfApp" type="text" class="form-control" id="nameOfApp"
-                                           placeholder="Enter application name">
+                                           placeholder="Type your application name">
                                     <div class="app-name-validation">
                                         <div class="invalid-feedback regex-error">
-                                            Application names may only contain lower-case letters, numbers, and dashes. They may not start or end with a dash. Min 2 characters.
+                                            Project name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters.
                                         </div>
                                     </div>
                                     <div class="app-name-duplicate-validation">
@@ -194,9 +200,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <p>Select application type
+                                <p>Application code language/framework
                                     <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                          title="You must select one of the framework."></span>
+                                          title="Select application language/framework and build tool."></span>
                                 </p>
                                 <div class="form__input-wrapper">
                                     <fieldset id="subFormWrapper" class="language">
@@ -295,7 +301,7 @@
                                     <div class="js-form-subsection form-subsection formSubsection1">
                                         <label for="buildTool">Select build tool
                                             <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="You must select of the build tools."></span>
+                                                  title="Select application build tool."></span>
                                         </label>
                                         <select class="form-control java-build-tools" name="buildTool">
                                             <option>Gradle</option>
@@ -305,7 +311,7 @@
                                     <div class="js-form-subsection form-subsection formSubsection2">
                                         <label for="buildTool">Select build tool
                                             <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="You must select of the build tools."></span>
+                                                  title="Select application build tool."></span>
                                         </label>
                                         <select class="form-control" name="buildTool">
                                             <option>NPM</option>
@@ -314,7 +320,7 @@
                                     <div class="js-form-subsection form-subsection formSubsection3">
                                         <label for="buildTool">Select build tool
                                             <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="You must select of the build tools."></span>
+                                                  title="Select application build tool."></span>
                                         </label>
                                         <select class="form-control" name="buildTool">
                                             <option>dotnet</option>
@@ -325,14 +331,16 @@
                                     <input class="form-check-input" type="checkbox" value="true" id="multiModule"
                                            name="isMultiModule">
                                     <label class="form-check-label" for="isMultiModule">
-                                        Is application multi module
+                                        Multi-module project
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="The application has multi-module structure, in which there is API and a main application that implements the API."></span>
                                     </label>
                                 </div>
                                 <button type="button" class="main-info-submit edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
                                         data-target="{{if .IsVcsEnabled}}#collapseThree{{else}}#collapseFour{{end}}"
                                         aria-expanded="false"
-                                        aria-controls="collapseTwo">{{if .IsVcsEnabled}}PROCEED TO VCS INFO{{else}}PROCEED TO ROUTE{{end}}
+                                        aria-controls="collapseTwo">{{if .IsVcsEnabled}}PROCEED TO VCS INFO{{else}}PROCEED TO INGRESS INFO{{end}}
                                 </button>
                             </div>
                         </div>
@@ -370,7 +378,7 @@
                                         data-toggle="collapse"
                                         data-target="#collapseFour" aria-expanded="false"
                                         aria-controls="collapseThree"
-                                >PROCEED TO ROUTE
+                                >PROCEED TO INGRESS INFO
                                 </button>
                             </div>
                         </div>
@@ -382,7 +390,9 @@
                              aria-controls="collapseFour">
                             <h5 class="mb-0">
                                 <button class="btn btn-link collapsed" type="button">
-                                    Route
+                                    Exposing service info
+                                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                          title="In case of your application should be available outside of the cluster you should configure ingress Name and Path."></span>
                                 </button>
                             </h5>
                         </div>
@@ -397,12 +407,12 @@
                                     </label>
                                 </div>
                                 <div class="form-group">
-                                    <label for="site">Site
+                                    <label for="site">Name
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                                               title="Site names may only contain lower-case letters, numbers, and dashes. They may not start or end with a dash. Min 2 characters."></span>
                                     </label>
                                     <input name="routeSite" type="text" class="form-control" id="routeSite"
-                                           placeholder="Enter route site ">
+                                           placeholder="Enter exposing service name">
                                     <div class="invalid-feedback">
                                         Site names may only contain lower-case letters, numbers, and dashes. They may not start or end with a dash. Min 2 characters.
                                     </div>
@@ -413,7 +423,7 @@
                                               title="Path must start with /"></span>
                                     </label>
                                     <input name="routePath" type="text" class="form-control" id="routePath"
-                                           placeholder="Enter route path ">
+                                           placeholder="Enter exposing service path ">
                                     <div class="invalid-feedback">
                                         Path must start with /
                                     </div>
@@ -458,7 +468,7 @@
                                 <div class="form-group">
                                     <label for="dbVersion">Version
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Select version of database you wish to use."></span>
+                                              title="Select database version."></span>
                                     </label>
                                     <select class="form-control" id="dbVersion" name="dbVersion">
                                         <option>postgre:9.6</option>
@@ -467,11 +477,11 @@
                                 <div class="form-group">
                                     <label for="dbCapacity">Capacity
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Specify capacity of database."></span>
+                                              title="Specify size of database."></span>
                                     </label>
                                     <div class="d-flex">
                                         <input name="dbCapacity" type="number" class="form-control storage-capacity"
-                                               id="dbCapacity" placeholder="Enter database capacity">
+                                               id="dbCapacity" placeholder="Enter database size">
                                         <select class="capacity-ext form-control storage-capacity-ext" name="capacityExt">
                                             <option disabled="disabled">Binary units</option>
                                             <option value="MiB" >MiB</option>

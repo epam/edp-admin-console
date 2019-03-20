@@ -129,16 +129,16 @@ function createTableWithValue($formData) {
     var table = $("#window-table");
 
     $('<tbody class="window-table-body">' +
-        '<tr><td>EDP Name</td><td>' + getValueByName($formData, 'nameOfApp') + '</td></tr>' +
-        '<tr><td>Application language</td><td>' + getValueByName($formData, 'appLang') + '</td></tr>' +
+        '<tr><td>Name</td><td>' + getValueByName($formData, 'nameOfApp') + '</td></tr>' +
+        '<tr><td>Code language</td><td>' + getValueByName($formData, 'appLang') + '</td></tr>' +
         '<tr><td>Framework</td><td>' + getValueByName($formData, 'framework') + '</td></tr>' +
         '<tr><td>Build tool</td><td>' + getValueByName($formData, 'buildTool') + '</td></tr>' +
         '<tr><td>Integration with VCS is enabled</td><td>' + vcsIntegrationEnabled + '</td></tr>').appendTo(table);
 
-    $('<tr><td>Multi module application</td><td>' + isAppMultiModule + '</td></tr>').appendTo(table);
+    $('<tr><td>Multi-module project</td><td>' + isAppMultiModule + '</td></tr>').appendTo(table);
 
-    $('<tr><td class="font-weight-bold text-center" colspan="2">REPOSITORY</td></tr>' +
-        '<tr><td>Strategy</td><td>' + getValueByName($formData, 'strategy') + '</td></tr>').appendTo(table);
+    $('<tr><td class="font-weight-bold text-center" colspan="2">CODEBASE</td></tr>' +
+        '<tr><td>Integration method</td><td>' + getValueByName($formData, 'strategy') + '</td></tr>').appendTo(table);
 
     if (isStrategyClone) {
         $('<tr><td>Repository url</td><td>' + getValueByName($formData, 'gitRepoUrl') + '</td></tr>').appendTo(table);
@@ -150,15 +150,15 @@ function createTableWithValue($formData) {
 
     if (isVcsEnabled) {
         $('<tr><td class="font-weight-bold text-center" colspan="2">VCS</td></tr>' +
-            '<tr><td>Login</td><td>' + getValueByName($formData, 'vcsLogin') + '</td></tr>').appendTo(table)
+            '<tr><td>VCS Login</td><td>' + getValueByName($formData, 'vcsLogin') + '</td></tr>').appendTo(table)
     }
 
     if (isNeedRoute) {
-        $('<tr><td class="font-weight-bold text-center" colspan="2">ROUTE</td></tr>' +
-            '<tr><td>Route site</td><td>' + getValueByName($formData, 'routeSite') + '</td></tr>').appendTo(table);
+        $('<tr><td class="font-weight-bold text-center" colspan="2">EXPOSING SERVICE INFO</td></tr>' +
+            '<tr><td>Exposing service name</td><td>' + getValueByName($formData, 'routeSite') + '</td></tr>').appendTo(table);
 
         if (getValueByName($formData, 'routePath')) {
-            $('<tr><td>Route path</td><td>' + getValueByName($formData, 'routePath') + '</td></tr>').appendTo(table)
+            $('<tr><td>Exposing service path</td><td>' + getValueByName($formData, 'routePath') + '</td></tr>').appendTo(table)
         }
     }
 
