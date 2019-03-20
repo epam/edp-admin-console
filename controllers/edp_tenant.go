@@ -58,9 +58,8 @@ func (this *EDPTenantController) GetEDPComponents() {
 		return
 	}
 
-	this.Data["InputURL"] = strings.TrimSuffix(this.Ctx.Input.URL(), "/"+edpTenantName)
-	appLink := fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
-	this.Data["LinkToApplications"] = appLink
+	this.Data["InputURL"] = strings.TrimSuffix(this.Ctx.Input.URL(), "/" + edpTenantName)
+	this.Data["LinkToApplications"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
 	this.Data["EDPTenantName"] = edpTenantName
 	this.Data["EDPVersion"] = version
 	this.Data["EDPComponents"] = components

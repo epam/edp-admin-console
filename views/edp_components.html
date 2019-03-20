@@ -46,20 +46,7 @@
     </div>
     <section class="content d-flex">
         <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
-            <nav class="navbar navbar-expand navbar-dark bg-dark flex-column flex-row align-items-start p-0">
-                <div class="navbar-collapse">
-                    <ul class="flex-column flex-row navbar-nav w-100 justify-content-between">
-                        <li class="nav-item">
-                            <a class="nav-link pl-0" href="{{ .LinkToApplications }}">
-                                <i class="icon-apps"></i>
-                                <span class="link-name">
-                                    APPLICATIONS
-                                </span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+            {{template "navbar_template.html" .}}
         </aside>
         <div class="flex-fill pl-4 pr-4 wrapper">
 

@@ -44,8 +44,9 @@ func (this *ApplicationController) GetApplicationsOverviewPage() {
 		return
 	}
 
-	this.Data["CreateApplication"] = fmt.Sprintf("/admin/edp/%s/application/create", this.GetString(":name"))
-	this.Data["EdpTenantName"] = edpTenantName
+	this.Data["LinkToApplications"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
+	this.Data["CreateApplication"] = fmt.Sprintf("/admin/edp/%s/application/create", edpTenantName)
+	this.Data["EDPTenantName"] = edpTenantName
 	this.Data["Applications"] = applications
 	this.TplName = "application.html"
 }
@@ -59,14 +60,17 @@ func (this *ApplicationController) GetApplicationOverviewPage() {
 		return
 	}
 
+	this.Data["EDPTenantName"] = edpTenantName
+	this.Data["LinkToApplications"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
 	this.Data["Application"] = application
 	this.Data["ApplicationsLink"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
 	this.TplName = "application_overview.html"
 }
 
 func (this *ApplicationController) GetCreateApplicationPage() {
+	edpName := this.GetString(":name")
 	flash := beego.ReadFromRequest(&this.Controller)
-	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue(this.GetString(":name"))
+	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue(edpName)
 
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
@@ -76,9 +80,11 @@ func (this *ApplicationController) GetCreateApplicationPage() {
 	if flash.Data["error"] != "" {
 		this.Data["Error"] = flash.Data["error"]
 	}
+
+	this.Data["EDPTenantName"] = edpName
+	this.Data["LinkToApplications"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpName)
 	this.Data["IsVcsEnabled"] = isVcsEnabled
-	createApplicationLink := fmt.Sprintf("/admin/edp/%s/application", this.GetString(":name"))
-	this.Data["CreateApplicationLink"] = createApplicationLink
+	this.Data["CreateApplicationLink"] = fmt.Sprintf("/admin/edp/%s/application", edpName)
 	this.TplName = "create_application.html"
 }
 

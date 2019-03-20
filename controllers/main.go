@@ -17,6 +17,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/astaxie/beego"
 )
 
@@ -26,4 +27,10 @@ type MainController struct {
 
 func (this *MainController) Index() {
 	this.TplName = "index.html"
+}
+
+func (this *MainController) CockpitRedirectConfirmationPage() {
+	this.Data["Domain"] = fmt.Sprintf("https://edp-cockpit-%s-edp-cicd.%s", this.GetString("edpTenant"), beego.AppConfig.String("dnsWildcard"))
+	this.Data["Anchor"] = this.GetString("anchor")
+	this.TplName = "cockpit_redirect_confirmation.html"
 }

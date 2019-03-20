@@ -46,6 +46,7 @@ func init() {
 	beego.InsertFilter("/api/v1/edp/:name", beego.BeforeRouter, filters.RoleAccessControlFilter)
 
 	beego.Router("/", &controllers.MainController{}, "get:Index")
+	beego.Router("/cockpit-redirect-confirmation", &controllers.MainController{}, "get:CockpitRedirectConfirmationPage")
 
 	adminEdpNamespace := beego.NewNamespace("/admin/edp",
 		beego.NSRouter("/overview", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPTenants"),
