@@ -20,6 +20,7 @@ type Application struct {
 	Name      string `json:"name"`
 	Language  string `json:"language"`
 	BuildTool string `json:"build_tool"`
+	Status    string `json:"status"`
 }
 
 type ApplicationInfo struct {

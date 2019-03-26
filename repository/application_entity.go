@@ -36,14 +36,19 @@ func (this ApplicationEntityRepository) GetAllApplications(edpName string) ([]mo
 	o := orm.NewOrm()
 	var applications []models.Application
 	var maps []orm.Params
-
-	_, err := o.Raw("SELECT name,"+
-		" min(value) FILTER (WHERE property = 'language') AS language,"+
-		" min(value) FILTER (WHERE property = 'build_tool') AS build_tool"+
-		" FROM business_entity"+
-		" LEFT JOIN be_properties ON business_entity.id = be_properties.be_id"+
-		" WHERE tenant=? AND delition = 0"+
-		" GROUP BY name", edpName).Values(&maps)
+	_, err := o.Raw("select distinct on (\"name\") o.name, "+
+		"	o.status_name,"+
+		"	max(value) FILTER (WHERE property = 'language')   AS language,"+
+		"	max(value) FILTER (WHERE property = 'build_tool') AS build_tool "+
+		"	from (select * "+
+		"		FROM business_entity "+
+		"		LEFT JOIN be_status bs on business_entity.id = bs.be_id "+
+		"		LEFT JOIN statuses_list sl on bs.status = sl.status_id) o "+
+		"		LEFT JOIN be_properties ON o.be_id = be_properties.be_id "+
+		"		WHERE tenant = ? "+
+		"  AND delition = 0 "+
+		"		group by o.name, o.status_name, o.last_time_update"+
+		"	ORDER BY \"name\", \"last_time_update\" DESC;", edpName).Values(&maps)
 
 	if err != nil {
 		return nil, err
@@ -58,6 +63,7 @@ func (this ApplicationEntityRepository) GetAllApplications(edpName string) ([]mo
 			Name:      row["name"].(string),
 			Language:  row["language"].(string),
 			BuildTool: row["build_tool"].(string),
+			Status:    row["status_name"].(string),
 		})
 	}
 	return applications, nil
