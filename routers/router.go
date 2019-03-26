@@ -42,9 +42,10 @@ func init() {
 	beego.InsertFilter("/admin/*", beego.BeforeRouter, filters.AuthFilter)
 	beego.InsertFilter("/api/v1/edp/*", beego.BeforeRouter, filters.AuthRestFilter)
 	beego.InsertFilter("/admin/edp/:name/*", beego.BeforeRouter, filters.RoleAccessControlFilter)
-	beego.InsertFilter("/api/v1/edp/:name/*", beego.BeforeRouter, filters.RoleAccessControlFilter)
-	beego.InsertFilter("/api/v1/edp/:name", beego.BeforeRouter, filters.RoleAccessControlFilter)
+	beego.InsertFilter("/api/v1/edp/:name/*", beego.BeforeRouter, filters.RoleAccessControlRestFilter)
+	beego.InsertFilter("/api/v1/edp/:name", beego.BeforeRouter, filters.RoleAccessControlRestFilter)
 
+	beego.ErrorController(&controllers.ErrorController{})
 	beego.Router("/", &controllers.MainController{}, "get:Index")
 	beego.Router("/cockpit-redirect-confirmation", &controllers.MainController{}, "get:CockpitRedirectConfirmationPage")
 

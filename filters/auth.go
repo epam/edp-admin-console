@@ -56,13 +56,13 @@ func getRealmRoles(context *bgCtx.Context, token *oidc.IDToken) []string {
 	err := token.Claims(&claim)
 	if err != nil {
 		log.Printf("Error has been occurred during the parsing token %+v", token)
-		http.Error(context.ResponseWriter, "Internal Error", http.StatusInternalServerError)
+		context.Abort(200, "500")
 	}
 	var realmAccess map[string]*[]string
 	err = json.Unmarshal(*claim["realm_access"], &realmAccess)
 	if err != nil {
 		log.Printf("Error has been occurred during the parsing token %+v", token)
-		http.Error(context.ResponseWriter, "Internal Error", http.StatusInternalServerError)
+		context.Abort(200, "500")
 	}
 
 	return *realmAccess["roles"]
@@ -74,13 +74,13 @@ func getResourceAccessValues(context *bgCtx.Context, token *oidc.IDToken) map[st
 	err := token.Claims(&claim)
 	if err != nil {
 		log.Printf("Error has been occurred during the parsing token %+v", token)
-		http.Error(context.ResponseWriter, "Internal Error", http.StatusInternalServerError)
+		context.Abort(200, "500")
 	}
 	var resourceAccess map[string]*map[string][]string
 	err = json.Unmarshal(*claim["resource_access"], &resourceAccess)
 	if err != nil {
 		log.Printf("Error has been occurred during the parsing token %+v", token)
-		http.Error(context.ResponseWriter, "Internal Error", http.StatusInternalServerError)
+		context.Abort(200, "500")
 	}
 
 	instances := make(map[string][]string, len(resourceAccess))
