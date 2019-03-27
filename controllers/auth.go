@@ -21,7 +21,6 @@ import (
 	ctx "edp-admin-console/context"
 	"github.com/astaxie/beego"
 	"log"
-	"net/http"
 )
 
 type AuthController struct {
@@ -36,7 +35,8 @@ func (this *AuthController) Callback() {
 	sessionState := this.Ctx.Input.Session(authConfig.StateAuthKey)
 	log.Printf("State %s has been retrived from the session", sessionState)
 	if queryState != sessionState {
-		http.Error(this.Ctx.ResponseWriter, "State does not match", http.StatusBadRequest)
+		log.Println("State does not match")
+		this.Abort("400")
 		return
 	}
 
@@ -46,7 +46,7 @@ func (this *AuthController) Callback() {
 
 	if err != nil {
 		log.Printf("Failed to exchange token with code: %s", authCode)
-		http.Error(this.Ctx.ResponseWriter, "Failed to exchange token: "+err.Error(), http.StatusInternalServerError)
+		this.Abort("500")
 		return
 	}
 	log.Println("Authorization code has been successfully exchanged with token")

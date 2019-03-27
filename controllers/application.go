@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"log"
-	"net/http"
 )
 
 type ApplicationController struct {
@@ -73,7 +72,7 @@ func (this *ApplicationController) GetCreateApplicationPage() {
 	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue(edpName)
 
 	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		this.Abort("500")
 		return
 	}
 

@@ -20,7 +20,6 @@ import (
 	"edp-admin-console/service"
 	"fmt"
 	"github.com/astaxie/beego"
-	"net/http"
 	"strings"
 )
 
@@ -33,7 +32,7 @@ func (this *EDPTenantController) GetEDPTenants() {
 	resourceAccess := this.Ctx.Input.Session("resource_access").(map[string][]string)
 	edpTenants, err := this.EDPTenantService.GetEDPTenants(resourceAccess)
 	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		this.Abort("500")
 		return
 	}
 
@@ -46,7 +45,7 @@ func (this *EDPTenantController) GetEDPComponents() {
 	resourceAccess := this.Ctx.Input.Session("resource_access").(map[string][]string)
 	edpTenants, err := this.EDPTenantService.GetEDPTenants(resourceAccess)
 	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		this.Abort("500")
 		return
 	}
 
@@ -54,11 +53,11 @@ func (this *EDPTenantController) GetEDPComponents() {
 	components := this.EDPTenantService.GetEDPComponents(edpTenantName)
 	version, err := this.EDPTenantService.GetEDPVersionByName(edpTenantName)
 	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		this.Abort("500")
 		return
 	}
 
-	this.Data["InputURL"] = strings.TrimSuffix(this.Ctx.Input.URL(), "/" + edpTenantName)
+	this.Data["InputURL"] = strings.TrimSuffix(this.Ctx.Input.URL(), "/"+edpTenantName)
 	this.Data["LinkToApplications"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
 	this.Data["EDPTenantName"] = edpTenantName
 	this.Data["EDPVersion"] = version
@@ -71,7 +70,7 @@ func (this *EDPTenantController) GetVcsIntegrationValue() {
 	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue(this.GetString(":name"))
 
 	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		this.Abort("500")
 		return
 	}
 
