@@ -17,30 +17,30 @@
 package models
 
 type Application struct {
-	Name      string
-	Language  string
-	BuildTool string
+	Name      string `json:"name"`
+	Language  string `json:"language"`
+	BuildTool string `json:"build_tool"`
 }
 
 type ApplicationInfo struct {
-	Name           string
-	Tenant         string
-	Language       string
-	BuildTool      string
-	Framework      string
-	Strategy       string
-	GitUrl         string
-	RouteSite      string
-	RoutePath      string
-	DbKind         string
-	DbVersion      string
-	DbCapacity     string
-	DbStorage      string
-	DelitionTime   string
-	Type           string
-	Status         string
-	LastTimeUpdate string
-	UserName       string
-	Available      bool
-	Message        string
+	Name           string `json:"name"`
+	Tenant         string `json:"tenant"`
+	Language       string `json:"language"`
+	BuildTool      string `json:"build_tool"`
+	Framework      string `json:"framework"`
+	Strategy       string `json:"strategy"`
+	GitUrl         string `json:"git_url"`
+	RouteSite      string `json:"route_site"`
+	RoutePath      string `json:"route_path"`
+	DbKind         string `json:"db_kind"`
+	DbVersion      string `json:"db_version"`
+	DbCapacity     string `json:"db_capacity"`
+	DbStorage      string `json:"db_storage"`
+	DelitionTime   string `json:"delition_time"`
+	Type           string `json:"type"`
+	Status         string `json:"status"`
+	LastTimeUpdate string `json:"last_time_update"`
+	UserName       string `json:"user_name"`
+	Available      bool   `json:"available"`
+	Message        string `json:"message"`
 }
