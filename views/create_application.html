@@ -426,7 +426,7 @@
                                               title="Select database version."></span>
                                     </label>
                                     <select class="form-control" id="dbVersion" name="dbVersion">
-                                        <option>postgre:9.6</option>
+                                        <option>postgres:9.6</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -438,14 +438,9 @@
                                         <input name="dbCapacity" type="number" class="form-control storage-capacity"
                                                id="dbCapacity" placeholder="Enter database size">
                                         <select class="capacity-ext form-control storage-capacity-ext" name="capacityExt">
-                                            <option disabled="disabled">Binary units</option>
-                                            <option value="MiB" >MiB</option>
-                                            <option value="GiB">GiB</option>
-                                            <option value="TiB">TiB</option>
-                                            <option disabled="disabled">Decimal units</option>
-                                            <option value="MB">MB</option>
-                                            <option value="GB">GB</option>
-                                            <option value="TB">TB</option>
+                                            <option value="Mi" >Mi</option>
+                                            <option value="Gi">Gi</option>
+                                            <option value="Ti">Ti</option>
                                         </select>
                                     </div>
                                     <div class="invalid-feedback">
