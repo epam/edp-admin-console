@@ -50,7 +50,7 @@ func (this ApplicationEntityRepository) GetAllApplications(edpName string) ([]mo
 	}
 
 	if maps == nil {
-		return nil, nil
+		return []models.Application{}, nil
 	}
 
 	for _, row := range maps {

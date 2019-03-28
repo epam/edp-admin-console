@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"edp-admin-console/service"
+	"fmt"
 	"github.com/astaxie/beego"
 	"net/http"
 )
@@ -28,6 +29,12 @@ func (this *EdpRestController) GetTenantByName() {
 	edpTenant, err := this.EDPTenantService.GetTenantByName(edpTenantName)
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if &edpTenantName == nil {
+		nonAppMsg := fmt.Sprintf("Please check tenant name. It seems there're not %s tenant.", edpTenantName)
+		http.Error(this.Ctx.ResponseWriter, nonAppMsg, http.StatusNotFound)
 		return
 	}
 

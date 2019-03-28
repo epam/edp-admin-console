@@ -64,7 +64,7 @@ func (this *ApplicationRestController) GetApplication() {
 
 	if application == nil {
 		nonAppMsg := fmt.Sprintf("Please check application name. It seems there're not %s application.", appName)
-		http.Error(this.Ctx.ResponseWriter, nonAppMsg, http.StatusBadRequest)
+		http.Error(this.Ctx.ResponseWriter, nonAppMsg, http.StatusNotFound)
 		return
 	}
 

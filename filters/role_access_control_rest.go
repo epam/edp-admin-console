@@ -14,7 +14,7 @@ func RoleAccessControlRestFilter(context *bgCtx.Context) {
 
 	if contextRoles == nil {
 		nonValidTenantMsg := fmt.Sprintf("Couldn't find tenant by %s name.", context.Input.Param(":name"))
-		http.Error(context.ResponseWriter, nonValidTenantMsg, http.StatusBadRequest)
+		http.Error(context.ResponseWriter, nonValidTenantMsg, http.StatusNotFound)
 		return
 	}
 
