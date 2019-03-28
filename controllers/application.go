@@ -19,6 +19,7 @@ package controllers
 import (
 	"edp-admin-console/models"
 	"edp-admin-console/service"
+	"edp-admin-console/util"
 	"fmt"
 	"github.com/astaxie/beego"
 	"log"
@@ -43,6 +44,8 @@ func (this *ApplicationController) GetApplicationsOverviewPage() {
 		return
 	}
 
+	resourceAccess := this.GetSession("resource_access").(map[string][]string)
+	this.Data["HasRights"] = isAdmin(resourceAccess, this.GetString(":name")+"-edp")
 	this.Data["LinkToApplications"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
 	this.Data["CreateApplication"] = fmt.Sprintf("/admin/edp/%s/application/create", edpTenantName)
 	this.Data["EDPTenantName"] = edpTenantName
@@ -189,4 +192,13 @@ func extractRequestData(this *ApplicationController) models.App {
 		}
 	}
 	return app
+}
+
+func isAdmin(resourceAccess map[string][]string, edpName string) bool {
+	contextRoles := resourceAccess[edpName]
+	if contextRoles == nil {
+		log.Println(fmt.Sprintf("Couldn't find tenant by %s name.", edpName))
+		return false
+	}
+	return util.Contains(contextRoles, beego.AppConfig.String("adminRole"))
 }

@@ -34,13 +34,15 @@
                 <div class="flex-fill">
                     <h1>Applications</h1>
                 </div>
-                <div class="flex-fill">
-                    <div class="float-right">
-                        <a href="{{ .CreateApplication }}">
-                            <button class="btn btn-success">CREATE APPLICATION</button>
-                        </a>
+                {{if .HasRights}}
+                    <div class="flex-fill">
+                        <div class="float-right">
+                            <a href="{{ .CreateApplication }}">
+                                <button class="btn btn-success">CREATE APPLICATION</button>
+                            </a>
+                        </div>
                     </div>
-                </div>
+                {{end}}
             </div>
             <table class="table edp-table">
                 <thead>
@@ -74,9 +76,13 @@
             {{else}}
                 <div class="no-tenant no-app-message">
                     <h1>Looks like there're not any applications.</h1>
-                    <a href="{{ .CreateApplication }}">
-                        <button class="btn btn-success">CREATE APPLICATION</button>
-                    </a>
+                    {{if .HasRights}}
+                        <a href="{{ .CreateApplication }}">
+                            <button class="btn btn-success">CREATE APPLICATION</button>
+                        </a>
+                    {{else}}
+                        <p class="no-rights-msg">Please, contact EDP support team.</p>
+                    {{end}}
                 </div>
             {{end}}
         </div>

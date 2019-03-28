@@ -7,3 +7,7 @@
     margin: 10% auto auto;
     text-align: center;
 }
+
+.no-rights-msg {
+    font-size: 2rem;
+}
