@@ -26,6 +26,7 @@ import (
 	"golang.org/x/oauth2"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func AuthFilter(context *bgCtx.Context) {
@@ -48,6 +49,9 @@ func AuthFilter(context *bgCtx.Context) {
 	resourceRoles := getResourceAccessValues(context, idToken)
 	log.Printf("ResourceAccess %s has been retrieved from the token", resourceRoles)
 	context.Output.Session("resource_access", resourceRoles)
+	username := getUserInfoFromToken(context, idToken)
+	log.Printf("Username {%s} has been fetched from token", username)
+	context.Output.Session("username", username)
 }
 
 func getRealmRoles(context *bgCtx.Context, token *oidc.IDToken) []string {
@@ -97,4 +101,14 @@ func startAuth(context *bgCtx.Context) {
 	log.Printf("State %s has been generated, saved in the session and added in the auth request", state)
 	context.Output.Session(authConfig.StateAuthKey, state)
 	context.Redirect(http.StatusFound, authConfig.Oauth2Config.AuthCodeURL(state))
+}
+
+func getUserInfoFromToken(context *bgCtx.Context, token *oidc.IDToken) string {
+	var claim map[string]*json.RawMessage
+	err := token.Claims(&claim)
+	if err != nil {
+		log.Printf("Error has been occurred during the parsing token %+v", token)
+		context.Abort(200, "500")
+	}
+	return strings.Replace(string(*claim["name"]), "\"", "", -1)
 }

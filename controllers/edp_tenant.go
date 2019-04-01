@@ -36,6 +36,7 @@ func (this *EDPTenantController) GetEDPTenants() {
 		return
 	}
 
+	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["InputURL"] = this.Ctx.Input.URL()
 	this.Data["EDPTenants"] = edpTenants
 	this.TplName = "edp_tenants.html"
@@ -57,6 +58,7 @@ func (this *EDPTenantController) GetEDPComponents() {
 		return
 	}
 
+	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["InputURL"] = strings.TrimSuffix(this.Ctx.Input.URL(), "/"+edpTenantName)
 	this.Data["LinkToApplications"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
 	this.Data["EDPTenantName"] = edpTenantName

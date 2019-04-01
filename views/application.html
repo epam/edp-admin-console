@@ -10,23 +10,10 @@
 </head>
 <body>
 <main>
-    <header class="edp-header">
-        <div class="burger">
-            <button class="js-toggle-menu-button" type="button" data-toggle="collapse">
-                <span class="opened">&#10006;</span>
-                <span class="closed"></span>
-            </button>
-        </div>
-        <div class="logo">
-            <a href="/admin/edp/{{.EDPTenantName}}/overview">
-                <img src="/static/img/epam-logo-full-color-pms-colors.png" alt="epam">
-            </a>
-        </div>
-        <h2>Epam Delivery Platform</h2>
-    </header>
+    {{template "template/header_application_template.html" .}}
     <section class="content d-flex">
         <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
-            {{template "navbar_template.html" .}}
+            {{template "template/navbar_template.html" .}}
         </aside>
         <div class="flex-fill pl-3 pr-3 wrapper">
             {{if .Applications}}
@@ -89,12 +76,7 @@
             {{end}}
         </div>
     </section>
-    <footer class="edp-footer">
-        <div class="copy">
-            <p>© 2018 EPAM Systems, Inc. </p>
-            <p> All Rights Reserved.</p>
-        </div>
-    </footer>
+    {{template "template/footer_template.html" .}}
 
     <!-- Modal success -->
     <div class="modal fade" id="successPopup" tabindex="-1" role="dialog" aria-labelledby="successPopupLabel" aria-hidden="true" data-display="{{ if .Success }}true{{ else }}false{{ end }}">

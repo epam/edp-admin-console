@@ -9,12 +9,7 @@
 </head>
 <body>
 <main>
-    <header class="edp-header">
-        <div class="logo">
-            <img src="/static/img/epam-logo-full-color-pms-colors.png" alt="epam">
-        </div>
-        <h2>Epam Delivery Platform</h2>
-    </header>
+    {{template "template/header_template.html" .}}
     <section class="content error">
         <div class="edp-landing-text container">
             <div class="edp-error-image">
@@ -28,12 +23,7 @@
             </div>
         </div>
     </section>
-    <footer class="edp-footer">
-        <div class="copy">
-            <p>© 2018 EPAM Systems, Inc. </p>
-            <p> All Rights Reserved.</p>
-        </div>
-    </footer>
+    {{template "template/footer_template.html" .}}
 </main>
 <script src="/static/js/jquery-3.3.1.js"></script>
 <script src="/static/js/popper.js"></script>

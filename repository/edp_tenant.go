@@ -45,9 +45,9 @@ func (this EDPTenantRepository) GetAllEDPTenantsByNames(adminClients []string) (
 func (this EDPTenantRepository) GetEdpVersionByName(edpName string) (string, error) {
 	var edp models.EDPTenant
 	o := orm.NewOrm()
-	err := o.QueryTable(new(models.EDPTenant)).Filter("name__istartswith", edpName).One(&edp, "name", "version")
+	err := o.QueryTable(new(models.EDPTenant)).Filter("name", edpName).One(&edp, "name", "version")
 	if err == orm.ErrMultiRows {
-		return "", errors.New("The problem has been detected due to db contains more than one value.")
+		return "", errors.New("the problem has been detected due to db contains more than one value")
 	}
 	if err == orm.ErrNoRows {
 		return "", errors.New(fmt.Sprintf("Couldn't find EDP version for %s.", edpName))

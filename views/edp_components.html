@@ -10,12 +10,7 @@
 </head>
 <body>
 <main>
-    <header class="edp-header">
-        <div class="logo">
-            <img src="/static/img/epam-logo-full-color-pms-colors.png" alt="epam">
-        </div>
-        <h2>Epam Delivery Platform</h2>
-    </header>
+    {{template "template/header_template.html" .}}
     <div class="form-group">
         <div class="d-flex flex-row">
             <div class="border-nav">
@@ -46,23 +41,22 @@
     </div>
     <section class="content d-flex">
         <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
-            {{template "navbar_template.html" .}}
+            {{template "template/navbar_template.html" .}}
         </aside>
         <div class="flex-fill pl-4 pr-4 wrapper">
 
             <div style="margin-top: 10px">
-                <p style="font-weight:bold;">{{ .EDPTenantName }} {{ .EDPVersion }}</p>
                 <table class="table">
                     <tbody>
                         {{ range $k, $v := .EDPComponents }}
                             <tr>
                                 <td width="25px">
-                                    <a href="{{ $v }}">
-                                        <img src="/static/img/{{$k}}.png" alt="{{$k}}" height="45" width="{{if eq "Jenkins" $k}} 35 {{else}} 42 {{end}}">
+                                    <a href="{{ $v }}" target="_blank" rel="noopener noreferrer">
+                                        <img src="/static/img/{{$k}}.svg" alt="{{$k}}" height="45" width="42">
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="{{ $v }}">{{ $k }}</a>
+                                    <a href="{{ $v }}" target="_blank" rel="noopener noreferrer">{{ $k }}</a>
                                 </td>
                             </tr>
                         {{end}}
@@ -71,12 +65,7 @@
             </div>
         </div>
     </section>
-    <footer class="edp-footer">
-        <div class="copy">
-            <p>© 2018 EPAM Systems, Inc. </p>
-            <p> All Rights Reserved.</p>
-        </div>
-    </footer>
+    {{template "template/footer_template.html" .}}
 </main>
 <script src="/static/js/jquery-3.3.1.js"></script>
 <script src="/static/js/popper.js"></script>

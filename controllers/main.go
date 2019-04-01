@@ -25,6 +25,7 @@ type MainController struct {
 	beego.Controller
 }
 
+//todo add tenant version to footer
 func (this *MainController) Index() {
 	this.TplName = "index.html"
 }

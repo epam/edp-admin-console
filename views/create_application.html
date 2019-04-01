@@ -10,21 +10,10 @@
 </head>
 <body>
 <main>
-    <header class="edp-header">
-        <div class="burger">
-            <button class="js-toggle-menu-button" type="button" data-toggle="collapse">
-                <span class="opened">&#10006;</span>
-                <span class="closed"></span>
-            </button>
-        </div>
-        <div class="logo">
-            <img src="/static/img/epam-logo-full-color-pms-colors.png" alt="epam">
-        </div>
-        <h2>Epam Delivery Platform</h2>
-    </header>
+    {{template "template/header_template.html" .}}
     <section class="content d-flex">
         <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
-            {{template "navbar_template.html" .}}
+            {{template "template/navbar_template.html" .}}
         </aside>
         <div class="flex-fill pl-4 pr-4 wrapper">
 
@@ -472,12 +461,7 @@
             </form>
         </div>
     </section>
-    <footer class="edp-footer">
-        <div class="copy">
-            <p>© 2018 EPAM Systems, Inc. </p>
-            <p> All Rights Reserved.</p>
-        </div>
-    </footer>
+    {{template "template/footer_template.html" .}}
 
     <!-- Modal confirmation -->
     <div class="modal fade" id="confirmationPopup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">

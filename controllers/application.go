@@ -44,7 +44,15 @@ func (this *ApplicationController) GetApplicationsOverviewPage() {
 		return
 	}
 
+	version, err := this.EDPTenantService.GetEDPVersionByName(edpTenantName)
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
 	resourceAccess := this.GetSession("resource_access").(map[string][]string)
+	this.Data["EDPVersion"] = version
+	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["HasRights"] = isAdmin(resourceAccess, this.GetString(":name")+"-edp")
 	this.Data["LinkToApplications"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
 	this.Data["CreateApplication"] = fmt.Sprintf("/admin/edp/%s/application/create", edpTenantName)
@@ -62,6 +70,14 @@ func (this *ApplicationController) GetApplicationOverviewPage() {
 		return
 	}
 
+	version, err := this.EDPTenantService.GetEDPVersionByName(edpTenantName)
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
+	this.Data["EDPVersion"] = version
+	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["EDPTenantName"] = edpTenantName
 	this.Data["LinkToApplications"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
 	this.Data["Application"] = application
@@ -83,6 +99,14 @@ func (this *ApplicationController) GetCreateApplicationPage() {
 		this.Data["Error"] = flash.Data["error"]
 	}
 
+	version, err := this.EDPTenantService.GetEDPVersionByName(edpName)
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
+	this.Data["EDPVersion"] = version
+	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["EDPTenantName"] = edpName
 	this.Data["LinkToApplications"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpName)
 	this.Data["IsVcsEnabled"] = isVcsEnabled

@@ -35,7 +35,7 @@ type EDPTenantService struct {
 }
 
 var (
-	edpComponentNames = []string{"Jenkins", "Gerrit", "Sonar", "Nexus", "EDP-Cockpit"}
+	edpComponentNames = []string{"Jenkins", "Gerrit", "Sonar", "Nexus"}
 	wildcard          = beego.AppConfig.String("dnsWildcard")
 )
 
