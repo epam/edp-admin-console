@@ -43,7 +43,7 @@ func (this EDPTenantService) GetEDPTenants(resourceAccess map[string][]string) (
 	edpTenantNames := filterEdpTenantNamesWithoutSuffixWithCurrentRoles(resourceAccess)
 	if edpTenantNames == nil {
 		log.Println("There aren't edp tenants to display.")
-		return nil, nil
+		return []*models.EDPTenant{}, nil
 	}
 
 	edpSpecs, err := this.IEDPTenantRep.GetAllEDPTenantsByNames(edpTenantNames)
@@ -105,7 +105,6 @@ func (this EDPTenantService) GetVcsIntegrationValue(edpName string) (bool, error
 		log.Printf("An error has occurred while parsing 'vcs_integration_enabled=false': %s", err)
 		return false, err
 	}
-
 	return result, nil
 }
 

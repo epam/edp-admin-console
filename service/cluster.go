@@ -33,7 +33,11 @@ func (this ClusterService) GetAllStorageClasses() ([]string, error) {
 	classList, err := storageClient.StorageClasses().List(metav1.ListOptions{})
 	if err != nil {
 		log.Printf("An error has occurred while getting storage classes: %s", err)
-		return storageClasses, err
+		return nil, err
+	}
+
+	if len(classList.Items) == 0 {
+		return []string{},nil
 	}
 
 	for _, element := range classList.Items {

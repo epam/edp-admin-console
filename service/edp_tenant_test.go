@@ -83,7 +83,7 @@ func TestShouldReturnErrorFromEDPTenantsByNameBecauseInvalidArguments(t *testing
 		"client2": {"developer"},
 	})
 	assert.NoError(t, err)
-	assert.Nil(t, tenants, "should be nil as there're all incorrect tenants")
+	assert.Equal(t, len(tenants), 0,"should be equal as there're all incorrect tenants")
 }
 
 func TestShouldReturnAllEDPTenants(t *testing.T) {
