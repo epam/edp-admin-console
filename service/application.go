@@ -21,6 +21,7 @@ import (
 	"edp-admin-console/models"
 	"edp-admin-console/repository"
 	"fmt"
+	"github.com/astaxie/beego"
 	"k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -34,12 +35,12 @@ type ApplicationService struct {
 	IApplicationRepository repository.IApplicationEntityRepository
 }
 
-func (this ApplicationService) CreateApp(app models.App, edpName string) (*k8s.BusinessApplication, error) {
+func (this ApplicationService) CreateApp(app models.App) (*k8s.BusinessApplication, error) {
 	log.Println("Start creating CR...")
 	appClient := this.Clients.ApplicationClient
 	coreClient := this.Clients.CoreClient
 	spec := convertData(app)
-	namespace := edpName + "-edp-cicd"
+	namespace := beego.AppConfig.String("cicdNamespace") + "-edp-cicd"
 
 	crd := &k8s.BusinessApplication{
 		TypeMeta: metav1.TypeMeta{
@@ -75,9 +76,9 @@ func (this ApplicationService) CreateApp(app models.App, edpName string) (*k8s.B
 	return result, nil
 }
 
-func (this ApplicationService) GetApplicationCR(appName string, edpName string) (*k8s.BusinessApplication, error) {
+func (this ApplicationService) GetApplicationCR(appName string) (*k8s.BusinessApplication, error) {
 	appClient := this.Clients.ApplicationClient
-	namespace := edpName + "-edp-cicd"
+	namespace := beego.AppConfig.String("cicdNamespace") + "-edp-cicd"
 
 	result := &k8s.BusinessApplication{}
 	err := appClient.Get().Namespace(namespace).Resource("businessapplications").Name(appName).Do().Into(result)
@@ -95,8 +96,9 @@ func (this ApplicationService) GetApplicationCR(appName string, edpName string) 
 	return result, nil
 }
 
-func (this *ApplicationService) GetAllApplications(edpName string) ([]models.Application, error) {
-	applications, err := this.IApplicationRepository.GetAllApplications(edpName)
+func (this *ApplicationService) GetAllApplications() ([]models.Application, error) {
+	edpTenantName := beego.AppConfig.String("cicdNamespace")
+	applications, err := this.IApplicationRepository.GetAllApplications(edpTenantName)
 	if err != nil {
 		log.Printf("An error has occurred while getting application objects from database: %s", err)
 		return nil, err
@@ -106,8 +108,9 @@ func (this *ApplicationService) GetAllApplications(edpName string) ([]models.App
 	return applications, nil
 }
 
-func (this ApplicationService) GetApplication(appName string, edpName string) (*models.ApplicationInfo, error) {
-	application, err := this.IApplicationRepository.GetApplication(appName, edpName)
+func (this ApplicationService) GetApplication(appName string) (*models.ApplicationInfo, error) {
+	edpTenantName := beego.AppConfig.String("cicdNamespace")
+	application, err := this.IApplicationRepository.GetApplication(appName, edpTenantName)
 	if err != nil {
 		log.Printf("An error has occurred while getting application object %s from database: %s", appName, err)
 		return nil, err

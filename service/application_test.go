@@ -28,7 +28,7 @@ func TestShouldReturnApplications(t *testing.T) {
 	repositoryMock.On("GetAllApplications", mock.Anything).Return(createApplications(), nil)
 	appService := ApplicationService{IApplicationRepository: repositoryMock}
 
-	applications, err := appService.GetAllApplications(mock.Anything)
+	applications, err := appService.GetAllApplications()
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(applications), "they should be equal")
 }
@@ -38,7 +38,7 @@ func TestShouldReturnErrorFromGetAllApplications(t *testing.T) {
 	repositoryMock.On("GetAllApplications", mock.Anything).Return(createApplications(), errors.New("internal error"))
 	appService := ApplicationService{IApplicationRepository: repositoryMock}
 
-	applications, err := appService.GetAllApplications(mock.Anything)
+	applications, err := appService.GetAllApplications()
 	assert.Error(t, err)
 	assert.Nil(t, applications)
 }
@@ -48,7 +48,7 @@ func TestShouldReturnApplication(t *testing.T) {
 	repositoryMock.On("GetApplication", mock.Anything, mock.Anything).Return(&models.ApplicationInfo{}, nil)
 	appService := ApplicationService{IApplicationRepository: repositoryMock}
 
-	application, err := appService.GetApplication(mock.Anything, mock.Anything)
+	application, err := appService.GetApplication(mock.Anything)
 	assert.Nil(t, err)
 	assert.NotNil(t, application)
 }
@@ -58,7 +58,7 @@ func TestShouldReturnErrorFromGetAllApplication(t *testing.T) {
 	repositoryMock.On("GetApplication", mock.Anything, mock.Anything).Return(&models.ApplicationInfo{}, errors.New("internal error"))
 	appService := ApplicationService{IApplicationRepository: repositoryMock}
 
-	application, err := appService.GetApplication(mock.Anything, mock.Anything)
+	application, err := appService.GetApplication(mock.Anything)
 	assert.NotNil(t, err)
 	assert.Nil(t, application)
 }

@@ -169,6 +169,8 @@ objects:
                   value: "admin"
                 - name: PG_PORT
                   value: "5432"
+                - name: TENANT
+                  value: ${TENANT}
               terminationMessagePath: /dev/termination-log
               terminationMessagePolicy: File
           dnsPolicy: ClusterFirst
@@ -268,3 +270,7 @@ parameters:
   - displayName: Storage capacity for persistent volume
     name: STORAGE_CAPACITY
     value: "1Gi"
+  - displayName: Tenant name
+    name: TENANT
+    value: ''
+    required: true

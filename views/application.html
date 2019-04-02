@@ -10,7 +10,7 @@
 </head>
 <body>
 <main>
-    {{template "template/header_application_template.html" .}}
+    {{template "template/header_template.html" .}}
     <section class="content d-flex">
         <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
             {{template "template/navbar_template.html" .}}
@@ -24,7 +24,7 @@
                 {{if .HasRights}}
                     <div class="flex-fill">
                         <div class="float-right">
-                            <a href="{{ .CreateApplication }}">
+                            <a href="/admin/edp/application/create">
                                 <button class="btn btn-success">CREATE APPLICATION</button>
                             </a>
                         </div>
@@ -46,7 +46,7 @@
                 {{range .Applications}}
                     <tr>
                         <td>
-                            <a href="/admin/edp/{{$.EDPTenantName}}/application/{{.Name}}/overview">
+                            <a href="/admin/edp/application/{{.Name}}/overview">
                                 {{.Name}}
                             </a>
                         </td>

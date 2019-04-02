@@ -17,16 +17,24 @@
 package controllers
 
 import (
+	"edp-admin-console/service"
 	"fmt"
 	"github.com/astaxie/beego"
 )
 
 type MainController struct {
 	beego.Controller
+	EDPTenantService service.EDPTenantService
 }
 
-//todo add tenant version to footer
 func (this *MainController) Index() {
+	version, err := this.EDPTenantService.GetEDPVersion()
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
+	this.Data["EDPVersion"] = version
 	this.TplName = "index.html"
 }
 

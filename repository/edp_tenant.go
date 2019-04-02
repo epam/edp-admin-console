@@ -24,22 +24,10 @@ import (
 )
 
 type IEDPTenantRepository interface {
-	GetAllEDPTenantsByNames(adminClients []string) ([]*models.EDPTenant, error)
 	GetEdpVersionByName(edpName string) (string, error)
-	GetTenantByName(edpName string) (*models.EDPTenant, error)
 }
 
 type EDPTenantRepository struct {
-}
-
-func (this EDPTenantRepository) GetAllEDPTenantsByNames(adminClients []string) ([]*models.EDPTenant, error) {
-	var edpTenants []*models.EDPTenant
-	o := orm.NewOrm()
-	_, err := o.QueryTable(new(models.EDPTenant)).Filter("name__in", adminClients).All(&edpTenants, "name", "version")
-	if err != nil {
-		return nil, err
-	}
-	return edpTenants, nil
 }
 
 func (this EDPTenantRepository) GetEdpVersionByName(edpName string) (string, error) {
@@ -53,14 +41,4 @@ func (this EDPTenantRepository) GetEdpVersionByName(edpName string) (string, err
 		return "", errors.New(fmt.Sprintf("Couldn't find EDP version for %s.", edpName))
 	}
 	return edp.Version, nil
-}
-
-func (this EDPTenantRepository) GetTenantByName(edpName string) (*models.EDPTenant, error) {
-	var edpTenant models.EDPTenant
-	o := orm.NewOrm()
-	err := o.QueryTable(new(models.EDPTenant)).Filter("name", edpName).One(&edpTenant)
-	if err != nil {
-		return nil, err
-	}
-	return &edpTenant, nil
 }

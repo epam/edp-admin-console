@@ -41,35 +41,31 @@ func init() {
 	beego.Router("/auth/callback", &controllers.AuthController{}, "get:Callback")
 	beego.InsertFilter("/admin/*", beego.BeforeRouter, filters.AuthFilter)
 	beego.InsertFilter("/api/v1/edp/*", beego.BeforeRouter, filters.AuthRestFilter)
-	beego.InsertFilter("/admin/edp/:name/*", beego.BeforeRouter, filters.RoleAccessControlFilter)
-	beego.InsertFilter("/api/v1/edp/:name/*", beego.BeforeRouter, filters.RoleAccessControlRestFilter)
-	beego.InsertFilter("/api/v1/edp/:name", beego.BeforeRouter, filters.RoleAccessControlRestFilter)
+	beego.InsertFilter("/admin/edp/*", beego.BeforeRouter, filters.RoleAccessControlFilter)
+	beego.InsertFilter("/api/v1/edp/*", beego.BeforeRouter, filters.RoleAccessControlRestFilter)
 
 	beego.ErrorController(&controllers.ErrorController{})
-	beego.Router("/", &controllers.MainController{}, "get:Index")
+	beego.Router("/", &controllers.MainController{EDPTenantService: edpService}, "get:Index")
 	beego.Router("/cockpit-redirect-confirmation", &controllers.MainController{}, "get:CockpitRedirectConfirmationPage")
 
 	adminEdpNamespace := beego.NewNamespace("/admin/edp",
-		beego.NSRouter("/overview", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPTenants"),
-		beego.NSRouter("/:name/overview", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPComponents"),
-		beego.NSRouter("/:name/application/overview", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "get:GetApplicationsOverviewPage"),
-		beego.NSRouter("/:name/application/:appName/overview", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "get:GetApplicationOverviewPage"),
-		beego.NSRouter("/:name/application/create", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "get:GetCreateApplicationPage"),
-		beego.NSRouter("/:name/application", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "post:CreateApplication"),
+		beego.NSRouter("/overview", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPComponents"),
+		beego.NSRouter("/application/overview", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "get:GetApplicationsOverviewPage"),
+		beego.NSRouter("/application/:appName/overview", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "get:GetApplicationOverviewPage"),
+		beego.NSRouter("/application/create", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "get:GetCreateApplicationPage"),
+		beego.NSRouter("/application", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "post:CreateApplication"),
 	)
 	beego.AddNamespace(adminEdpNamespace)
 
 	apiV1EdpNamespace := beego.NewNamespace("/api/v1/edp",
-		beego.NSRouter("/:name", &controllers.EdpRestController{EDPTenantService: edpService}, "get:GetTenantByName"),
-		beego.NSRouter("/:name/application", &controllers.ApplicationRestController{AppService: appService}, "post:CreateApplication"),
-		beego.NSRouter("/:name/application", &controllers.ApplicationRestController{AppService: appService}, "get:GetApplications"),
-		beego.NSRouter("/:name/application/:appName", &controllers.ApplicationRestController{AppService: appService}, "get:GetApplication"),
-		beego.NSRouter("/:name/vcs", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetVcsIntegrationValue"),
+		beego.NSRouter("/application", &controllers.ApplicationRestController{AppService: appService}, "post:CreateApplication"),
+		beego.NSRouter("/application", &controllers.ApplicationRestController{AppService: appService}, "get:GetApplications"),
+		beego.NSRouter("/application/:appName", &controllers.ApplicationRestController{AppService: appService}, "get:GetApplication"),
+		beego.NSRouter("/vcs", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetVcsIntegrationValue"),
 	)
 	beego.AddNamespace(apiV1EdpNamespace)
 
 	apiV1Namespace := beego.NewNamespace("/api/v1",
-		beego.NSRouter("/edp", &controllers.EdpRestController{EDPTenantService: edpService}, "get:GetEDPTenants"),
 		beego.NSRouter("/storage-class", &controllers.OpenshiftRestController{ClusterService: clusterService}, "get:GetAllStorageClasses"),
 		beego.NSRouter("/repository/available", &controllers.RepositoryRestController{}, "post:IsGitRepoAvailable"),
 	)

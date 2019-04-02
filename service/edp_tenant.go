@@ -18,9 +18,8 @@ package service
 
 import (
 	"edp-admin-console/k8s"
-	"edp-admin-console/models"
 	"edp-admin-console/repository"
-	"edp-admin-console/util"
+	"errors"
 	"fmt"
 	"github.com/astaxie/beego"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -39,23 +38,8 @@ var (
 	wildcard          = beego.AppConfig.String("dnsWildcard")
 )
 
-func (this EDPTenantService) GetEDPTenants(resourceAccess map[string][]string) ([]*models.EDPTenant, error) {
-	edpTenantNames := filterEdpTenantNamesWithoutSuffixWithCurrentRoles(resourceAccess)
-	if edpTenantNames == nil {
-		log.Println("There aren't edp tenants to display.")
-		return []*models.EDPTenant{}, nil
-	}
-
-	edpSpecs, err := this.IEDPTenantRep.GetAllEDPTenantsByNames(edpTenantNames)
-	if err != nil {
-		log.Printf("Couldn't get all EDP specifications. Reason: %v\n", err)
-		return nil, err
-	}
-
-	return edpSpecs, nil
-}
-
-func (this EDPTenantService) GetEDPVersionByName(edpTenantName string) (string, error) {
+func (this EDPTenantService) GetEDPVersion() (string, error) {
+	edpTenantName := beego.AppConfig.String("cicdNamespace")
 	version, err := this.IEDPTenantRep.GetEdpVersionByName(edpTenantName)
 	if err != nil {
 		log.Printf("An error has occurred while getting version of %s EDP.", edpTenantName)
@@ -64,16 +48,8 @@ func (this EDPTenantService) GetEDPVersionByName(edpTenantName string) (string, 
 	return version, nil
 }
 
-func (this EDPTenantService) GetTenantByName(edpName string) (*models.EDPTenant, error) {
-	edpTenant, err := this.IEDPTenantRep.GetTenantByName(edpName)
-	if err != nil {
-		log.Printf("An error has occurred while getting tenant by %s name.", edpName)
-		return nil, err
-	}
-	return edpTenant, nil
-}
-
-func (edpService EDPTenantService) GetEDPComponents(edpTenantName string) map[string]string {
+func (edpService EDPTenantService) GetEDPComponents() map[string]string {
+	edpTenantName := beego.AppConfig.String("cicdNamespace")
 	var compWithLinks = make(map[string]string, len(edpComponentNames))
 	for _, val := range edpComponentNames {
 		compWithLinks[val] = fmt.Sprintf("https://%s-%s-edp-cicd.%s", strings.ToLower(val), edpTenantName, wildcard)
@@ -81,9 +57,9 @@ func (edpService EDPTenantService) GetEDPComponents(edpTenantName string) map[st
 	return compWithLinks
 }
 
-func (this EDPTenantService) GetVcsIntegrationValue(edpName string) (bool, error) {
+func (this EDPTenantService) GetVcsIntegrationValue() (bool, error) {
 	coreClient := this.Clients.CoreClient
-	namespace := edpName + "-edp-cicd"
+	namespace := beego.AppConfig.String("cicdNamespace") + "-edp-cicd"
 
 	res, err := coreClient.ConfigMaps(namespace).Get("user-settings", metav1.GetOptions{})
 
@@ -95,8 +71,8 @@ func (this EDPTenantService) GetVcsIntegrationValue(edpName string) (bool, error
 	var vcsEnabled = res.Data["vcs_integration_enabled"]
 
 	if len(vcsEnabled) == 0 {
-		log.Println("vcs_integration_enabled property doesn't exist. Configured default value: 'vcs_integration_enabled=false'")
-		return false, nil
+		log.Println("vcs_integration_enabled property doesn't exist")
+		return false, errors.New("NOT_FOUND")
 	}
 
 	result, err := strconv.ParseBool(vcsEnabled)
@@ -106,16 +82,4 @@ func (this EDPTenantService) GetVcsIntegrationValue(edpName string) (bool, error
 		return false, err
 	}
 	return result, nil
-}
-
-func filterEdpTenantNamesWithoutSuffixWithCurrentRoles(resourceAccess map[string][]string) []string {
-	var edpTenants []string
-	suffix := "-edp"
-	for key, value := range resourceAccess {
-		if strings.HasSuffix(key, suffix) &&
-			(util.Contains(value, beego.AppConfig.String("adminRole")) || util.Contains(value, beego.AppConfig.String("developerRole"))) {
-			edpTenants = append(edpTenants, strings.TrimSuffix(key, suffix))
-		}
-	}
-	return edpTenants
 }

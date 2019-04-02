@@ -18,8 +18,8 @@ package controllers
 
 import (
 	"edp-admin-console/service"
-	"fmt"
 	"github.com/astaxie/beego"
+	"net/http"
 	"strings"
 )
 
@@ -28,31 +28,10 @@ type EDPTenantController struct {
 	EDPTenantService service.EDPTenantService
 }
 
-func (this *EDPTenantController) GetEDPTenants() {
-	resourceAccess := this.Ctx.Input.Session("resource_access").(map[string][]string)
-	edpTenants, err := this.EDPTenantService.GetEDPTenants(resourceAccess)
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["InputURL"] = this.Ctx.Input.URL()
-	this.Data["EDPTenants"] = edpTenants
-	this.TplName = "edp_tenants.html"
-}
-
 func (this *EDPTenantController) GetEDPComponents() {
-	resourceAccess := this.Ctx.Input.Session("resource_access").(map[string][]string)
-	edpTenants, err := this.EDPTenantService.GetEDPTenants(resourceAccess)
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
-	edpTenantName := this.GetString(":name")
-	components := this.EDPTenantService.GetEDPComponents(edpTenantName)
-	version, err := this.EDPTenantService.GetEDPVersionByName(edpTenantName)
+	edpTenantName := beego.AppConfig.String("cicdNamespace")
+	components := this.EDPTenantService.GetEDPComponents()
+	version, err := this.EDPTenantService.GetEDPVersion()
 	if err != nil {
 		this.Abort("500")
 		return
@@ -60,19 +39,21 @@ func (this *EDPTenantController) GetEDPComponents() {
 
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["InputURL"] = strings.TrimSuffix(this.Ctx.Input.URL(), "/"+edpTenantName)
-	this.Data["LinkToApplications"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
 	this.Data["EDPTenantName"] = edpTenantName
 	this.Data["EDPVersion"] = version
 	this.Data["EDPComponents"] = components
-	this.Data["EDPTenants"] = edpTenants
 	this.TplName = "edp_components.html"
 }
 
 func (this *EDPTenantController) GetVcsIntegrationValue() {
-	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue(this.GetString(":name"))
+	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue()
 
 	if err != nil {
-		this.Abort("500")
+		if err.Error() == "NOT_FOUND" {
+			http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusNotFound)
+			return
+		}
+		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

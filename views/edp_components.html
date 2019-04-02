@@ -11,34 +11,6 @@
 <body>
 <main>
     {{template "template/header_template.html" .}}
-    <div class="form-group">
-        <div class="d-flex flex-row">
-            <div class="border-nav">
-                <nav class="navbar navbar-expand-lg navbar-light">
-                    <div class="burger">
-                        <button class="js-toggle-menu-button" type="button" data-toggle="collapse">
-                            <span class="opened">&#10006;</span>
-                            <span class="closed"></span>
-                        </button>
-                    </div>
-                </nav>
-            </div>
-            <div class="col-md-12">
-                <div class="dropdown">
-                    <button class="dropbtn pointer" type="button" id="dropdownMenuButton"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <p>Select EDP tenant <i class="arrow down"></i></p>
-                    </button>
-                    <div class="dropdown-content" aria-labelledby="dropdownMenuButton">
-                        {{range $k, $v := .EDPTenants}}
-                            <a href="/admin/edp/{{$v.Name}}/overview">{{$v.Name}}</a>
-                        {{end}}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
     <section class="content d-flex">
         <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
             {{template "template/navbar_template.html" .}}

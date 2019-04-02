@@ -37,14 +37,14 @@ func (this *ApplicationController) GetApplicationsOverviewPage() {
 		this.Data["Success"] = true
 	}
 
-	edpTenantName := this.GetString(":name")
-	applications, err := this.AppService.GetAllApplications(edpTenantName)
+	edpTenantName := beego.AppConfig.String("cicdNamespace")
+	applications, err := this.AppService.GetAllApplications()
 	if err != nil {
 		this.Abort("500")
 		return
 	}
 
-	version, err := this.EDPTenantService.GetEDPVersionByName(edpTenantName)
+	version, err := this.EDPTenantService.GetEDPVersion()
 	if err != nil {
 		this.Abort("500")
 		return
@@ -53,24 +53,20 @@ func (this *ApplicationController) GetApplicationsOverviewPage() {
 	resourceAccess := this.GetSession("resource_access").(map[string][]string)
 	this.Data["EDPVersion"] = version
 	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["HasRights"] = isAdmin(resourceAccess, this.GetString(":name")+"-edp")
-	this.Data["LinkToApplications"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
-	this.Data["CreateApplication"] = fmt.Sprintf("/admin/edp/%s/application/create", edpTenantName)
-	this.Data["EDPTenantName"] = edpTenantName
+	this.Data["HasRights"] = isAdmin(resourceAccess, edpTenantName+"-edp")
 	this.Data["Applications"] = applications
 	this.TplName = "application.html"
 }
 
 func (this *ApplicationController) GetApplicationOverviewPage() {
-	edpTenantName := this.GetString(":name")
 	appName := this.GetString(":appName")
-	application, err := this.AppService.GetApplication(appName, edpTenantName)
+	application, err := this.AppService.GetApplication(appName)
 	if err != nil {
 		this.Abort("500")
 		return
 	}
 
-	version, err := this.EDPTenantService.GetEDPVersionByName(edpTenantName)
+	version, err := this.EDPTenantService.GetEDPVersion()
 	if err != nil {
 		this.Abort("500")
 		return
@@ -78,17 +74,13 @@ func (this *ApplicationController) GetApplicationOverviewPage() {
 
 	this.Data["EDPVersion"] = version
 	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["EDPTenantName"] = edpTenantName
-	this.Data["LinkToApplications"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
 	this.Data["Application"] = application
-	this.Data["ApplicationsLink"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName)
 	this.TplName = "application_overview.html"
 }
 
 func (this *ApplicationController) GetCreateApplicationPage() {
-	edpName := this.GetString(":name")
 	flash := beego.ReadFromRequest(&this.Controller)
-	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue(edpName)
+	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue()
 
 	if err != nil {
 		this.Abort("500")
@@ -99,7 +91,7 @@ func (this *ApplicationController) GetCreateApplicationPage() {
 		this.Data["Error"] = flash.Data["error"]
 	}
 
-	version, err := this.EDPTenantService.GetEDPVersionByName(edpName)
+	version, err := this.EDPTenantService.GetEDPVersion()
 	if err != nil {
 		this.Abort("500")
 		return
@@ -107,34 +99,30 @@ func (this *ApplicationController) GetCreateApplicationPage() {
 
 	this.Data["EDPVersion"] = version
 	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["EDPTenantName"] = edpName
-	this.Data["LinkToApplications"] = fmt.Sprintf("/admin/edp/%s/application/overview", edpName)
 	this.Data["IsVcsEnabled"] = isVcsEnabled
-	this.Data["CreateApplicationLink"] = fmt.Sprintf("/admin/edp/%s/application", edpName)
 	this.TplName = "create_application.html"
 }
 
 func (this *ApplicationController) CreateApplication() {
 	flash := beego.NewFlash()
-	edpTenantName := this.GetString(":name")
 	app := extractRequestData(this)
 	errMsg := validRequestData(app)
 	if errMsg != nil {
 		log.Printf("Failed to validate request data: %s", errMsg.Message)
 		flash.Error(errMsg.Message)
 		flash.Store(&this.Controller)
-		this.Redirect(fmt.Sprintf("/admin/edp/%s/application/create", edpTenantName), 302)
+		this.Redirect("/admin/edp/application/create", 302)
 		return
 	}
 	logRequestData(app)
 
-	applicationCr, err := this.AppService.GetApplicationCR(app.Name, edpTenantName)
+	applicationCr, err := this.AppService.GetApplicationCR(app.Name)
 	if err != nil {
 		this.Abort("500")
 		return
 	}
 
-	application, err := this.AppService.GetApplication(app.Name, edpTenantName)
+	application, err := this.AppService.GetApplication(app.Name)
 	if err != nil {
 		this.Abort("500")
 		return
@@ -143,11 +131,11 @@ func (this *ApplicationController) CreateApplication() {
 	if applicationCr != nil || application != nil {
 		flash.Error("Application name is already exists.")
 		flash.Store(&this.Controller)
-		this.Redirect(fmt.Sprintf("/admin/edp/%s/application/create", edpTenantName), 302)
+		this.Redirect("/admin/edp/application/create", 302)
 		return
 	}
 
-	createdObject, err := this.AppService.CreateApp(app, edpTenantName)
+	createdObject, err := this.AppService.CreateApp(app)
 
 	if err != nil {
 		this.Abort("500")
@@ -157,7 +145,7 @@ func (this *ApplicationController) CreateApplication() {
 	log.Printf("Application object is saved into k8s: %s", createdObject)
 	flash.Success("Application object is created.")
 	flash.Store(&this.Controller)
-	this.Redirect(fmt.Sprintf("/admin/edp/%s/application/overview", edpTenantName), 302)
+	this.Redirect("/admin/edp/application/overview", 302)
 }
 
 func extractRequestData(this *ApplicationController) models.App {

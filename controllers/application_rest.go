@@ -42,8 +42,7 @@ type ErrMsg struct {
 }
 
 func (this *ApplicationRestController) GetApplications() {
-	edpTenantName := this.GetString(":name")
-	applications, err := this.AppService.GetAllApplications(edpTenantName)
+	applications, err := this.AppService.GetAllApplications()
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
@@ -54,9 +53,8 @@ func (this *ApplicationRestController) GetApplications() {
 }
 
 func (this *ApplicationRestController) GetApplication() {
-	edpTenantName := this.GetString(":name")
 	appName := this.GetString(":appName")
-	application, err := this.AppService.GetApplication(appName, edpTenantName)
+	application, err := this.AppService.GetApplication(appName)
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
@@ -73,7 +71,6 @@ func (this *ApplicationRestController) GetApplication() {
 }
 
 func (this *ApplicationRestController) CreateApplication() {
-	edpTenantName := this.GetString(":name")
 	var app models.App
 	err := json.NewDecoder(this.Ctx.Request.Body).Decode(&app)
 	if err != nil {
@@ -89,13 +86,13 @@ func (this *ApplicationRestController) CreateApplication() {
 	}
 	logRequestData(app)
 
-	applicationCr, err := this.AppService.GetApplicationCR(app.Name, edpTenantName)
+	applicationCr, err := this.AppService.GetApplicationCR(app.Name)
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, "Failed to get custom resource from cluster: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	application, err := this.AppService.GetApplication(app.Name, edpTenantName)
+	application, err := this.AppService.GetApplication(app.Name)
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, "Failed to get custom resource from database: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -106,7 +103,7 @@ func (this *ApplicationRestController) CreateApplication() {
 		return
 	}
 
-	createdObject, err := this.AppService.CreateApp(app, edpTenantName)
+	createdObject, err := this.AppService.CreateApp(app)
 
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, "Failed to create custom resource: "+err.Error(), http.StatusInternalServerError)
