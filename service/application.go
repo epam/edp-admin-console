@@ -37,7 +37,7 @@ type ApplicationService struct {
 
 func (this ApplicationService) CreateApp(app models.App) (*k8s.BusinessApplication, error) {
 	log.Println("Start creating CR...")
-	appClient := this.Clients.ApplicationClient
+	appClient := this.Clients.EDPRestClient
 	coreClient := this.Clients.CoreClient
 	spec := convertData(app)
 	namespace := beego.AppConfig.String("cicdNamespace") + "-edp-cicd"
@@ -77,7 +77,7 @@ func (this ApplicationService) CreateApp(app models.App) (*k8s.BusinessApplicati
 }
 
 func (this ApplicationService) GetApplicationCR(appName string) (*k8s.BusinessApplication, error) {
-	appClient := this.Clients.ApplicationClient
+	appClient := this.Clients.EDPRestClient
 	namespace := beego.AppConfig.String("cicdNamespace") + "-edp-cicd"
 
 	result := &k8s.BusinessApplication{}

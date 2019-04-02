@@ -399,12 +399,3 @@ function blockIsValid($block) {
         .addClass('success')
         .removeClass('error');
 }
-
-
-function getTenantName() {
-    var segments = window.location.pathname.split('/');
-    if (segments && segments[3]) {
-        return segments[3];
-    }
-    console.error('Couldn\'t get edp name from url.');
-}

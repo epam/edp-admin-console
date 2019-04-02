@@ -32,9 +32,9 @@ var k8sConfig clientcmd.ClientConfig
 var SchemeGroupVersion = schema.GroupVersion{Group: "edp.epam.com", Version: "v1alpha1"}
 
 type ClientSet struct {
-	CoreClient        *coreV1Client.CoreV1Client
-	StorageClient     *storageV1Client.StorageV1Client
-	ApplicationClient *rest.RESTClient
+	CoreClient    *coreV1Client.CoreV1Client
+	StorageClient *storageV1Client.StorageV1Client
+	EDPRestClient *rest.RESTClient
 }
 
 func init() {
@@ -64,9 +64,9 @@ func CreateOpenShiftClients() ClientSet {
 	}
 
 	return ClientSet{
-		CoreClient:        coreClient,
-		StorageClient:     storageClient,
-		ApplicationClient: crClient,
+		CoreClient:    coreClient,
+		StorageClient: storageClient,
+		EDPRestClient: crClient,
 	}
 }
 
@@ -134,6 +134,11 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&BusinessApplication{},
 		&BusinessApplicationList{},
 	)
+	scheme.AddKnownTypes(SchemeGroupVersion,
+		&ApplicationBranch{},
+		&ApplicationBranchList{},
+	)
+
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
 }

@@ -34,9 +34,11 @@ func init() {
 	clients := k8s.CreateOpenShiftClients()
 	edpRepository := repository.EDPTenantRepository{}
 	appRepository := repository.ApplicationEntityRepository{}
+	branchRepository := repository.ReleaseBranchRepository{}
 	edpService := service.EDPTenantService{IEDPTenantRep: edpRepository, Clients: clients}
 	appService := service.ApplicationService{Clients: clients, IApplicationRepository: appRepository}
 	clusterService := service.ClusterService{Clients: clients}
+	branchService := service.BranchService{Clients: clients, IReleaseBranchRepository: branchRepository}
 
 	beego.Router("/auth/callback", &controllers.AuthController{}, "get:Callback")
 	beego.InsertFilter("/admin/*", beego.BeforeRouter, filters.AuthFilter)
@@ -50,10 +52,11 @@ func init() {
 
 	adminEdpNamespace := beego.NewNamespace("/admin/edp",
 		beego.NSRouter("/overview", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPComponents"),
-		beego.NSRouter("/application/overview", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "get:GetApplicationsOverviewPage"),
-		beego.NSRouter("/application/:appName/overview", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "get:GetApplicationOverviewPage"),
-		beego.NSRouter("/application/create", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "get:GetCreateApplicationPage"),
-		beego.NSRouter("/application", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService}, "post:CreateApplication"),
+		beego.NSRouter("/application/overview", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService, BranchService: branchService}, "get:GetApplicationsOverviewPage"),
+		beego.NSRouter("/application/:appName/overview", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService, BranchService: branchService}, "get:GetApplicationOverviewPage"),
+		beego.NSRouter("/application/create", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService, BranchService: branchService}, "get:GetCreateApplicationPage"),
+		beego.NSRouter("/application", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService, BranchService: branchService}, "post:CreateApplication"),
+		beego.NSRouter("/application/:appName/branch", &controllers.BranchController{BranchService: branchService}, "post:CreateReleaseBranch"),
 	)
 	beego.AddNamespace(adminEdpNamespace)
 

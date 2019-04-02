@@ -22,9 +22,9 @@
                 <h1>{{.Application.Name}} application</h1>
 
                 <div class="accordion" id="accordionCreateApplication">
-                    <div class="card repo-block">
+                    <div class="card">
                         <div class="card-header" id="headingOne" data-toggle="collapse"
-                             data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                             aria-expanded="true" aria-controls="collapseOne">
                             <h5 class="mb-0">
                                 <button class="btn btn-link collapsed" type="button">
                                     Main info
@@ -55,9 +55,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card main-block">
-                        <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
-                             data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    <div class="card">
+                        <div class="card-header" id="headingTwo" data-toggle="collapse"
+                             aria-expanded="true" aria-controls="collapseTwo">
                             <h5 class="mb-0">
                                 <button class="btn btn-link" type="button">
                                     Properties info
@@ -65,7 +65,7 @@
                             </h5>
                         </div>
 
-                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
+                        <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo"
                              data-parent="#accordionCreateApplication">
                             <div class="card-body">
                                 <div class="form-check">
@@ -133,17 +133,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card route-block">
-                        <div class="card-header collapsed" id="headingFour" data-toggle="collapse"
-                             data-target="#collapseFour" aria-expanded="false"
-                             aria-controls="collapseFour">
+                    <div class="card">
+                        <div class="card-header" id="headingThree" data-toggle="collapse"
+                             aria-expanded="true" aria-controls="collapseThree">
                             <h5 class="mb-0">
                                 <button class="btn btn-link collapsed" type="button">
                                     Status info
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapseFour" class="collapse route" aria-labelledby="headingFour"
+                        <div id="collapseThree" class="collapse show route" aria-labelledby="headingThree"
                              data-parent="#accordionCreateApplication">
                             <div class="card-body">
                                 <div class="form-check">
@@ -171,18 +170,127 @@
                             </div>
                         </div>
                     </div>
+
+                    {{if ne (len .ReleaseBranches) 0}}
+                        <div class="card">
+                            <div class="card-header" id="headingFour" data-toggle="collapse"
+                                 aria-expanded="true" aria-controls="collapseFour">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" type="button">
+                                        Release Branches
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseFour" class="collapse show route" aria-labelledby="headingFour"
+                                 data-parent="#accordionCreateApplication">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <table class="edp-table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Status</th>
+                                                    <th scope="col">Branch</th>
+                                                    <th scope="col">VCS</th>
+                                                    <th scope="col">CI/CD</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {{range .ReleaseBranches}}
+                                                    <tr>
+                                                        <td>
+                                                            <img src="{{if eq .Event "created"}}/static/img/green_circle.svg{{else if eq .Event "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}" alt="" style="width:25px; height:25px;">
+                                                        </td>
+                                                        <td>{{.Name}}</td>
+                                                        <td>
+                                                            <a href="{{.VCSLink}}" target="_blank" rel="noopener noreferrer" class="{{if ne .Event "created"}}disabled{{end}}">Link</a>
+                                                        </td>
+                                                        <td>
+                                                            <a href="{{.CICDLink}}" target="_blank" rel="noopener noreferrer" class="{{if ne .Event "created"}}disabled{{end}}">Link</a>
+                                                        </td>
+                                                    </tr>
+                                                {{end}}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {{end}}
+
+                    <button type="button"
+                            class="modal-release-branch btn btn-primary"
+                            aria-controls="">Create New Branch
+                    </button>
                 </div>
             </div>
         </div>
     </section>
-
     {{template "template/footer_template.html" .}}
 
+    <div class="modal fade" id="releaseBranchModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">CREATE NEW RELEASE BRANCH</h5>
+                    <button id="btn-cross-close" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="error-block branch-exists-modal form-error" style="display: none;">
+                        Resource with current name is already exists.
+                    </div>
+                    <form id="create-branch-action" action="/admin/edp/application/{{.Application.Name}}/branch"
+                          method="post">
+                        <div class="form-group">
+                            <p>Branch Name:</p>
+                            <input type="text" class="form-control" id="branchName" name="name"
+                                   placeholder="Enter Branch Name">
+
+                            <p>From Commit:</p>
+                            <input type="text" class="form-control" id="commitNumber" name="commit"
+                                   placeholder="Enter Commit">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="btn-modal-close" type="button" class="btn btn-secondary btn-modal-close"
+                            data-dismiss="modal">CANCEL
+                    </button>
+                    <button id="create-release-branch" type="button" class="edp-submit-form-btn btn btn-primary">
+                        PROCEED
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal success -->
+    <div class="modal fade" id="successPopup" tabindex="-1" role="dialog" aria-labelledby="successPopupLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successPopupLabel">Success</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Release Branch resource has been created.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
-</div>
 <script src="/static/js/jquery-3.3.1.js"></script>
 <script src="/static/js/popper.js"></script>
 <script src="/static/js/bootstrap.js"></script>
 <script src="/static/js/application.js"></script>
+<script src="/static/js/release-branch.js"></script>
 </body>
 </html>

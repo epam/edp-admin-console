@@ -16,6 +16,7 @@ func init() {
 		"GET /admin/edp/application/create$":           {administrator},
 		"GET /admin/edp/application/([^/]*)/overview$": {administrator, developer},
 		"POST /admin/edp/application$":                 {administrator},
+		"POST /admin/edp/application/([^/]*)/branch$":  {administrator},
 
 		"GET /api/v1/edp/vcs$":                 {administrator, developer},
 		"GET /api/v1/edp/application$":         {administrator, developer},

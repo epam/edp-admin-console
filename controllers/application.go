@@ -28,6 +28,7 @@ type ApplicationController struct {
 	beego.Controller
 	AppService       service.ApplicationService
 	EDPTenantService service.EDPTenantService
+	BranchService    service.BranchService
 }
 
 func (this *ApplicationController) GetApplicationsOverviewPage() {
@@ -70,6 +71,13 @@ func (this *ApplicationController) GetApplicationOverviewPage() {
 		return
 	}
 
+	branchEntities, err := this.BranchService.GetAllReleaseBranches(appName)
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
+	this.Data["ReleaseBranches"] = branchEntities
 	this.Data["EDPVersion"] = version
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["Application"] = application

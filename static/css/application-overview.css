@@ -11,3 +11,17 @@
 .no-rights-msg {
     font-size: 2rem;
 }
+
+.non-valid-input {
+    border: 1px solid red;
+}
+
+.form-error {
+    color: red;
+}
+
+.disabled {
+    pointer-events: none;
+    cursor: default;
+    color: grey;
+}

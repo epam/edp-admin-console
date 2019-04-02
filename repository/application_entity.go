@@ -19,7 +19,7 @@ package repository
 import (
 	"edp-admin-console/models"
 	"github.com/astaxie/beego/orm"
-	"strconv"
+	"log"
 	"time"
 )
 
@@ -151,7 +151,11 @@ func (this ApplicationEntityRepository) GetApplication(appName string, edpName s
 	return &application, nil
 }
 
-func formatUnixTimestamp(timestamp string) string {
-	tempTime, _ := strconv.ParseInt(timestamp, 10, 64)
-	return time.Unix(tempTime, 0).Format("2006-01-02 15:04:05")
+func formatUnixTimestamp(date string) string {
+	dateTime, err := time.Parse(time.RFC3339, date)
+	if err != nil {
+		log.Println("Couldn't parse dateTime")
+		return ""
+	}
+	return dateTime.String()
 }
