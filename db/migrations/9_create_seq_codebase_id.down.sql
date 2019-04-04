@@ -1,0 +1,1 @@
+drop sequence if exists codebase_id_seq;

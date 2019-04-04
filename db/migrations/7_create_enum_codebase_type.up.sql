@@ -1,0 +1,1 @@
+create type codebase_type as enum ('application', 'autotests');

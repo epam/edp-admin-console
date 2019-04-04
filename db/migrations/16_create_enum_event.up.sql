@@ -1,0 +1,1 @@
+create type event as enum ('initialized', 'in_progress', 'created', 'failed', 'reopened');

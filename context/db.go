@@ -21,6 +21,10 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
+	"github.com/golang-migrate/migrate"
+	"github.com/golang-migrate/migrate/database/postgres"
+	_ "github.com/golang-migrate/migrate/database/postgres"
+	_ "github.com/golang-migrate/migrate/source/file"
 	_ "github.com/lib/pq"
 	"log"
 )
@@ -42,10 +46,18 @@ func InitDb() {
 	err = orm.RegisterDataBase("default", "postgres", params)
 	checkErr(err)
 	log.Printf("Connection to %s:%s database is established.", pgHost, pgPort)
-	err = orm.RunSyncdb("default", false, true)
-	checkErr(err)
 
-	TryToCreateTables()
+	db, err := orm.GetDB("default")
+	checkErr(err)
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://db/migrations",
+		pgDatabase, driver)
+	checkErr(err)
+	err = m.Up()
+	if err != nil {
+		log.Printf("Warning from db migration: %v", err)
+	}
 }
 
 func checkErr(err error) {

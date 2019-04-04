@@ -7,5 +7,6 @@ COPY edp-admin-console .
 COPY static static
 COPY views views
 COPY conf conf
+COPY db db
 
 ENTRYPOINT ["edp-admin-console"]

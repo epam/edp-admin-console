@@ -17,3 +17,5 @@ import:
   version: release-3.9
 - package: gopkg.in/src-d/go-git.v4
   version: v4.10.0
+- package: github.com/golang-migrate/migrate
+  version: v3.5.4

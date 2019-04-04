@@ -1,0 +1,1 @@
+drop index if exists action_log_id_uindex;

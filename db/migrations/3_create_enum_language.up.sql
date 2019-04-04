@@ -1,0 +1,1 @@
+create type language as enum ('java', 'javascript', 'dotnet');

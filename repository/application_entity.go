@@ -36,19 +36,14 @@ func (this ApplicationEntityRepository) GetAllApplications(edpName string) ([]mo
 	o := orm.NewOrm()
 	var applications []models.Application
 	var maps []orm.Params
-	_, err := o.Raw("select distinct on (\"name\") o.name, "+
-		"	o.status_name,"+
-		"	max(value) FILTER (WHERE property = 'language')   AS language,"+
-		"	max(value) FILTER (WHERE property = 'build_tool') AS build_tool "+
-		"	from (select * "+
-		"		FROM business_entity "+
-		"		LEFT JOIN be_status bs on business_entity.id = bs.be_id "+
-		"		LEFT JOIN statuses_list sl on bs.status = sl.status_id) o "+
-		"		LEFT JOIN be_properties ON o.be_id = be_properties.be_id "+
-		"		WHERE tenant = ? "+
-		"  AND delition = 0 "+
-		"		group by o.name, o.status_name, o.last_time_update"+
-		"	ORDER BY \"name\", \"last_time_update\" DESC;", edpName).Values(&maps)
+
+	var query = "select cb.name, cb.language, cb.build_tool, al.event as status_name " +
+		"from codebase cb " +
+		"       left join codebase_action_log cal on cb.id = cal.codebase_id " +
+		"       left join action_log al on cal.action_log_id = al.id " +
+		"where tenant_name = ? " +
+		"order by al.updated_at desc limit 1;"
+	_, err := o.Raw(query, edpName).Values(&maps)
 
 	if err != nil {
 		return nil, err
@@ -74,23 +69,34 @@ func (this ApplicationEntityRepository) GetApplication(appName string, edpName s
 	var application models.ApplicationInfo
 	var maps []orm.Params
 
-	_, err := o.Raw("SELECT business_entity.id,tenant,user_name,available,message,last_time_update,status_name, bs.be_id,name,delition,be_type,"+
-		"max(value) FILTER (WHERE property = 'language') AS language,"+
-		" max(value) FILTER (WHERE property = 'build_tool') AS build_tool,"+
-		" max(value) FILTER (WHERE property = 'framework') AS framework,"+
-		" max(value) FILTER (WHERE property = 'strategy') AS strategy,"+
-		" max(value) FILTER (WHERE property = 'git_url') AS git_url,"+
-		" max(value) FILTER (WHERE property = 'route_site') AS route_site,"+
-		" max(value) FILTER (WHERE property = 'route_path') AS route_path, "+
-		" max(value) FILTER (WHERE property = 'db_kind') AS db_kind,"+
-		" max(value) FILTER (WHERE property = 'db_version') AS db_version,"+
-		" max(value) FILTER (WHERE property = 'db_capacity') AS db_capacity,"+
-		" max(value) FILTER (WHERE property = 'db_storage') AS db_storage"+
-		" FROM business_entity"+
-		" LEFT JOIN be_properties ON business_entity.id = be_properties.be_id"+
-		" LEFT JOIN be_status as bs ON business_entity.id = bs.be_id "+
-		" LEFT JOIN statuses_list as sl ON bs.status = sl.status_id WHERE business_entity.name = ? AND business_entity.tenant=? AND business_entity.delition=0"+
-		" GROUP BY business_entity.id,tenant,user_name,available,message,last_time_update,status_name, bs.be_id,name,delition,be_type order by last_time_update DESC limit(1)", appName, edpName).Values(&maps)
+	var query = "select cb.name, " +
+		"       cb.tenant_name       as tenant, " +
+		"       cb.type              as be_type, " +
+		"       al.event             as status_name, " +
+		"       cb.language, " +
+		"       cb.build_tool, " +
+		"       cb.framework, " +
+		"       cb.strategy, " +
+		"       cb.status            as available, " +
+		"       cb.repository_url    as git_url, " +
+		"       cb.route_site, " +
+		"       cb.route_path, " +
+		"       cb.database_kind     as db_kind, " +
+		"       cb.database_version  as db_version, " +
+		"       cb.database_capacity as db_capacity, " +
+		"       cb.database_storage  as db_storage, " +
+		"       al.username          as user_name, " +
+		"       al.detailed_message  as message, " +
+		"       al.updated_at        as last_time_update " +
+		"from codebase cb " +
+		"       left join codebase_action_log cal on cb.id = cal.codebase_id " +
+		"       left join action_log al on cal.action_log_id = al.id " +
+		"where cb.type = 'application' " +
+		"  and cb.name = ? " +
+		"  and cb.tenant_name = ? " +
+		"order by al.updated_at desc limit 1;"
+
+	_, err := o.Raw(query, appName, edpName).Values(&maps)
 
 	if err != nil {
 		return nil, err
@@ -110,15 +116,18 @@ func (this ApplicationEntityRepository) GetApplication(appName string, edpName s
 			BuildTool: row["build_tool"].(string),
 			Framework: row["framework"].(string),
 			Strategy:  row["strategy"].(string),
-			UserName:  row["user_name"].(string),
-			Message:   row["message"].(string),
 		}
 
-		application.DelitionTime = formatUnixTimestamp(row["delition"].(string))
+		if row["user_name"] != nil {
+			application.UserName = row["user_name"].(string)
+		}
+		if row["message"] != nil {
+			application.Message = row["message"].(string)
+		}
+
 		application.LastTimeUpdate = formatUnixTimestamp(row["last_time_update"].(string))
 
-		available, _ := strconv.ParseBool(row["available"].(string))
-		application.Available = available
+		application.Available = row["available"] == "active"
 
 		if row["git_url"] != nil {
 			application.GitUrl = row["git_url"].(string)
