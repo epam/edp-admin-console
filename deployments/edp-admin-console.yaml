@@ -60,7 +60,7 @@ objects:
               imagePullPolicy: IfNotPresent
               resources:
                 requests:
-                  memory: "1Gi"
+                  memory: 500Mi
               ports:
                 - containerPort: 5432
                   protocol: TCP
@@ -71,6 +71,7 @@ objects:
                     - -c
                     - exec pg_isready --host $POD_IP
                 initialDelaySeconds: 60
+                periodSeconds: 20
                 timeoutSeconds: 5
                 failureThreshold: 6
               readinessProbe:
@@ -80,8 +81,8 @@ objects:
                     - -c
                     - exec pg_isready --host $POD_IP
                 initialDelaySeconds: 60
-                timeoutSeconds: 3
-                periodSeconds: 5
+                timeoutSeconds: 5
+                periodSeconds: 20
               volumeMounts:
                 - mountPath: /var/lib/postgresql/data
                   name: "edp-install-wizard-db"
@@ -147,7 +148,7 @@ objects:
                 timeoutSeconds: 5
               resources:
                 requests:
-                  memory: 1Gi
+                  memory: 500Mi
               env:
                 - name: HOST
                   value: "https://edp-admin-console-${EDP_DEPLOY_PROJECT}.${DNS_WILDCARD}"
