@@ -49,9 +49,15 @@ objects:
                 - name: POSTGRES_DB
                   value: "edp-install-wizard-db"
                 - name: POSTGRES_USER
-                  value: "admin"
+                  valueFrom:
+                    secretKeyRef:
+                      name: admin-console-db
+                      key: username
                 - name: POSTGRES_PASSWORD
-                  value: "admin"
+                  valueFrom:
+                    secretKeyRef:
+                      name: admin-console-db
+                      key: password
                 - name: PGDATA
                   value: /var/lib/postgresql/data/pgdata
                 - name: POD_IP
@@ -165,9 +171,15 @@ objects:
                 - name: PG_DATABASE
                   value: "edp-install-wizard-db"
                 - name: PG_USER
-                  value: "admin"
+                  valueFrom:
+                    secretKeyRef:
+                      name: admin-console-db
+                      key: username
                 - name: PG_PASSWORD
-                  value: "admin"
+                  valueFrom:
+                    secretKeyRef:
+                      name: admin-console-db
+                      key: password
                 - name: PG_PORT
                   value: "5432"
                 - name: TENANT
