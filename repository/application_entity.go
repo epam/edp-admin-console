@@ -37,12 +37,12 @@ func (this ApplicationEntityRepository) GetAllApplications(edpName string) ([]mo
 	var applications []models.Application
 	var maps []orm.Params
 
-	var query = "select cb.name, cb.language, cb.build_tool, al.event as status_name " +
+	var query = "select distinct on (\"name\") cb.name, cb.language, cb.build_tool, al.event as status_name " +
 		"from codebase cb " +
-		"       left join codebase_action_log cal on cb.id = cal.codebase_id " +
-		"       left join action_log al on cal.action_log_id = al.id " +
+		"		left join codebase_action_log cal on cb.id = cal.codebase_id " +
+		"		left join action_log al on cal.action_log_id = al.id " +
 		"where tenant_name = ? " +
-		"order by al.updated_at desc limit 1;"
+		"order by name, al.updated_at desc;"
 	_, err := o.Raw(query, edpName).Values(&maps)
 
 	if err != nil {
