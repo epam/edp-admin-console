@@ -20,7 +20,6 @@ import (
 	"edp-admin-console/models"
 	"edp-admin-console/service"
 	"edp-admin-console/util"
-	"fmt"
 	"github.com/astaxie/beego"
 	"log"
 )
@@ -37,7 +36,6 @@ func (this *ApplicationController) GetApplicationsOverviewPage() {
 		this.Data["Success"] = true
 	}
 
-	edpTenantName := beego.AppConfig.String("cicdNamespace")
 	applications, err := this.AppService.GetAllApplications()
 	if err != nil {
 		this.Abort("500")
@@ -50,10 +48,10 @@ func (this *ApplicationController) GetApplicationsOverviewPage() {
 		return
 	}
 
-	resourceAccess := this.GetSession("resource_access").(map[string][]string)
+	contextRoles := this.GetSession("realm_roles").([]string)
 	this.Data["EDPVersion"] = version
 	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["HasRights"] = isAdmin(resourceAccess, edpTenantName+"-edp")
+	this.Data["HasRights"] = isAdmin(contextRoles)
 	this.Data["Applications"] = applications
 	this.TplName = "application.html"
 }
@@ -206,10 +204,8 @@ func extractRequestData(this *ApplicationController) models.App {
 	return app
 }
 
-func isAdmin(resourceAccess map[string][]string, edpName string) bool {
-	contextRoles := resourceAccess[edpName]
+func isAdmin(contextRoles []string) bool {
 	if contextRoles == nil {
-		log.Println(fmt.Sprintf("Couldn't find tenant by %s name.", edpName))
 		return false
 	}
 	return util.Contains(contextRoles, beego.AppConfig.String("adminRole"))
