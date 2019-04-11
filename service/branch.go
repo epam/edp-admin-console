@@ -27,7 +27,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
 	"log"
-	"net/url"
+	"strings"
 	"time"
 )
 
@@ -120,12 +120,8 @@ func convertBranchInfoData(branchInfo models.ReleaseBranchRequestData, appName s
 func createLinks(branchEntities []models.ReleaseBranch, appName string, edpTenantName string) {
 	wildcard := beego.AppConfig.String("dnsWildcard")
 	for index, branch := range branchEntities {
-		branch.VCSLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb", "gerrit", edpTenantName, wildcard) +
-			url.QueryEscape(fmt.Sprintf("?p=%s;a=shortlog;h=refs/heads/%s", appName, branch.Name))
-
-
-		branch.CICDLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job", "jenkins", edpTenantName, wildcard) +
-			url.QueryEscape(fmt.Sprintf("/%s/view/%s", appName, branch.Name))
+		branch.VCSLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb?p=%s;a=shortlog;h=refs/heads/%s", "gerrit", edpTenantName, wildcard, appName, strings.ToUpper(branch.Name))
+		branch.CICDLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s/view/%s", "jenkins", edpTenantName, wildcard, appName, strings.ToUpper(branch.Name))
 		branchEntities[index] = branch
 	}
 }
