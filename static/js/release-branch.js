@@ -18,6 +18,8 @@ $(function () {
     $('#btn-modal-close, #btn-cross-close').click(function () {
         $('.branch-exists-modal').hide();
         $('#branchName,#commitNumber').val('').removeClass('non-valid-input');
+        $('.invalid-feedback.branch-name').hide();
+        $('.invalid-feedback.commit-message').hide();
     });
 
     $('.modal-release-branch').click(function () {
@@ -27,7 +29,7 @@ $(function () {
     $('#create-release-branch').click(function () {
         $('.branch-exists-modal').hide();
         let isBranchValid = handleBranchNameValidation();
-        let isCommitValid = handleCommitHashvalidation();
+        let isCommitValid = handleCommitHashValidation();
 
         if (isBranchValid && isCommitValid) {
             $('#create-branch-action').submit();
@@ -39,7 +41,7 @@ $(function () {
     });
 
     $('#commitNumber').focusout(function () {
-        handleCommitHashvalidation();
+        handleCommitHashValidation();
     });
 
 });
@@ -71,18 +73,22 @@ function handleBranchNameValidation() {
     let isBranchValid = isBranchNameValid();
     if (!isBranchValid) {
         $('#branchName').addClass('non-valid-input');
+        $('.invalid-feedback.branch-name').show();
     } else {
         $('#branchName').removeClass('non-valid-input');
+        $('.invalid-feedback.branch-name').hide();
     }
     return isBranchValid;
 }
 
-function handleCommitHashvalidation() {
+function handleCommitHashValidation() {
     let isCommitValid = isHashCommitValid();
     if (!isCommitValid) {
         $('#commitNumber').addClass('non-valid-input');
+        $('.invalid-feedback.commit-message').show();
     } else {
         $('#commitNumber').removeClass('non-valid-input');
+        $('.invalid-feedback.commit-message').hide();
     }
     return isCommitValid;
 }

@@ -215,10 +215,16 @@
                             <input type="text" class="form-control" id="branchName" name="name"
                                    placeholder="Enter Branch Name">
                             <div class="error-block branch-exists-modal form-error" style="display: none;"></div>
+                            <div class="invalid-feedback branch-name">
+                                Branch name may contain only: lower-case letters, numbers, dots and dashes and cannot start and end with dash and dot. Can not be empty.
+                            </div>
 
                             <p>From Commit Hash:</p>
                             <input type="text" class="form-control" id="commitNumber" name="commit"
                                    placeholder="Enter Commit">
+                            <div class="invalid-feedback commit-message">
+                                Commit hash field may contain only fully qualified hash string (40 letters)
+                            </div>
                         </div>
                     </form>
                 </div>
