@@ -13,6 +13,6 @@ type ReleaseBranch struct {
 }
 
 type ReleaseBranchRequestData struct {
-	Name   string `json:"name" valid:"Required;Match(/^[a-z\\d](?:[a-z\\d]|-([a-z\\d])){0,38}$/)"`
+	Name   string `json:"name" valid:"Required;Match(/^[a-z][a-z0-9-.]*[a-z0-9]$/)"`
 	Commit string `json:"commit"`
 }
