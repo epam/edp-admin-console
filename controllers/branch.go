@@ -34,7 +34,7 @@ func (this *BranchController) CreateReleaseBranch() {
 	}
 
 	if branch != nil {
-		this.Redirect(fmt.Sprintf("/admin/edp/application/%s/overview#branchExistsModal", appName), 302)
+		this.Redirect(fmt.Sprintf("/admin/edp/application/%s/overview?errorExistingBranch=%s#branchExistsModal", appName, branchInfo.Name), 302)
 		return
 	}
 

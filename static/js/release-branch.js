@@ -4,13 +4,14 @@ $(function () {
         let anchor = $(location).attr('hash');
         if (anchor) {
             if (anchor === '#branchExistsModal') {
-                $('.branch-exists-modal').show();
+                let errorMessage = 'Release branch with ' + getUrlParameter('errorExistingBranch') + ' name is already exists.';
+                $('.branch-exists-modal').text(errorMessage).show();
                 $('#releaseBranchModal').modal('show');
             }
             if (anchor === '#branchSuccessModal') {
                 $('#successPopup').modal('show');
             }
-            location.hash = '';
+            window.history.pushState(null, null, window.location.pathname);
         }
     });
 
@@ -85,3 +86,18 @@ function handleCommitHashvalidation() {
     }
     return isCommitValid;
 }
+
+function getUrlParameter(sParam) {
+    let sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+};

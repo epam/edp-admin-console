@@ -238,15 +238,13 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="error-block branch-exists-modal form-error" style="display: none;">
-                        Resource with current name is already exists.
-                    </div>
                     <form id="create-branch-action" action="/admin/edp/application/{{.Application.Name}}/branch"
                           method="post">
                         <div class="form-group">
                             <p>Branch Name:</p>
                             <input type="text" class="form-control" id="branchName" name="name"
                                    placeholder="Enter Branch Name">
+                            <div class="error-block branch-exists-modal form-error" style="display: none;"></div>
 
                             <p>From Commit Hash:</p>
                             <input type="text" class="form-control" id="commitNumber" name="commit"

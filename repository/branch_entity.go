@@ -18,7 +18,6 @@ package repository
 
 import (
 	"edp-admin-console/models"
-	"fmt"
 	"github.com/astaxie/beego/orm"
 	"log"
 )
@@ -74,7 +73,7 @@ func (this ReleaseBranchRepository) GetReleaseBranch(appName, branchName, edpNam
 	o := orm.NewOrm()
 	var branch models.ReleaseBranch
 
-	err := o.Raw(SelectBranch, edpName, appName, fmt.Sprintf("%s-%s", appName, branchName)).QueryRow(&branch)
+	err := o.Raw(SelectBranch, edpName, appName, branchName).QueryRow(&branch)
 
 	if err != nil {
 		if err == orm.ErrNoRows {
