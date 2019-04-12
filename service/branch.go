@@ -120,7 +120,7 @@ func convertBranchInfoData(branchInfo models.ReleaseBranchRequestData, appName s
 func createLinks(branchEntities []models.ReleaseBranch, appName string, edpTenantName string) {
 	wildcard := beego.AppConfig.String("dnsWildcard")
 	for index, branch := range branchEntities {
-		branch.VCSLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb?p=%s;a=shortlog;h=refs/heads/%s", "gerrit", edpTenantName, wildcard, appName, strings.ToUpper(branch.Name))
+		branch.VCSLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb?p=%s.git;a=shortlog;h=refs/heads/%s", "gerrit", edpTenantName, wildcard, appName, branch.Name)
 		branch.CICDLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s/view/%s", "jenkins", edpTenantName, wildcard, appName, strings.ToUpper(branch.Name))
 		branchEntities[index] = branch
 	}
