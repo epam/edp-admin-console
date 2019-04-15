@@ -45,3 +45,8 @@ type ApplicationInfo struct {
 	Available      bool   `json:"available"`
 	Message        string `json:"message"`
 }
+
+type ApplicationWithReleaseBranch struct {
+	ApplicationName string
+	ReleaseBranches []string
+}

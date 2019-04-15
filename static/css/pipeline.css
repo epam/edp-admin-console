@@ -1,0 +1,7 @@
+.non-valid-input {
+    border: 1px solid red;
+}
+
+.backend-validation-error {
+    color: red;
+}

@@ -120,6 +120,17 @@ func (this ApplicationService) GetApplication(appName string) (*models.Applicati
 	return application, nil
 }
 
+func (this ApplicationService) GetAllApplicationsWithReleaseBranches() ([]models.ApplicationWithReleaseBranch, error) {
+	applications, err := this.IApplicationRepository.GetAllApplicationsWithReleaseBranches()
+	if err != nil {
+		log.Printf("An error has occurred while getting all application objects: %s", err)
+		return nil, err
+	}
+	log.Printf("Fetched application info: {%+v}", applications)
+
+	return applications, nil
+}
+
 func createSecret(namespace string, secret *v1.Secret, coreClient *coreV1Client.CoreV1Client) (*v1.Secret, error) {
 	createdSecret, err := coreClient.Secrets(namespace).Create(secret)
 	if err != nil {

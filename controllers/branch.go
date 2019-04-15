@@ -48,14 +48,14 @@ func (this *BranchController) CreateReleaseBranch() {
 	this.Redirect(fmt.Sprintf("/admin/edp/application/%s/overview#branchSuccessModal", appName), 302)
 }
 
-func extractReleaseBranchRequestData(this *BranchController) models.ReleaseBranchRequestData {
-	return models.ReleaseBranchRequestData{
+func extractReleaseBranchRequestData(this *BranchController) models.ReleaseBranchCreateCommand {
+	return models.ReleaseBranchCreateCommand{
 		Name:   this.GetString("name"),
 		Commit: this.GetString("commit"),
 	}
 }
 
-func validReleaseBranchRequestData(requestData models.ReleaseBranchRequestData) *ErrMsg {
+func validReleaseBranchRequestData(requestData models.ReleaseBranchCreateCommand) *ErrMsg {
 	valid := validation.Validation{}
 	_, err := valid.Valid(requestData)
 

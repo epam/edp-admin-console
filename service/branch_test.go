@@ -13,19 +13,19 @@ type ReleaseBranchRepositoryMock struct {
 	mock.Mock
 }
 
-func (mock *ReleaseBranchRepositoryMock) GetAllReleaseBranches(appName, edpName string) ([]models.ReleaseBranch, error) {
+func (mock *ReleaseBranchRepositoryMock) GetAllReleaseBranches(appName, edpName string) ([]models.ReleaseBranchView, error) {
 	args := mock.Called(edpName)
-	return args.Get(0).([]models.ReleaseBranch), args.Error(1)
+	return args.Get(0).([]models.ReleaseBranchView), args.Error(1)
 }
 
-func (mock *ReleaseBranchRepositoryMock) GetReleaseBranch(appName, branchName, edpName string) (*models.ReleaseBranch, error) {
+func (mock *ReleaseBranchRepositoryMock) GetReleaseBranch(appName, branchName, edpName string) (*models.ReleaseBranchView, error) {
 	args := mock.Called(appName, edpName)
-	return args.Get(0).(*models.ReleaseBranch), args.Error(1)
+	return args.Get(0).(*models.ReleaseBranchView), args.Error(1)
 }
 
 func TestShouldReturnBranch(t *testing.T) {
 	repositoryMock := new(ReleaseBranchRepositoryMock)
-	repositoryMock.On("GetReleaseBranch", mock.Anything, mock.Anything, mock.Anything).Return(&models.ReleaseBranch{}, nil)
+	repositoryMock.On("GetReleaseBranch", mock.Anything, mock.Anything, mock.Anything).Return(&models.ReleaseBranchView{}, nil)
 	branchService := BranchService{IReleaseBranchRepository: repositoryMock}
 
 	branchEntity, err := branchService.GetReleaseBranch(mock.Anything, mock.Anything)
@@ -35,7 +35,7 @@ func TestShouldReturnBranch(t *testing.T) {
 
 func TestShouldReturnErrorBranch(t *testing.T) {
 	repositoryMock := new(ReleaseBranchRepositoryMock)
-	repositoryMock.On("GetReleaseBranch", mock.Anything, mock.Anything, mock.Anything).Return(&models.ReleaseBranch{}, errors.New("internal error"))
+	repositoryMock.On("GetReleaseBranch", mock.Anything, mock.Anything, mock.Anything).Return(&models.ReleaseBranchView{}, errors.New("internal error"))
 	branchService := BranchService{IReleaseBranchRepository: repositoryMock}
 
 	branchEntity, err := branchService.GetReleaseBranch(mock.Anything, mock.Anything)
@@ -63,8 +63,8 @@ func TestShouldReturnErrorAllBranch(t *testing.T) {
 	assert.Nil(t, branchEntity)
 }
 
-func createBranchEntities() []models.ReleaseBranch {
-	return []models.ReleaseBranch{
+func createBranchEntities() []models.ReleaseBranchView {
+	return []models.ReleaseBranchView{
 		{
 			Name:            "fake-name",
 			Event:           "fake-event",

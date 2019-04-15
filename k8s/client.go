@@ -133,10 +133,10 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
 		&BusinessApplication{},
 		&BusinessApplicationList{},
-	)
-	scheme.AddKnownTypes(SchemeGroupVersion,
 		&ApplicationBranch{},
 		&ApplicationBranchList{},
+		&CDPipeline{},
+		&CDPipelineList{},
 	)
 
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)

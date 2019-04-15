@@ -26,6 +26,7 @@ import (
 type IApplicationEntityRepository interface {
 	GetAllApplications(edpName string) ([]models.Application, error)
 	GetApplication(appName string, edpName string) (*models.ApplicationInfo, error)
+	GetAllApplicationsWithReleaseBranches() ([]models.ApplicationWithReleaseBranch, error)
 }
 
 type ApplicationEntityRepository struct {
@@ -151,6 +152,39 @@ func (this ApplicationEntityRepository) GetApplication(appName string, edpName s
 	return &application, nil
 }
 
+func (this ApplicationEntityRepository) GetAllApplicationsWithReleaseBranches() ([]models.ApplicationWithReleaseBranch, error) {
+	o := orm.NewOrm()
+	var applications []models.ApplicationWithReleaseBranch
+	var maps []orm.Params
+
+	var query = "select c.name as app_name, cb.name as branch_name " +
+		"from codebase c " +
+		"		left join codebase_branch cb on c.id = cb.codebase_id;"
+	_, err := o.Raw(query).Values(&maps)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if maps == nil {
+		return nil, nil
+	}
+
+	for _, row := range maps {
+		if index, app := getApplication(applications, row["app_name"].(string)); app != nil {
+			app.ReleaseBranches = append(app.ReleaseBranches, row["branch_name"].(string))
+			applications[*index] = *app
+			continue
+		}
+		applications = append(applications, models.ApplicationWithReleaseBranch{
+			ApplicationName: row["app_name"].(string),
+			ReleaseBranches: []string{row["branch_name"].(string)},
+		})
+	}
+
+	return applications, nil
+}
+
 func formatUnixTimestamp(date string) string {
 	dateTime, err := time.Parse(time.RFC3339, date)
 	if err != nil {
@@ -158,4 +192,13 @@ func formatUnixTimestamp(date string) string {
 		return ""
 	}
 	return dateTime.String()
+}
+
+func getApplication(applications []models.ApplicationWithReleaseBranch, appName string) (*int, *models.ApplicationWithReleaseBranch) {
+	for i, v := range applications {
+		if v.ApplicationName == appName {
+			return &i, &v
+		}
+	}
+	return nil, nil
 }

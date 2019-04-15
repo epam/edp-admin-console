@@ -1,6 +1,6 @@
 package models
 
-type CDPipelineReadRestApi struct {
-	Name             string                      `json:"name"`
-	CodebaseBranches []CodebaseBranchReadRestApi `json:"codebaseBranches"`
+type CDPipelineDTO struct {
+	Name             string              `json:"name"`
+	CodebaseBranches []CodebaseBranchDTO `json:"codebaseBranches"`
 }

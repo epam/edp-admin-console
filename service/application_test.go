@@ -23,6 +23,11 @@ func (mock *ApplicationEntityRepositoryMock) GetApplication(appName string, edpN
 	return args.Get(0).(*models.ApplicationInfo), args.Error(1)
 }
 
+func (mock *ApplicationEntityRepositoryMock) GetAllApplicationsWithReleaseBranches() ([]models.ApplicationWithReleaseBranch, error) {
+	args := mock.Called()
+	return args.Get(0).([]models.ApplicationWithReleaseBranch), args.Error(1)
+}
+
 func TestShouldReturnApplications(t *testing.T) {
 	repositoryMock := new(ApplicationEntityRepositoryMock)
 	repositoryMock.On("GetAllApplications", mock.Anything).Return(createApplications(), nil)
@@ -61,6 +66,26 @@ func TestShouldReturnErrorFromGetAllApplication(t *testing.T) {
 	application, err := appService.GetApplication(mock.Anything)
 	assert.NotNil(t, err)
 	assert.Nil(t, application)
+}
+
+func TestShouldReturnApplicationsWithReleaseBranches(t *testing.T) {
+	repositoryMock := new(ApplicationEntityRepositoryMock)
+	repositoryMock.On("GetAllApplicationsWithReleaseBranches", mock.Anything).Return([]models.ApplicationWithReleaseBranch{}, errors.New("internal error"))
+	appService := ApplicationService{IApplicationRepository: repositoryMock}
+
+	applications, err := appService.GetAllApplicationsWithReleaseBranches()
+	assert.NotNil(t, err)
+	assert.Nil(t, applications)
+}
+
+func TestShouldReturnErrorApplicationsWithReleaseBranches(t *testing.T) {
+	repositoryMock := new(ApplicationEntityRepositoryMock)
+	repositoryMock.On("GetAllApplicationsWithReleaseBranches", mock.Anything).Return([]models.ApplicationWithReleaseBranch{}, nil)
+	appService := ApplicationService{IApplicationRepository: repositoryMock}
+
+	applications, err := appService.GetAllApplicationsWithReleaseBranches()
+	assert.Nil(t, err)
+	assert.NotNil(t, applications)
 }
 
 func createApplications() []models.Application {

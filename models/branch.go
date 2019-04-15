@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type ReleaseBranch struct {
+type ReleaseBranchView struct {
 	Name            string    `json:"name"`
 	Event           string    `json:"event"`
 	DetailedMessage string    `json:"detailed_message"`
@@ -12,12 +12,17 @@ type ReleaseBranch struct {
 	CICDLink        string
 }
 
-type ReleaseBranchRequestData struct {
+type ReleaseBranchCreateCommand struct {
 	Name   string `json:"name" valid:"Required;Match(/^[a-z][a-z0-9-.]*[a-z0-9]$/)"`
 	Commit string `json:"commit"`
 }
 
-type CodebaseBranchReadRestApi struct {
-	BranchName string `json:"branchName"`
+type ReleaseBranchCreatePipelineCommand struct {
+	AppName    string
+	BranchName string
+}
+
+type CodebaseBranchDTO struct {
 	AppName    string `json:"appName"`
+	BranchName string `json:"branchName"`
 }

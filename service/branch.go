@@ -36,7 +36,7 @@ type BranchService struct {
 	IReleaseBranchRepository repository.IReleaseBranchRepository
 }
 
-func (this *BranchService) CreateReleaseBranch(branchInfo models.ReleaseBranchRequestData, appName string) (*k8s.ApplicationBranch, error) {
+func (this *BranchService) CreateReleaseBranch(branchInfo models.ReleaseBranchCreateCommand, appName string) (*k8s.ApplicationBranch, error) {
 	log.Println("Start creating CR for branch release...")
 	edpRestClient := this.Clients.EDPRestClient
 	namespace := beego.AppConfig.String("cicdNamespace") + "-edp-cicd"
@@ -78,7 +78,7 @@ func (this *BranchService) CreateReleaseBranch(branchInfo models.ReleaseBranchRe
 	return result, nil
 }
 
-func (this *BranchService) GetReleaseBranch(appName string, branchName string) (*models.ReleaseBranch, error) {
+func (this *BranchService) GetReleaseBranch(appName string, branchName string) (*models.ReleaseBranchView, error) {
 	edpTenantName := beego.AppConfig.String("cicdNamespace")
 	releaseBranch, err := this.IReleaseBranchRepository.GetReleaseBranch(appName, branchName, edpTenantName)
 	if err != nil {
@@ -93,7 +93,7 @@ func (this *BranchService) GetReleaseBranch(appName string, branchName string) (
 	return releaseBranch, nil
 }
 
-func (this *BranchService) GetAllReleaseBranches(appName string) ([]models.ReleaseBranch, error) {
+func (this *BranchService) GetAllReleaseBranches(appName string) ([]models.ReleaseBranchView, error) {
 	edpTenantName := beego.AppConfig.String("cicdNamespace")
 	releaseBranches, err := this.IReleaseBranchRepository.GetAllReleaseBranches(appName, edpTenantName)
 	if err != nil {
@@ -109,7 +109,7 @@ func (this *BranchService) GetAllReleaseBranches(appName string) ([]models.Relea
 	return releaseBranches, nil
 }
 
-func convertBranchInfoData(branchInfo models.ReleaseBranchRequestData, appName string) k8s.ApplicationBranchSpec {
+func convertBranchInfoData(branchInfo models.ReleaseBranchCreateCommand, appName string) k8s.ApplicationBranchSpec {
 	return k8s.ApplicationBranchSpec{
 		Name:            branchInfo.Name,
 		Commit:          branchInfo.Commit,
@@ -117,7 +117,7 @@ func convertBranchInfoData(branchInfo models.ReleaseBranchRequestData, appName s
 	}
 }
 
-func createLinks(branchEntities []models.ReleaseBranch, appName string, edpTenantName string) {
+func createLinks(branchEntities []models.ReleaseBranchView, appName string, edpTenantName string) {
 	wildcard := beego.AppConfig.String("dnsWildcard")
 	for index, branch := range branchEntities {
 		branch.VCSLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb?p=%s.git;a=shortlog;h=refs/heads/%s", "gerrit", edpTenantName, wildcard, appName, branch.Name)

@@ -23,8 +23,8 @@ import (
 )
 
 type IReleaseBranchRepository interface {
-	GetAllReleaseBranches(appName, edpName string) ([]models.ReleaseBranch, error)
-	GetReleaseBranch(appName, branchName, edpName string) (*models.ReleaseBranch, error)
+	GetAllReleaseBranches(appName, edpName string) ([]models.ReleaseBranchView, error)
+	GetReleaseBranch(appName, branchName, edpName string) (*models.ReleaseBranchView, error)
 }
 
 const (
@@ -52,9 +52,9 @@ type ReleaseBranchRepository struct {
 	IReleaseBranchRepository
 }
 
-func (this ReleaseBranchRepository) GetAllReleaseBranches(appName, edpName string) ([]models.ReleaseBranch, error) {
+func (this ReleaseBranchRepository) GetAllReleaseBranches(appName, edpName string) ([]models.ReleaseBranchView, error) {
 	o := orm.NewOrm()
-	var branches []models.ReleaseBranch
+	var branches []models.ReleaseBranchView
 
 	_, err := o.Raw(SelectAllBranches, edpName, appName).QueryRows(&branches)
 
@@ -69,9 +69,9 @@ func (this ReleaseBranchRepository) GetAllReleaseBranches(appName, edpName strin
 	return branches, nil
 }
 
-func (this ReleaseBranchRepository) GetReleaseBranch(appName, branchName, edpName string) (*models.ReleaseBranch, error) {
+func (this ReleaseBranchRepository) GetReleaseBranch(appName, branchName, edpName string) (*models.ReleaseBranchView, error) {
 	o := orm.NewOrm()
-	var branch models.ReleaseBranch
+	var branch models.ReleaseBranchView
 
 	err := o.Raw(SelectBranch, edpName, appName, branchName).QueryRow(&branch)
 

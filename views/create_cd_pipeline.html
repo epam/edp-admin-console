@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/css/pipeline.css">
+</head>
+<body>
+<main>
+    {{template "template/header_template.html" .}}
+    <section class="content d-flex">
+        <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
+            {{template "template/navbar_template.html" .}}
+        </aside>
+        <div class="flex-fill pl-3 pr-3 wrapper">
+
+            <div class="edp-form" id="createPipelineForm">
+                <h1>Select which applications within this pipeline user wants to deploy:</h1>
+                <div class="accordion" id="accordionCreatePipeline">
+                    <div class="card">
+                        <div class="card-header" id="headingOne" data-toggle="collapse"
+                             aria-expanded="true" aria-controls="collapseOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button">
+                                    Pipeline info
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                             data-parent="#accordionCreatePipeline">
+                            <div class="card-body">
+                                <form id="createCDCR" method="post" action="/admin/edp/cd-pipeline">
+                                    <div class="form-group pipeline-name">
+                                        <label for="pipelineName">Pipeline Name:</label>
+                                        <input name="pipelineName" type="text" class="form-control" id="pipelineName"
+                                               placeholder="Enter pipeline name ">
+                                        <div class="invalid-feedback pipeline-name">
+                                            Pipeline name may contain only: lower-case letters, numbers, dots and dashes
+                                            and
+                                            cannot start
+                                            and end with dash and dot. Can not be empty.
+                                        </div>
+                                    </div>
+
+                                    {{range .ApplicationsWithReleaseBranches}}
+                                        <div class="row">
+                                            <div class="form-group col-sm-4">
+                                                <div class="custom-control custom-checkbox application-checkbox">
+                                                    <input type="checkbox" class="custom-control-input app-checkbox"
+                                                           id="{{.ApplicationName}}"
+                                                           name="app" value="{{.ApplicationName}}">
+                                                    <label class="custom-control-label"
+                                                           for="{{.ApplicationName}}">{{.ApplicationName}}</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group col-sm-8">
+                                                <select title="Release Branches"
+                                                        class="release-branch selectpicker select-{{.ApplicationName}} form-control"
+                                                        name="{{.ApplicationName}}" disabled>
+                                                    {{range $i, $rb := .ReleaseBranches}}
+                                                        <option value="{{$rb}}">{{$rb}}</option>
+                                                    {{end}}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    {{end}}
+                                    <div class="invalid-feedback app-checkbox-error">
+                                        At least one checkbox must be checked.
+                                    </div>
+
+                                    {{if .Error}}
+                                        <div class="backend-validation-error">
+                                            {{.Error}}
+                                        </div>
+                                    {{end}}
+                                    <a href="/admin/edp/cd-pipeline/overview">
+                                        <button type="button" class="edp-submit-form-btn btn btn-primary">CANCEL
+                                        </button>
+                                    </a>
+                                    <button type="submit"
+                                            class="create-cd-pipeline edp-submit-form-btn btn btn-primary">CREATE CD
+                                        PIPELINE
+                                    </button>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {{template "template/footer_template.html" .}}
+
+    <!-- Modal success -->
+    <div class="modal fade" id="successPopup" tabindex="-1" role="dialog" aria-labelledby="successPopupLabel"
+         aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successPopupLabel">Success</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Provisioning has been started.
+                </div>
+                <div class="modal-footer">
+                    <a href="/admin/edp/cd-pipeline/overview">
+                        <button type="button" class="btn btn-secondary">OK</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script src="/static/js/jquery-3.3.1.js"></script>
+<script src="/static/js/popper.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/cd-pipeline.js"></script>
+</body>
+</html>
