@@ -17,12 +17,12 @@
 package service
 
 import (
+	"edp-admin-console/context"
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
 	"edp-admin-console/repository"
 	"errors"
 	"fmt"
-	"github.com/astaxie/beego"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
@@ -38,9 +38,8 @@ type CDPipelineService struct {
 func (this *CDPipelineService) CreatePipeline(pipelineName string, releaseBranchCommands []models.ReleaseBranchCreatePipelineCommand) (*k8s.CDPipeline, error) {
 	log.Println("Start creating CR pipeline...")
 	edpRestClient := this.Clients.EDPRestClient
-	namespace := beego.AppConfig.String("cicdNamespace") + "-edp-cicd"
 
-	pipelineCR, err := getCDPipelineCR(edpRestClient, pipelineName, namespace)
+	pipelineCR, err := getCDPipelineCR(edpRestClient, pipelineName, context.Namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +56,7 @@ func (this *CDPipelineService) CreatePipeline(pipelineName string, releaseBranch
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      pipelineName,
-			Namespace: namespace,
+			Namespace: context.Namespace,
 		},
 		Spec: convertPipelineData(pipelineName, releaseBranchCommands),
 		Status: k8s.CDPipelineStatus{
@@ -67,7 +66,7 @@ func (this *CDPipelineService) CreatePipeline(pipelineName string, releaseBranch
 	}
 
 	cdPipeline := &k8s.CDPipeline{}
-	err = edpRestClient.Post().Namespace(namespace).Resource("cdpipelines").Body(crd).Do().Into(cdPipeline)
+	err = edpRestClient.Post().Namespace(context.Namespace).Resource("cdpipelines").Body(crd).Do().Into(cdPipeline)
 
 	if err != nil {
 		log.Printf("An error has occurred while creating CD Pipeline object in k8s: %s", err)

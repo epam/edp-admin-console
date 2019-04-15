@@ -17,6 +17,7 @@
 package service
 
 import (
+	"edp-admin-console/context"
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
 	"edp-admin-console/repository"
@@ -39,9 +40,8 @@ type BranchService struct {
 func (this *BranchService) CreateReleaseBranch(branchInfo models.ReleaseBranchCreateCommand, appName string) (*k8s.ApplicationBranch, error) {
 	log.Println("Start creating CR for branch release...")
 	edpRestClient := this.Clients.EDPRestClient
-	namespace := beego.AppConfig.String("cicdNamespace") + "-edp-cicd"
 
-	releaseBranchCR, err := getReleaseBranchCR(edpRestClient, branchInfo.Name, appName, namespace)
+	releaseBranchCR, err := getReleaseBranchCR(edpRestClient, branchInfo.Name, appName, context.Namespace)
 	if err != nil {
 		log.Printf("An error has occurred while getting release branch CR {%s} from k8s: %s", branchInfo.Name, err)
 		return nil, err
@@ -60,7 +60,7 @@ func (this *BranchService) CreateReleaseBranch(branchInfo models.ReleaseBranchCr
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-%s", appName, branchInfo.Name),
-			Namespace: namespace,
+			Namespace: context.Namespace,
 		},
 		Spec: spec,
 		Status: k8s.ApplicationBranchStatus{
@@ -70,7 +70,7 @@ func (this *BranchService) CreateReleaseBranch(branchInfo models.ReleaseBranchCr
 	}
 
 	result := &k8s.ApplicationBranch{}
-	err = edpRestClient.Post().Namespace(namespace).Resource("applicationbranches").Body(branch).Do().Into(result)
+	err = edpRestClient.Post().Namespace(context.Namespace).Resource("applicationbranches").Body(branch).Do().Into(result)
 	if err != nil {
 		log.Printf("An error has occurred while creating release branch custom resource in k8s: %s", err)
 		return &k8s.ApplicationBranch{}, err
@@ -100,7 +100,7 @@ func (this *BranchService) GetAllReleaseBranchesByAppName(appName string) ([]mod
 	}
 
 	if len(releaseBranches) != 0 {
-		edpTenantName := beego.AppConfig.String("cicdNamespace")
+		edpTenantName := context.Tenant
 		createLinks(releaseBranches, appName, edpTenantName)
 		log.Printf("Fetched branch entities: {%s}. Count: {%s}", releaseBranches, string(len(releaseBranches)))
 	}

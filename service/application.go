@@ -17,11 +17,11 @@
 package service
 
 import (
+	"edp-admin-console/context"
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
 	"edp-admin-console/repository"
 	"fmt"
-	"github.com/astaxie/beego"
 	"k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -41,7 +41,6 @@ func (this ApplicationService) CreateApp(app models.App) (*k8s.BusinessApplicati
 	appClient := this.Clients.EDPRestClient
 	coreClient := this.Clients.CoreClient
 	spec := convertData(app)
-	namespace := beego.AppConfig.String("cicdNamespace") + "-edp-cicd"
 
 	crd := &k8s.BusinessApplication{
 		TypeMeta: metav1.TypeMeta{
@@ -50,7 +49,7 @@ func (this ApplicationService) CreateApp(app models.App) (*k8s.BusinessApplicati
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      app.Name,
-			Namespace: namespace,
+			Namespace: context.Namespace,
 		},
 		Spec: spec,
 		Status: k8s.BusinessApplicationStatus{
@@ -60,14 +59,14 @@ func (this ApplicationService) CreateApp(app models.App) (*k8s.BusinessApplicati
 		},
 	}
 
-	err := createTempSecrets(namespace, app, coreClient)
+	err := createTempSecrets(context.Namespace, app, coreClient)
 
 	if err != nil {
 		return nil, err
 	}
 
 	result := &k8s.BusinessApplication{}
-	err = appClient.Post().Namespace(namespace).Resource("businessapplications").Body(crd).Do().Into(result)
+	err = appClient.Post().Namespace(context.Namespace).Resource("businessapplications").Body(crd).Do().Into(result)
 
 	if err != nil {
 		log.Printf("An error has occurred while creating object in k8s: %s", err)
@@ -86,10 +85,9 @@ func (this ApplicationService) CreateApp(app models.App) (*k8s.BusinessApplicati
 
 func (this ApplicationService) GetApplicationCR(appName string) (*k8s.BusinessApplication, error) {
 	appClient := this.Clients.EDPRestClient
-	namespace := beego.AppConfig.String("cicdNamespace") + "-edp-cicd"
 
 	result := &k8s.BusinessApplication{}
-	err := appClient.Get().Namespace(namespace).Resource("businessapplications").Name(appName).Do().Into(result)
+	err := appClient.Get().Namespace(context.Namespace).Resource("businessapplications").Name(appName).Do().Into(result)
 
 	if k8serrors.IsNotFound(err) {
 		log.Printf("Current resourse %s doesn't exist.", appName)

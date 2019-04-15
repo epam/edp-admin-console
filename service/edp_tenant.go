@@ -17,6 +17,7 @@
 package service
 
 import (
+	"edp-admin-console/context"
 	"edp-admin-console/k8s"
 	"errors"
 	"fmt"
@@ -41,19 +42,17 @@ func (this EDPTenantService) GetEDPVersion() (string, error) {
 }
 
 func (edpService EDPTenantService) GetEDPComponents() map[string]string {
-	edpTenantName := beego.AppConfig.String("cicdNamespace")
 	var compWithLinks = make(map[string]string, len(edpComponentNames))
 	for _, val := range edpComponentNames {
-		compWithLinks[val] = fmt.Sprintf("https://%s-%s-edp-cicd.%s", strings.ToLower(val), edpTenantName, wildcard)
+		compWithLinks[val] = fmt.Sprintf("https://%s-%s-edp-cicd.%s", strings.ToLower(val), context.Tenant, wildcard)
 	}
 	return compWithLinks
 }
 
 func (this EDPTenantService) GetVcsIntegrationValue() (bool, error) {
 	coreClient := this.Clients.CoreClient
-	namespace := beego.AppConfig.String("cicdNamespace") + "-edp-cicd"
 
-	res, err := coreClient.ConfigMaps(namespace).Get("user-settings", metav1.GetOptions{})
+	res, err := coreClient.ConfigMaps(context.Namespace).Get("user-settings", metav1.GetOptions{})
 
 	if err != nil {
 		log.Printf("An error has occurred while getting user settings: %s", err)

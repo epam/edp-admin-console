@@ -37,7 +37,7 @@ func (this ClusterService) GetAllStorageClasses() ([]string, error) {
 	}
 
 	if len(classList.Items) == 0 {
-		return []string{},nil
+		return []string{}, nil
 	}
 
 	for _, element := range classList.Items {

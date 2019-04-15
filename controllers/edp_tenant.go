@@ -17,6 +17,7 @@
 package controllers
 
 import (
+	"edp-admin-console/context"
 	"edp-admin-console/service"
 	"github.com/astaxie/beego"
 	"net/http"
@@ -29,7 +30,6 @@ type EDPTenantController struct {
 }
 
 func (this *EDPTenantController) GetEDPComponents() {
-	edpTenantName := beego.AppConfig.String("cicdNamespace")
 	components := this.EDPTenantService.GetEDPComponents()
 	version, err := this.EDPTenantService.GetEDPVersion()
 	if err != nil {
@@ -38,8 +38,8 @@ func (this *EDPTenantController) GetEDPComponents() {
 	}
 
 	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["InputURL"] = strings.TrimSuffix(this.Ctx.Input.URL(), "/"+edpTenantName)
-	this.Data["EDPTenantName"] = edpTenantName
+	this.Data["InputURL"] = strings.TrimSuffix(this.Ctx.Input.URL(), "/"+context.Tenant)
+	this.Data["EDPTenantName"] = context.Tenant
 	this.Data["EDPVersion"] = version
 	this.Data["EDPComponents"] = components
 	this.TplName = "edp_components.html"
