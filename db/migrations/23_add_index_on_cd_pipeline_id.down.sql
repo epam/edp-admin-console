@@ -1,0 +1,1 @@
+drop index if exists cd_pipeline_id_uindex;
