@@ -37,9 +37,9 @@ func init() {
 	branchRepository := repository.ReleaseBranchRepository{}
 	pipelineRepository := repository.CDPipelineRepository{}
 	edpService := service.EDPTenantService{IEDPTenantRep: edpRepository, Clients: clients}
-	appService := service.ApplicationService{Clients: clients, IApplicationRepository: appRepository}
 	clusterService := service.ClusterService{Clients: clients}
 	branchService := service.BranchService{Clients: clients, IReleaseBranchRepository: branchRepository}
+	appService := service.ApplicationService{Clients: clients, IApplicationRepository: appRepository, BranchService: branchService}
 	pipelineService := service.CDPipelineService{Clients: clients, ICDPipelineRepository: pipelineRepository}
 
 	beego.Router("/auth/callback", &controllers.AuthController{}, "get:Callback")

@@ -33,6 +33,7 @@ import (
 type ApplicationService struct {
 	Clients                k8s.ClientSet
 	IApplicationRepository repository.IApplicationEntityRepository
+	BranchService          BranchService
 }
 
 func (this ApplicationService) CreateApp(app models.App) (*k8s.BusinessApplication, error) {
@@ -73,6 +74,13 @@ func (this ApplicationService) CreateApp(app models.App) (*k8s.BusinessApplicati
 		return &k8s.BusinessApplication{}, err
 	}
 
+	_, err = this.BranchService.CreateReleaseBranch(models.ReleaseBranchCreateCommand{
+		Name: "master-duplicate",
+	}, app.Name)
+	if err != nil {
+		log.Printf("Error has been occurred during the master branch creation: %v", err)
+		return &k8s.BusinessApplication{}, err
+	}
 	return result, nil
 }
 
