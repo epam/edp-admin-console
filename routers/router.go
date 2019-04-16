@@ -65,6 +65,7 @@ func init() {
 		beego.NSRouter("/application", &controllers.ApplicationRestController{AppService: appService}, "get:GetApplications"),
 		beego.NSRouter("/application/:appName", &controllers.ApplicationRestController{AppService: appService}, "get:GetApplication"),
 		beego.NSRouter("/vcs", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetVcsIntegrationValue"),
+		beego.NSRouter("/cd-pipeline/:name", &controllers.CDPipelineRestController{}, "get:GetCDPipelineByName"),
 	)
 	beego.AddNamespace(apiV1EdpNamespace)
 

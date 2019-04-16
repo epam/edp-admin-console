@@ -16,3 +16,8 @@ type ReleaseBranchRequestData struct {
 	Name   string `json:"name" valid:"Required;Match(/^[a-z][a-z0-9-.]*[a-z0-9]$/)"`
 	Commit string `json:"commit"`
 }
+
+type CodebaseBranchReadRestApi struct {
+	BranchName string `json:"branchName"`
+	AppName    string `json:"appName"`
+}
