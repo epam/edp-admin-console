@@ -75,7 +75,7 @@ func (this ApplicationService) CreateApp(app models.App) (*k8s.BusinessApplicati
 	}
 
 	_, err = this.BranchService.CreateReleaseBranch(models.ReleaseBranchCreateCommand{
-		Name: "master-duplicate",
+		Name: "master",
 	}, app.Name)
 	if err != nil {
 		log.Printf("Error has been occurred during the master branch creation: %v", err)
