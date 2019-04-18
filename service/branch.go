@@ -93,9 +93,9 @@ func (this *BranchService) GetReleaseBranch(appName string, branchName string) (
 	return releaseBranch, nil
 }
 
-func (this *BranchService) GetAllReleaseBranches(appName string) ([]models.ReleaseBranchView, error) {
+func (this *BranchService) GetAllReleaseBranchesByAppName(appName string) ([]models.ReleaseBranchView, error) {
 	edpTenantName := beego.AppConfig.String("cicdNamespace")
-	releaseBranches, err := this.IReleaseBranchRepository.GetAllReleaseBranches(appName, edpTenantName)
+	releaseBranches, err := this.IReleaseBranchRepository.GetAllReleaseBranchesByAppName(appName, edpTenantName)
 	if err != nil {
 		log.Printf("An error has occurred while getting branch entities for {%s} application: %s", appName, err)
 		return nil, err
@@ -106,6 +106,16 @@ func (this *BranchService) GetAllReleaseBranches(appName string) ([]models.Relea
 		log.Printf("Fetched branch entities: {%s}. Count: {%s}", releaseBranches, string(len(releaseBranches)))
 	}
 
+	return releaseBranches, nil
+}
+
+func (this *BranchService) GetAllReleaseBranches(branchFilterCriteria models.BranchCriteria) ([]models.ReleaseBranchView, error) {
+	edpTenantName := beego.AppConfig.String("cicdNamespace")
+	releaseBranches, err := this.IReleaseBranchRepository.GetAllReleaseBranches(edpTenantName, branchFilterCriteria)
+	if err != nil {
+		log.Printf("An error has occurred while getting branch entities: %s", err)
+		return nil, err
+	}
 	return releaseBranches, nil
 }
 

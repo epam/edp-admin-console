@@ -42,7 +42,7 @@ type ErrMsg struct {
 }
 
 func (this *ApplicationRestController) GetApplications() {
-	applications, err := this.AppService.GetAllApplications()
+	applications, err := this.AppService.GetAllApplications(models.ApplicationCriteria{})
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return

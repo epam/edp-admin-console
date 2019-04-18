@@ -18,59 +18,20 @@ package repository
 
 import (
 	"edp-admin-console/models"
+	"edp-admin-console/repository/sql_builder"
 	"github.com/astaxie/beego/orm"
 	"log"
 	"time"
 )
 
 type IApplicationEntityRepository interface {
-	GetAllApplications(edpName string) ([]models.Application, error)
+	GetAllApplications(edpName string, filterCriteria models.ApplicationCriteria) ([]models.Application, error)
 	GetApplication(appName string, edpName string) (*models.ApplicationInfo, error)
-	GetAllApplicationsWithReleaseBranches() ([]models.ApplicationWithReleaseBranch, error)
+	GetAllApplicationsWithReleaseBranches(applicationFilterCriteria models.ApplicationCriteria) ([]models.ApplicationWithReleaseBranch, error)
 }
 
-type ApplicationEntityRepository struct {
-	IApplicationEntityRepository
-}
-
-func (this ApplicationEntityRepository) GetAllApplications(edpName string) ([]models.Application, error) {
-	o := orm.NewOrm()
-	var applications []models.Application
-	var maps []orm.Params
-
-	var query = "select distinct on (\"name\") cb.name, cb.language, cb.build_tool, al.event as status_name " +
-		"from codebase cb " +
-		"		left join codebase_action_log cal on cb.id = cal.codebase_id " +
-		"		left join action_log al on cal.action_log_id = al.id " +
-		"where tenant_name = ? " +
-		"order by name, al.updated_at desc;"
-	_, err := o.Raw(query, edpName).Values(&maps)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if maps == nil {
-		return []models.Application{}, nil
-	}
-
-	for _, row := range maps {
-		applications = append(applications, models.Application{
-			Name:      row["name"].(string),
-			Language:  row["language"].(string),
-			BuildTool: row["build_tool"].(string),
-			Status:    row["status_name"].(string),
-		})
-	}
-	return applications, nil
-}
-
-func (this ApplicationEntityRepository) GetApplication(appName string, edpName string) (*models.ApplicationInfo, error) {
-	o := orm.NewOrm()
-	var application models.ApplicationInfo
-	var maps []orm.Params
-
-	var query = "select cb.name, " +
+const (
+	SelectApplication = "select cb.name, " +
 		"       cb.tenant_name       as tenant, " +
 		"       cb.type              as be_type, " +
 		"       al.event             as status_name, " +
@@ -96,8 +57,46 @@ func (this ApplicationEntityRepository) GetApplication(appName string, edpName s
 		"  and cb.name = ? " +
 		"  and cb.tenant_name = ? " +
 		"order by al.updated_at desc limit 1;"
+)
 
-	_, err := o.Raw(query, appName, edpName).Values(&maps)
+type ApplicationEntityRepository struct {
+	IApplicationEntityRepository
+	QueryManager sql_builder.ApplicationQueryBuilder
+}
+
+func (this ApplicationEntityRepository) GetAllApplications(edpName string, filterCriteria models.ApplicationCriteria) ([]models.Application, error) {
+	o := orm.NewOrm()
+	var applications []models.Application
+	var maps []orm.Params
+
+	selectAllApplicationsQuery := this.QueryManager.GetAllApplicationsQuery(filterCriteria)
+	_, err := o.Raw(selectAllApplicationsQuery, edpName).Values(&maps)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if maps == nil {
+		return []models.Application{}, nil
+	}
+
+	for _, row := range maps {
+		applications = append(applications, models.Application{
+			Name:      row["name"].(string),
+			Language:  row["language"].(string),
+			BuildTool: row["build_tool"].(string),
+			Status:    row["status_name"].(string),
+		})
+	}
+	return applications, nil
+}
+
+func (this ApplicationEntityRepository) GetApplication(appName string, edpName string) (*models.ApplicationInfo, error) {
+	o := orm.NewOrm()
+	var application models.ApplicationInfo
+	var maps []orm.Params
+
+	_, err := o.Raw(SelectApplication, appName, edpName).Values(&maps)
 
 	if err != nil {
 		return nil, err
@@ -152,14 +151,12 @@ func (this ApplicationEntityRepository) GetApplication(appName string, edpName s
 	return &application, nil
 }
 
-func (this ApplicationEntityRepository) GetAllApplicationsWithReleaseBranches() ([]models.ApplicationWithReleaseBranch, error) {
+func (this ApplicationEntityRepository) GetAllApplicationsWithReleaseBranches(applicationFilterCriteria models.ApplicationCriteria) ([]models.ApplicationWithReleaseBranch, error) {
 	o := orm.NewOrm()
 	var applications []models.ApplicationWithReleaseBranch
 	var maps []orm.Params
 
-	var query = "select c.name as app_name, cb.name as branch_name " +
-		"from codebase c " +
-		"		left join codebase_branch cb on c.id = cb.codebase_id;"
+	query := this.QueryManager.GetAllApplicationsWithReleaseBranchesQuery(applicationFilterCriteria)
 	_, err := o.Raw(query).Values(&maps)
 
 	if err != nil {

@@ -18,12 +18,14 @@ package repository
 
 import (
 	"edp-admin-console/models"
+	"edp-admin-console/repository/sql_builder"
 	"github.com/astaxie/beego/orm"
 	"log"
 )
 
 type IReleaseBranchRepository interface {
-	GetAllReleaseBranches(appName, edpName string) ([]models.ReleaseBranchView, error)
+	GetAllReleaseBranchesByAppName(appName, edpName string) ([]models.ReleaseBranchView, error)
+	GetAllReleaseBranches(edpName string, branchFilterCriteria models.BranchCriteria) ([]models.ReleaseBranchView, error)
 	GetReleaseBranch(appName, branchName, edpName string) (*models.ReleaseBranchView, error)
 }
 
@@ -36,7 +38,6 @@ const (
 		"where c.tenant_name = ? " +
 		"	and c.name = ? " +
 		"order by cb.name, al.updated_at desc;"
-
 	SelectBranch = "select distinct on (cb.\"name\") cb.name, al.event, al.detailed_message, al.username, al.updated_at " +
 		"from codebase_branch cb " +
 		"		left join codebase c on cb.codebase_id = c.id " +
@@ -50,9 +51,10 @@ const (
 
 type ReleaseBranchRepository struct {
 	IReleaseBranchRepository
+	QueryManager sql_builder.BranchQueryBuilder
 }
 
-func (this ReleaseBranchRepository) GetAllReleaseBranches(appName, edpName string) ([]models.ReleaseBranchView, error) {
+func (this ReleaseBranchRepository) GetAllReleaseBranchesByAppName(appName, edpName string) ([]models.ReleaseBranchView, error) {
 	o := orm.NewOrm()
 	var branches []models.ReleaseBranchView
 
@@ -60,7 +62,25 @@ func (this ReleaseBranchRepository) GetAllReleaseBranches(appName, edpName strin
 
 	if err != nil {
 		if err == orm.ErrNoRows {
-			log.Printf("No branch entities found with {%s} appName parameter", appName)
+			log.Printf("No branch entities are found with {%s} appName parameter", appName)
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return branches, nil
+}
+
+func (this ReleaseBranchRepository) GetAllReleaseBranches(edpName string, branchFilterCriteria models.BranchCriteria) ([]models.ReleaseBranchView, error) {
+	o := orm.NewOrm()
+	var branches []models.ReleaseBranchView
+
+	selectAllBranchesQuery := this.QueryManager.GetAllBranchesQuery(branchFilterCriteria)
+	_, err := o.Raw(selectAllBranchesQuery, edpName).QueryRows(&branches)
+
+	if err != nil {
+		if err == orm.ErrNoRows {
+			log.Println("No branch entities are found")
 			return nil, nil
 		}
 		return nil, err

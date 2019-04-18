@@ -37,7 +37,7 @@ func (this *ApplicationController) GetApplicationsOverviewPage() {
 		this.Data["Success"] = true
 	}
 
-	applications, err := this.AppService.GetAllApplications()
+	applications, err := this.AppService.GetAllApplications(models.ApplicationCriteria{})
 	if err != nil {
 		this.Abort("500")
 		return
@@ -71,7 +71,7 @@ func (this *ApplicationController) GetApplicationOverviewPage() {
 		return
 	}
 
-	branchEntities, err := this.BranchService.GetAllReleaseBranches(appName)
+	branchEntities, err := this.BranchService.GetAllReleaseBranchesByAppName(appName)
 	if err != nil {
 		this.Abort("500")
 		return

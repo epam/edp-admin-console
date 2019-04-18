@@ -22,6 +22,7 @@ import (
 	"edp-admin-console/filters"
 	"edp-admin-console/k8s"
 	"edp-admin-console/repository"
+	"edp-admin-console/repository/sql_builder"
 	"edp-admin-console/service"
 	"github.com/astaxie/beego"
 	"log"
@@ -32,9 +33,11 @@ func init() {
 	context.InitDb()
 	context.InitAuth()
 	clients := k8s.CreateOpenShiftClients()
+	appQueryManager := sql_builder.ApplicationQueryBuilder{}
+	branchQueryManager := sql_builder.BranchQueryBuilder{}
 	edpRepository := repository.EDPTenantRepository{}
-	appRepository := repository.ApplicationEntityRepository{}
-	branchRepository := repository.ReleaseBranchRepository{}
+	appRepository := repository.ApplicationEntityRepository{QueryManager: appQueryManager}
+	branchRepository := repository.ReleaseBranchRepository{QueryManager: branchQueryManager}
 	pipelineRepository := repository.CDPipelineRepository{}
 	edpService := service.EDPTenantService{IEDPTenantRep: edpRepository, Clients: clients}
 	clusterService := service.ClusterService{Clients: clients}
@@ -60,9 +63,9 @@ func init() {
 		beego.NSRouter("/application", &controllers.ApplicationController{AppService: appService, EDPTenantService: edpService, BranchService: branchService}, "post:CreateApplication"),
 		beego.NSRouter("/application/:appName/branch", &controllers.BranchController{BranchService: branchService}, "post:CreateReleaseBranch"),
 
-		beego.NSRouter("/cd-pipeline/overview", &controllers.CDPipelineController{AppService: appService, PipelineService: pipelineService, EDPTenantService: edpService}, "get:GetContinuousDeliveryPage"),
-		beego.NSRouter("/cd-pipeline/create", &controllers.CDPipelineController{AppService: appService, PipelineService: pipelineService, EDPTenantService: edpService}, "get:GetCreateCDPipelinePage"),
-		beego.NSRouter("/cd-pipeline", &controllers.CDPipelineController{AppService: appService, PipelineService: pipelineService, EDPTenantService: edpService}, "post:CreateCDPipeline"),
+		beego.NSRouter("/cd-pipeline/overview", &controllers.CDPipelineController{AppService: appService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService}, "get:GetContinuousDeliveryPage"),
+		beego.NSRouter("/cd-pipeline/create", &controllers.CDPipelineController{AppService: appService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService}, "get:GetCreateCDPipelinePage"),
+		beego.NSRouter("/cd-pipeline", &controllers.CDPipelineController{AppService: appService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService}, "post:CreateCDPipeline"),
 	)
 	beego.AddNamespace(adminEdpNamespace)
 

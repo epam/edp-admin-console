@@ -31,10 +31,22 @@ type CDPipelineController struct {
 	AppService       service.ApplicationService
 	PipelineService  service.CDPipelineService
 	EDPTenantService service.EDPTenantService
+	BranchService    service.BranchService
 }
 
 func (this *CDPipelineController) GetContinuousDeliveryPage() {
-	applications, err := this.AppService.GetAllApplications()
+	var activeStatus = "active"
+	applications, err := this.AppService.GetAllApplications(models.ApplicationCriteria{
+		Status: &activeStatus,
+	})
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
+	branches, err := this.BranchService.GetAllReleaseBranches(models.BranchCriteria{
+		Status: &activeStatus,
+	})
 	if err != nil {
 		this.Abort("500")
 		return
@@ -47,7 +59,7 @@ func (this *CDPipelineController) GetContinuousDeliveryPage() {
 	}
 
 	contextRoles := this.GetSession("realm_roles").([]string)
-	this.Data["Applications"] = applications
+	this.Data["ActiveApplicationsAndBranches"] = len(applications) > 0 && len(branches) > 0
 	this.Data["EDPVersion"] = version
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["HasRights"] = isAdmin(contextRoles)
@@ -56,7 +68,10 @@ func (this *CDPipelineController) GetContinuousDeliveryPage() {
 
 func (this *CDPipelineController) GetCreateCDPipelinePage() {
 	flash := beego.ReadFromRequest(&this.Controller)
-	applicationsWithReleaseBranches, err := this.AppService.GetAllApplicationsWithReleaseBranches()
+	var activeStatus = "active"
+	applicationsWithReleaseBranches, err := this.AppService.GetAllApplicationsWithReleaseBranches(models.ApplicationCriteria{
+		Status: &activeStatus,
+	})
 	if err != nil {
 		this.Abort("500")
 		return
