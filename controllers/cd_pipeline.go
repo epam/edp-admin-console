@@ -19,6 +19,7 @@ package controllers
 import (
 	"edp-admin-console/models"
 	"edp-admin-console/service"
+	"fmt"
 	"github.com/astaxie/beego"
 	"log"
 	"net/http"
@@ -94,7 +95,22 @@ func (this *CDPipelineController) CreateCDPipeline() {
 	releaseBranchCommands := convertRequestReleaseBranchData(appNameCheckboxes, this)
 	log.Printf("Request data is receieved to create CD pipelines: %s, with %s name", releaseBranchCommands, pipelineName)
 
-	_, err := this.PipelineService.CreatePipeline(pipelineName, releaseBranchCommands)
+	cdPipeline, err := this.PipelineService.GetCDPipelineByName(pipelineName)
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
+	if cdPipeline != nil {
+		errMsg := fmt.Sprintf("CD Pipeline %s is already exists.", cdPipeline.Name)
+		log.Printf(errMsg)
+		flash.Error(errMsg)
+		flash.Store(&this.Controller)
+		this.Redirect("/admin/edp/cd-pipeline/create", 302)
+		return
+	}
+
+	_, err = this.PipelineService.CreatePipeline(pipelineName, releaseBranchCommands)
 	if err != nil {
 		this.Abort("500")
 		return
