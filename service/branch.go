@@ -79,8 +79,7 @@ func (this *BranchService) CreateReleaseBranch(branchInfo models.ReleaseBranchCr
 }
 
 func (this *BranchService) GetReleaseBranch(appName string, branchName string) (*models.ReleaseBranchView, error) {
-	edpTenantName := beego.AppConfig.String("cicdNamespace")
-	releaseBranch, err := this.IReleaseBranchRepository.GetReleaseBranch(appName, branchName, edpTenantName)
+	releaseBranch, err := this.IReleaseBranchRepository.GetReleaseBranch(appName, branchName)
 	if err != nil {
 		log.Printf("An error has occurred while getting branch entity %s-%s from database: %s", appName, branchName, err)
 		return nil, err
@@ -94,14 +93,14 @@ func (this *BranchService) GetReleaseBranch(appName string, branchName string) (
 }
 
 func (this *BranchService) GetAllReleaseBranchesByAppName(appName string) ([]models.ReleaseBranchView, error) {
-	edpTenantName := beego.AppConfig.String("cicdNamespace")
-	releaseBranches, err := this.IReleaseBranchRepository.GetAllReleaseBranchesByAppName(appName, edpTenantName)
+	releaseBranches, err := this.IReleaseBranchRepository.GetAllReleaseBranchesByAppName(appName)
 	if err != nil {
 		log.Printf("An error has occurred while getting branch entities for {%s} application: %s", appName, err)
 		return nil, err
 	}
 
 	if len(releaseBranches) != 0 {
+		edpTenantName := beego.AppConfig.String("cicdNamespace")
 		createLinks(releaseBranches, appName, edpTenantName)
 		log.Printf("Fetched branch entities: {%s}. Count: {%s}", releaseBranches, string(len(releaseBranches)))
 	}
@@ -110,8 +109,7 @@ func (this *BranchService) GetAllReleaseBranchesByAppName(appName string) ([]mod
 }
 
 func (this *BranchService) GetAllReleaseBranches(branchFilterCriteria models.BranchCriteria) ([]models.ReleaseBranchView, error) {
-	edpTenantName := beego.AppConfig.String("cicdNamespace")
-	releaseBranches, err := this.IReleaseBranchRepository.GetAllReleaseBranches(edpTenantName, branchFilterCriteria)
+	releaseBranches, err := this.IReleaseBranchRepository.GetAllReleaseBranches(branchFilterCriteria)
 	if err != nil {
 		log.Printf("An error has occurred while getting branch entities: %s", err)
 		return nil, err

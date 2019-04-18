@@ -25,14 +25,13 @@ import (
 )
 
 type IApplicationEntityRepository interface {
-	GetAllApplications(edpName string, filterCriteria models.ApplicationCriteria) ([]models.Application, error)
-	GetApplication(appName string, edpName string) (*models.ApplicationInfo, error)
+	GetAllApplications(filterCriteria models.ApplicationCriteria) ([]models.Application, error)
+	GetApplication(appName string) (*models.ApplicationInfo, error)
 	GetAllApplicationsWithReleaseBranches(applicationFilterCriteria models.ApplicationCriteria) ([]models.ApplicationWithReleaseBranch, error)
 }
 
 const (
 	SelectApplication = "select cb.name, " +
-		"       cb.tenant_name       as tenant, " +
 		"       cb.type              as be_type, " +
 		"       al.event             as status_name, " +
 		"       cb.language, " +
@@ -55,7 +54,6 @@ const (
 		"       left join action_log al on cal.action_log_id = al.id " +
 		"where cb.type = 'application' " +
 		"  and cb.name = ? " +
-		"  and cb.tenant_name = ? " +
 		"order by al.updated_at desc limit 1;"
 )
 
@@ -64,13 +62,13 @@ type ApplicationEntityRepository struct {
 	QueryManager sql_builder.ApplicationQueryBuilder
 }
 
-func (this ApplicationEntityRepository) GetAllApplications(edpName string, filterCriteria models.ApplicationCriteria) ([]models.Application, error) {
+func (this ApplicationEntityRepository) GetAllApplications(filterCriteria models.ApplicationCriteria) ([]models.Application, error) {
 	o := orm.NewOrm()
 	var applications []models.Application
 	var maps []orm.Params
 
 	selectAllApplicationsQuery := this.QueryManager.GetAllApplicationsQuery(filterCriteria)
-	_, err := o.Raw(selectAllApplicationsQuery, edpName).Values(&maps)
+	_, err := o.Raw(selectAllApplicationsQuery).Values(&maps)
 
 	if err != nil {
 		return nil, err
@@ -91,12 +89,12 @@ func (this ApplicationEntityRepository) GetAllApplications(edpName string, filte
 	return applications, nil
 }
 
-func (this ApplicationEntityRepository) GetApplication(appName string, edpName string) (*models.ApplicationInfo, error) {
+func (this ApplicationEntityRepository) GetApplication(appName string) (*models.ApplicationInfo, error) {
 	o := orm.NewOrm()
 	var application models.ApplicationInfo
 	var maps []orm.Params
 
-	_, err := o.Raw(SelectApplication, appName, edpName).Values(&maps)
+	_, err := o.Raw(SelectApplication, appName).Values(&maps)
 
 	if err != nil {
 		return nil, err
@@ -109,7 +107,6 @@ func (this ApplicationEntityRepository) GetApplication(appName string, edpName s
 	for _, row := range maps {
 		application = models.ApplicationInfo{
 			Name:      row["name"].(string),
-			Tenant:    row["tenant"].(string),
 			Type:      row["be_type"].(string),
 			Status:    row["status_name"].(string),
 			Language:  row["language"].(string),

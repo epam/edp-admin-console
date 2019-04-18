@@ -11,7 +11,7 @@ const (
 		"		left join codebase c on cb.codebase_id = c.id " +
 		"		left join codebase_branch_action_log cbal on cb.id = cbal.codebase_branch_id " +
 		"		left join action_log al on al.id = cbal.action_log_id " +
-		"where c.tenant_name = ? %s " +
+		"%s" +
 		"order by cb.name, al.updated_at desc;"
 )
 
@@ -23,7 +23,7 @@ func (this *BranchQueryBuilder) GetAllBranchesQuery(filterCriteria models.Branch
 		return fmt.Sprintf(SelectAllBranches, "")
 	}
 	if *filterCriteria.Status == "active" {
-		return fmt.Sprintf(SelectAllBranches, " and al.event = 'created' ")
+		return fmt.Sprintf(SelectAllBranches, " where al.event = 'created' ")
 	}
-	return fmt.Sprintf(SelectAllBranches, " and al.event != 'created' ")
+	return fmt.Sprintf(SelectAllBranches, " where al.event != 'created' ")
 }

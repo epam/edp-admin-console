@@ -105,8 +105,7 @@ func (this ApplicationService) GetApplicationCR(appName string) (*k8s.BusinessAp
 }
 
 func (this *ApplicationService) GetAllApplications(filterCriteria models.ApplicationCriteria) ([]models.Application, error) {
-	edpTenantName := beego.AppConfig.String("cicdNamespace")
-	applications, err := this.IApplicationRepository.GetAllApplications(edpTenantName, filterCriteria)
+	applications, err := this.IApplicationRepository.GetAllApplications(filterCriteria)
 	if err != nil {
 		log.Printf("An error has occurred while getting application objects from database: %s", err)
 		return nil, err
@@ -117,8 +116,7 @@ func (this *ApplicationService) GetAllApplications(filterCriteria models.Applica
 }
 
 func (this ApplicationService) GetApplication(appName string) (*models.ApplicationInfo, error) {
-	edpTenantName := beego.AppConfig.String("cicdNamespace")
-	application, err := this.IApplicationRepository.GetApplication(appName, edpTenantName)
+	application, err := this.IApplicationRepository.GetApplication(appName)
 	if err != nil {
 		log.Printf("An error has occurred while getting application object %s from database: %s", appName, err)
 		return nil, err

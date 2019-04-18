@@ -24,9 +24,9 @@ import (
 )
 
 type IReleaseBranchRepository interface {
-	GetAllReleaseBranchesByAppName(appName, edpName string) ([]models.ReleaseBranchView, error)
-	GetAllReleaseBranches(edpName string, branchFilterCriteria models.BranchCriteria) ([]models.ReleaseBranchView, error)
-	GetReleaseBranch(appName, branchName, edpName string) (*models.ReleaseBranchView, error)
+	GetAllReleaseBranchesByAppName(appName string) ([]models.ReleaseBranchView, error)
+	GetAllReleaseBranches(branchFilterCriteria models.BranchCriteria) ([]models.ReleaseBranchView, error)
+	GetReleaseBranch(appName, branchName string) (*models.ReleaseBranchView, error)
 }
 
 const (
@@ -35,16 +35,14 @@ const (
 		"		left join codebase c on cb.codebase_id = c.id " +
 		"		left join codebase_branch_action_log cbal on cb.id = cbal.codebase_branch_id " +
 		"		left join action_log al on al.id = cbal.action_log_id " +
-		"where c.tenant_name = ? " +
-		"	and c.name = ? " +
+		"where c.name = ? " +
 		"order by cb.name, al.updated_at desc;"
 	SelectBranch = "select distinct on (cb.\"name\") cb.name, al.event, al.detailed_message, al.username, al.updated_at " +
 		"from codebase_branch cb " +
 		"		left join codebase c on cb.codebase_id = c.id " +
 		"		left join codebase_branch_action_log cbal on cb.id = cbal.codebase_branch_id " +
 		"		left join action_log al on al.id = cbal.action_log_id " +
-		"where c.tenant_name = ? " +
-		"	and c.name = ? " +
+		"where c.name = ? " +
 		"	and cb.name = ? " +
 		"order by cb.name, al.updated_at desc;"
 )
@@ -54,11 +52,11 @@ type ReleaseBranchRepository struct {
 	QueryManager sql_builder.BranchQueryBuilder
 }
 
-func (this ReleaseBranchRepository) GetAllReleaseBranchesByAppName(appName, edpName string) ([]models.ReleaseBranchView, error) {
+func (this ReleaseBranchRepository) GetAllReleaseBranchesByAppName(appName string) ([]models.ReleaseBranchView, error) {
 	o := orm.NewOrm()
 	var branches []models.ReleaseBranchView
 
-	_, err := o.Raw(SelectAllBranches, edpName, appName).QueryRows(&branches)
+	_, err := o.Raw(SelectAllBranches, appName).QueryRows(&branches)
 
 	if err != nil {
 		if err == orm.ErrNoRows {
@@ -71,12 +69,12 @@ func (this ReleaseBranchRepository) GetAllReleaseBranchesByAppName(appName, edpN
 	return branches, nil
 }
 
-func (this ReleaseBranchRepository) GetAllReleaseBranches(edpName string, branchFilterCriteria models.BranchCriteria) ([]models.ReleaseBranchView, error) {
+func (this ReleaseBranchRepository) GetAllReleaseBranches(branchFilterCriteria models.BranchCriteria) ([]models.ReleaseBranchView, error) {
 	o := orm.NewOrm()
 	var branches []models.ReleaseBranchView
 
 	selectAllBranchesQuery := this.QueryManager.GetAllBranchesQuery(branchFilterCriteria)
-	_, err := o.Raw(selectAllBranchesQuery, edpName).QueryRows(&branches)
+	_, err := o.Raw(selectAllBranchesQuery).QueryRows(&branches)
 
 	if err != nil {
 		if err == orm.ErrNoRows {
@@ -89,11 +87,11 @@ func (this ReleaseBranchRepository) GetAllReleaseBranches(edpName string, branch
 	return branches, nil
 }
 
-func (this ReleaseBranchRepository) GetReleaseBranch(appName, branchName, edpName string) (*models.ReleaseBranchView, error) {
+func (this ReleaseBranchRepository) GetReleaseBranch(appName, branchName string) (*models.ReleaseBranchView, error) {
 	o := orm.NewOrm()
 	var branch models.ReleaseBranchView
 
-	err := o.Raw(SelectBranch, edpName, appName, branchName).QueryRow(&branch)
+	err := o.Raw(SelectBranch, appName, branchName).QueryRow(&branch)
 
 	if err != nil {
 		if err == orm.ErrNoRows {

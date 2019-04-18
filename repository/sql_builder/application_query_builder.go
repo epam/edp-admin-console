@@ -10,7 +10,7 @@ const (
 		"from codebase cb " +
 		"		left join codebase_action_log cal on cb.id = cal.codebase_id " +
 		"		left join action_log al on cal.action_log_id = al.id " +
-		"where tenant_name = ? %s " +
+		"%s" +
 		"order by name, al.updated_at desc;"
 	SelectAllApplicationsWithReleaseBranches = "select c.name as app_name, cb.name as branch_name, al.event " +
 		"from codebase c " +
@@ -28,9 +28,9 @@ func (this *ApplicationQueryBuilder) GetAllApplicationsQuery(filterCriteria mode
 		return fmt.Sprintf(SelectAllApplications, "")
 	}
 	if *filterCriteria.Status == "active" {
-		return fmt.Sprintf(SelectAllApplications, " and al.event = 'created' ")
+		return fmt.Sprintf(SelectAllApplications, " where al.event = 'created' ")
 	}
-	return fmt.Sprintf(SelectAllApplications, " and al.event != 'created' ")
+	return fmt.Sprintf(SelectAllApplications, " where al.event != 'created' ")
 }
 
 func (this *ApplicationQueryBuilder) GetAllApplicationsWithReleaseBranchesQuery(filterCriteria models.ApplicationCriteria) string {
