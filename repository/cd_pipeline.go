@@ -26,7 +26,7 @@ type ICDPipelineRepository interface {
 }
 
 const (
-	SelectCDPipelineByName = "select cdp.name as pipeline_name, cb.name as branch_name, c.name as app_name " +
+	SelectCDPipelineByName = "select cdp.name as pipeline_name, cb.name as branch_name, c.name as app_name, cdp.status " +
 		"from cd_pipeline cdp " +
 		"		left join cd_pipeline_codebase_branch cpcb on cdp.id = cpcb.cd_pipeline_id " +
 		"		left join codebase_branch cb on cpcb.codebase_branch_id = cb.id " +
@@ -55,6 +55,7 @@ func (this CDPipelineRepository) GetCDPipelineByName(pipelineName string) (*mode
 
 	for _, row := range maps {
 		cdPipeline.Name = row["pipeline_name"].(string)
+		cdPipeline.Status = row["status"].(string)
 		cdPipeline.CodebaseBranches = append(cdPipeline.CodebaseBranches, models.CodebaseBranchDTO{
 			AppName:    row["app_name"].(string),
 			BranchName: row["branch_name"].(string),
