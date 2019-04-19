@@ -18,7 +18,6 @@ package service
 
 import (
 	"edp-admin-console/k8s"
-	"edp-admin-console/repository"
 	"errors"
 	"fmt"
 	"github.com/astaxie/beego"
@@ -29,8 +28,7 @@ import (
 )
 
 type EDPTenantService struct {
-	IEDPTenantRep repository.IEDPTenantRepository
-	Clients       k8s.ClientSet
+	Clients k8s.ClientSet
 }
 
 var (
@@ -39,13 +37,7 @@ var (
 )
 
 func (this EDPTenantService) GetEDPVersion() (string, error) {
-	edpTenantName := beego.AppConfig.String("cicdNamespace")
-	version, err := this.IEDPTenantRep.GetEdpVersionByName(edpTenantName)
-	if err != nil {
-		log.Printf("An error has occurred while getting version of %s EDP.", edpTenantName)
-		return "", err
-	}
-	return version, nil
+	return beego.AppConfig.String("edpVersion"), nil
 }
 
 func (edpService EDPTenantService) GetEDPComponents() map[string]string {

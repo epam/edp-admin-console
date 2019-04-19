@@ -17,7 +17,6 @@
 package context
 
 import (
-	"edp-admin-console/models"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
@@ -30,7 +29,6 @@ import (
 )
 
 func InitDb() {
-	orm.RegisterModel(new(models.EDPTenant))
 	err := orm.RegisterDriver("postgres", orm.DRPostgres)
 	checkErr(err)
 
