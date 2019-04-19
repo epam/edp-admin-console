@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>EDP Admin Console</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="/static/css/index.css">
@@ -23,39 +23,8 @@
 
                 <div class="accordion" id="accordionCreateApplication">
                     <div class="card">
-                        <div class="card-header" id="headingOne" data-toggle="collapse"
+                        <div class="card-header" id="headingOne"
                              aria-expanded="true" aria-controls="collapseOne">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link collapsed" type="button">
-                                    Main info
-                                </button>
-                            </h5>
-                        </div>
-                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
-                             data-parent="#accordionCreateApplication">
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <table class="edp-table">
-                                        <thead>
-                                        <tr>
-                                            <th scope="col">Name</th>
-                                            <th scope="col">Type</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td>{{.Application.Name}}</td>
-                                            <td>{{.Application.Type}}</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header" id="headingTwo" data-toggle="collapse"
-                             aria-expanded="true" aria-controls="collapseTwo">
                             <h5 class="mb-0">
                                 <button class="btn btn-link" type="button">
                                     Properties info
@@ -63,8 +32,7 @@
                             </h5>
                         </div>
 
-                        <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo"
-                             data-parent="#accordionCreateApplication">
+                        <div id="collapseOne" class="show" aria-labelledby="headingOne">
                             <div class="card-body">
                                 <div class="form-check">
                                     <table class="edp-table">
@@ -99,11 +67,11 @@
                                         {{end}}
                                         {{if and .Application.RouteSite .Application.RoutePath }}
                                             <tr>
-                                                <td>Route Site</td>
+                                                <td>Expose Service Site</td>
                                                 <td>{{.Application.RouteSite}}</td>
                                             </tr>
                                             <tr>
-                                                <td>Route Path</td>
+                                                <td>Expose Service Path</td>
                                                 <td>{{.Application.RoutePath}}</td>
                                             </tr>
                                         {{end}}
@@ -132,15 +100,15 @@
                         </div>
                     </div>
                     <div class="card">
-                        <div class="card-header" id="headingThree" data-toggle="collapse"
-                             aria-expanded="true" aria-controls="collapseThree">
+                        <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
+                             data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                             <h5 class="mb-0">
-                                <button class="btn btn-link collapsed" type="button">
+                                <button class="btn btn-link" type="button">
                                     Status info
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapseThree" class="collapse show route" aria-labelledby="headingThree"
+                        <div id="collapseTwo" class="collapse route" aria-labelledby="headingTwo"
                              data-parent="#accordionCreateApplication">
                             <div class="card-body">
                                 <div class="form-check">
@@ -171,16 +139,15 @@
 
                     {{if ne (len .ReleaseBranches) 0}}
                         <div class="card">
-                            <div class="card-header" id="headingFour" data-toggle="collapse"
-                                 aria-expanded="true" aria-controls="collapseFour">
+                            <div class="card-header" id="headingThree"
+                                 aria-expanded="true" aria-controls="collapseThree">
                                 <h5 class="mb-0">
-                                    <button class="btn btn-link collapsed" type="button">
+                                    <button class="btn btn-link" type="button">
                                         Release Branches
                                     </button>
                                 </h5>
                             </div>
-                            <div id="collapseFour" class="collapse show route" aria-labelledby="headingFour"
-                                 data-parent="#accordionCreateApplication">
+                            <div id="collapseThree" class="show route" aria-labelledby="headingThree">
                                 <div class="card-body">
                                     <div class="form-check">
                                         <table class="edp-table">

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>EDP Admin Console</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="/static/css/index.css">
@@ -52,7 +52,9 @@
                         </td>
                         <td>{{.Language}}</td>
                         <td>{{.BuildTool}}</td>
-                        <td>{{.Status}}</td>
+                        <td>
+                            <img src="{{if eq .Status "created"}}/static/img/green_circle.svg{{else if eq .Status "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}" alt="" style="width:25px; height:25px;">
+                        </td>
                         <td>
                             <button class="delete" data-toggle="modal" data-target="#exampleModal">
                                 <i class="icon-trashcan"></i>

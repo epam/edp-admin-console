@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>EDP Admin Console</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="/static/css/index.css">
@@ -26,6 +26,7 @@
                         <li>Jenkins Pipelines</li>
                     </ul>
                 </p>
+                <p>Pass all steps below to create your Application.</p>
 
                 {{ if .Error }}
                     <div class="form-error">
@@ -108,7 +109,7 @@
                                         data-toggle="collapse"
                                         data-target="#collapseTwo" aria-expanded="false"
                                         aria-controls="collapseOne"
-                                >PROCEED TO MAIN INFO
+                                >PROCEED TO APPLICATION INFO
                                 </button>
                             </div>
                         </div>
@@ -118,7 +119,7 @@
                              data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                             <h5 class="mb-0">
                                 <button class="btn btn-link" type="button">
-                                    Main info
+                                    Application info
                                 </button>
                             </h5>
                         </div>
@@ -284,7 +285,7 @@
                                         data-toggle="collapse"
                                         data-target="{{if .IsVcsEnabled}}#collapseThree{{else}}#collapseFour{{end}}"
                                         aria-expanded="false"
-                                        aria-controls="collapseTwo">{{if .IsVcsEnabled}}PROCEED TO VCS INFO{{else}}PROCEED TO INGRESS INFO{{end}}
+                                        aria-controls="collapseTwo">{{if .IsVcsEnabled}}PROCEED TO VCS INFO{{else}}PROCEED TO EXPOSING SERVICE INFO{{end}}
                                 </button>
                             </div>
                         </div>
@@ -474,7 +475,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to create application?
+                    Press continue for adding your Application. Status will be available on "Applications" page.
                     <p/>
                     <table id="window-table" class="table table-bordered">
                         <thead class="thead-dark">
@@ -486,8 +487,8 @@
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button id="btn-modal-close" type="button" class="btn btn-secondary btn-modal-close" data-dismiss="modal">CLOSE</button>
-                    <button id="create-application" type="button" class="edp-submit-form-btn btn btn-primary">CREATE APPLICATION</button>
+                    <button id="btn-modal-close" type="button" class="btn btn-secondary btn-modal-close" data-dismiss="modal">CANCEL</button>
+                    <button id="create-application" type="button" class="edp-submit-form-btn btn btn-primary">CONTINUE</button>
                 </div>
             </div>
         </div>
