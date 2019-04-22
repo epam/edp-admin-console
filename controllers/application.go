@@ -20,6 +20,7 @@ import (
 	"edp-admin-console/models"
 	"edp-admin-console/service"
 	"edp-admin-console/util"
+	"fmt"
 	"github.com/astaxie/beego"
 	"log"
 )
@@ -151,7 +152,7 @@ func (this *ApplicationController) CreateApplication() {
 	log.Printf("Application object is saved into k8s: %s", createdObject)
 	flash.Success("Application object is created.")
 	flash.Store(&this.Controller)
-	this.Redirect("/admin/edp/application/overview", 302)
+	this.Redirect(fmt.Sprintf("/admin/edp/application/overview?waitingforapp=%s", app.Name), 302)
 }
 
 func extractRequestData(this *ApplicationController) models.App {

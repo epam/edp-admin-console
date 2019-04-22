@@ -12,7 +12,7 @@ func init() {
 	developer := beego.AppConfig.String("developerRole")
 	roles = map[string][]string{
 		"GET /admin/edp/overview$":                    {administrator, developer},
-		"GET /admin/edp/application/overview$":        {administrator, developer},
+		"GET /admin/edp/application/overview":         {administrator, developer},
 		"GET /admin/edp/application/create$":          {administrator},
 		"GET /admin/edp/application/([^/]*)/overview": {administrator, developer},
 		"GET /admin/edp/cd-pipeline/overview$":        {administrator, developer},
