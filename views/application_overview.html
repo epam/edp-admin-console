@@ -99,7 +99,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card">
+                    <div class="card status-info">
                         <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
                              data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                             <h5 class="mb-0">
@@ -108,7 +108,7 @@
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapseTwo" class="collapse route" aria-labelledby="headingTwo"
+                        <div id="collapseTwo" class="collapse status" aria-labelledby="headingTwo"
                              data-parent="#accordionCreateApplication">
                             <div class="card-body">
                                 <div class="form-check">
@@ -127,7 +127,8 @@
                                             <td>{{.Application.Message}}</td>
                                             <td>{{.Application.LastTimeUpdate}}</td>
                                             <td>{{.Application.UserName}}</td>
-                                            <td>{{.Application.Status}}</td>
+                                            <td class="app-status"
+                                                data-status="{{.Application.Status}}">{{.Application.Status}}</td>
                                             <td>{{.Application.Available}}</td>
                                         </tr>
                                         </tbody>
@@ -152,28 +153,32 @@
                                     <div class="form-check">
                                         <table class="edp-table">
                                             <thead>
-                                                <tr>
-                                                    <th scope="col">Status</th>
-                                                    <th scope="col">Branch</th>
-                                                    <th scope="col">VCS</th>
-                                                    <th scope="col">CI/CD</th>
-                                                </tr>
+                                            <tr>
+                                                <th scope="col">Status</th>
+                                                <th scope="col">Branch</th>
+                                                <th scope="col">VCS</th>
+                                                <th scope="col">CI/CD</th>
+                                            </tr>
                                             </thead>
                                             <tbody>
-                                                {{range .ReleaseBranches}}
-                                                    <tr>
-                                                        <td>
-                                                            <img src="{{if eq .Event "created"}}/static/img/green_circle.svg{{else if eq .Event "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}" alt="" style="width:25px; height:25px;">
-                                                        </td>
-                                                        <td>{{.Name}}</td>
-                                                        <td>
-                                                            <a href="{{.VCSLink}}" target="_blank" rel="noopener noreferrer" class="{{if ne .Event "created"}}disabled{{end}}">Link</a>
-                                                        </td>
-                                                        <td>
-                                                            <a href="{{.CICDLink}}" target="_blank" rel="noopener noreferrer" class="{{if ne .Event "created"}}disabled{{end}}">Link</a>
-                                                        </td>
-                                                    </tr>
-                                                {{end}}
+                                            {{range .ReleaseBranches}}
+                                                <tr>
+                                                    <td>
+                                                        <img src="{{if eq .Event "created"}}/static/img/green_circle.svg{{else if eq .Event "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}"
+                                                             alt="" style="width:25px; height:25px;">
+                                                    </td>
+                                                    <td>{{.Name}}</td>
+                                                    <td>
+                                                        <a href="{{.VCSLink}}" target="_blank" rel="noopener noreferrer"
+                                                           class="{{if ne .Event "created"}}disabled{{end}}">Link</a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{.CICDLink}}" target="_blank"
+                                                           rel="noopener noreferrer"
+                                                           class="{{if ne .Event "created"}}disabled{{end}}">Link</a>
+                                                    </td>
+                                                </tr>
+                                            {{end}}
                                             </tbody>
                                         </table>
                                     </div>
@@ -255,6 +260,7 @@
 <script src="/static/js/bootstrap.js"></script>
 <script src="/static/js/util.js"></script>
 <script src="/static/js/application.js"></script>
+<script src="/static/js/application-overview.js"></script>
 <script src="/static/js/release-branch.js"></script>
 </body>
 </html>
