@@ -25,7 +25,6 @@ type Application struct {
 
 type ApplicationInfo struct {
 	Name           string `json:"name"`
-	Tenant         string `json:"tenant"`
 	Language       string `json:"language"`
 	BuildTool      string `json:"build_tool"`
 	Framework      string `json:"framework"`

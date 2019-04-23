@@ -35,11 +35,10 @@ func init() {
 	clients := k8s.CreateOpenShiftClients()
 	appQueryManager := sql_builder.ApplicationQueryBuilder{}
 	branchQueryManager := sql_builder.BranchQueryBuilder{}
-	edpRepository := repository.EDPTenantRepository{}
 	appRepository := repository.ApplicationEntityRepository{QueryManager: appQueryManager}
 	branchRepository := repository.ReleaseBranchRepository{QueryManager: branchQueryManager}
 	pipelineRepository := repository.CDPipelineRepository{}
-	edpService := service.EDPTenantService{IEDPTenantRep: edpRepository, Clients: clients}
+	edpService := service.EDPTenantService{Clients: clients}
 	clusterService := service.ClusterService{Clients: clients}
 	branchService := service.BranchService{Clients: clients, IReleaseBranchRepository: branchRepository}
 	appService := service.ApplicationService{Clients: clients, IApplicationRepository: appRepository, BranchService: branchService}
