@@ -27,7 +27,7 @@ let STATUS = {
     CREATED: 'created',
     FAILED: 'failed'
 };
-let delayTime = 3000;
+let delayTime = 10000;
 
 function getApplicationStatus(appName) {
     let status;
