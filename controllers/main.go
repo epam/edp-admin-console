@@ -17,6 +17,7 @@
 package controllers
 
 import (
+	"edp-admin-console/context"
 	"edp-admin-console/service"
 	"fmt"
 	"github.com/astaxie/beego"
@@ -39,7 +40,7 @@ func (this *MainController) Index() {
 }
 
 func (this *MainController) CockpitRedirectConfirmationPage() {
-	this.Data["Domain"] = fmt.Sprintf("https://edp-cockpit-%s-edp-cicd.%s", this.GetString("edpTenant"), beego.AppConfig.String("dnsWildcard"))
+	this.Data["Domain"] = fmt.Sprintf("https://edp-cockpit-%s-edp-cicd.%s", context.Tenant, beego.AppConfig.String("dnsWildcard"))
 	this.Data["Anchor"] = this.GetString("anchor")
 	this.TplName = "cockpit_redirect_confirmation.html"
 }
