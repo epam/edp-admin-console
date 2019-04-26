@@ -65,7 +65,7 @@ func (this *BranchService) CreateReleaseBranch(branchInfo models.ReleaseBranchCr
 		Spec: spec,
 		Status: k8s.ApplicationBranchStatus{
 			Status:          "initialized",
-			LastTimeUpdated: time.Now().Format("2006-01-02T15:04:05Z"),
+			LastTimeUpdated: time.Now(),
 		},
 	}
 

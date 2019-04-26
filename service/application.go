@@ -54,7 +54,7 @@ func (this ApplicationService) CreateApp(app models.App) (*k8s.BusinessApplicati
 		Spec: spec,
 		Status: k8s.BusinessApplicationStatus{
 			Available:       false,
-			LastTimeUpdated: time.Now().Format("2006-01-02T15:04:05Z"),
+			LastTimeUpdated: time.Now(),
 			Status:          "initialized",
 		},
 	}

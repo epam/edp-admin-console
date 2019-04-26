@@ -18,6 +18,7 @@ package k8s
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"time"
 )
 
 // +k8s:openapi-gen=true
@@ -28,8 +29,8 @@ type CDPipelineSpec struct {
 
 // +k8s:openapi-gen=true
 type CDPipelineStatus struct {
-	LastTimeUpdated string `json:"last_time_updated"`
-	Status          string `json:"status"`
+	LastTimeUpdated time.Time `json:"last_time_updated"`
+	Status          string    `json:"status"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

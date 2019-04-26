@@ -60,7 +60,7 @@ func (this *CDPipelineService) CreatePipeline(pipelineName string, releaseBranch
 		},
 		Spec: convertPipelineData(pipelineName, releaseBranchCommands),
 		Status: k8s.CDPipelineStatus{
-			LastTimeUpdated: time.Now().Format("2006-01-02T15:04:05Z"),
+			LastTimeUpdated: time.Now(),
 			Status:          "initialized",
 		},
 	}
