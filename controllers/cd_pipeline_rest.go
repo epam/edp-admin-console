@@ -17,6 +17,7 @@
 package controllers
 
 import (
+	"edp-admin-console/models"
 	"edp-admin-console/service"
 	"fmt"
 	"github.com/astaxie/beego"
@@ -43,5 +44,30 @@ func (this *CDPipelineRestController) GetCDPipelineByName() {
 	}
 
 	this.Data["json"] = cdPipeline
+	this.ServeJSON()
+}
+
+func (this *CDPipelineRestController) GetStage() {
+	stage := models.Stage{
+		Name:        "sit",
+		CDPipeline:  "team-a",
+		Description: "SIT environment for dedicated team",
+		QualityGate: "manual",
+		TriggerType: "is-changed",
+		Applications: []models.ApplicationStage{
+			{
+				Name:     "petclinic-fe",
+				InputIs:  "petclinic-fe-release-1.0",
+				OutputIs: "team-a-sit-petclinic-fe-verified",
+			},
+			{
+				Name:     "petclinic-be",
+				InputIs:  "petclinic-be-master",
+				OutputIs: "team-a-sit-petclinic-be-verified",
+			},
+		},
+	}
+
+	this.Data["json"] = stage
 	this.ServeJSON()
 }
