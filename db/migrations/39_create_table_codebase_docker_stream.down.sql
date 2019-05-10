@@ -1,0 +1,1 @@
+drop table if exists codebase_docker_stream;

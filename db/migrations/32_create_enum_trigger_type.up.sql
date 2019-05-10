@@ -1,0 +1,1 @@
+create type trigger_type as enum ('manual', 'is-changed');
