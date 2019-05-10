@@ -87,6 +87,24 @@ func (this *CDPipelineService) GetCDPipelineByName(pipelineName string) (*models
 	return cdPipeline, nil
 }
 
+func (this *CDPipelineService) CreateStages(cdPipelineName string, stages []models.StageCreate) ([]k8s.Stage, error) {
+	log.Printf("Start creating CR stages: %+v\n", stages)
+	edpRestClient := this.Clients.EDPRestClient
+
+	err := checkStagesInK8s(edpRestClient, cdPipelineName, stages)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	stagesCr, err := saveStagesIntoK8s(edpRestClient, cdPipelineName, stages)
+	if err != nil {
+		return nil, err
+	}
+
+	return stagesCr, nil
+}
+
 func convertPipelineData(pipelineName string, releaseBranchCommands []models.ReleaseBranchCreatePipelineCommand) k8s.CDPipelineSpec {
 	var codebaseBranches []string
 	for _, v := range releaseBranchCommands {
@@ -113,4 +131,70 @@ func getCDPipelineCR(edpRestClient *rest.RESTClient, pipelineName string, namesp
 	}
 
 	return cdPipeline, nil
+}
+
+func createCrd(cdPipelineName string, stage models.StageCreate) k8s.Stage {
+	return k8s.Stage{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "edp.epam.com/v1alpha1",
+			Kind:       "Stage",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      fmt.Sprintf("%s-%s", cdPipelineName, stage.Name),
+			Namespace: context.Namespace,
+		},
+		Spec: k8s.StageSpec{
+			Name:        stage.Name,
+			Description: stage.Description,
+			QualityGate: stage.QualityGateType,
+			JenkinsStep: stage.StepName,
+			TriggerType: stage.TriggerType,
+			Order:       stage.Order,
+			CdPipeline:  cdPipelineName,
+		},
+		Status: k8s.StageStatus{
+			LastTimeUpdated: time.Now(),
+			Status:          "initialized",
+		},
+	}
+}
+
+func saveStagesIntoK8s(edpRestClient *rest.RESTClient, cdPipelineName string, stages []models.StageCreate) ([]k8s.Stage, error) {
+	var stagesCr []k8s.Stage
+	for _, stage := range stages {
+		crd := createCrd(cdPipelineName, stage)
+		stageCr := k8s.Stage{}
+		err := edpRestClient.Post().Namespace(context.Namespace).Resource("stages").Body(&crd).Do().Into(&stageCr)
+		if err != nil {
+			log.Printf("An error has occurred while creating Stage object in k8s: %s", err)
+			return nil, err
+		}
+		log.Printf("Stage is saved into k8s: %+v\n", stage.Name)
+		stagesCr = append(stagesCr, stageCr)
+	}
+	return stagesCr, nil
+}
+
+func checkStagesInK8s(edpRestClient *rest.RESTClient, cdPipelineName string, stages []models.StageCreate) error {
+	for _, stage := range stages {
+		stagesCr := &k8s.Stage{}
+		stageName := fmt.Sprintf("%s-%s", cdPipelineName, stage.Name)
+		err := edpRestClient.Get().Namespace(context.Namespace).Resource("stages").Name(stageName).Do().Into(stagesCr)
+
+		if k8serrors.IsNotFound(err) {
+			log.Printf("Stage %s doesn't exist.", stage.Name)
+			continue
+		}
+
+		if err != nil {
+			log.Printf("An error has occurred while getting Stage from k8s: %s", err)
+			return err
+		}
+
+		if stagesCr != nil {
+			log.Printf("CR Stage %s is already exists in k8s: %s", stageName, err)
+			return fmt.Errorf("stage %s is already exists", stage.Name)
+		}
+	}
+	return nil
 }

@@ -21,6 +21,7 @@ import (
 	"edp-admin-console/service"
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/validation"
 	"log"
 	"net/http"
 	"regexp"
@@ -97,8 +98,9 @@ func (this *CDPipelineController) CreateCDPipeline() {
 	flash := beego.NewFlash()
 	appNameCheckboxes := this.GetStrings("app")
 	pipelineName := this.GetString("pipelineName")
+	stages := retrieveStagesFromRequest(this)
 
-	errMsg := validateRequestData(appNameCheckboxes, pipelineName)
+	errMsg := validateRequestData(appNameCheckboxes, pipelineName, stages)
 	if errMsg != nil {
 		log.Printf("Request data is not valid: %s", errMsg.Message)
 		flash.Error(errMsg.Message)
@@ -131,6 +133,12 @@ func (this *CDPipelineController) CreateCDPipeline() {
 		return
 	}
 
+	_, err = this.PipelineService.CreateStages(pipelineName, stages)
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
 	version, err := this.EDPTenantService.GetEDPVersion()
 	if err != nil {
 		this.Abort("500")
@@ -140,6 +148,23 @@ func (this *CDPipelineController) CreateCDPipeline() {
 	this.Data["EDPVersion"] = version
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Redirect("/admin/edp/cd-pipeline/create#cdPipelineSuccessModal", 302)
+}
+
+func retrieveStagesFromRequest(this *CDPipelineController) []models.StageCreate {
+	var stages []models.StageCreate
+	for index, stageName := range this.GetStrings("stageName") {
+		stage := models.StageCreate{
+			Name:            stageName,
+			Description:     this.GetString(stageName + "-stageDesc"),
+			StepName:        this.GetString(stageName + "-nameOfStep"),
+			QualityGateType: this.GetString(stageName + "-qualityGateType"),
+			TriggerType:     this.GetString(stageName + "-triggerType"),
+			Order:           index,
+		}
+		stages = append(stages, stage)
+	}
+	log.Printf("Stages are fetched from request: %s", stages)
+	return stages
 }
 
 func convertRequestReleaseBranchData(appNameCheckboxes []string, this *CDPipelineController) []models.ReleaseBranchCreatePipelineCommand {
@@ -153,7 +178,7 @@ func convertRequestReleaseBranchData(appNameCheckboxes []string, this *CDPipelin
 	return releaseBranchCommands
 }
 
-func validateRequestData(applications []string, pipelineName string) *ErrMsg {
+func validateRequestData(applications []string, pipelineName string, stages []models.StageCreate) *ErrMsg {
 	var errorMessage string
 
 	match, _ := regexp.MatchString("^[a-z][a-z0-9-.]*[a-z0-9]$", pipelineName)
@@ -166,7 +191,22 @@ func validateRequestData(applications []string, pipelineName string) *ErrMsg {
 	if len(applications) == 0 {
 		checkboxErrMsg := "At least one checkbox must be checked"
 		log.Println(checkboxErrMsg)
-		errorMessage = errorMessage + checkboxErrMsg
+		errorMessage += checkboxErrMsg
+	}
+
+	valid := validation.Validation{}
+
+	for _, stage := range stages {
+		_, err := valid.Valid(stage)
+		if err != nil {
+			return &ErrMsg{"An internal error has occurred on server while validating stage's form fields.", http.StatusInternalServerError}
+		}
+
+		if valid.Errors != nil {
+			stageErrMsg := fmt.Sprintf("Stage %s is not valid", stage.Name)
+			log.Println(stageErrMsg)
+			errorMessage += stageErrMsg
+		}
 	}
 
 	if len(errorMessage) > 0 {

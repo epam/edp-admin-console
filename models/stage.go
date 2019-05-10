@@ -1,6 +1,6 @@
 package models
 
-type Stage struct {
+type StageView struct {
 	Name         string             `json:"name"`
 	CDPipeline   string             `json:"cdPipeline"`
 	Description  string             `json:"description"`
