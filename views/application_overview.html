@@ -162,7 +162,7 @@
                                             </thead>
                                             <tbody>
                                             {{range .ReleaseBranches}}
-                                                <tr>
+                                                <tr  data-branch-name="{{.Name}}" data-branch-status="{{.Event}}">
                                                     <td>
                                                         <img src="{{if eq .Event "created"}}/static/img/green_circle.svg{{else if eq .Event "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}"
                                                              alt="" style="width:25px; height:25px;">

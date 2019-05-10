@@ -11,8 +11,7 @@ $(function () {
         if (appName) {
             let status = getApplicationStatus(appName);
             if (status === STATUS.CREATED || status === STATUS.FAILED) {
-                let uri = window.location.href;
-                window.history.replaceState({}, document.title, uri.substring(0, uri.indexOf("?")));
+                window.history.replaceState({}, document.title, window.location.pathname);
             } else {
                 setTimeout(function () {
                     location.reload();
