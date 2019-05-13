@@ -1,15 +1,5 @@
 $(function () {
 
-    $(document).ready(function () {
-        let anchor = $(location).attr('hash');
-        if (anchor) {
-            if (anchor === '#cdPipelineSuccessModal') {
-                $('#successPopup').modal('show');
-            }
-            location.hash = '';
-        }
-    });
-
     $('.application-checkbox :checkbox').change(function () {
         let $selectEl = $('.select-' + $(this).attr('id'));
         if ($(this).is(':checked')) {
@@ -70,5 +60,5 @@ function isPipelineValid() {
 }
 
 function checkPipelineName(pipelineName) {
-    return /^[a-z][a-z0-9-.]*[a-z0-9]$/.test(pipelineName);
+    return /^[a-z0-9]([-a-z0-9]*[a-z0-9])$/.test(pipelineName);
 }

@@ -35,6 +35,8 @@ type CDPipelineController struct {
 	BranchService    service.BranchService
 }
 
+const paramWaitingForCdPipeline = "waitingforcdpipeline"
+
 func (this *CDPipelineController) GetContinuousDeliveryPage() {
 	var activeStatus = "active"
 	applications, err := this.AppService.GetAllApplications(models.ApplicationCriteria{
@@ -59,8 +61,17 @@ func (this *CDPipelineController) GetContinuousDeliveryPage() {
 		return
 	}
 
+	cdPipelines, err := this.PipelineService.GetAllPipelines(models.CDPipelineCriteria{})
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+	cdPipelines = addCdPipelineInProgressIfAny(cdPipelines, this.GetString(paramWaitingForCdPipeline))
+
 	contextRoles := this.GetSession("realm_roles").([]string)
 	this.Data["ActiveApplicationsAndBranches"] = len(applications) > 0 && len(branches) > 0
+	this.Data["CDPipelines"] = cdPipelines
+	this.Data["Applications"] = applications
 	this.Data["EDPVersion"] = version
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["HasRights"] = isAdmin(contextRoles)
@@ -147,7 +158,7 @@ func (this *CDPipelineController) CreateCDPipeline() {
 
 	this.Data["EDPVersion"] = version
 	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Redirect("/admin/edp/cd-pipeline/create#cdPipelineSuccessModal", 302)
+	this.Redirect(fmt.Sprintf("/admin/edp/cd-pipeline/overview?%s=%s#cdPipelineSuccessModal", paramWaitingForCdPipeline, pipelineName), 302)
 }
 
 func retrieveStagesFromRequest(this *CDPipelineController) []models.StageCreate {
@@ -181,7 +192,7 @@ func convertRequestReleaseBranchData(appNameCheckboxes []string, this *CDPipelin
 func validateRequestData(applications []string, pipelineName string, stages []models.StageCreate) *ErrMsg {
 	var errorMessage string
 
-	match, _ := regexp.MatchString("^[a-z][a-z0-9-.]*[a-z0-9]$", pipelineName)
+	match, _ := regexp.MatchString("^[a-z0-9]([-a-z0-9]*[a-z0-9])$", pipelineName)
 	if !match {
 		pipelineErrMsg := "Pipeline name may contain only: lower-case letters, numbers, dots and dashes and cannot start and end with dash and dot. Can not be empty."
 		log.Println(pipelineErrMsg)
@@ -216,4 +227,22 @@ func validateRequestData(applications []string, pipelineName string, stages []mo
 		}
 	}
 	return nil
+}
+
+func addCdPipelineInProgressIfAny(cdPipelines []models.CDPipelineView, pipelineInProgress string) []models.CDPipelineView {
+	if pipelineInProgress != "" {
+		for _, pipeline := range cdPipelines {
+			if pipeline.Name == pipelineInProgress {
+				return cdPipelines
+			}
+		}
+
+		log.Println("Adding CD Pipeline " + pipelineInProgress + " which is going to be created to the list.")
+
+		cdPipelines = append(cdPipelines, models.CDPipelineView{
+			Name:   pipelineInProgress,
+			Status: "In progress",
+		})
+	}
+	return cdPipelines
 }

@@ -49,7 +49,6 @@ const (
 
 type ReleaseBranchRepository struct {
 	IReleaseBranchRepository
-	QueryManager sql_builder.BranchQueryBuilder
 }
 
 func (this ReleaseBranchRepository) GetAllReleaseBranchesByAppName(appName string) ([]models.ReleaseBranchView, error) {
@@ -73,7 +72,7 @@ func (this ReleaseBranchRepository) GetAllReleaseBranches(branchFilterCriteria m
 	o := orm.NewOrm()
 	var branches []models.ReleaseBranchView
 
-	selectAllBranchesQuery := this.QueryManager.GetAllBranchesQuery(branchFilterCriteria)
+	selectAllBranchesQuery := sql_builder.GetAllBranchesQuery(branchFilterCriteria)
 	_, err := o.Raw(selectAllBranchesQuery).QueryRows(&branches)
 
 	if err != nil {

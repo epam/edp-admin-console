@@ -15,10 +15,7 @@ const (
 		"order by cb.name, al.updated_at desc;"
 )
 
-type BranchQueryBuilder struct {
-}
-
-func (this *BranchQueryBuilder) GetAllBranchesQuery(filterCriteria models.BranchCriteria) string {
+func GetAllBranchesQuery(filterCriteria models.BranchCriteria) string {
 	if filterCriteria.Status == nil {
 		return fmt.Sprintf(SelectAllBranches, "")
 	}

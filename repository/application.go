@@ -59,7 +59,6 @@ const (
 
 type ApplicationEntityRepository struct {
 	IApplicationEntityRepository
-	QueryManager sql_builder.ApplicationQueryBuilder
 }
 
 func (this ApplicationEntityRepository) GetAllApplications(filterCriteria models.ApplicationCriteria) ([]models.Application, error) {
@@ -67,7 +66,7 @@ func (this ApplicationEntityRepository) GetAllApplications(filterCriteria models
 	var applications []models.Application
 	var maps []orm.Params
 
-	selectAllApplicationsQuery := this.QueryManager.GetAllApplicationsQuery(filterCriteria)
+	selectAllApplicationsQuery := sql_builder.GetAllApplicationsQuery(filterCriteria)
 	_, err := o.Raw(selectAllApplicationsQuery).Values(&maps)
 
 	if err != nil {
@@ -153,7 +152,7 @@ func (this ApplicationEntityRepository) GetAllApplicationsWithReleaseBranches(ap
 	var applications []models.ApplicationWithReleaseBranch
 	var maps []orm.Params
 
-	query := this.QueryManager.GetAllApplicationsWithReleaseBranchesQuery(applicationFilterCriteria)
+	query := sql_builder.GetAllApplicationsWithReleaseBranchesQuery(applicationFilterCriteria)
 	_, err := o.Raw(query).Values(&maps)
 
 	if err != nil {

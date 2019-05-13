@@ -18,11 +18,13 @@ package repository
 
 import (
 	"edp-admin-console/models"
+	"edp-admin-console/repository/sql_builder"
 	"github.com/astaxie/beego/orm"
 )
 
 type ICDPipelineRepository interface {
 	GetCDPipelineByName(pipelineName string) (*models.CDPipelineDTO, error)
+	GetCDPipelines(filterCriteria models.CDPipelineCriteria) ([]models.CDPipelineView, error)
 }
 
 const (
@@ -63,4 +65,18 @@ func (this CDPipelineRepository) GetCDPipelineByName(pipelineName string) (*mode
 	}
 
 	return &cdPipeline, nil
+}
+
+func (this CDPipelineRepository) GetCDPipelines(filterCriteria models.CDPipelineCriteria) ([]models.CDPipelineView, error) {
+	o := orm.NewOrm()
+	var pipelines []models.CDPipelineView
+
+	selectAllCDPipelinesQuery := sql_builder.GetAllCDPipelinesQuery(filterCriteria)
+	_, err := o.Raw(selectAllCDPipelinesQuery).QueryRows(&pipelines)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pipelines, nil
 }

@@ -22,7 +22,6 @@ import (
 	"edp-admin-console/filters"
 	"edp-admin-console/k8s"
 	"edp-admin-console/repository"
-	"edp-admin-console/repository/sql_builder"
 	"edp-admin-console/service"
 	"github.com/astaxie/beego"
 	"log"
@@ -33,10 +32,8 @@ func init() {
 	context.InitDb()
 	context.InitAuth()
 	clients := k8s.CreateOpenShiftClients()
-	appQueryManager := sql_builder.ApplicationQueryBuilder{}
-	branchQueryManager := sql_builder.BranchQueryBuilder{}
-	appRepository := repository.ApplicationEntityRepository{QueryManager: appQueryManager}
-	branchRepository := repository.ReleaseBranchRepository{QueryManager: branchQueryManager}
+	appRepository := repository.ApplicationEntityRepository{}
+	branchRepository := repository.ReleaseBranchRepository{}
 	pipelineRepository := repository.CDPipelineRepository{}
 	edpService := service.EDPTenantService{Clients: clients}
 	clusterService := service.ClusterService{Clients: clients}

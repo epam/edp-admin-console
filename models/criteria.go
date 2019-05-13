@@ -7,3 +7,7 @@ type ApplicationCriteria struct {
 type BranchCriteria struct {
 	Status *string
 }
+
+type CDPipelineCriteria struct {
+	Status *string
+}

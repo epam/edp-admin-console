@@ -194,7 +194,7 @@ function handleStepNameValidation() {
 
 function isStageNameValid() {
     let checkStageName = function (stageName) {
-        return /^[a-z0-9][a-z0-9-._]*[a-z0-9]$/.test(stageName);
+        return /^[a-z0-9]([-a-z0-9]*[a-z0-9])$/.test(stageName);
     };
 
     let $stageNameEl = $('#stageName');
@@ -208,7 +208,7 @@ function isStageDescriptionValid() {
 
 function isStepNameValid() {
     let checkStepName = function (stepName) {
-        return /^[a-z0-9][a-z0-9-._]*[a-z0-9]$/.test(stepName);
+        return /^[a-z0-9]([-a-z0-9]*[a-z0-9])$/.test(stepName);
     };
 
     let $stepNameEl = $('#nameOfStep');

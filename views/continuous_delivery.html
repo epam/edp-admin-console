@@ -6,6 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/css/continuous-delivery.css">
 </head>
 <body>
 <main>
@@ -16,41 +17,95 @@
         </aside>
         <div class="flex-fill pl-3 pr-3 wrapper">
 
-            <div class="d-flex edp-controls">
-                <div class="flex-fill">
-                    <h1>CD Pipelines</h1>
+            {{if .Applications}}
+                <div class="d-flex edp-controls">
+                    <div class="flex-fill">
+                        <h1>CD Pipelines</h1>
+                    </div>
+                        {{if .HasRights}}
+                            <div class="flex-fill">
+                                <div class="float-right">
+                                    <a href="/admin/edp/cd-pipeline/create">
+                                        <button class="btn btn-success" {{if not .ActiveApplicationsAndBranches}}disabled{{end}}>CREATE CD PIPELINE</button>
+                                    </a>
+                                </div>
+                            </div>
+                        {{end}}
                 </div>
                 {{if .ActiveApplicationsAndBranches}}
-                    {{if .HasRights}}
-                        <div class="flex-fill">
-                            <div class="float-right">
-                                <a href="/admin/edp/cd-pipeline/create">
-                                    <button class="btn btn-success">CREATE CD PIPELINE</button>
-                                </a>
-                            </div>
-                        </div>
+                    {{if .CDPipelines}}
+                        <table class="table edp-table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Status</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Jenkins</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {{range .CDPipelines}}
+                                <tr data-cd-pipeline-name="{{.Name}}" data-cd-pipeline-status="{{.Status}}">
+                                    <td class="cd-pipeline-status" data-status="{{.Status}}">
+                                        <img src="{{if eq .Status "created"}}/static/img/green_circle.svg{{else if eq .Status "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}" alt="" style="width:25px; height:25px;">
+                                    </td>
+                                    <td class="cd-pipeline-name">{{.Name}}</td>
+                                    <td>
+                                        <a href="{{.JenkinsLink}}" target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="{{if ne .Status "created"}}disabled{{end}}">Link</a>
+                                    </td>
+                                </tr>
+                            {{end}}
+                            </tbody>
+                        </table>
                     {{end}}
+                {{else}}
+                    <div class="no-app-message">
+                        <h1>Looks like there're not release branches.</h1>
+                    </div>
                 {{end}}
-            </div>
-            <table class="table edp-table">
-                <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Status</th>
-                    <th scope="col"></th>
-                </tr>
-                </thead>
-                <tbody>
-
-                </tbody>
-            </table>
+            {{else}}
+                <div class="no-app-message">
+                    <h1>Looks like there're not any applications.</h1>
+                    {{if .HasRights}}
+                        <a href="/admin/edp/application/create">
+                            <button class="btn btn-success">CREATE APPLICATION</button>
+                        </a>
+                    {{else}}
+                        <p class="no-rights-msg">Please, contact EDP support team.</p>
+                    {{end}}
+                </div>
+            {{end}}
 
         </div>
     </section>
     {{template "template/footer_template.html" .}}
+
+    <!-- Modal success -->
+    <div class="modal fade" id="successPopup" tabindex="-1" role="dialog" aria-labelledby="successPopupLabel"
+         aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successPopupLabel">Success</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Provisioning has been started.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 <script src="/static/js/jquery-3.3.1.js"></script>
 <script src="/static/js/popper.js"></script>
 <script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/util.js"></script>
+<script src="/static/js/continuous_delivery.js"></script>
 </body>
 </html>

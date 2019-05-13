@@ -23,6 +23,7 @@ import (
 	"edp-admin-console/repository"
 	"errors"
 	"fmt"
+	"github.com/astaxie/beego"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
@@ -105,6 +106,18 @@ func (this *CDPipelineService) CreateStages(cdPipelineName string, stages []mode
 	return stagesCr, nil
 }
 
+func (this *CDPipelineService) GetAllPipelines(filterCriteria models.CDPipelineCriteria) ([]models.CDPipelineView, error) {
+	log.Println("Start fetching all CD Pipelines...")
+	cdPipelines, err := this.ICDPipelineRepository.GetCDPipelines(filterCriteria)
+	if err != nil {
+		log.Printf("An error has occurred while getting CD Pipelines from database: %s", err)
+		return nil, err
+	}
+	createCDPipelineLinks(cdPipelines)
+	log.Printf("Fetched CD Pipelines. Count: {%v}. Rows: {%v}", len(cdPipelines), cdPipelines)
+	return cdPipelines, nil
+}
+
 func convertPipelineData(pipelineName string, releaseBranchCommands []models.ReleaseBranchCreatePipelineCommand) k8s.CDPipelineSpec {
 	var codebaseBranches []string
 	for _, v := range releaseBranchCommands {
@@ -131,6 +144,15 @@ func getCDPipelineCR(edpRestClient *rest.RESTClient, pipelineName string, namesp
 	}
 
 	return cdPipeline, nil
+}
+
+func createCDPipelineLinks(cdPipelines []models.CDPipelineView) {
+	wildcard := beego.AppConfig.String("dnsWildcard")
+	for index, pipeline := range cdPipelines {
+		pipeline.JenkinsLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s", "jenkins", context.Tenant, wildcard, fmt.Sprintf("%s-%s", pipeline.Name, "cd-pipeline"))
+		cdPipelines[index] = pipeline
+		log.Printf("Created Jenkins link %v", pipeline.JenkinsLink)
+	}
 }
 
 func createCrd(cdPipelineName string, stage models.StageCreate) k8s.Stage {
