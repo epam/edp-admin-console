@@ -12,7 +12,8 @@ type StageSpec struct {
 	Description string `json:"description"`
 	QualityGate string `json:"qualityGate"`
 	TriggerType string `json:"triggerType"`
-	Input       string `json:"input"`
+	Order       int    `json:"order"`
+	JenkinsStep string `json:"jenkinsStep"`
 }
 
 // +k8s:openapi-gen=true

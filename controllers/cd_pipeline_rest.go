@@ -48,7 +48,7 @@ func (this *CDPipelineRestController) GetCDPipelineByName() {
 }
 
 func (this *CDPipelineRestController) GetStage() {
-	stage := models.Stage{
+	stage := models.StageView{
 		Name:        "sit",
 		CDPipeline:  "team-a",
 		Description: "SIT environment for dedicated team",

@@ -53,6 +53,11 @@ $(function () {
             $('#createCDCR').submit();
         }
     });
+
+    $('.add-stage-modal').click(function () {
+        $('#stage-creation').modal('show');
+    });
+
 });
 
 function isAppCheckboxesValid() {

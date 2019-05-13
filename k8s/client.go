@@ -137,6 +137,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&ApplicationBranchList{},
 		&CDPipeline{},
 		&CDPipelineList{},
+		&Stage{},
+		&StageList{},
 	)
 
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
