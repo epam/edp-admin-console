@@ -45,7 +45,7 @@ func (this *BranchController) CreateReleaseBranch() {
 	}
 
 	log.Printf("BranchRelease resource is saved into k8s: %s", releaseBranch)
-	this.Redirect(fmt.Sprintf("/admin/edp/application/%s/overview#branchSuccessModal", appName), 302)
+	this.Redirect(fmt.Sprintf("/admin/edp/application/%s/overview?%s=%s#branchSuccessModal", appName, paramWaitingForBranch, branchInfo.Name), 302)
 }
 
 func extractReleaseBranchRequestData(this *BranchController) models.ReleaseBranchCreateCommand {

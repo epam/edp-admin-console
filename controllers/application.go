@@ -32,13 +32,17 @@ type ApplicationController struct {
 	BranchService    service.BranchService
 }
 
+const paramWaitingForBranch = "waitingforbranch"
+const paramWaitingForApp = "waitingforapp"
+
+
 func (this *ApplicationController) GetApplicationsOverviewPage() {
 	flash := beego.ReadFromRequest(&this.Controller)
 	if flash.Data["success"] != "" {
 		this.Data["Success"] = true
 	}
-
 	applications, err := this.AppService.GetAllApplications(models.ApplicationCriteria{})
+	applications = addApplicationInProgressIfAny(applications, this.GetString(paramWaitingForApp));
 	if err != nil {
 		this.Abort("500")
 		return
@@ -58,6 +62,26 @@ func (this *ApplicationController) GetApplicationsOverviewPage() {
 	this.TplName = "application.html"
 }
 
+func addApplicationInProgressIfAny(applications []models.Application, appInProgress string) []models.Application {
+	if appInProgress != "" {
+		for _, app := range applications {
+			if (app.Name == appInProgress) {
+				return applications;
+			}
+		}
+
+		log.Println("Adding application " + appInProgress + " which is going to be created to the list.");
+
+		app := models.Application{
+			Name: appInProgress,
+			Status: "In progress",
+		};
+		applications = append(applications, app);
+	}
+	return applications;
+}
+
+
 func (this *ApplicationController) GetApplicationOverviewPage() {
 	appName := this.GetString(":appName")
 	application, err := this.AppService.GetApplication(appName)
@@ -73,6 +97,7 @@ func (this *ApplicationController) GetApplicationOverviewPage() {
 	}
 
 	branchEntities, err := this.BranchService.GetAllReleaseBranchesByAppName(appName)
+	branchEntities = addCodebaseBranchInProgressIfAny(branchEntities, this.GetString(paramWaitingForBranch));
 	if err != nil {
 		this.Abort("500")
 		return
@@ -84,6 +109,26 @@ func (this *ApplicationController) GetApplicationOverviewPage() {
 	this.Data["Application"] = application
 	this.TplName = "application_overview.html"
 }
+
+func addCodebaseBranchInProgressIfAny(branches []models.ReleaseBranchView, branchInProgress string) []models.ReleaseBranchView {
+	if branchInProgress != "" {
+		for _, branch := range branches {
+			if (branch.Name == branchInProgress) {
+				return branches;
+			}
+		}
+
+		log.Println("Adding branch " + branchInProgress + " which is going to be created to the list.");
+
+		app := models.ReleaseBranchView{
+			Name:   branchInProgress,
+			Event: "In progress",
+		};
+		branches = append(branches, app);
+	}
+	return branches;
+}
+
 
 func (this *ApplicationController) GetCreateApplicationPage() {
 	flash := beego.ReadFromRequest(&this.Controller)
@@ -152,7 +197,7 @@ func (this *ApplicationController) CreateApplication() {
 	log.Printf("Application object is saved into k8s: %s", createdObject)
 	flash.Success("Application object is created.")
 	flash.Store(&this.Controller)
-	this.Redirect(fmt.Sprintf("/admin/edp/application/overview?waitingforapp=%s", app.Name), 302)
+	this.Redirect(fmt.Sprintf("/admin/edp/application/overview?%s=%s", paramWaitingForApp, app.Name), 302)
 }
 
 func extractRequestData(this *ApplicationController) models.App {

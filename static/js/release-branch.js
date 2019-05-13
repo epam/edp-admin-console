@@ -1,6 +1,13 @@
 $(function () {
 
+    let STATUS = {
+        IN_PROGRESS: 'In Progress'
+    };
+    let delayTime = 10000;
+
     $(document).ready(function () {
+
+        let uri = window.location.pathname;
         let anchor = $(location).attr('hash');
         if (anchor) {
             if (anchor === '#branchExistsModal') {
@@ -11,8 +18,18 @@ $(function () {
             if (anchor === '#branchSuccessModal') {
                 $('#successPopup').modal('show');
             }
-            window.history.pushState(null, null, window.location.pathname);
         }
+        let branchName = getUrlParameter('waitingforbranch');
+        if (branchName) {
+            let branchStatus = $("tr[data-branch-name='"+branchName+"']").attr("data-branch-status");
+            if (status != STATUS.IN_PROGRESS) {
+                uri += "?waitingforbranch="+branchName;
+                setTimeout(function () {
+                    location.reload();
+                }, delayTime);
+            }
+        }
+        window.history.replaceState({}, document.title, uri);
     });
 
     $('#btn-modal-close, #btn-cross-close').click(function () {
