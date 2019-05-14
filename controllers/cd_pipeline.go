@@ -207,16 +207,22 @@ func validateRequestData(applications []string, pipelineName string, stages []mo
 
 	valid := validation.Validation{}
 
-	for _, stage := range stages {
-		_, err := valid.Valid(stage)
-		if err != nil {
-			return &ErrMsg{"An internal error has occurred on server while validating stage's form fields.", http.StatusInternalServerError}
-		}
+	if len(stages) == 0 {
+		stageErrMsg := "At least one stage must be added"
+		log.Println(stageErrMsg)
+		errorMessage += stageErrMsg
+	} else {
+		for _, stage := range stages {
+			_, err := valid.Valid(stage)
+			if err != nil {
+				return &ErrMsg{"An internal error has occurred on server while validating stage's form fields.", http.StatusInternalServerError}
+			}
 
-		if valid.Errors != nil {
-			stageErrMsg := fmt.Sprintf("Stage %s is not valid", stage.Name)
-			log.Println(stageErrMsg)
-			errorMessage += stageErrMsg
+			if valid.Errors != nil {
+				stageErrMsg := fmt.Sprintf("Stage %s is not valid", stage.Name)
+				log.Println(stageErrMsg)
+				errorMessage += stageErrMsg
+			}
 		}
 	}
 

@@ -39,7 +39,14 @@ $(function () {
             $('.app-checkbox-error').hide();
         }
 
-        if (isPipelineValueValid && areCheckboxesChecked) {
+        let isStageValid = isStageAdded();
+        if (!isStageValid) {
+            $('.stage-error').show();
+        } else {
+            $('.stage-error').hide();
+        }
+
+        if (isPipelineValueValid && areCheckboxesChecked && isStageValid) {
             $('#createCDCR').submit();
         }
     });
@@ -61,4 +68,8 @@ function isPipelineValid() {
 
 function checkPipelineName(pipelineName) {
     return /^[a-z0-9]([-a-z0-9]*[a-z0-9])$/.test(pipelineName);
+}
+
+function isStageAdded() {
+    return $('.stages-list .stage-info').length > 0;
 }
