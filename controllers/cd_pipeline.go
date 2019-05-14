@@ -161,6 +161,35 @@ func (this *CDPipelineController) CreateCDPipeline() {
 	this.Redirect(fmt.Sprintf("/admin/edp/cd-pipeline/overview?%s=%s#cdPipelineSuccessModal", paramWaitingForCdPipeline, pipelineName), 302)
 }
 
+func (this *CDPipelineController) GetCDPipelineOverviewPage() {
+	pipelineName := this.GetString(":pipelineName")
+
+	cdPipeline, err := this.PipelineService.GetCDPipelineByName(pipelineName)
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
+	stages, err := this.PipelineService.GetCDPipelineStages(pipelineName)
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
+	cdPipeline.Stages = stages
+
+	version, err := this.EDPTenantService.GetEDPVersion()
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
+	this.Data["CDPipeline"] = cdPipeline
+	this.Data["EDPVersion"] = version
+	this.Data["Username"] = this.Ctx.Input.Session("username")
+	this.TplName = "cd_pipeline_overview.html"
+}
+
 func retrieveStagesFromRequest(this *CDPipelineController) []models.StageCreate {
 	var stages []models.StageCreate
 	for index, stageName := range this.GetStrings("stageName") {

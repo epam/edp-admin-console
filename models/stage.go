@@ -14,3 +14,12 @@ type ApplicationStage struct {
 	InputIs  string `json:"inputIs"`
 	OutputIs string `json:"outputIs"`
 }
+
+type CDPipelineStageView struct {
+	Name                 string `json:"name"`
+	Description          string `json:"description"`
+	TriggerType          string `json:"triggerType"`
+	QualityGate          string `json:"qualityGate"`
+	JenkinsStepName      string `json:"jenkinsStepName"`
+	OpenshiftProjectLink string `json:"openshiftProjectLink"`
+}

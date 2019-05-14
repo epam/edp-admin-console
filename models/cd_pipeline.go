@@ -1,15 +1,17 @@
 package models
 
 type CDPipelineDTO struct {
-	Name             string              `json:"name"`
-	Status           string              `json:"status"`
-	CodebaseBranches []CodebaseBranchDTO `json:"codebaseBranches"`
+	Name             string                `json:"name"`
+	Status           string                `json:"status"`
+	JenkinsLink      string                `json:"jenkinsLink"`
+	CodebaseBranches []CodebaseBranchDTO   `json:"codebaseBranches"`
+	Stages           []CDPipelineStageView `json:"stages"`
 }
 
 type CDPipelineView struct {
 	Name        string `json:"name"`
 	Status      string `json:"status"`
-	JenkinsLink string
+	JenkinsLink string `json:"jenkinsLink"`
 }
 
 type StageCreate struct {

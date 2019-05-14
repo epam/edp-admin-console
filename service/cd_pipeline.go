@@ -28,6 +28,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -35,6 +36,8 @@ type CDPipelineService struct {
 	Clients               k8s.ClientSet
 	ICDPipelineRepository repository.ICDPipelineRepository
 }
+
+const OpenshiftProjectLink = "https://master.delivery.aws.main.edp.projects.epam.com/console/project/"
 
 func (this *CDPipelineService) CreatePipeline(pipelineName string, releaseBranchCommands []models.ReleaseBranchCreatePipelineCommand) (*k8s.CDPipeline, error) {
 	log.Println("Start creating CR pipeline...")
@@ -84,7 +87,11 @@ func (this *CDPipelineService) GetCDPipelineByName(pipelineName string) (*models
 		log.Printf("An error has occurred while getting CD Pipeline from database: %s", err)
 		return nil, err
 	}
-	log.Printf("Fetched CD Pipeline from DB: %s", cdPipeline)
+	if cdPipeline != nil {
+		createJenkinsLink(cdPipeline)
+		log.Printf("Fetched CD Pipeline from DB: %s", cdPipeline)
+	}
+
 	return cdPipeline, nil
 }
 
@@ -113,9 +120,36 @@ func (this *CDPipelineService) GetAllPipelines(filterCriteria models.CDPipelineC
 		log.Printf("An error has occurred while getting CD Pipelines from database: %s", err)
 		return nil, err
 	}
-	createCDPipelineLinks(cdPipelines)
-	log.Printf("Fetched CD Pipelines. Count: {%v}. Rows: {%v}", len(cdPipelines), cdPipelines)
+
+	if len(cdPipelines) != 0 {
+		createJenkinsLinks(cdPipelines)
+		log.Printf("Fetched CD Pipelines. Count: {%v}. Rows: {%v}", len(cdPipelines), cdPipelines)
+	}
+
 	return cdPipelines, nil
+}
+
+func (this *CDPipelineService) GetCDPipelineStages(cdPipelineName string) ([]models.CDPipelineStageView, error) {
+	log.Printf("Start fetching all stages for %v CD Pipeline...", cdPipelineName)
+	stages, err := this.ICDPipelineRepository.GetCDPipelineStages(cdPipelineName)
+	if err != nil {
+		log.Printf("An error has occurred while getting Stages from database: %s", err)
+		return nil, err
+	}
+
+	if len(stages) != 0 {
+		createOpenshiftProjectLinks(stages, cdPipelineName)
+		log.Printf("Fetched Stages. Count: {%v}. Rows: {%v}", len(stages), stages)
+	}
+
+	return stages, nil
+}
+
+func createOpenshiftProjectLinks(stages []models.CDPipelineStageView, cdPipelineName string) {
+	for index, stage := range stages {
+		stage.OpenshiftProjectLink = fmt.Sprintf(OpenshiftProjectLink+"%s-%s-%s", context.Tenant, cdPipelineName, stage.Name)
+		stages[index] = stage
+	}
 }
 
 func convertPipelineData(pipelineName string, releaseBranchCommands []models.ReleaseBranchCreatePipelineCommand) k8s.CDPipelineSpec {
@@ -146,12 +180,28 @@ func getCDPipelineCR(edpRestClient *rest.RESTClient, pipelineName string, namesp
 	return cdPipeline, nil
 }
 
-func createCDPipelineLinks(cdPipelines []models.CDPipelineView) {
+func createJenkinsLinks(cdPipelines []models.CDPipelineView) {
 	wildcard := beego.AppConfig.String("dnsWildcard")
 	for index, pipeline := range cdPipelines {
 		pipeline.JenkinsLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s", "jenkins", context.Tenant, wildcard, fmt.Sprintf("%s-%s", pipeline.Name, "cd-pipeline"))
 		cdPipelines[index] = pipeline
 		log.Printf("Created Jenkins link %v", pipeline.JenkinsLink)
+	}
+}
+
+func createJenkinsLink(cdPipeline *models.CDPipelineDTO) {
+	wildcard := beego.AppConfig.String("dnsWildcard")
+	cdPipeline.JenkinsLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s", "jenkins", context.Tenant, wildcard, fmt.Sprintf("%s-%s", cdPipeline.Name, "cd-pipeline"))
+	log.Printf("Created CD Pipeline Jenkins link %v", cdPipeline.JenkinsLink)
+	createLinksForBranchEntities(cdPipeline.CodebaseBranches)
+}
+
+func createLinksForBranchEntities(branchEntities []models.CodebaseBranchDTO) {
+	wildcard := beego.AppConfig.String("dnsWildcard")
+	for index, branch := range branchEntities {
+		branch.BranchLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb?p=%s.git;a=shortlog;h=refs/heads/%s", "gerrit", context.Tenant, wildcard, branch.AppName, branch.BranchName)
+		branch.JenkinsLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s/view/%s", "jenkins", context.Tenant, wildcard, branch.AppName, strings.ToUpper(branch.BranchName))
+		branchEntities[index] = branch
 	}
 }
 

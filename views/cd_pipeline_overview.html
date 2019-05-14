@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EDP Admin Console</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/static/css/index.css">
+</head>
+<body>
+<main>
+    {{template "template/header_template.html" .}}
+
+    <section class="content d-flex">
+        <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
+            {{template "template/navbar_template.html" .}}
+        </aside>
+        <div class="flex-fill pl-4 pr-4 wrapper">
+
+            <div class="edp-form">
+                <div class="row">
+                    <h1 class="col-md-3">CD Pipeline: </h1>
+                    <h1>{{.CDPipeline.Name}}</h1>
+                </div>
+                <div class="row">
+                    <h1 class="col-md-3">Jenkins: </h1>
+                    <h1>
+                        <a href="{{.CDPipeline.JenkinsLink}}" target="_blank"
+                           rel="noopener noreferrer">Link to Jenkins</a>
+                    </h1>
+                </div>
+
+                <div class="accordion" id="accordionCreateApplication">
+                    <div class="card">
+                        <div class="card-header" id="headingOne"
+                             aria-expanded="true" aria-controls="collapseOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" type="button">
+                                    Applications
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseOne" class="show" aria-labelledby="headingOne">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <table class="edp-table">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">Application</th>
+                                            <th scope="col">Branch</th>
+                                            <th scope="col">Jenkins</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {{range .CDPipeline.CodebaseBranches}}
+                                            <tr>
+                                                <td>
+                                                    {{.AppName}}
+                                                </td>
+                                                <td>
+                                                    <a href="{{.BranchLink}}" target="_blank"
+                                                       rel="noopener noreferrer">{{.BranchName}}</a>
+                                                </td>
+                                                <td>
+                                                    <a href="{{.JenkinsLink}}" target="_blank"
+                                                       rel="noopener noreferrer">Link</a>
+                                                </td>
+                                            </tr>
+                                        {{end}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{if .CDPipeline.Stages}}
+                            <div class="card stages-info">
+                                <div class="card-header" id="headingTwo"
+                                     aria-expanded="true" aria-controls="collapseTwo">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" type="button">
+                                            Stages
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseTwo" class="show" aria-labelledby="headingTwo">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <table class="edp-table">
+                                                <thead>
+                                                <tr>
+                                                    <th scope="col">Name</th>
+                                                    <th scope="col">Description</th>
+                                                    <th scope="col">Trigger Type</th>
+                                                    <th scope="col">Quality Gate</th>
+                                                    <th scope="col">Jenkins Step Name</th>
+                                                    <th scope="col">Openshift Project</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {{range .CDPipeline.Stages}}
+                                                    <tr>
+                                                        <td>{{.Name}}</td>
+                                                        <td>{{.Description}}</td>
+                                                        <td>{{.TriggerType}}</td>
+                                                        <td>{{.QualityGate}}</td>
+                                                        <td>{{.JenkinsStepName}}</td>
+                                                        <td>
+                                                            <a href="{{.OpenshiftProjectLink}}" target="_blank"
+                                                               rel="noopener noreferrer">Openshift Link</a>
+                                                        </td>
+                                                    </tr>
+                                                {{end}}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {{end}}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {{template "template/footer_template.html" .}}
+
+</main>
+<script src="/static/js/jquery-3.3.1.js"></script>
+<script src="/static/js/popper.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+</body>
+</html>

@@ -22,15 +22,17 @@
                     <div class="flex-fill">
                         <h1>CD Pipelines</h1>
                     </div>
-                        {{if .HasRights}}
-                            <div class="flex-fill">
-                                <div class="float-right">
-                                    <a href="/admin/edp/cd-pipeline/create">
-                                        <button class="btn btn-success" {{if not .ActiveApplicationsAndBranches}}disabled{{end}}>CREATE CD PIPELINE</button>
-                                    </a>
-                                </div>
+                    {{if .HasRights}}
+                        <div class="flex-fill">
+                            <div class="float-right">
+                                <a href="/admin/edp/cd-pipeline/create">
+                                    <button class="btn btn-success"
+                                            {{if not .ActiveApplicationsAndBranches}}disabled{{end}}>CREATE CD PIPELINE
+                                    </button>
+                                </a>
                             </div>
-                        {{end}}
+                        </div>
+                    {{end}}
                 </div>
                 {{if .ActiveApplicationsAndBranches}}
                     {{if .CDPipelines}}
@@ -46,9 +48,13 @@
                             {{range .CDPipelines}}
                                 <tr data-cd-pipeline-name="{{.Name}}" data-cd-pipeline-status="{{.Status}}">
                                     <td class="cd-pipeline-status" data-status="{{.Status}}">
-                                        <img src="{{if eq .Status "created"}}/static/img/green_circle.svg{{else if eq .Status "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}" alt="" style="width:25px; height:25px;">
+                                        <img src="{{if eq .Status "created"}}/static/img/green_circle.svg{{else if eq .Status "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}"
+                                             alt="" style="width:25px; height:25px;">
                                     </td>
-                                    <td class="cd-pipeline-name">{{.Name}}</td>
+                                    <td class="cd-pipeline-name">
+                                        <a href="/admin/edp/cd-pipeline/{{.Name}}/overview"
+                                           class="{{if ne .Status "created"}}disabled{{end}}">{{.Name}}</a>
+                                    </td>
                                     <td>
                                         <a href="{{.JenkinsLink}}" target="_blank"
                                            rel="noopener noreferrer"
