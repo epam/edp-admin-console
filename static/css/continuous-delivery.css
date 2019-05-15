@@ -9,3 +9,7 @@
     cursor: default;
     color: grey;
 }
+
+.status-width {
+    width: 10%;
+}
