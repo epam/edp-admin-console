@@ -145,6 +145,17 @@ func (this *CDPipelineService) GetCDPipelineStages(cdPipelineName string) ([]mod
 	return stages, nil
 }
 
+func (this *CDPipelineService) GetStage(cdPipelineName, stageName string) (*models.StageView, error) {
+	log.Printf("Start fetching Stage by CD Pipeline %s and Stage %s names...", cdPipelineName, stageName)
+	stage, err := this.ICDPipelineRepository.GetStage(cdPipelineName, stageName)
+	if err != nil {
+		log.Printf("An error has occurred while getting Stage from database: %s", err)
+		return nil, err
+	}
+	log.Printf("Fetched Stage: {%v}", stage)
+	return stage, nil
+}
+
 func createOpenshiftProjectLinks(stages []models.CDPipelineStageView, cdPipelineName string) {
 	for index, stage := range stages {
 		stage.OpenshiftProjectLink = fmt.Sprintf(OpenshiftProjectLink+"%s-%s-%s", context.Tenant, cdPipelineName, stage.Name)

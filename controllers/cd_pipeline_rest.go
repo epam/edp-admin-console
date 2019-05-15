@@ -17,7 +17,6 @@
 package controllers
 
 import (
-	"edp-admin-console/models"
 	"edp-admin-console/service"
 	"fmt"
 	"github.com/astaxie/beego"
@@ -48,24 +47,18 @@ func (this *CDPipelineRestController) GetCDPipelineByName() {
 }
 
 func (this *CDPipelineRestController) GetStage() {
-	stage := models.StageView{
-		Name:        "sit",
-		CDPipeline:  "team-a",
-		Description: "SIT environment for dedicated team",
-		QualityGate: "manual",
-		TriggerType: "is-changed",
-		Applications: []models.ApplicationStage{
-			{
-				Name:     "petclinic-fe",
-				InputIs:  "petclinic-fe-release-1.0",
-				OutputIs: "team-a-sit-petclinic-fe-verified",
-			},
-			{
-				Name:     "petclinic-be",
-				InputIs:  "petclinic-be-master",
-				OutputIs: "team-a-sit-petclinic-be-verified",
-			},
-		},
+	pipelineName := this.GetString(":pipelineName")
+	stageName := this.GetString(":stageName")
+
+	stage, err := this.CDPipelineService.GetStage(pipelineName, stageName)
+	if err != nil {
+		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if stage == nil {
+		http.Error(this.Ctx.ResponseWriter, "Please check request data.", http.StatusNotFound)
+		return
 	}
 
 	this.Data["json"] = stage

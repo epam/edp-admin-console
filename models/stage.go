@@ -1,18 +1,21 @@
 package models
 
 type StageView struct {
-	Name         string             `json:"name"`
-	CDPipeline   string             `json:"cdPipeline"`
-	Description  string             `json:"description"`
-	QualityGate  string             `json:"qualityGate"`
-	TriggerType  string             `json:"triggerType"`
-	Applications []ApplicationStage `json:"applications"`
+	Name            string             `json:"name"`
+	CDPipeline      string             `json:"cdPipeline"`
+	Description     string             `json:"description"`
+	QualityGate     string             `json:"qualityGate"`
+	TriggerType     string             `json:"triggerType"`
+	Order           string             `json:"order"`
+	JenkinsStepName string             `json:"jenkinsStepName"`
+	Applications    []ApplicationStage `json:"applications"`
 }
 
 type ApplicationStage struct {
-	Name     string `json:"name"`
-	InputIs  string `json:"inputIs"`
-	OutputIs string `json:"outputIs"`
+	Name       string `json:"name"`
+	BranchName string `json:"branchName"`
+	InputIs    string `json:"inputIs"`
+	OutputIs   string `json:"outputIs"`
 }
 
 type CDPipelineStageView struct {
