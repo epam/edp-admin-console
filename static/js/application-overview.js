@@ -11,6 +11,8 @@ $(function () {
 
 });
 
+let delayTime = 10000;
+
 function getApplicationStatus() {
     return $('.status-info .status .card-body td.app-status').data('status').trim();
 }
