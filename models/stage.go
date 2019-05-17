@@ -24,5 +24,6 @@ type CDPipelineStageView struct {
 	TriggerType          string `json:"triggerType"`
 	QualityGate          string `json:"qualityGate"`
 	JenkinsStepName      string `json:"jenkinsStepName"`
+	Order                int    `json:"order"`
 	OpenshiftProjectLink string `json:"openshiftProjectLink"`
 }

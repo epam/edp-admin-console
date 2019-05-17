@@ -36,7 +36,7 @@ const (
 		"		left join codebase_branch cb on cpcb.codebase_branch_id = cb.id " +
 		"		left join codebase c on cb.codebase_id = c.id " +
 		"where cdp.name = ?;"
-	SelectStagesByName = "select cs.name, cs.description, cs.trigger_type, cs.quality_gate, cs.jenkins_step_name " +
+	SelectStagesByName = "select cs.name, cs.description, cs.trigger_type, cs.quality_gate, cs.jenkins_step_name, cs.\"order\" " +
 		"from cd_stage cs " +
 		"		left join cd_pipeline cp on cs.cd_pipeline_id = cp.id " +
 		"where cp.name = ?;"

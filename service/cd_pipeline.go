@@ -28,6 +28,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
 	"log"
+	"sort"
 	"strings"
 	"time"
 )
@@ -138,11 +139,18 @@ func (this *CDPipelineService) GetCDPipelineStages(cdPipelineName string) ([]mod
 	}
 
 	if len(stages) != 0 {
+		sortStagesByOrder(stages)
 		createOpenshiftProjectLinks(stages, cdPipelineName)
 		log.Printf("Fetched Stages. Count: {%v}. Rows: {%v}", len(stages), stages)
 	}
 
 	return stages, nil
+}
+
+func sortStagesByOrder(stages []models.CDPipelineStageView) {
+	sort.Slice(stages, func(i, j int) bool {
+		return stages[i].Order < stages[j].Order
+	})
 }
 
 func (this *CDPipelineService) GetStage(cdPipelineName, stageName string) (*models.StageView, error) {
