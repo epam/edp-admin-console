@@ -34,10 +34,10 @@
             <table class="table edp-table">
                 <thead>
                 <tr>
+                    <th scope="col">Status</th>
                     <th scope="col">Name</th>
                     <th scope="col">Language</th>
                     <th scope="col">Build Tool</th>
-                    <th scope="col">Status</th>
                     <th scope="col"></th>
                 </tr>
                 </thead>
@@ -45,6 +45,9 @@
 
                 {{range .Applications}}
                     <tr>
+                        <td class="app-status" data-status="{{.Status}}">
+                            <img src="{{if eq .Status "created"}}/static/img/green_circle.svg{{else if eq .Status "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}" alt="" style="width:25px; height:25px;">
+                        </td>
                         <td class="app-name">
                             <a href="/admin/edp/application/{{.Name}}/overview">
                                 {{.Name}}
@@ -52,9 +55,6 @@
                         </td>
                         <td>{{.Language}}</td>
                         <td>{{.BuildTool}}</td>
-                        <td class="app-status" data-status="{{.Status}}">
-                            <img src="{{if eq .Status "created"}}/static/img/green_circle.svg{{else if eq .Status "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}" alt="" style="width:25px; height:25px;">
-                        </td>
                         <td>
                             <button class="delete" data-toggle="modal" data-target="#exampleModal">
                                 <i class="icon-trashcan"></i>
