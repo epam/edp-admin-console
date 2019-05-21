@@ -188,7 +188,7 @@
                     {{end}}
 
                     <button type="button"
-                            class="modal-release-branch btn btn-primary"
+                            class="modal-release-branch btn btn-primary {{if ne .Application.Status "created"}}button-disabled{{end}}"
                             aria-controls="">Create New Branch
                     </button>
                 </div>
