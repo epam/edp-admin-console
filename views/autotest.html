@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EDP Admin Console</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/static/css/index.css">
+</head>
+<body>
+<main>
+    {{template "template/header_template.html" .}}
+    <section class="content d-flex">
+        <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
+            {{template "template/navbar_template.html" .}}
+        </aside>
+        <div class="flex-fill pl-3 pr-3 wrapper">
+
+            <div class="d-flex edp-controls">
+                <div class="flex-fill">
+                    <h1>AUTOTESTS</h1>
+                </div>
+                {{if .HasRights}}
+                    <div class="flex-fill">
+                        <div class="float-right">
+                            <a href="/admin/edp/autotest/create">
+                                <button class="btn btn-success">ADD AUTOTEST</button>
+                            </a>
+                        </div>
+                    </div>
+                {{end}}
+            </div>
+
+            <table class="table edp-table">
+                <thead>
+                <tr>
+                    <th scope="col">Status</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Language</th>
+                    <th scope="col">Build Tool</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {{range .Autotests}}
+                    <tr data-autotest-name="{{.Name}}" data-autotest-status="{{.Status}}">
+                        <td>
+                            <img src="{{if eq .Status "created"}}/static/img/green_circle.svg{{else if eq .Status "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}"
+                                 alt="" style="width:25px; height:25px;">
+                        </td>
+                        <td class="autotest-name">
+                            {{.Name}}
+                        </td>
+                        <td>{{.Language}}</td>
+                        <td>{{.BuildTool}}</td>
+                        <td>
+                            <button class="delete" data-toggle="modal" data-target="#exampleModal">
+                                <i class="icon-trashcan"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {{end}}
+                </tbody>
+            </table>
+
+        </div>
+    </section>
+    {{template "template/footer_template.html" .}}
+
+</main>
+<script src="/static/js/jquery-3.3.1.js"></script>
+<script src="/static/js/popper.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+</body>
+</html>

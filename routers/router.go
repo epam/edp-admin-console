@@ -63,6 +63,9 @@ func init() {
 		beego.NSRouter("/cd-pipeline/create", &controllers.CDPipelineController{AppService: appService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService}, "get:GetCreateCDPipelinePage"),
 		beego.NSRouter("/cd-pipeline", &controllers.CDPipelineController{AppService: appService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService}, "post:CreateCDPipeline"),
 		beego.NSRouter("/cd-pipeline/:pipelineName/overview", &controllers.CDPipelineController{EDPTenantService: edpService, BranchService: branchService, PipelineService: pipelineService}, "get:GetCDPipelineOverviewPage"),
+		beego.NSRouter("/autotest/overview", &controllers.AutotestController{EDPTenantService: edpService}, "get:GetAutotestsOverviewPage"),
+		beego.NSRouter("/autotest/create", &controllers.AutotestController{EDPTenantService: edpService}, "get:GetCreateAutotestPage"),
+		beego.NSRouter("/autotest", &controllers.AutotestController{EDPTenantService: edpService}, "post:CreateAutotest"),
 	)
 	beego.AddNamespace(adminEdpNamespace)
 
