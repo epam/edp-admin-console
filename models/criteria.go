@@ -1,7 +1,8 @@
 package models
 
-type ApplicationCriteria struct {
+type CodebaseCriteria struct {
 	Status *string
+	Type   *string
 }
 
 type BranchCriteria struct {

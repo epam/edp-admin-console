@@ -11,7 +11,7 @@ import (
 
 type RepositoryRestController struct {
 	beego.Controller
-	AppService service.ApplicationService
+	AppService service.CodebaseService
 }
 
 type RepoData struct {

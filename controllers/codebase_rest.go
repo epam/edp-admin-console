@@ -31,9 +31,9 @@ import (
 	"strings"
 )
 
-type ApplicationRestController struct {
+type CodebaseRestController struct {
 	beego.Controller
-	AppService service.ApplicationService
+	CodebaseService service.CodebaseService
 }
 
 type ErrMsg struct {
@@ -41,93 +41,82 @@ type ErrMsg struct {
 	StatusCode int
 }
 
-func (this *ApplicationRestController) GetApplications() {
-	applications, err := this.AppService.GetAllApplications(models.ApplicationCriteria{})
+func (this *CodebaseRestController) GetCodebases() {
+	codebases, err := this.CodebaseService.GetAllCodebases(models.CodebaseCriteria{})
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	this.Data["json"] = applications
+	this.Data["json"] = codebases
 	this.ServeJSON()
 }
 
-func (this *ApplicationRestController) GetApplication() {
-	appName := this.GetString(":appName")
-	application, err := this.AppService.GetApplication(appName)
+func (this *CodebaseRestController) GetCodebase() {
+	codebaseName := this.GetString(":codebaseName")
+	codebase, err := this.CodebaseService.GetCodebase(codebaseName)
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if application == nil {
-		nonAppMsg := fmt.Sprintf("Please check application name. It seems there're not %s application.", appName)
+	if codebase == nil {
+		nonAppMsg := fmt.Sprintf("Please check codebase name. It seems there're not %s codebase.", codebaseName)
 		http.Error(this.Ctx.ResponseWriter, nonAppMsg, http.StatusNotFound)
 		return
 	}
 
-	this.Data["json"] = application
+	this.Data["json"] = codebase
 	this.ServeJSON()
 }
 
-func (this *ApplicationRestController) CreateApplication() {
-	var app models.App
-	err := json.NewDecoder(this.Ctx.Request.Body).Decode(&app)
+func (this *CodebaseRestController) CreateCodebase() {
+	var codebase models.Codebase
+	err := json.NewDecoder(this.Ctx.Request.Body).Decode(&codebase)
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	errMsg := validRequestData(app)
+	errMsg := validRequestData(codebase)
 	if errMsg != nil {
 		log.Printf("Failed to validate request data: %s", errMsg.Message)
 		http.Error(this.Ctx.ResponseWriter, errMsg.Message, http.StatusBadRequest)
 		return
 	}
-	logRequestData(app)
+	logRequestData(codebase)
 
-	applicationCr, err := this.AppService.GetApplicationCR(app.Name)
-	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, "Failed to get custom resource from cluster: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	application, err := this.AppService.GetApplication(app.Name)
-	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, "Failed to get custom resource from database: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if applicationCr != nil || application != nil {
-		http.Error(this.Ctx.ResponseWriter, "Application name is already exists.", http.StatusBadRequest)
-		return
-	}
-
-	createdObject, err := this.AppService.CreateApp(app)
+	createdObject, err := this.CodebaseService.CreateCodebase(codebase)
 
 	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, "Failed to create custom resource: "+err.Error(), http.StatusInternalServerError)
+		if err.Error() == "CODEBASE_ALREADY_EXISTS" {
+			errMsg := fmt.Sprintf("Codebase resource with %s name is already exists.", codebase.Name)
+			http.Error(this.Ctx.ResponseWriter, errMsg, http.StatusBadRequest)
+			return
+		}
+		errMsg := fmt.Sprintf("Failed to create codebase resource: %v", err.Error())
+		http.Error(this.Ctx.ResponseWriter, errMsg, http.StatusInternalServerError)
 		return
 	}
 
-	log.Printf("Custom object is saved into k8s: %s", createdObject)
+	log.Printf("Codebase resource is saved into k8s: %+v", createdObject)
 
 	location := fmt.Sprintf("%s/%s", this.Ctx.Input.URL(), uuid.NewV4().String())
 	this.Ctx.ResponseWriter.WriteHeader(200)
 	this.Ctx.Output.Header("Location", location)
 }
 
-func validRequestData(addApp models.App) *ErrMsg {
+func validRequestData(codebase models.Codebase) *ErrMsg {
 	valid := validation.Validation{}
 	var resErr error
 
-	_, err := valid.Valid(addApp)
+	_, err := valid.Valid(codebase)
 	resErr = err
 
-	if addApp.Repository != nil {
-		_, err := valid.Valid(addApp.Repository)
+	if codebase.Repository != nil {
+		_, err := valid.Valid(codebase.Repository)
 
-		isAvailable := util.IsGitRepoAvailable(addApp.Repository.Url, addApp.Repository.Login, addApp.Repository.Password)
+		isAvailable := util.IsGitRepoAvailable(codebase.Repository.Url, codebase.Repository.Login, codebase.Repository.Password)
 
 		if !isAvailable {
 			err := &validation.Error{Key: "repository", Message: "Repository doesn't exist or invalid login and password."}
@@ -137,23 +126,28 @@ func validRequestData(addApp models.App) *ErrMsg {
 		resErr = err
 	}
 
-	if addApp.Route != nil {
-		if len(addApp.Route.Path) > 0 {
-			_, err := valid.Valid(addApp.Route)
+	if codebase.Route != nil {
+		if len(codebase.Route.Path) > 0 {
+			_, err := valid.Valid(codebase.Route)
 			resErr = err
 		} else {
-			valid.Match(addApp.Route.Site, regexp.MustCompile("^[a-z][a-z0-9-]*[a-z0-9]$"), "Route.Site.Match")
+			valid.Match(codebase.Route.Site, regexp.MustCompile("^[a-z][a-z0-9-]*[a-z0-9]$"), "Route.Site.Match")
 		}
 	}
 
-	if addApp.Vcs != nil {
-		_, err := valid.Valid(addApp.Vcs)
+	if codebase.Vcs != nil {
+		_, err := valid.Valid(codebase.Vcs)
 		resErr = err
 	}
 
-	if addApp.Database != nil {
-		_, err := valid.Valid(addApp.Database)
+	if codebase.Database != nil {
+		_, err := valid.Valid(codebase.Database)
 		resErr = err
+	}
+
+	if codebase.Type != "autotest" && codebase.Type != "application" {
+		err := &validation.Error{Key: "repository", Message: "codebase type should be: autotest or application"}
+		valid.Errors = append(valid.Errors, err)
 	}
 
 	if resErr != nil {
@@ -188,7 +182,7 @@ func extractErrors(valid validation.Validation) []string {
 	return errMap
 }
 
-func logRequestData(app models.App) {
+func logRequestData(app models.Codebase) {
 	var result strings.Builder
 	result.WriteString(fmt.Sprintf("Request data to create CR is valid. name=%s, strategy=%s, lang=%s, buildTool=%s, multiModule=%s, framework=%s",
 		app.Name, app.Strategy, app.Lang, app.BuildTool, app.MultiModule, app.Framework))

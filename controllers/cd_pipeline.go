@@ -29,7 +29,7 @@ import (
 
 type CDPipelineController struct {
 	beego.Controller
-	AppService       service.ApplicationService
+	AppService       service.CodebaseService
 	PipelineService  service.CDPipelineService
 	EDPTenantService service.EDPTenantService
 	BranchService    service.BranchService
@@ -39,8 +39,10 @@ const paramWaitingForCdPipeline = "waitingforcdpipeline"
 
 func (this *CDPipelineController) GetContinuousDeliveryPage() {
 	var activeStatus = "active"
-	applications, err := this.AppService.GetAllApplications(models.ApplicationCriteria{
+	var appType  = "application"
+	applications, err := this.AppService.GetAllCodebases(models.CodebaseCriteria{
 		Status: &activeStatus,
+		Type: &appType,
 	})
 	if err != nil {
 		this.Abort("500")
@@ -81,8 +83,10 @@ func (this *CDPipelineController) GetContinuousDeliveryPage() {
 func (this *CDPipelineController) GetCreateCDPipelinePage() {
 	flash := beego.ReadFromRequest(&this.Controller)
 	var activeStatus = "active"
-	applicationsWithReleaseBranches, err := this.AppService.GetAllApplicationsWithReleaseBranches(models.ApplicationCriteria{
+	var appType = "application"
+	applicationsWithReleaseBranches, err := this.AppService.GetAllCodebasesWithReleaseBranches(models.CodebaseCriteria{
 		Status: &activeStatus,
+		Type:   &appType,
 	})
 	if err != nil {
 		this.Abort("500")

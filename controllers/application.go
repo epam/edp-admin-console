@@ -27,22 +27,28 @@ import (
 
 type ApplicationController struct {
 	beego.Controller
-	AppService       service.ApplicationService
+	CodebaseService  service.CodebaseService
 	EDPTenantService service.EDPTenantService
 	BranchService    service.BranchService
 }
 
-const paramWaitingForBranch = "waitingforbranch"
-const paramWaitingForApp = "waitingforapp"
-
+const (
+	paramWaitingForBranch = "waitingforbranch"
+	paramWaitingForApp    = "waitingforapp"
+	ApplicationType       = "application"
+)
 
 func (this *ApplicationController) GetApplicationsOverviewPage() {
 	flash := beego.ReadFromRequest(&this.Controller)
 	if flash.Data["success"] != "" {
 		this.Data["Success"] = true
 	}
-	applications, err := this.AppService.GetAllApplications(models.ApplicationCriteria{})
-	applications = addApplicationInProgressIfAny(applications, this.GetString(paramWaitingForApp));
+
+	var appType = "application"
+	applications, err := this.CodebaseService.GetAllCodebases(models.CodebaseCriteria{
+		Type: &appType,
+	})
+	applications = addCodebaseInProgressIfAny(applications, this.GetString(paramWaitingForApp))
 	if err != nil {
 		this.Abort("500")
 		return
@@ -62,29 +68,27 @@ func (this *ApplicationController) GetApplicationsOverviewPage() {
 	this.TplName = "application.html"
 }
 
-func addApplicationInProgressIfAny(applications []models.Application, appInProgress string) []models.Application {
-	if appInProgress != "" {
-		for _, app := range applications {
-			if (app.Name == appInProgress) {
-				return applications;
+func addCodebaseInProgressIfAny(codebases []models.CodebaseView, codebaseInProgress string) []models.CodebaseView {
+	if codebaseInProgress != "" {
+		for _, codebase := range codebases {
+			if codebase.Name == codebaseInProgress {
+				return codebases
 			}
 		}
 
-		log.Println("Adding application " + appInProgress + " which is going to be created to the list.");
-
-		app := models.Application{
-			Name: appInProgress,
-			Status: "In progress",
-		};
-		applications = append(applications, app);
+		log.Printf("Adding codebase %s which is going to be created to the list.", codebaseInProgress)
+		app := models.CodebaseView{
+			Name:   codebaseInProgress,
+			Status: "in_progress",
+		}
+		codebases = append(codebases, app)
 	}
-	return applications;
+	return codebases
 }
-
 
 func (this *ApplicationController) GetApplicationOverviewPage() {
 	appName := this.GetString(":appName")
-	application, err := this.AppService.GetApplication(appName)
+	application, err := this.CodebaseService.GetCodebase(appName)
 	if err != nil {
 		this.Abort("500")
 		return
@@ -97,7 +101,7 @@ func (this *ApplicationController) GetApplicationOverviewPage() {
 	}
 
 	branchEntities, err := this.BranchService.GetAllReleaseBranchesByAppName(appName)
-	branchEntities = addCodebaseBranchInProgressIfAny(branchEntities, this.GetString(paramWaitingForBranch));
+	branchEntities = addCodebaseBranchInProgressIfAny(branchEntities, this.GetString(paramWaitingForBranch))
 	if err != nil {
 		this.Abort("500")
 		return
@@ -113,22 +117,20 @@ func (this *ApplicationController) GetApplicationOverviewPage() {
 func addCodebaseBranchInProgressIfAny(branches []models.ReleaseBranchView, branchInProgress string) []models.ReleaseBranchView {
 	if branchInProgress != "" {
 		for _, branch := range branches {
-			if (branch.Name == branchInProgress) {
-				return branches;
+			if branch.Name == branchInProgress {
+				return branches
 			}
 		}
 
-		log.Println("Adding branch " + branchInProgress + " which is going to be created to the list.");
-
+		log.Println("Adding branch " + branchInProgress + " which is going to be created to the list.")
 		app := models.ReleaseBranchView{
-			Name:   branchInProgress,
+			Name:  branchInProgress,
 			Event: "In progress",
-		};
-		branches = append(branches, app);
+		}
+		branches = append(branches, app)
 	}
-	return branches;
+	return branches
 }
-
 
 func (this *ApplicationController) GetCreateApplicationPage() {
 	flash := beego.ReadFromRequest(&this.Controller)
@@ -157,8 +159,8 @@ func (this *ApplicationController) GetCreateApplicationPage() {
 
 func (this *ApplicationController) CreateApplication() {
 	flash := beego.NewFlash()
-	app := extractRequestData(this)
-	errMsg := validRequestData(app)
+	codebase := extractApplicationRequestData(this)
+	errMsg := validRequestData(codebase)
 	if errMsg != nil {
 		log.Printf("Failed to validate request data: %s", errMsg.Message)
 		flash.Error(errMsg.Message)
@@ -166,30 +168,17 @@ func (this *ApplicationController) CreateApplication() {
 		this.Redirect("/admin/edp/application/create", 302)
 		return
 	}
-	logRequestData(app)
+	logRequestData(codebase)
 
-	applicationCr, err := this.AppService.GetApplicationCR(app.Name)
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
-	application, err := this.AppService.GetApplication(app.Name)
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
-	if applicationCr != nil || application != nil {
-		flash.Error("Application name is already exists.")
-		flash.Store(&this.Controller)
-		this.Redirect("/admin/edp/application/create", 302)
-		return
-	}
-
-	createdObject, err := this.AppService.CreateApp(app)
+	createdObject, err := this.CodebaseService.CreateCodebase(codebase)
 
 	if err != nil {
+		if err.Error() == "CODEBASE_ALREADY_EXISTS" {
+			flash.Error("Application %s name is already exists.", codebase.Name)
+			flash.Store(&this.Controller)
+			this.Redirect("/admin/edp/application/create", 302)
+			return
+		}
 		this.Abort("500")
 		return
 	}
@@ -197,40 +186,41 @@ func (this *ApplicationController) CreateApplication() {
 	log.Printf("Application object is saved into k8s: %s", createdObject)
 	flash.Success("Application object is created.")
 	flash.Store(&this.Controller)
-	this.Redirect(fmt.Sprintf("/admin/edp/application/overview?%s=%s", paramWaitingForApp, app.Name), 302)
+	this.Redirect(fmt.Sprintf("/admin/edp/application/overview?%s=%s", paramWaitingForApp, codebase.Name), 302)
 }
 
-func extractRequestData(this *ApplicationController) models.App {
-	app := models.App{
+func extractApplicationRequestData(this *ApplicationController) models.Codebase {
+	codebase := models.Codebase{
 		Lang:      this.GetString("appLang"),
 		Framework: this.GetString("framework"),
 		BuildTool: this.GetString("buildTool"),
-		Strategy:  this.GetString("strategy"),
 		Name:      this.GetString("nameOfApp"),
+		Strategy:  this.GetString("strategy"),
+		Type:      ApplicationType,
 	}
 
 	isMultiModule, _ := this.GetBool("isMultiModule", false)
 	if isMultiModule {
-		app.Framework = app.Framework + "-multimodule"
+		codebase.Framework = codebase.Framework + "-multimodule"
 	}
 
 	repoUrl := this.GetString("gitRepoUrl")
 	if repoUrl != "" {
-		app.Repository = &models.Repository{
+		codebase.Repository = &models.Repository{
 			Url: repoUrl,
 		}
 
 		isRepoPrivate, _ := this.GetBool("isRepoPrivate", false)
 		if isRepoPrivate {
-			app.Repository.Login = this.GetString("repoLogin")
-			app.Repository.Password = this.GetString("repoPassword")
+			codebase.Repository.Login = this.GetString("repoLogin")
+			codebase.Repository.Password = this.GetString("repoPassword")
 		}
 	}
 
 	vcsLogin := this.GetString("vcsLogin")
 	vcsPassword := this.GetString("vcsPassword")
 	if vcsLogin != "" && vcsPassword != "" {
-		app.Vcs = &models.Vcs{
+		codebase.Vcs = &models.Vcs{
 			Login:    vcsLogin,
 			Password: vcsPassword,
 		}
@@ -238,24 +228,24 @@ func extractRequestData(this *ApplicationController) models.App {
 
 	needRoute, _ := this.GetBool("needRoute", false)
 	if needRoute {
-		app.Route = &models.Route{
+		codebase.Route = &models.Route{
 			Site: this.GetString("routeSite"),
 		}
 		if len(this.GetString("routePath")) > 0 {
-			app.Route.Path = this.GetString("routePath")
+			codebase.Route.Path = this.GetString("routePath")
 		}
 	}
 
 	needDb, _ := this.GetBool("needDb", false)
 	if needDb {
-		app.Database = &models.Database{
+		codebase.Database = &models.Database{
 			Kind:     this.GetString("database"),
 			Version:  this.GetString("dbVersion"),
 			Capacity: this.GetString("dbCapacity") + this.GetString("capacityExt"),
 			Storage:  this.GetString("dbPersistentStorage"),
 		}
 	}
-	return app
+	return codebase
 }
 
 func isAdmin(contextRoles []string) bool {

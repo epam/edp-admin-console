@@ -32,6 +32,12 @@
                              data-parent="#accordionAutotestCreation">
                             <div class="card-body">
                                 <form id="createAutotest" method="post" action="/admin/edp/autotest">
+                                    {{ if .Error }}
+                                        <div class="form-error">
+                                            <p>{{ .Error }}</p>
+                                        </div>
+                                    {{ end }}
+
                                     <div class="form-group repo-url">
                                         <label for="gitRepoUrl">Git repository url
                                             <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
@@ -243,11 +249,11 @@
 
                                     <div class="form-group">
                                         <div class="js-form-subsection-autotest-framework">
-                                            <label for="autotestFramework">Select autotest report framework
+                                            <label for="testReportFramework">Select autotest report framework
                                                 <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                                                       title="Select autotest report framework"></span>
                                             </label>
-                                            <select class="form-control java-build-tools" name="autotestFramework">
+                                            <select class="form-control java-build-tools" name="testReportFramework">
                                                 <option>Allure</option>
                                             </select>
                                         </div>

@@ -50,17 +50,17 @@
                                             <div class="form-group col-sm-4">
                                                 <div class="custom-control custom-checkbox application-checkbox">
                                                     <input type="checkbox" class="custom-control-input app-checkbox"
-                                                           id="{{.ApplicationName}}"
-                                                           name="app" value="{{.ApplicationName}}">
+                                                           id="{{.CodebaseName}}"
+                                                           name="app" value="{{.CodebaseName}}">
                                                     <label class="custom-control-label"
-                                                           for="{{.ApplicationName}}">{{.ApplicationName}}</label>
+                                                           for="{{.CodebaseName}}">{{.CodebaseName}}</label>
                                                 </div>
                                             </div>
 
                                             <div class="form-group col-sm-8">
                                                 <select title="Release Branches"
-                                                        class="release-branch selectpicker select-{{.ApplicationName}} form-control"
-                                                        name="{{.ApplicationName}}" disabled>
+                                                        class="release-branch selectpicker select-{{.CodebaseName}} form-control"
+                                                        name="{{.CodebaseName}}" disabled>
                                                     {{range $i, $rb := .ReleaseBranches}}
                                                         <option value="{{$rb}}">{{$rb}}</option>
                                                     {{end}}

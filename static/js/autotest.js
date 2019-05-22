@@ -66,7 +66,7 @@ $(function () {
     $('.create-autotest').click(function (e) {
         e.preventDefault();
 
-        isGitDataValid();
+        let isGitValid = isGitDataValid();
 
         let $appNameErrEl = $('.app-name-validation'),
             isAppValid = isFieldValid($('#nameOfApp'), REGEX.APPLICATION_NAME);
@@ -75,7 +75,12 @@ $(function () {
             : $appNameErrEl.hide();
 
 
-        isApplicationCodeAndFrameworkSelected();
+        let isApplicationAndFrameworkValid = isApplicationCodeAndFrameworkSelected();
+
+
+        if (isGitValid && isAppValid && isApplicationAndFrameworkValid) {
+            $('#createAutotest').submit();
+        }
     });
 
 });
@@ -134,6 +139,7 @@ function isGitDataValid() {
     } else {
         $gitUrlErrEl.show();
     }
+    return isValid;
 }
 
 function isFieldValid(elementToValidate, regex) {
@@ -152,8 +158,15 @@ function isApplicationCodeAndFrameworkSelected() {
 
     if ($languageCheckboxElems.is(':checked')) {
         $appLanguageErrEl.hide();
-        $frameworkCheckboxElems.is(":checked") ? $frameworkErrEl.hide() : $frameworkErrEl.show();
+        if ($frameworkCheckboxElems.is(":checked")) {
+            $frameworkErrEl.hide();
+            return true;
+        } else {
+            $frameworkErrEl.show();
+            return false;
+        }
     } else {
         $appLanguageErrEl.show();
+        return false;
     }
 }

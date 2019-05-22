@@ -24,15 +24,15 @@ import (
 	"time"
 )
 
-type IApplicationEntityRepository interface {
-	GetAllApplications(filterCriteria models.ApplicationCriteria) ([]models.Application, error)
-	GetApplication(appName string) (*models.ApplicationInfo, error)
-	GetAllApplicationsWithReleaseBranches(applicationFilterCriteria models.ApplicationCriteria) ([]models.ApplicationWithReleaseBranch, error)
+type ICodebaseEntityRepository interface {
+	GetAllCodebases(filterCriteria models.CodebaseCriteria) ([]models.CodebaseView, error)
+	GetCodebase(codebaseName string) (*models.CodebaseDetailInfo, error)
+	GetAllCodebasesWithReleaseBranches(criteria models.CodebaseCriteria) ([]models.CodebaseWithReleaseBranch, error)
 }
 
 const (
-	SelectApplication = "select cb.name, " +
-		"       cb.type              as be_type, " +
+	SelectCodebase = "select cb.name, " +
+		"       cb.type              as cb_type, " +
 		"       al.event             as status_name, " +
 		"       cb.language, " +
 		"       cb.build_tool, " +
@@ -46,54 +46,54 @@ const (
 		"       cb.database_version  as db_version, " +
 		"       cb.database_capacity as db_capacity, " +
 		"       cb.database_storage  as db_storage, " +
+		"       cb.test_report_framework  as test_report_framework, " +
 		"       al.username          as user_name, " +
 		"       al.detailed_message  as message, " +
 		"       al.updated_at        as last_time_update " +
 		"from codebase cb " +
 		"       left join codebase_action_log cal on cb.id = cal.codebase_id " +
 		"       left join action_log al on cal.action_log_id = al.id " +
-		"where cb.type = 'application' " +
-		"  and cb.name = ? " +
+		"where cb.name = ? " +
 		"order by al.updated_at desc limit 1;"
 )
 
-type ApplicationEntityRepository struct {
-	IApplicationEntityRepository
+type CodebaseEntityRepository struct {
+	ICodebaseEntityRepository
 }
 
-func (this ApplicationEntityRepository) GetAllApplications(filterCriteria models.ApplicationCriteria) ([]models.Application, error) {
+func (this CodebaseEntityRepository) GetAllCodebases(filterCriteria models.CodebaseCriteria) ([]models.CodebaseView, error) {
 	o := orm.NewOrm()
-	var applications []models.Application
+	var codebases []models.CodebaseView
 	var maps []orm.Params
 
-	selectAllApplicationsQuery := sql_builder.GetAllApplicationsQuery(filterCriteria)
-	_, err := o.Raw(selectAllApplicationsQuery).Values(&maps)
+	selectAllCodebasesQuery := sql_builder.GetAllCodebasesQuery(filterCriteria)
+	_, err := o.Raw(selectAllCodebasesQuery).Values(&maps)
 
 	if err != nil {
 		return nil, err
 	}
 
 	if maps == nil {
-		return []models.Application{}, nil
+		return []models.CodebaseView{}, nil
 	}
 
 	for _, row := range maps {
-		applications = append(applications, models.Application{
+		codebases = append(codebases, models.CodebaseView{
 			Name:      row["name"].(string),
 			Language:  row["language"].(string),
 			BuildTool: row["build_tool"].(string),
 			Status:    row["status_name"].(string),
 		})
 	}
-	return applications, nil
+	return codebases, nil
 }
 
-func (this ApplicationEntityRepository) GetApplication(appName string) (*models.ApplicationInfo, error) {
+func (this CodebaseEntityRepository) GetCodebase(codebaseName string) (*models.CodebaseDetailInfo, error) {
 	o := orm.NewOrm()
-	var application models.ApplicationInfo
+	var codebase models.CodebaseDetailInfo
 	var maps []orm.Params
 
-	_, err := o.Raw(SelectApplication, appName).Values(&maps)
+	_, err := o.Raw(SelectCodebase, codebaseName).Values(&maps)
 
 	if err != nil {
 		return nil, err
@@ -104,9 +104,9 @@ func (this ApplicationEntityRepository) GetApplication(appName string) (*models.
 	}
 
 	for _, row := range maps {
-		application = models.ApplicationInfo{
+		codebase = models.CodebaseDetailInfo{
 			Name:      row["name"].(string),
-			Type:      row["be_type"].(string),
+			Type:      row["cb_type"].(string),
 			Status:    row["status_name"].(string),
 			Language:  row["language"].(string),
 			BuildTool: row["build_tool"].(string),
@@ -115,44 +115,49 @@ func (this ApplicationEntityRepository) GetApplication(appName string) (*models.
 		}
 
 		if row["user_name"] != nil {
-			application.UserName = row["user_name"].(string)
+			codebase.UserName = row["user_name"].(string)
 		}
 		if row["message"] != nil {
-			application.Message = row["message"].(string)
+			codebase.Message = row["message"].(string)
 		}
 
-		application.LastTimeUpdate = formatUnixTimestamp(row["last_time_update"].(string))
+		codebase.LastTimeUpdate = formatUnixTimestamp(row["last_time_update"].(string))
 
-		application.Available = row["available"] == "active"
+		codebase.Available = row["available"] == "active"
 
 		if row["git_url"] != nil {
-			application.GitUrl = row["git_url"].(string)
+			codebase.GitUrl = row["git_url"].(string)
 		}
 
 		if row["route_site"] != nil {
-			application.RouteSite = row["route_site"].(string)
+			codebase.RouteSite = row["route_site"].(string)
 		}
 
 		if row["route_path"] != nil {
-			application.RoutePath = row["route_path"].(string)
+			codebase.RoutePath = row["route_path"].(string)
 		}
 
 		if row["db_kind"] != nil && row["db_version"] != nil && row["db_capacity"] != nil && row["db_storage"] != nil {
-			application.DbKind = row["db_kind"].(string)
-			application.DbVersion = row["db_version"].(string)
-			application.DbCapacity = row["db_capacity"].(string)
-			application.DbStorage = row["db_storage"].(string)
+			codebase.DbKind = row["db_kind"].(string)
+			codebase.DbVersion = row["db_version"].(string)
+			codebase.DbCapacity = row["db_capacity"].(string)
+			codebase.DbStorage = row["db_storage"].(string)
 		}
+
+		if row["test_report_framework"] != nil {
+			codebase.TestReportFramework = row["test_report_framework"].(string)
+		}
+
 	}
-	return &application, nil
+	return &codebase, nil
 }
 
-func (this ApplicationEntityRepository) GetAllApplicationsWithReleaseBranches(applicationFilterCriteria models.ApplicationCriteria) ([]models.ApplicationWithReleaseBranch, error) {
+func (this CodebaseEntityRepository) GetAllCodebasesWithReleaseBranches(criteria models.CodebaseCriteria) ([]models.CodebaseWithReleaseBranch, error) {
 	o := orm.NewOrm()
-	var applications []models.ApplicationWithReleaseBranch
+	var codebases []models.CodebaseWithReleaseBranch
 	var maps []orm.Params
 
-	query := sql_builder.GetAllApplicationsWithReleaseBranchesQuery(applicationFilterCriteria)
+	query := sql_builder.GetAllCodebasesWithReleaseBranchesQuery(criteria)
 	_, err := o.Raw(query).Values(&maps)
 
 	if err != nil {
@@ -164,18 +169,18 @@ func (this ApplicationEntityRepository) GetAllApplicationsWithReleaseBranches(ap
 	}
 
 	for _, row := range maps {
-		if index, app := getApplication(applications, row["app_name"].(string)); app != nil {
-			app.ReleaseBranches = append(app.ReleaseBranches, row["branch_name"].(string))
-			applications[*index] = *app
+		if index, codebase := getCodebase(codebases, row["codebase_name"].(string)); codebase != nil {
+			codebase.ReleaseBranches = append(codebase.ReleaseBranches, row["branch_name"].(string))
+			codebases[*index] = *codebase
 			continue
 		}
-		applications = append(applications, models.ApplicationWithReleaseBranch{
-			ApplicationName: row["app_name"].(string),
+		codebases = append(codebases, models.CodebaseWithReleaseBranch{
+			CodebaseName:    row["codebase_name"].(string),
 			ReleaseBranches: []string{row["branch_name"].(string)},
 		})
 	}
 
-	return applications, nil
+	return codebases, nil
 }
 
 func formatUnixTimestamp(date string) string {
@@ -187,9 +192,9 @@ func formatUnixTimestamp(date string) string {
 	return dateTime.String()
 }
 
-func getApplication(applications []models.ApplicationWithReleaseBranch, appName string) (*int, *models.ApplicationWithReleaseBranch) {
-	for i, v := range applications {
-		if v.ApplicationName == appName {
+func getCodebase(codebases []models.CodebaseWithReleaseBranch, codebaseName string) (*int, *models.CodebaseWithReleaseBranch) {
+	for i, v := range codebases {
+		if v.CodebaseName == codebaseName {
 			return &i, &v
 		}
 	}
