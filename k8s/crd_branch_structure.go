@@ -5,14 +5,14 @@ import (
 	"time"
 )
 
-type ApplicationBranchSpec struct {
-	Name            string `json:"branchName"`
-	Commit          string `json:"fromCommit"`
-	ApplicationName string `json:"appName"`
+type CodebaseBranchSpec struct {
+	Name         string `json:"branchName"`
+	Commit       string `json:"fromCommit"`
+	CodebaseName string `json:"codebaseName"`
 }
 
 // +k8s:openapi-gen=true
-type ApplicationBranchStatus struct {
+type CodebaseBranchStatus struct {
 	LastTimeUpdated time.Time `json:"last_time_updated"`
 	Status          string    `json:"status"`
 }
@@ -20,19 +20,19 @@ type ApplicationBranchStatus struct {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // +k8s:openapi-gen=true
-type ApplicationBranch struct {
+type CodebaseBranch struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   ApplicationBranchSpec   `json:"spec,omitempty"`
-	Status ApplicationBranchStatus `json:"status,omitempty"`
+	Spec   CodebaseBranchSpec   `json:"spec,omitempty"`
+	Status CodebaseBranchStatus `json:"status,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// impl.ApplicationBranchList contains a list of impl.ApplicationBranch
-type ApplicationBranchList struct {
+// impl.CodebaseBranchList contains a list of impl.CodebaseBranch
+type CodebaseBranchList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []ApplicationBranch `json:"items"`
+	Items           []CodebaseBranch `json:"items"`
 }
