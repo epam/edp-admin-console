@@ -131,8 +131,8 @@ func createCrdClient(cfg *rest.Config) (*rest.RESTClient, error) {
 
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&BusinessApplication{},
-		&BusinessApplicationList{},
+		&Codebase{},
+		&CodebaseList{},
 		&ApplicationBranch{},
 		&ApplicationBranchList{},
 		&CDPipeline{},

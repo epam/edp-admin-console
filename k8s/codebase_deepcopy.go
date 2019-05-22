@@ -20,7 +20,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (in *BusinessApplication) DeepCopyInto(out *BusinessApplication) {
+func (in *Codebase) DeepCopyInto(out *Codebase) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
@@ -29,29 +29,29 @@ func (in *BusinessApplication) DeepCopyInto(out *BusinessApplication) {
 	return
 }
 
-func (in *BusinessApplication) DeepCopy() *BusinessApplication {
+func (in *Codebase) DeepCopy() *Codebase {
 	if in == nil {
 		return nil
 	}
-	out := new(BusinessApplication)
+	out := new(Codebase)
 	in.DeepCopyInto(out)
 	return out
 }
 
-func (in *BusinessApplication) DeepCopyObject() runtime.Object {
+func (in *Codebase) DeepCopyObject() runtime.Object {
 	if c := in.DeepCopy(); c != nil {
 		return c
 	}
 	return nil
 }
 
-func (in *BusinessApplicationList) DeepCopyInto(out *BusinessApplicationList) {
+func (in *CodebaseList) DeepCopyInto(out *CodebaseList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]BusinessApplication, len(*in))
+		*out = make([]Codebase, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -59,23 +59,23 @@ func (in *BusinessApplicationList) DeepCopyInto(out *BusinessApplicationList) {
 	return
 }
 
-func (in *BusinessApplicationList) DeepCopy() *BusinessApplicationList {
+func (in *CodebaseList) DeepCopy() *CodebaseList {
 	if in == nil {
 		return nil
 	}
-	out := new(BusinessApplicationList)
+	out := new(CodebaseList)
 	in.DeepCopyInto(out)
 	return out
 }
 
-func (in *BusinessApplicationList) DeepCopyObject() runtime.Object {
+func (in *CodebaseList) DeepCopyObject() runtime.Object {
 	if c := in.DeepCopy(); c != nil {
 		return c
 	}
 	return nil
 }
 
-func (in *BusinessApplicationSpec) DeepCopyInto(out *BusinessApplicationSpec) {
+func (in *CodebaseSpec) DeepCopyInto(out *CodebaseSpec) {
 	*out = *in
 	if in.Repository != nil {
 		in, out := &in.Repository, &out.Repository
@@ -95,25 +95,25 @@ func (in *BusinessApplicationSpec) DeepCopyInto(out *BusinessApplicationSpec) {
 	return
 }
 
-func (in *BusinessApplicationSpec) DeepCopy() *BusinessApplicationSpec {
+func (in *CodebaseSpec) DeepCopy() *CodebaseSpec {
 	if in == nil {
 		return nil
 	}
-	out := new(BusinessApplicationSpec)
+	out := new(CodebaseSpec)
 	in.DeepCopyInto(out)
 	return out
 }
 
-func (in *BusinessApplicationStatus) DeepCopyInto(out *BusinessApplicationStatus) {
+func (in *CodebaseStatus) DeepCopyInto(out *CodebaseStatus) {
 	*out = *in
 	return
 }
 
-func (in *BusinessApplicationStatus) DeepCopy() *BusinessApplicationStatus {
+func (in *CodebaseStatus) DeepCopy() *CodebaseStatus {
 	if in == nil {
 		return nil
 	}
-	out := new(BusinessApplicationStatus)
+	out := new(CodebaseStatus)
 	in.DeepCopyInto(out)
 	return out
 }

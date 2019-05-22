@@ -36,23 +36,23 @@ type ApplicationService struct {
 	BranchService          BranchService
 }
 
-func (this ApplicationService) CreateApp(app models.App) (*k8s.BusinessApplication, error) {
+func (this ApplicationService) CreateApp(app models.App) (*k8s.Codebase, error) {
 	log.Println("Start creating CR...")
 	appClient := this.Clients.EDPRestClient
 	coreClient := this.Clients.CoreClient
 	spec := convertData(app)
 
-	crd := &k8s.BusinessApplication{
+	crd := &k8s.Codebase{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "edp.epam.com/v1alpha1",
-			Kind:       "BusinessApplication",
+			Kind:       "Codebase",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      app.Name,
 			Namespace: context.Namespace,
 		},
 		Spec: spec,
-		Status: k8s.BusinessApplicationStatus{
+		Status: k8s.CodebaseStatus{
 			Available:       false,
 			LastTimeUpdated: time.Now(),
 			Status:          "initialized",
@@ -65,12 +65,12 @@ func (this ApplicationService) CreateApp(app models.App) (*k8s.BusinessApplicati
 		return nil, err
 	}
 
-	result := &k8s.BusinessApplication{}
-	err = appClient.Post().Namespace(context.Namespace).Resource("businessapplications").Body(crd).Do().Into(result)
+	result := &k8s.Codebase{}
+	err = appClient.Post().Namespace(context.Namespace).Resource("codebases").Body(crd).Do().Into(result)
 
 	if err != nil {
 		log.Printf("An error has occurred while creating object in k8s: %s", err)
-		return &k8s.BusinessApplication{}, err
+		return &k8s.Codebase{}, err
 	}
 
 	_, err = this.BranchService.CreateReleaseBranch(models.ReleaseBranchCreateCommand{
@@ -78,16 +78,16 @@ func (this ApplicationService) CreateApp(app models.App) (*k8s.BusinessApplicati
 	}, app.Name)
 	if err != nil {
 		log.Printf("Error has been occurred during the master branch creation: %v", err)
-		return &k8s.BusinessApplication{}, err
+		return &k8s.Codebase{}, err
 	}
 	return result, nil
 }
 
-func (this ApplicationService) GetApplicationCR(appName string) (*k8s.BusinessApplication, error) {
+func (this ApplicationService) GetApplicationCR(appName string) (*k8s.Codebase, error) {
 	appClient := this.Clients.EDPRestClient
 
-	result := &k8s.BusinessApplication{}
-	err := appClient.Get().Namespace(context.Namespace).Resource("businessapplications").Name(appName).Do().Into(result)
+	result := &k8s.Codebase{}
+	err := appClient.Get().Namespace(context.Namespace).Resource("codebases").Name(appName).Do().Into(result)
 
 	if k8serrors.IsNotFound(err) {
 		log.Printf("Current resourse %s doesn't exist.", appName)
@@ -184,8 +184,8 @@ func getSecret(name string, username string, password string) *v1.Secret {
 	}
 }
 
-func convertData(app models.App) k8s.BusinessApplicationSpec {
-	spec := k8s.BusinessApplicationSpec{
+func convertData(app models.App) k8s.CodebaseSpec {
+	spec := k8s.CodebaseSpec{
 		Lang:      app.Lang,
 		Framework: app.Framework,
 		BuildTool: app.BuildTool,
