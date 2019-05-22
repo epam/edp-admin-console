@@ -21,7 +21,7 @@ import (
 	"time"
 )
 
-type BusinessApplicationSpec struct {
+type CodebaseSpec struct {
 	Name       string      `json:"name" valid:"Required"`
 	Strategy   string      `json:"strategy" valid:"Required"`
 	Lang       string      `json:"lang" valid:"Required"`
@@ -49,7 +49,7 @@ type Database struct {
 }
 
 // +k8s:openapi-gen=true
-type BusinessApplicationStatus struct {
+type CodebaseStatus struct {
 	Available       bool      `json:"available"`
 	LastTimeUpdated time.Time `json:"last_time_updated"`
 	Status          string    `json:"status"`
@@ -58,19 +58,19 @@ type BusinessApplicationStatus struct {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // +k8s:openapi-gen=true
-type BusinessApplication struct {
+type Codebase struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   BusinessApplicationSpec   `json:"spec,omitempty"`
-	Status BusinessApplicationStatus `json:"status,omitempty"`
+	Spec   CodebaseSpec   `json:"spec,omitempty"`
+	Status CodebaseStatus `json:"status,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// impl.BusinessApplicationList contains a list of impl.BusinessApplication
-type BusinessApplicationList struct {
+// impl.CodebaseList contains a list of impl.Codebase
+type CodebaseList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []BusinessApplication `json:"items"`
+	Items           []Codebase `json:"items"`
 }
