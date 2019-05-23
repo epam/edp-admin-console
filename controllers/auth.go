@@ -51,7 +51,19 @@ func (this *AuthController) Callback() {
 	}
 	log.Println("Authorization code has been successfully exchanged with token")
 
-	this.Ctx.Output.Session("token", token)
-	log.Println("Token has been saved to the session")
-	this.Redirect("/admin/edp/overview", 302)
+	ts := authConfig.Oauth2Config.TokenSource(context.Background(), token)
+
+	this.Ctx.Output.Session("token_source", ts)
+	log.Println("Token source has been saved to the session")
+	path := this.getRedirectPath()
+	this.Redirect(path, 302)
+}
+
+func (this *AuthController) getRedirectPath() string {
+	requestPath := this.Ctx.Input.Session("request_path")
+	if requestPath == nil {
+		return "/admin/edp/overview"
+	}
+	this.Ctx.Output.Session("request_path", nil)
+	return requestPath.(string)
 }
