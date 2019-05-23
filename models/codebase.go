@@ -83,6 +83,7 @@ type CodebaseDetailInfo struct {
 	Available           bool   `json:"available"`
 	Message             string `json:"message"`
 	TestReportFramework string `json:"testReportFramework"`
+	Description         string `json:"description"`
 }
 
 type CodebaseWithReleaseBranch struct {

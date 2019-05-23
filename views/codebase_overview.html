@@ -19,7 +19,7 @@
         <div class="flex-fill pl-4 pr-4 wrapper">
 
             <div class="edp-form" id="createAppForm">
-                <h1>{{.Application.Name}} application</h1>
+                <h1>{{.Codebase.Name}} {{if eq .Codebase.Type "application"}}application{{else}}autotest{{end}}</h1>
 
                 <div class="accordion" id="accordionCreateApplication">
                     <div class="card">
@@ -45,52 +45,66 @@
                                         <tbody>
                                         <tr>
                                             <td>Language</td>
-                                            <td>{{.Application.Language}}</td>
+                                            <td>{{.Codebase.Language}}</td>
                                         </tr>
                                         <tr>
                                             <td>Build Tool</td>
-                                            <td>{{.Application.BuildTool}}</td>
+                                            <td>{{.Codebase.BuildTool}}</td>
                                         </tr>
-                                        <tr>
-                                            <td>Framework</td>
-                                            <td>{{.Application.Framework}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Strategy</td>
-                                            <td>{{.Application.Strategy}}</td>
-                                        </tr>
-                                        {{if .Application.GitUrl }}
+                                        {{if .Codebase.Framework}}
                                             <tr>
-                                                <td>Git Url</td>
-                                                <td>{{.Application.GitUrl}}</td>
+                                                <td>Framework</td>
+                                                <td>{{.Codebase.Framework}}</td>
                                             </tr>
                                         {{end}}
-                                        {{if and .Application.RouteSite .Application.RoutePath }}
+                                        <tr>
+                                            <td>Strategy</td>
+                                            <td>{{.Codebase.Strategy}}</td>
+                                        </tr>
+                                        {{if .Codebase.TestReportFramework }}
+                                            <tr>
+                                                <td>Test Report Framework</td>
+                                                <td>{{.Codebase.TestReportFramework}}</td>
+                                            </tr>
+                                        {{end}}
+                                        {{if .Codebase.GitUrl }}
+                                            <tr>
+                                                <td>Git Url</td>
+                                                <td>{{.Codebase.GitUrl}}</td>
+                                            </tr>
+                                        {{end}}
+                                        {{if ne (len .Codebase.Description) 0}}
+                                            <tr>
+                                                <td>Description</td>
+                                                <td>{{.Codebase.Description}}</td>
+                                            </tr>
+                                        {{end}}
+                                        {{if and .Codebase.RouteSite .Codebase.RoutePath }}
                                             <tr>
                                                 <td>Expose Service Site</td>
-                                                <td>{{.Application.RouteSite}}</td>
+                                                <td>{{.Codebase.RouteSite}}</td>
                                             </tr>
                                             <tr>
                                                 <td>Expose Service Path</td>
-                                                <td>{{.Application.RoutePath}}</td>
+                                                <td>{{.Codebase.RoutePath}}</td>
                                             </tr>
                                         {{end}}
-                                        {{if and .Application.DbKind .Application.DbVersion .Application.DbCapacity .Application.DbStorage }}
+                                        {{if and .Codebase.DbKind .Codebase.DbVersion .Codebase.DbCapacity .Codebase.DbStorage }}
                                             <tr>
                                                 <td>Db Kind</td>
-                                                <td>{{.Application.DbKind}}</td>
+                                                <td>{{.Codebase.DbKind}}</td>
                                             </tr>
                                             <tr>
                                                 <td>Db Version</td>
-                                                <td>{{.Application.DbVersion}}</td>
+                                                <td>{{.Codebase.DbVersion}}</td>
                                             </tr>
                                             <tr>
                                                 <td>Db Capacity</td>
-                                                <td>{{.Application.DbCapacity}}</td>
+                                                <td>{{.Codebase.DbCapacity}}</td>
                                             </tr>
                                             <tr>
                                                 <td>Db Storage</td>
-                                                <td>{{.Application.DbStorage}}</td>
+                                                <td>{{.Codebase.DbStorage}}</td>
                                             </tr>
                                         {{end}}
                                         </tbody>
@@ -124,12 +138,12 @@
                                         </thead>
                                         <tbody>
                                         <tr>
-                                            <td>{{.Application.Message}}</td>
-                                            <td>{{.Application.LastTimeUpdate}}</td>
-                                            <td>{{.Application.UserName}}</td>
+                                            <td>{{.Codebase.Message}}</td>
+                                            <td>{{.Codebase.LastTimeUpdate}}</td>
+                                            <td>{{.Codebase.UserName}}</td>
                                             <td class="app-status"
-                                                data-status="{{.Application.Status}}">{{.Application.Status}}</td>
-                                            <td>{{.Application.Available}}</td>
+                                                data-status="{{.Codebase.Status}}">{{.Codebase.Status}}</td>
+                                            <td>{{.Codebase.Available}}</td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -162,7 +176,7 @@
                                             </thead>
                                             <tbody>
                                             {{range .ReleaseBranches}}
-                                                <tr  data-branch-name="{{.Name}}" data-branch-status="{{.Event}}">
+                                                <tr data-branch-name="{{.Name}}" data-branch-status="{{.Event}}">
                                                     <td>
                                                         <img src="{{if eq .Event "created"}}/static/img/green_circle.svg{{else if eq .Event "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}"
                                                              alt="" style="width:25px; height:25px;">
@@ -188,7 +202,7 @@
                     {{end}}
 
                     <button type="button"
-                            class="modal-release-branch btn btn-primary {{if ne .Application.Status "created"}}button-disabled{{end}}"
+                            class="modal-release-branch btn btn-primary {{if ne .Codebase.Status "created"}}button-disabled{{end}}"
                             aria-controls="">Create New Branch
                     </button>
                 </div>
@@ -208,7 +222,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="create-branch-action" action="/admin/edp/codebase/{{.Application.Name}}/branch"
+                    <form id="create-branch-action" action="/admin/edp/codebase/{{.Codebase.Name}}/branch"
                           method="post">
                         <div class="form-group">
                             <p>Branch Name:</p>
@@ -216,7 +230,8 @@
                                    placeholder="Enter Branch Name">
                             <div class="error-block branch-exists-modal form-error" style="display: none;"></div>
                             <div class="invalid-feedback branch-name">
-                                Branch name may contain only: lower-case letters, numbers, dots and dashes and cannot start and end with dash and dot. Can not be empty.
+                                Branch name may contain only: lower-case letters, numbers, dots and dashes and cannot
+                                start and end with dash and dot. Can not be empty.
                             </div>
 
                             <p>From Commit Hash:</p>

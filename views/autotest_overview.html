@@ -19,7 +19,7 @@
         <div class="flex-fill pl-4 pr-4 wrapper">
 
             <div class="edp-form" id="createAppForm">
-                <h1>{{.Application.Name}} application</h1>
+                <h1>{{.Autotests.Name}} autotest</h1>
 
                 <div class="accordion" id="accordionCreateApplication">
                     <div class="card">
@@ -45,52 +45,30 @@
                                         <tbody>
                                         <tr>
                                             <td>Language</td>
-                                            <td>{{.Application.Language}}</td>
+                                            <td>{{.Autotests.Language}}</td>
                                         </tr>
                                         <tr>
                                             <td>Build Tool</td>
-                                            <td>{{.Application.BuildTool}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Framework</td>
-                                            <td>{{.Application.Framework}}</td>
+                                            <td>{{.Autotests.BuildTool}}</td>
                                         </tr>
                                         <tr>
                                             <td>Strategy</td>
-                                            <td>{{.Application.Strategy}}</td>
+                                            <td>{{.Autotests.Strategy}}</td>
                                         </tr>
-                                        {{if .Application.GitUrl }}
+                                        <tr>
+                                            <td>Test Report Framework</td>
+                                            <td>{{.Autotests.TestReportFramework}}</td>
+                                        </tr>
+                                        {{if .Autotests.GitUrl }}
                                             <tr>
                                                 <td>Git Url</td>
-                                                <td>{{.Application.GitUrl}}</td>
+                                                <td>{{.Autotests.GitUrl}}</td>
                                             </tr>
                                         {{end}}
-                                        {{if and .Application.RouteSite .Application.RoutePath }}
+                                        {{if ne (len .Autotests.Description) 0}}
                                             <tr>
-                                                <td>Expose Service Site</td>
-                                                <td>{{.Application.RouteSite}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Expose Service Path</td>
-                                                <td>{{.Application.RoutePath}}</td>
-                                            </tr>
-                                        {{end}}
-                                        {{if and .Application.DbKind .Application.DbVersion .Application.DbCapacity .Application.DbStorage }}
-                                            <tr>
-                                                <td>Db Kind</td>
-                                                <td>{{.Application.DbKind}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Db Version</td>
-                                                <td>{{.Application.DbVersion}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Db Capacity</td>
-                                                <td>{{.Application.DbCapacity}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Db Storage</td>
-                                                <td>{{.Application.DbStorage}}</td>
+                                                <td>Description</td>
+                                                <td>{{.Autotests.Description}}</td>
                                             </tr>
                                         {{end}}
                                         </tbody>
@@ -124,12 +102,12 @@
                                         </thead>
                                         <tbody>
                                         <tr>
-                                            <td>{{.Application.Message}}</td>
-                                            <td>{{.Application.LastTimeUpdate}}</td>
-                                            <td>{{.Application.UserName}}</td>
+                                            <td>{{.Autotests.Message}}</td>
+                                            <td>{{.Autotests.LastTimeUpdate}}</td>
+                                            <td>{{.Autotests.UserName}}</td>
                                             <td class="app-status"
-                                                data-status="{{.Application.Status}}">{{.Application.Status}}</td>
-                                            <td>{{.Application.Available}}</td>
+                                                data-status="{{.Autotests.Status}}">{{.Autotests.Status}}</td>
+                                            <td>{{.Autotests.Available}}</td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -162,7 +140,7 @@
                                             </thead>
                                             <tbody>
                                             {{range .ReleaseBranches}}
-                                                <tr  data-branch-name="{{.Name}}" data-branch-status="{{.Event}}">
+                                                <tr data-branch-name="{{.Name}}" data-branch-status="{{.Event}}">
                                                     <td>
                                                         <img src="{{if eq .Event "created"}}/static/img/green_circle.svg{{else if eq .Event "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}"
                                                              alt="" style="width:25px; height:25px;">
@@ -188,7 +166,7 @@
                     {{end}}
 
                     <button type="button"
-                            class="modal-release-branch btn btn-primary {{if ne .Application.Status "created"}}button-disabled{{end}}"
+                            class="modal-release-branch btn btn-primary"
                             aria-controls="">Create New Branch
                     </button>
                 </div>
@@ -208,7 +186,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="create-branch-action" action="/admin/edp/codebase/{{.Application.Name}}/branch"
+                    <form id="create-branch-action" action="/admin/edp/codebase/{{.Autotests.Name}}/branch"
                           method="post">
                         <div class="form-group">
                             <p>Branch Name:</p>
@@ -216,7 +194,8 @@
                                    placeholder="Enter Branch Name">
                             <div class="error-block branch-exists-modal form-error" style="display: none;"></div>
                             <div class="invalid-feedback branch-name">
-                                Branch name may contain only: lower-case letters, numbers, dots and dashes and cannot start and end with dash and dot. Can not be empty.
+                                Branch name may contain only: lower-case letters, numbers, dots and dashes and cannot
+                                start and end with dash and dot. Can not be empty.
                             </div>
 
                             <p>From Commit Hash:</p>

@@ -111,7 +111,7 @@ func (this *ApplicationController) GetApplicationOverviewPage() {
 	this.Data["EDPVersion"] = version
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["Application"] = application
-	this.TplName = "application_overview.html"
+	this.TplName = "codebase_overview.html"
 }
 
 func addCodebaseBranchInProgressIfAny(branches []models.ReleaseBranchView, branchInProgress string) []models.ReleaseBranchView {

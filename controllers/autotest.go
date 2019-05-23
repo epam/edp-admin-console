@@ -14,8 +14,9 @@ import (
 
 type AutotestController struct {
 	beego.Controller
-	EDPTenantService service.EDPTenantService
 	CodebaseService  service.CodebaseService
+	EDPTenantService service.EDPTenantService
+	BranchService    service.BranchService
 }
 
 const paramWaitingForAutotest = "waitingforautotest"
@@ -202,4 +203,32 @@ func (this *AutotestController) GetAutotestsOverviewPage() {
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["HasRights"] = isAdmin(this.GetSession("realm_roles").([]string))
 	this.TplName = "autotest.html"
+}
+
+func (this *AutotestController) GetAutotestOverviewPage() {
+	testName := this.GetString(":testName")
+	codebases, err := this.CodebaseService.GetCodebase(testName)
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
+	version, err := this.EDPTenantService.GetEDPVersion()
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
+	branchEntities, err := this.BranchService.GetAllReleaseBranchesByAppName(testName)
+	branchEntities = addCodebaseBranchInProgressIfAny(branchEntities, this.GetString(paramWaitingForBranch))
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
+	this.Data["ReleaseBranches"] = branchEntities
+	this.Data["EDPVersion"] = version
+	this.Data["Username"] = this.Ctx.Input.Session("username")
+	this.Data["Autotests"] = codebases
+	this.TplName = "codebase_overview.html"
 }

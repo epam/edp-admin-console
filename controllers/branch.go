@@ -19,10 +19,10 @@ type BranchController struct {
 func (this *BranchController) CreateReleaseBranch() {
 	branchInfo := extractReleaseBranchRequestData(this)
 	errMsg := validReleaseBranchRequestData(branchInfo)
-	appName := this.GetString(":appName")
+	appName := this.GetString(":codebaseName")
 	if errMsg != nil {
 		log.Printf("Failed to validate request data: %s", errMsg.Message)
-		this.Redirect(fmt.Sprintf("/admin/edp/application/%s/overview", appName), 302)
+		this.Redirect(fmt.Sprintf("/admin/edp/codebase/%s/overview", appName), 302)
 		return
 	}
 	log.Printf("Request data to create CR for release branch is valid: {Branch Name: %s, Commit Hash: %s}", branchInfo.Name, branchInfo.Commit)
@@ -34,7 +34,7 @@ func (this *BranchController) CreateReleaseBranch() {
 	}
 
 	if branch != nil {
-		this.Redirect(fmt.Sprintf("/admin/edp/application/%s/overview?errorExistingBranch=%s#branchExistsModal", appName, branchInfo.Name), 302)
+		this.Redirect(fmt.Sprintf("/admin/edp/codebase/%s/overview?errorExistingBranch=%s#branchExistsModal", appName, branchInfo.Name), 302)
 		return
 	}
 
@@ -45,7 +45,7 @@ func (this *BranchController) CreateReleaseBranch() {
 	}
 
 	log.Printf("BranchRelease resource is saved into k8s: %s", releaseBranch)
-	this.Redirect(fmt.Sprintf("/admin/edp/application/%s/overview?%s=%s#branchSuccessModal", appName, paramWaitingForBranch, branchInfo.Name), 302)
+	this.Redirect(fmt.Sprintf("/admin/edp/codebase/%s/overview?%s=%s#branchSuccessModal", appName, paramWaitingForBranch, branchInfo.Name), 302)
 }
 
 func extractReleaseBranchRequestData(this *BranchController) models.ReleaseBranchCreateCommand {

@@ -47,6 +47,7 @@ const (
 		"       cb.database_capacity as db_capacity, " +
 		"       cb.database_storage  as db_storage, " +
 		"       cb.test_report_framework  as test_report_framework, " +
+		"       cb.description  	 as description, " +
 		"       al.username          as user_name, " +
 		"       al.detailed_message  as message, " +
 		"       al.updated_at        as last_time_update " +
@@ -149,6 +150,10 @@ func (this CodebaseEntityRepository) GetCodebase(codebaseName string) (*models.C
 
 		if row["framework"] != nil {
 			codebase.Framework = row["framework"].(string)
+		}
+
+		if row["description"] != nil {
+			codebase.Description = row["description"].(string)
 		}
 
 	}

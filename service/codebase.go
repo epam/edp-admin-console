@@ -215,12 +215,12 @@ func getSecret(name string, username string, password string) *v1.Secret {
 
 func convertData(codebase models.Codebase) k8s.CodebaseSpec {
 	spec := k8s.CodebaseSpec{
-		Lang:        codebase.Lang,
-		BuildTool:   codebase.BuildTool,
-		Strategy:    codebase.Strategy,
-		Name:        codebase.Name,
-		Type:        codebase.Type,
-		Description: codebase.Description,
+		Lang:      codebase.Lang,
+		Framework: codebase.Framework,
+		BuildTool: codebase.BuildTool,
+		Strategy:  codebase.Strategy,
+		Name:      codebase.Name,
+		Type:      codebase.Type,
 	}
 
 	if codebase.Framework != nil {
@@ -253,6 +253,10 @@ func convertData(codebase models.Codebase) k8s.CodebaseSpec {
 
 	if codebase.TestReportFramework != nil {
 		spec.TestReportFramework = codebase.TestReportFramework
+	}
+
+	if codebase.Description != nil {
+		spec.Description = codebase.Description
 	}
 
 	return spec
