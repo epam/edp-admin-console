@@ -31,13 +31,19 @@ import (
 
 func AuthFilter(context *bgCtx.Context) {
 	log.Println("Start auth filter..")
-	rawToken := context.Input.Session("token")
-	if rawToken == nil {
-		log.Println("There are no token in the session")
+	tsRaw := context.Input.Session("token_source")
+	if tsRaw == nil {
+		log.Println("There are no token source in the session")
 		startAuth(context)
 		return
 	}
-	token := rawToken.(*oauth2.Token)
+	ts := tsRaw.(oauth2.TokenSource)
+	token, err := ts.Token()
+	if err != nil {
+		log.Printf("Token source presented in the session is not valid")
+		startAuth(context)
+		return
+	}
 	idToken, err := appCtx.GetAuthConfig().Verifier.Verify(ctx.Background(), token.AccessToken)
 	if err != nil {
 		log.Printf("Token presented in the session is not valid")
@@ -101,6 +107,9 @@ func startAuth(context *bgCtx.Context) {
 	state := uuid.NewV4().String()
 	log.Printf("State %s has been generated, saved in the session and added in the auth request", state)
 	context.Output.Session(authConfig.StateAuthKey, state)
+	if context.Request.Method == "GET" {
+		context.Output.Session("request_path", context.Request.URL.Path)
+	}
 	context.Redirect(http.StatusFound, authConfig.Oauth2Config.AuthCodeURL(state))
 }
 
