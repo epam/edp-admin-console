@@ -20,7 +20,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func (in *ApplicationBranch) DeepCopyInto(out *ApplicationBranch) {
+func (in *CodebaseBranch) DeepCopyInto(out *CodebaseBranch) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
@@ -29,29 +29,29 @@ func (in *ApplicationBranch) DeepCopyInto(out *ApplicationBranch) {
 	return
 }
 
-func (in *ApplicationBranch) DeepCopy() *ApplicationBranch {
+func (in *CodebaseBranch) DeepCopy() *CodebaseBranch {
 	if in == nil {
 		return nil
 	}
-	out := new(ApplicationBranch)
+	out := new(CodebaseBranch)
 	in.DeepCopyInto(out)
 	return out
 }
 
-func (in *ApplicationBranch) DeepCopyObject() runtime.Object {
+func (in *CodebaseBranch) DeepCopyObject() runtime.Object {
 	if c := in.DeepCopy(); c != nil {
 		return c
 	}
 	return nil
 }
 
-func (in *ApplicationBranchList) DeepCopyInto(out *ApplicationBranchList) {
+func (in *CodebaseBranchList) DeepCopyInto(out *CodebaseBranchList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]ApplicationBranch, len(*in))
+		*out = make([]CodebaseBranch, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -59,46 +59,46 @@ func (in *ApplicationBranchList) DeepCopyInto(out *ApplicationBranchList) {
 	return
 }
 
-func (in *ApplicationBranchList) DeepCopy() *ApplicationBranchList {
+func (in *CodebaseBranchList) DeepCopy() *CodebaseBranchList {
 	if in == nil {
 		return nil
 	}
-	out := new(ApplicationBranchList)
+	out := new(CodebaseBranchList)
 	in.DeepCopyInto(out)
 	return out
 }
 
-func (in *ApplicationBranchList) DeepCopyObject() runtime.Object {
+func (in *CodebaseBranchList) DeepCopyObject() runtime.Object {
 	if c := in.DeepCopy(); c != nil {
 		return c
 	}
 	return nil
 }
 
-func (in *ApplicationBranchSpec) DeepCopyInto(out *ApplicationBranchSpec) {
+func (in *CodebaseBranchSpec) DeepCopyInto(out *CodebaseBranchSpec) {
 	*out = *in
 	return
 }
 
-func (in *ApplicationBranchSpec) DeepCopy() *ApplicationBranchSpec {
+func (in *CodebaseBranchSpec) DeepCopy() *CodebaseBranchSpec {
 	if in == nil {
 		return nil
 	}
-	out := new(ApplicationBranchSpec)
+	out := new(CodebaseBranchSpec)
 	in.DeepCopyInto(out)
 	return out
 }
 
-func (in *ApplicationBranchStatus) DeepCopyInto(out *ApplicationBranchStatus) {
+func (in *CodebaseBranchStatus) DeepCopyInto(out *CodebaseBranchStatus) {
 	*out = *in
 	return
 }
 
-func (in *ApplicationBranchStatus) DeepCopy() *ApplicationBranchStatus {
+func (in *CodebaseBranchStatus) DeepCopy() *CodebaseBranchStatus {
 	if in == nil {
 		return nil
 	}
-	out := new(ApplicationBranchStatus)
+	out := new(CodebaseBranchStatus)
 	in.DeepCopyInto(out)
 	return out
 }

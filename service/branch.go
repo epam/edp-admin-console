@@ -37,7 +37,7 @@ type BranchService struct {
 	IReleaseBranchRepository repository.IReleaseBranchRepository
 }
 
-func (this *BranchService) CreateReleaseBranch(branchInfo models.ReleaseBranchCreateCommand, appName string) (*k8s.ApplicationBranch, error) {
+func (this *BranchService) CreateReleaseBranch(branchInfo models.ReleaseBranchCreateCommand, appName string) (*k8s.CodebaseBranch, error) {
 	log.Println("Start creating CR for branch release...")
 	edpRestClient := this.Clients.EDPRestClient
 
@@ -53,27 +53,27 @@ func (this *BranchService) CreateReleaseBranch(branchInfo models.ReleaseBranchCr
 	}
 
 	spec := convertBranchInfoData(branchInfo, appName)
-	branch := &k8s.ApplicationBranch{
+	branch := &k8s.CodebaseBranch{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "edp.epam.com/v1alpha1",
-			Kind:       "ApplicationBranch",
+			Kind:       "CodebaseBranch",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-%s", appName, branchInfo.Name),
 			Namespace: context.Namespace,
 		},
 		Spec: spec,
-		Status: k8s.ApplicationBranchStatus{
+		Status: k8s.CodebaseBranchStatus{
 			Status:          "initialized",
 			LastTimeUpdated: time.Now(),
 		},
 	}
 
-	result := &k8s.ApplicationBranch{}
-	err = edpRestClient.Post().Namespace(context.Namespace).Resource("applicationbranches").Body(branch).Do().Into(result)
+	result := &k8s.CodebaseBranch{}
+	err = edpRestClient.Post().Namespace(context.Namespace).Resource("codebasebranches").Body(branch).Do().Into(result)
 	if err != nil {
 		log.Printf("An error has occurred while creating release branch custom resource in k8s: %s", err)
-		return &k8s.ApplicationBranch{}, err
+		return &k8s.CodebaseBranch{}, err
 	}
 	return result, nil
 }
@@ -117,11 +117,11 @@ func (this *BranchService) GetAllReleaseBranches(branchFilterCriteria models.Bra
 	return releaseBranches, nil
 }
 
-func convertBranchInfoData(branchInfo models.ReleaseBranchCreateCommand, appName string) k8s.ApplicationBranchSpec {
-	return k8s.ApplicationBranchSpec{
-		Name:            branchInfo.Name,
-		Commit:          branchInfo.Commit,
-		ApplicationName: appName,
+func convertBranchInfoData(branchInfo models.ReleaseBranchCreateCommand, appName string) k8s.CodebaseBranchSpec {
+	return k8s.CodebaseBranchSpec{
+		Name:         branchInfo.Name,
+		Commit:       branchInfo.Commit,
+		CodebaseName: appName,
 	}
 }
 
@@ -134,9 +134,9 @@ func createLinks(branchEntities []models.ReleaseBranchView, appName string, edpT
 	}
 }
 
-func getReleaseBranchCR(edpRestClient *rest.RESTClient, branchName string, appName string, namespace string) (*k8s.ApplicationBranch, error) {
-	result := &k8s.ApplicationBranch{}
-	err := edpRestClient.Get().Namespace(namespace).Resource("applicationbranches").Name(fmt.Sprintf("%s-%s", appName, branchName)).Do().Into(result)
+func getReleaseBranchCR(edpRestClient *rest.RESTClient, branchName string, appName string, namespace string) (*k8s.CodebaseBranch, error) {
+	result := &k8s.CodebaseBranch{}
+	err := edpRestClient.Get().Namespace(namespace).Resource("codebasebranches").Name(fmt.Sprintf("%s-%s", appName, branchName)).Do().Into(result)
 
 	if k8serrors.IsNotFound(err) {
 		log.Printf("Current resourse %s doesn't exist.", branchName)
