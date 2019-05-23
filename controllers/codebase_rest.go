@@ -21,6 +21,7 @@ import (
 	"edp-admin-console/service"
 	"edp-admin-console/util"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
@@ -42,7 +43,13 @@ type ErrMsg struct {
 }
 
 func (this *CodebaseRestController) GetCodebases() {
-	codebases, err := this.CodebaseService.GetAllCodebases(models.CodebaseCriteria{})
+	criteria, err := getFilterCriteria(this)
+	if err != nil {
+		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	codebases, err := this.CodebaseService.GetAllCodebases(*criteria)
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
@@ -50,6 +57,16 @@ func (this *CodebaseRestController) GetCodebases() {
 
 	this.Data["json"] = codebases
 	this.ServeJSON()
+}
+
+func getFilterCriteria(this *CodebaseRestController) (*models.CodebaseCriteria, error) {
+	codebaseType := this.GetString("type")
+	if codebaseType == "application" || codebaseType == "autotests" || codebaseType == "" {
+		return &models.CodebaseCriteria{
+			Type: &codebaseType,
+		}, nil
+	}
+	return nil, errors.New("type is not valid")
 }
 
 func (this *CodebaseRestController) GetCodebase() {

@@ -29,7 +29,7 @@ type Codebase struct {
 	Route               *Route      `json:"route,omitempty"`
 	Database            *Database   `json:"database,omitempty"`
 	Vcs                 *Vcs        `json:"vcs,omitempty"`
-	Description         string      `json:"description,omitempty" valid:"Required"`
+	Description         *string     `json:"description,omitempty"`
 }
 
 type Repository struct {

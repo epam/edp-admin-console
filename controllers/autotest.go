@@ -18,7 +18,7 @@ type AutotestController struct {
 }
 
 const paramWaitingForAutotest = "waitingforautotest"
-const AutotestType = "autotest"
+const AutotestType = "autotests"
 
 func (this *AutotestController) CreateAutotest() {
 	flash := beego.NewFlash()
@@ -61,7 +61,6 @@ func extractAutotestRequestData(this *AutotestController) models.Codebase {
 		BuildTool:   this.GetString("buildTool"),
 		Strategy:    "Clone",
 		Type:        AutotestType,
-		Description: this.GetString("description"),
 	}
 
 	testReportFramework := this.GetString("testReportFramework")
@@ -81,6 +80,12 @@ func extractAutotestRequestData(this *AutotestController) models.Codebase {
 			codebase.Repository.Password = this.GetString("repoPassword")
 		}
 	}
+
+	description := this.GetString("description")
+	if description != "" {
+		codebase.Description = &description
+	}
+
 	return codebase
 }
 
@@ -98,6 +103,11 @@ func validateAutotestRequestData(autotest models.Codebase) *ErrMsg {
 			err := &validation.Error{Key: "repository", Message: "Repository doesn't exist or invalid login and password."}
 			valid.Errors = append(valid.Errors, err)
 		}
+	}
+
+	if autotest.Description == nil {
+		err := &validation.Error{Key: "description", Message: "Description field can't be empty."}
+		valid.Errors = append(valid.Errors, err)
 	}
 
 	if err != nil {

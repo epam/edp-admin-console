@@ -32,7 +32,7 @@ type CodebaseSpec struct {
 	Database            *Database   `json:"database,omitempty"`
 	TestReportFramework *string     `json:"testReportFramework"`
 	Type                string      `json:"type"`
-	Description         string      `json:"description"`
+	Description         *string     `json:"description"`
 }
 
 type Repository struct {

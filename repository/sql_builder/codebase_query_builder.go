@@ -22,7 +22,7 @@ const (
 
 func GetAllCodebasesQuery(filterCriteria models.CodebaseCriteria) string {
 	var kind string
-	if filterCriteria.Type == nil {
+	if filterCriteria.Type == nil || *filterCriteria.Type == "" {
 		kind = ""
 	} else {
 		kind = fmt.Sprintf(" where cb.type = '%s' ", *filterCriteria.Type)
