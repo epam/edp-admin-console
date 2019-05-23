@@ -59,6 +59,13 @@ $(function () {
             : $appNameErrEl.hide();
     });
 
+    $('#description').focusout(function () {
+        let $descriptionErrEl = $('.description-validation');
+        !isFieldValid($(this), REGEX.DESCRIPTION)
+            ? $descriptionErrEl.show()
+            : $descriptionErrEl.hide();
+    });
+
     $('.form__input-wrapper .form-subsection input').click(function () {
         $('.frameworkError').hide();
     });
@@ -74,11 +81,16 @@ $(function () {
             ? $appNameErrEl.show()
             : $appNameErrEl.hide();
 
+        let $descriptionErrEl = $('.description-validation'),
+            isDescValid = isFieldValid($('#description'), REGEX.DESCRIPTION);
+        !isDescValid
+            ? $descriptionErrEl.show()
+            : $descriptionErrEl.hide();
 
         let isApplicationAndFrameworkValid = isApplicationCodeAndFrameworkSelected();
 
 
-        if (isGitValid && isAppValid && isApplicationAndFrameworkValid) {
+        if (isGitValid && isAppValid && isDescValid && isApplicationAndFrameworkValid) {
             $('#createAutotest').submit();
         }
     });
@@ -89,7 +101,8 @@ let REGEX = {
     REPOSITORY_LOGIN: /\w/,
     REPOSITORY_PASSWORD: /\w/,
     APPLICATION_NAME: /^[a-z][a-z0-9-]*[a-z0-9]$/,
-    GIT_URL: /(?:^git|^ssh|^https?|^git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/
+    GIT_URL: /(?:^git|^ssh|^https?|^git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/,
+    DESCRIPTION: /^[a-zA-Z0-9]/
 };
 
 function isGitDataValid() {
