@@ -26,7 +26,7 @@ func init() {
 		"POST /admin/edp/autotest$":                   {administrator},
 
 		"GET /api/v1/edp/vcs$":                               {administrator, developer},
-		"GET /api/v1/edp/codebase$":                          {administrator, developer},
+		"GET /api/v1/edp/codebase":                           {administrator, developer},
 		"GET /api/v1/edp/codebase/([^/]*)$":                  {administrator, developer},
 		"GET /api/v1/edp/cd-pipeline/([^/]*)$":               {administrator, developer},
 		"GET /api/v1/edp/cd-pipeline/([^/]*)/stage/([^/]*)$": {administrator, developer},
