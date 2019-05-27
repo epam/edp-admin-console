@@ -1,0 +1,1 @@
+alter table codebase alter column framework drop not null;

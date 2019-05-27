@@ -59,7 +59,7 @@ func extractAutotestRequestData(this *AutotestController) models.Codebase {
 		Lang:        this.GetString("appLang"),
 		Framework:   this.GetString("framework"),
 		BuildTool:   this.GetString("buildTool"),
-		Strategy:    "Clone",
+		Strategy:    "clone",
 		Type:        AutotestType,
 	}
 
