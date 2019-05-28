@@ -29,18 +29,14 @@ type MainController struct {
 }
 
 func (this *MainController) Index() {
-	version, err := this.EDPTenantService.GetEDPVersion()
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
-	this.Data["EDPVersion"] = version
+	this.Data["EDPVersion"] = context.EDPVersion
 	this.TplName = "index.html"
 }
 
 func (this *MainController) CockpitRedirectConfirmationPage() {
 	this.Data["Domain"] = fmt.Sprintf("https://edp-cockpit-%s-edp-cicd.%s", context.Tenant, beego.AppConfig.String("dnsWildcard"))
 	this.Data["Anchor"] = this.GetString("anchor")
+	this.Data["EDPVersion"] = context.EDPVersion
+	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.TplName = "cockpit_redirect_confirmation.html"
 }

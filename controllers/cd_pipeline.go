@@ -17,6 +17,7 @@
 package controllers
 
 import (
+	"edp-admin-console/context"
 	"edp-admin-console/models"
 	"edp-admin-console/service"
 	"fmt"
@@ -39,10 +40,10 @@ const paramWaitingForCdPipeline = "waitingforcdpipeline"
 
 func (this *CDPipelineController) GetContinuousDeliveryPage() {
 	var activeStatus = "active"
-	var appType  = "application"
+	var appType = "application"
 	applications, err := this.AppService.GetAllCodebases(models.CodebaseCriteria{
 		Status: &activeStatus,
-		Type: &appType,
+		Type:   &appType,
 	})
 	if err != nil {
 		this.Abort("500")
@@ -52,12 +53,6 @@ func (this *CDPipelineController) GetContinuousDeliveryPage() {
 	branches, err := this.BranchService.GetAllReleaseBranches(models.BranchCriteria{
 		Status: &activeStatus,
 	})
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
-	version, err := this.EDPTenantService.GetEDPVersion()
 	if err != nil {
 		this.Abort("500")
 		return
@@ -74,7 +69,7 @@ func (this *CDPipelineController) GetContinuousDeliveryPage() {
 	this.Data["ActiveApplicationsAndBranches"] = len(applications) > 0 && len(branches) > 0
 	this.Data["CDPipelines"] = cdPipelines
 	this.Data["Applications"] = applications
-	this.Data["EDPVersion"] = version
+	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["HasRights"] = isAdmin(contextRoles)
 	this.TplName = "continuous_delivery.html"
@@ -93,18 +88,12 @@ func (this *CDPipelineController) GetCreateCDPipelinePage() {
 		return
 	}
 
-	version, err := this.EDPTenantService.GetEDPVersion()
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
 	if flash.Data["error"] != "" {
 		this.Data["Error"] = flash.Data["error"]
 	}
 
 	this.Data["ApplicationsWithReleaseBranches"] = applicationsWithReleaseBranches
-	this.Data["EDPVersion"] = version
+	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.TplName = "create_cd_pipeline.html"
 }
@@ -154,13 +143,7 @@ func (this *CDPipelineController) CreateCDPipeline() {
 		return
 	}
 
-	version, err := this.EDPTenantService.GetEDPVersion()
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
-	this.Data["EDPVersion"] = version
+	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Redirect(fmt.Sprintf("/admin/edp/cd-pipeline/overview?%s=%s#cdPipelineSuccessModal", paramWaitingForCdPipeline, pipelineName), 302)
 }
@@ -182,14 +165,8 @@ func (this *CDPipelineController) GetCDPipelineOverviewPage() {
 
 	cdPipeline.Stages = stages
 
-	version, err := this.EDPTenantService.GetEDPVersion()
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
 	this.Data["CDPipeline"] = cdPipeline
-	this.Data["EDPVersion"] = version
+	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.TplName = "cd_pipeline_overview.html"
 }

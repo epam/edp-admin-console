@@ -6,6 +6,7 @@ import (
 )
 
 var (
-	Namespace = beego.AppConfig.String("cicdNamespace")
-	Tenant    = strings.TrimSuffix(Namespace, "-edp-cicd")
+	Namespace  = beego.AppConfig.String("cicdNamespace")
+	Tenant     = strings.TrimSuffix(Namespace, "-edp-cicd")
+	EDPVersion = beego.AppConfig.String("edpVersion")
 )

@@ -31,16 +31,11 @@ type EDPTenantController struct {
 
 func (this *EDPTenantController) GetEDPComponents() {
 	components := this.EDPTenantService.GetEDPComponents()
-	version, err := this.EDPTenantService.GetEDPVersion()
-	if err != nil {
-		this.Abort("500")
-		return
-	}
 
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["InputURL"] = strings.TrimSuffix(this.Ctx.Input.URL(), "/"+context.Tenant)
 	this.Data["EDPTenantName"] = context.Tenant
-	this.Data["EDPVersion"] = version
+	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["EDPComponents"] = components
 	this.TplName = "edp_components.html"
 }

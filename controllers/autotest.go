@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"edp-admin-console/context"
 	"edp-admin-console/models"
 	"edp-admin-console/service"
 	"edp-admin-console/util"
@@ -157,19 +158,13 @@ func (this *AutotestController) GetCreateAutotestPage() {
 		this.Data["Error"] = flash.Data["error"]
 	}
 
-	version, err := this.EDPTenantService.GetEDPVersion()
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
 	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue()
 	if err != nil {
 		this.Abort("500")
 		return
 	}
 
-	this.Data["EDPVersion"] = version
+	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["HasRights"] = isAdmin(this.GetSession("realm_roles").([]string))
 	this.Data["IsVcsEnabled"] = isVcsEnabled
@@ -192,14 +187,8 @@ func (this *AutotestController) GetAutotestsOverviewPage() {
 		return
 	}
 
-	version, err := this.EDPTenantService.GetEDPVersion()
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
 	this.Data["Autotests"] = codebases
-	this.Data["EDPVersion"] = version
+	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["HasRights"] = isAdmin(this.GetSession("realm_roles").([]string))
 	this.TplName = "autotest.html"
@@ -213,12 +202,6 @@ func (this *AutotestController) GetAutotestOverviewPage() {
 		return
 	}
 
-	version, err := this.EDPTenantService.GetEDPVersion()
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
 	branchEntities, err := this.BranchService.GetAllReleaseBranchesByAppName(testName)
 	branchEntities = addCodebaseBranchInProgressIfAny(branchEntities, this.GetString(paramWaitingForBranch))
 	if err != nil {
@@ -227,7 +210,7 @@ func (this *AutotestController) GetAutotestOverviewPage() {
 	}
 
 	this.Data["ReleaseBranches"] = branchEntities
-	this.Data["EDPVersion"] = version
+	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["Autotests"] = codebases
 	this.TplName = "codebase_overview.html"

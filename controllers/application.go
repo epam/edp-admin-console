@@ -17,6 +17,7 @@
 package controllers
 
 import (
+	"edp-admin-console/context"
 	"edp-admin-console/models"
 	"edp-admin-console/service"
 	"edp-admin-console/util"
@@ -54,14 +55,8 @@ func (this *ApplicationController) GetApplicationsOverviewPage() {
 		return
 	}
 
-	version, err := this.EDPTenantService.GetEDPVersion()
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
 	contextRoles := this.GetSession("realm_roles").([]string)
-	this.Data["EDPVersion"] = version
+	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["HasRights"] = isAdmin(contextRoles)
 	this.Data["Applications"] = applications
@@ -94,12 +89,6 @@ func (this *ApplicationController) GetApplicationOverviewPage() {
 		return
 	}
 
-	version, err := this.EDPTenantService.GetEDPVersion()
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
 	branchEntities, err := this.BranchService.GetAllReleaseBranchesByAppName(appName)
 	branchEntities = addCodebaseBranchInProgressIfAny(branchEntities, this.GetString(paramWaitingForBranch))
 	if err != nil {
@@ -108,7 +97,7 @@ func (this *ApplicationController) GetApplicationOverviewPage() {
 	}
 
 	this.Data["ReleaseBranches"] = branchEntities
-	this.Data["EDPVersion"] = version
+	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["Application"] = application
 	this.TplName = "codebase_overview.html"
@@ -145,13 +134,7 @@ func (this *ApplicationController) GetCreateApplicationPage() {
 		this.Data["Error"] = flash.Data["error"]
 	}
 
-	version, err := this.EDPTenantService.GetEDPVersion()
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
-	this.Data["EDPVersion"] = version
+	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["IsVcsEnabled"] = isVcsEnabled
 	this.TplName = "create_application.html"

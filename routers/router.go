@@ -28,7 +28,7 @@ import (
 )
 
 func init() {
-	log.Printf("Start application in %s mode...", beego.AppConfig.String("runmode"))
+	log.Printf("Start application in %s mode with %s EDP version...", beego.AppConfig.String("runmode"), context.EDPVersion)
 	context.InitDb()
 	context.InitAuth()
 	clients := k8s.CreateOpenShiftClients()

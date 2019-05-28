@@ -17,6 +17,7 @@
 package controllers
 
 import (
+	"edp-admin-console/context"
 	"edp-admin-console/service"
 	"github.com/astaxie/beego"
 )
@@ -36,12 +37,6 @@ func (this *CodebaseController) GetCodebaseOverviewPage() {
 		return
 	}
 
-	version, err := this.EDPTenantService.GetEDPVersion()
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
 	branchEntities, err := this.BranchService.GetAllReleaseBranchesByAppName(codebaseName)
 	branchEntities = addCodebaseBranchInProgressIfAny(branchEntities, this.GetString(paramWaitingForBranch))
 	if err != nil {
@@ -50,7 +45,7 @@ func (this *CodebaseController) GetCodebaseOverviewPage() {
 	}
 
 	this.Data["ReleaseBranches"] = branchEntities
-	this.Data["EDPVersion"] = version
+	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["Codebase"] = codebase
 	this.TplName = "codebase_overview.html"
