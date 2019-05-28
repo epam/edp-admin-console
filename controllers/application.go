@@ -192,16 +192,19 @@ func (this *ApplicationController) CreateApplication() {
 func extractApplicationRequestData(this *ApplicationController) models.Codebase {
 	codebase := models.Codebase{
 		Lang:      this.GetString("appLang"),
-		Framework: this.GetString("framework"),
 		BuildTool: this.GetString("buildTool"),
 		Name:      this.GetString("nameOfApp"),
 		Strategy:  this.GetString("strategy"),
 		Type:      ApplicationType,
 	}
 
+	framework := this.GetString("framework")
+	codebase.Framework = &framework
+
 	isMultiModule, _ := this.GetBool("isMultiModule", false)
 	if isMultiModule {
-		codebase.Framework = codebase.Framework + "-multimodule"
+		multimoduleApp := fmt.Sprintf("%s-multimodule", *codebase.Framework)
+		codebase.Framework = &multimoduleApp
 	}
 
 	repoUrl := this.GetString("gitRepoUrl")

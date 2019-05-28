@@ -1,22 +1,8 @@
 $(function () {
 
     $('#languageSelection').on('change', function (e) {
-        $('.js-form-subsection').hide();
+        $('.js-form-subsection, .appLangError').hide();
         $($(e.target).data('target')).show();
-    });
-
-    $('#languageSelection .form__radio-btn').click(function () {
-        $(this).parents('.card-body').find('.appLangError').hide();
-        $('.framework').prop('checked', false);
-
-        let $target = $(this).data('target');
-        let $frameworks = $(this).parents('.card-body').find('.form-group .form-subsection');
-
-        $.each($frameworks, function () {
-            !$(this).hasClass($target.substring(1, $target.length))
-                ? $(this).find('select').attr('disabled', true)
-                : $(this).find('select').removeAttr('disabled');
-        });
     });
 
     $('#isRepoPrivate').change(function () {
@@ -66,10 +52,6 @@ $(function () {
             : $descriptionErrEl.hide();
     });
 
-    $('.form__input-wrapper .form-subsection input').click(function () {
-        $('.frameworkError').hide();
-    });
-
     $('.create-autotest').click(function (e) {
         e.preventDefault();
 
@@ -87,10 +69,9 @@ $(function () {
             ? $descriptionErrEl.show()
             : $descriptionErrEl.hide();
 
-        let isApplicationAndFrameworkValid = isApplicationCodeAndFrameworkSelected();
+        let isApplicationValid = isApplicationCodeSelected();
 
-
-        if (isGitValid && isAppValid && isDescValid && isApplicationAndFrameworkValid) {
+        if (isGitValid && isAppValid && isDescValid && isApplicationValid) {
             $('#createAutotest').submit();
         }
     });
@@ -163,23 +144,14 @@ function isFieldValid(elementToValidate, regex) {
     return !(!elementToValidate.val() || !check(elementToValidate.val()));
 }
 
-function isApplicationCodeAndFrameworkSelected() {
+function isApplicationCodeSelected() {
     let $languageCheckboxElems = $('.language input');
-    let $frameworkCheckboxElems = $('.form__input-wrapper .form-subsection input');
-    let $frameworkErrEl = $('.frameworkError');
     let $appLanguageErrEl = $('.appLangError');
 
     if ($languageCheckboxElems.is(':checked')) {
         $appLanguageErrEl.hide();
-        if ($frameworkCheckboxElems.is(":checked")) {
-            $frameworkErrEl.hide();
-            return true;
-        } else {
-            $frameworkErrEl.show();
-            return false;
-        }
-    } else {
-        $appLanguageErrEl.show();
-        return false;
+        return true;
     }
+    $appLanguageErrEl.show();
+    return false;
 }

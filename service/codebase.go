@@ -112,7 +112,6 @@ func (this CodebaseService) CreateCodebase(codebase models.Codebase) (*k8s.Codeb
 	return result, nil
 }
 
-//todo look at resourceName arg
 func (this CodebaseService) GetCodebaseCR(codebaseName string) (*k8s.Codebase, error) {
 	edpClient := this.Clients.EDPRestClient
 
@@ -217,7 +216,6 @@ func getSecret(name string, username string, password string) *v1.Secret {
 func convertData(codebase models.Codebase) k8s.CodebaseSpec {
 	spec := k8s.CodebaseSpec{
 		Lang:        codebase.Lang,
-		Framework:   codebase.Framework,
 		BuildTool:   codebase.BuildTool,
 		Strategy:    codebase.Strategy,
 		Name:        codebase.Name,
@@ -225,8 +223,8 @@ func convertData(codebase models.Codebase) k8s.CodebaseSpec {
 		Description: codebase.Description,
 	}
 
-	if codebase.MultiModule {
-		spec.Framework = codebase.Framework + "-multimodule"
+	if codebase.Framework != nil {
+		spec.Framework = codebase.Framework
 	}
 
 	if codebase.Repository != nil {

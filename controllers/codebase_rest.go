@@ -162,8 +162,18 @@ func validRequestData(codebase models.Codebase) *ErrMsg {
 		resErr = err
 	}
 
-	if codebase.Type != "autotest" && codebase.Type != "application" {
-		err := &validation.Error{Key: "repository", Message: "codebase type should be: autotest or application"}
+	if codebase.Type != "autotests" && codebase.Type != "application" {
+		err := &validation.Error{Key: "repository", Message: "codebase type should be: autotests or application"}
+		valid.Errors = append(valid.Errors, err)
+	}
+
+	if codebase.Type == "autotests" && codebase.Repository == nil {
+		err := &validation.Error{Key: "repository", Message: "can't be null"}
+		valid.Errors = append(valid.Errors, err)
+	}
+
+	if codebase.Type == "autotests" && codebase.Strategy == "create" {
+		err := &validation.Error{Key: "repository", Message: "strategy must be 'clone'"}
 		valid.Errors = append(valid.Errors, err)
 	}
 

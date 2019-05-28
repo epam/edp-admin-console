@@ -1,6 +1,8 @@
 $(function () {
 
     let STATUS = {
+        CREATED: 'created',
+        FAILED: 'failed',
         IN_PROGRESS: 'in_progress'
     };
     let delayTime = 10000;
@@ -18,7 +20,7 @@ $(function () {
         let autotestName = getUrlParameter('waitingforautotest');
         if (autotestName) {
             let status = $("tr[data-autotest-name='" + autotestName + "']").attr("data-autotest-status");
-            if (status === STATUS.IN_PROGRESS) {
+            if (status !== STATUS.CREATED && status !== STATUS.FAILED) {
                 uri += "?waitingforautotest=" + autotestName;
                 setTimeout(function () {
                     location.reload();

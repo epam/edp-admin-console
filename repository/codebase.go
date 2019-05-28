@@ -110,7 +110,6 @@ func (this CodebaseEntityRepository) GetCodebase(codebaseName string) (*models.C
 			Status:    row["status_name"].(string),
 			Language:  row["language"].(string),
 			BuildTool: row["build_tool"].(string),
-			Framework: row["framework"].(string),
 			Strategy:  row["strategy"].(string),
 		}
 
@@ -146,6 +145,10 @@ func (this CodebaseEntityRepository) GetCodebase(codebaseName string) (*models.C
 
 		if row["test_report_framework"] != nil {
 			codebase.TestReportFramework = row["test_report_framework"].(string)
+		}
+
+		if row["framework"] != nil {
+			codebase.Framework = row["framework"].(string)
 		}
 
 	}

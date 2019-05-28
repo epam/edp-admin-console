@@ -124,9 +124,9 @@
                                         </div>
                                     </div>
 
-                                    <p>Application code language/framework
+                                    <p>Application code language
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Select application language/framework and build tool."></span>
+                                              title="Select application language and build tool."></span>
                                     </p>
                                     <div class="form__input-wrapper">
                                         <fieldset id="languageSelection" class="language">
@@ -134,7 +134,7 @@
                                                 <div class="form__radio-btn-wrapper">
                                                     <input name="appLang" type="radio" class="form__radio-btn"
                                                            id="appLang-Java"
-                                                           value="Java" data-target=".formSubsection1">
+                                                           value="Java" data-target=".formSubsection-java">
                                                     <label class="form__radio-label" for="appLang-Java">
                                                         <img class="form__radio-label-icon"
                                                              src="/static/img/java-logo.png"
@@ -142,119 +142,21 @@
                                                         <span class="form__radio-label-text">Java</span>
                                                     </label>
                                                 </div>
-                                                <div class="form__radio-btn-wrapper">
-                                                    <input name="appLang" type="radio" class="form__radio-btn"
-                                                           id="appLang-JavaScript" value="JavaScript"
-                                                           data-target=".formSubsection2">
-                                                    <label class="form__radio-label" for="appLang-JavaScript">
-                                                        <img class="form__radio-label-icon"
-                                                             src="/static/img/unofficial-java-script-logo-2.png"
-                                                             alt="logo">
-                                                        <span class="form__radio-label-text">JavaScript</span>
-                                                    </label>
-                                                </div>
-                                                <div class="form__radio-btn-wrapper">
-                                                    <input name="appLang" type="radio" class="form__radio-btn"
-                                                           id="appLang-DotNet" value="DotNet"
-                                                           data-target=".formSubsection3">
-                                                    <label class="form__radio-label" for="appLang-DotNet">
-                                                        <img class="form__radio-label-icon"
-                                                             src="/static/img/dotNet.png" alt="logo">
-                                                        <span class="form__radio-label-text">DotNet</span>
-                                                    </label>
-                                                </div>
                                             </div>
                                         </fieldset>
-                                        <div class="js-form-subsection form-subsection formSubsection1">
-                                            <div class="form__input-wrapper  with-circle"><span
-                                                        class="form__input-heading"></span>
-                                                <div class="form__radio-btn-wrapper">
-                                                    <input name="framework" type="radio"
-                                                           class="form__radio-btn framework"
-                                                           id="framework-SpringBoot" value="SpringBoot">
-                                                    <label
-                                                            class="form__radio-label" for="framework-SpringBoot">
-                                                    <span class="form__radio-btn--outer-circle">
-                                                        <span class="form__radio-btn--inner-circle "></span>
-                                                    </span>
-                                                        <img class="form__radio-label-icon"
-                                                             src="/static/img/Springboot.png" alt="logo">
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="js-form-subsection form-subsection formSubsection2">
-                                            <div class="form__input-wrapper with-circle"><span
-                                                        class="form__input-heading"></span>
-                                                <div class="form__radio-btn-wrapper">
-                                                    <input name="framework" type="radio"
-                                                           class="form__radio-btn framework"
-                                                           id="framework-react" value="React">
-                                                    <label
-                                                            class="form__radio-label" for="framework-react">
-                                                    <span class="form__radio-btn--outer-circle">
-                                                        <span class="form__radio-btn--inner-circle "></span>
-                                                    </span>
-                                                        <img class="form__radio-label-icon" src="/static/img/React.png"
-                                                             alt="logo">
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="js-form-subsection form-subsection formSubsection3">
-                                            <div class="form__input-wrapper with-circle"><span
-                                                        class="form__input-heading"></span>
-                                                <div class="form__radio-btn-wrapper">
-                                                    <input name="framework" type="radio"
-                                                           class="form__radio-btn framework"
-                                                           id="framework-dotNet" value="netcore">
-                                                    <label
-                                                            class="form__radio-label" for="framework-dotNet">
-                                                    <span class="form__radio-btn--outer-circle">
-                                                        <span class="form__radio-btn--inner-circle "></span>
-                                                    </span>
-                                                        <img class="form__radio-label-icon"
-                                                             src="/static/img/netcore.png"
-                                                             alt="logo">
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                     <div class="invalid-feedback appLangError">
                                         Please select application type.
                                     </div>
-                                    <div class="invalid-feedback frameworkError">
-                                        Please select framework.
-                                    </div>
 
                                     <div class="form-group">
-                                        <div class="js-form-subsection form-subsection formSubsection1">
+                                        <div class="js-form-subsection form-subsection formSubsection-java">
                                             <label for="buildTool">Select build tool
                                                 <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                                                       title="Select application build tool."></span>
                                             </label>
                                             <select class="form-control java-build-tools" name="buildTool">
-                                                <option>Gradle</option>
                                                 <option>Maven</option>
-                                            </select>
-                                        </div>
-                                        <div class="js-form-subsection form-subsection formSubsection2">
-                                            <label for="buildTool">Select build tool
-                                                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                      title="Select application build tool."></span>
-                                            </label>
-                                            <select class="form-control" name="buildTool">
-                                                <option>NPM</option>
-                                            </select>
-                                        </div>
-                                        <div class="js-form-subsection form-subsection formSubsection3">
-                                            <label for="buildTool">Select build tool
-                                                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                      title="Select application build tool."></span>
-                                            </label>
-                                            <select class="form-control" name="buildTool">
-                                                <option>dotnet</option>
                                             </select>
                                         </div>
                                     </div>
@@ -266,10 +168,15 @@
                                                       title="Select autotest report framework"></span>
                                             </label>
                                             <select class="form-control java-build-tools" name="testReportFramework">
-                                                <option>Allure</option>
+                                                <option value="allure">Allure</option>
                                             </select>
                                         </div>
                                     </div>
+
+                                    <a href="/admin/edp/autotest/overview">
+                                        <button type="button" class="edp-submit-form-btn btn btn-primary">CANCEL
+                                        </button>
+                                    </a>
 
                                     <button type="submit"
                                             class="create-autotest edp-submit-form-btn btn btn-primary">ADD AUTOTEST

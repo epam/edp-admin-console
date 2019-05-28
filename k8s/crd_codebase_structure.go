@@ -26,7 +26,7 @@ type CodebaseSpec struct {
 	Strategy            string      `json:"strategy" valid:"Required"`
 	Lang                string      `json:"lang" valid:"Required"`
 	BuildTool           string      `json:"buildTool" valid:"Required"`
-	Framework           string      `json:"framework" valid:"Required"`
+	Framework           *string     `json:"framework"`
 	Repository          *Repository `json:"repository,omitempty"`
 	Route               *Route      `json:"route,omitempty"`
 	Database            *Database   `json:"database,omitempty"`

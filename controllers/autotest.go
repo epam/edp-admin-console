@@ -55,12 +55,11 @@ func (this *AutotestController) CreateAutotest() {
 
 func extractAutotestRequestData(this *AutotestController) models.Codebase {
 	codebase := models.Codebase{
-		Name:        this.GetString("nameOfApp"),
-		Lang:        this.GetString("appLang"),
-		Framework:   this.GetString("framework"),
-		BuildTool:   this.GetString("buildTool"),
-		Strategy:    "clone",
-		Type:        AutotestType,
+		Name:      this.GetString("nameOfApp"),
+		Lang:      this.GetString("appLang"),
+		BuildTool: this.GetString("buildTool"),
+		Strategy:  "clone",
+		Type:      AutotestType,
 	}
 
 	testReportFramework := this.GetString("testReportFramework")
