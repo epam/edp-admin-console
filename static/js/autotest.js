@@ -52,6 +52,20 @@ $(function () {
             : $descriptionErrEl.hide();
     });
 
+    $('#vcsLogin').focusout(function () {
+        let $vcsLoginErrEl = $('.vcs-login-validation');
+        !isFieldValid($(this), REGEX.REPOSITORY_LOGIN)
+            ? $vcsLoginErrEl.show()
+            : $vcsLoginErrEl.hide();
+    });
+
+    $('#vcsPassword').focusout(function () {
+        let $vcsPasswordErrEl = $('.vcs-password-validation');
+        !isFieldValid($(this), REGEX.REPOSITORY_PASSWORD)
+            ? $vcsPasswordErrEl.show()
+            : $vcsPasswordErrEl.hide();
+    });
+
     $('.create-autotest').click(function (e) {
         e.preventDefault();
 
@@ -69,9 +83,24 @@ $(function () {
             ? $descriptionErrEl.show()
             : $descriptionErrEl.hide();
 
+        let $vcsLoginErrEl = $('.vcs-login-validation'),
+            isVcsLoginValid = isFieldValid($('#vcsLogin'), REGEX.REPOSITORY_LOGIN);
+        !isVcsLoginValid
+            ? $vcsLoginErrEl.show()
+            : $vcsLoginErrEl.hide();
+
+        let $vcsPasswordErrEl = $('.vcs-password-validation'),
+            isVcsPasswordValid = isFieldValid($('#vcsPassword'), REGEX.REPOSITORY_PASSWORD);
+        !isVcsPasswordValid
+            ? $vcsPasswordErrEl.show()
+            : $vcsPasswordErrEl.hide();
+
         let isApplicationValid = isApplicationCodeSelected();
 
-        if (isGitValid && isAppValid && isDescValid && isApplicationValid) {
+        let isVcsBlockValid;
+        isVcsBlockValid = $('.vcs-block').length == 0 ? true : isVcsLoginValid && isVcsPasswordValid;
+
+        if (isGitValid && isAppValid && isDescValid && isApplicationValid && isVcsBlockValid) {
             $('#createAutotest').submit();
         }
     });

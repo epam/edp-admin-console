@@ -9,6 +9,7 @@ import (
 	"github.com/astaxie/beego/validation"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type AutotestController struct {
@@ -32,7 +33,7 @@ func (this *AutotestController) CreateAutotest() {
 		this.Redirect("/admin/edp/autotest/create", 302)
 		return
 	}
-	log.Printf("Received autotest data from request: %+v %+v", codebase, codebase.Repository)
+	logAutotestRequestData(codebase)
 
 	createdObject, err := this.CodebaseService.CreateCodebase(codebase)
 
@@ -51,6 +52,22 @@ func (this *AutotestController) CreateAutotest() {
 	flash.Success("Autotest object is created.")
 	flash.Store(&this.Controller)
 	this.Redirect(fmt.Sprintf("/admin/edp/autotest/overview?%s=%s#autotestSuccessModal", paramWaitingForAutotest, codebase.Name), 302)
+}
+
+func logAutotestRequestData(autotest models.Codebase) {
+	var result strings.Builder
+	result.WriteString(fmt.Sprintf("Request data to create codebase CR is valid. name=%s, strategy=%s, lang=%s, buildTool=%s, testReportFramework=%s",
+		autotest.Name, autotest.Strategy, autotest.Lang, autotest.BuildTool, *autotest.TestReportFramework))
+
+	if autotest.Repository != nil {
+		result.WriteString(fmt.Sprintf(", repositoryUrl=%s, repositoryLogin=%s", autotest.Repository.Url, autotest.Repository.Login))
+	}
+
+	if autotest.Vcs != nil {
+		result.WriteString(fmt.Sprintf(", vcsLogin=%s", autotest.Vcs.Login))
+	}
+
+	log.Println(result.String())
 }
 
 func extractAutotestRequestData(this *AutotestController) models.Codebase {
@@ -85,6 +102,15 @@ func extractAutotestRequestData(this *AutotestController) models.Codebase {
 		codebase.Description = &description
 	}
 
+	vcsLogin := this.GetString("vcsLogin")
+	vcsPassword := this.GetString("vcsPassword")
+	if vcsLogin != "" && vcsPassword != "" {
+		codebase.Vcs = &models.Vcs{
+			Login:    vcsLogin,
+			Password: vcsPassword,
+		}
+	}
+
 	return codebase
 }
 
@@ -107,6 +133,10 @@ func validateAutotestRequestData(autotest models.Codebase) *ErrMsg {
 	if autotest.Description == nil {
 		err := &validation.Error{Key: "description", Message: "Description field can't be empty."}
 		valid.Errors = append(valid.Errors, err)
+	}
+
+	if autotest.Vcs != nil {
+		_, err = valid.Valid(autotest.Vcs)
 	}
 
 	if err != nil {
@@ -132,9 +162,16 @@ func (this *AutotestController) GetCreateAutotestPage() {
 		return
 	}
 
+	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue()
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
 	this.Data["EDPVersion"] = version
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["HasRights"] = isAdmin(this.GetSession("realm_roles").([]string))
+	this.Data["IsVcsEnabled"] = isVcsEnabled
 	this.TplName = "create_autotest.html"
 }
 

@@ -30,8 +30,9 @@
                         </div>
                         <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
                              data-parent="#accordionAutotestCreation">
-                            <div class="card-body">
-                                <form id="createAutotest" method="post" action="/admin/edp/autotest">
+                            <form id="createAutotest" method="post" action="/admin/edp/autotest">
+                                <div class="card-body">
+
                                     {{ if .Error }}
                                         <div class="form-error">
                                             <p>{{ .Error }}</p>
@@ -173,18 +174,66 @@
                                         </div>
                                     </div>
 
-                                    <a href="/admin/edp/autotest/overview">
-                                        <button type="button" class="edp-submit-form-btn btn btn-primary">CANCEL
+                                    {{if not .IsVcsEnabled}}
+                                        <a href="/admin/edp/autotest/overview">
+                                            <button type="button" class="edp-submit-form-btn btn btn-primary">CANCEL
+                                            </button>
+                                        </a>
+
+                                        <button type="submit"
+                                                class="create-autotest edp-submit-form-btn btn btn-primary">ADD AUTOTEST
                                         </button>
-                                    </a>
+                                    {{end}}
 
-                                    <button type="submit"
-                                            class="create-autotest edp-submit-form-btn btn btn-primary">ADD AUTOTEST
-                                    </button>
+                                </div>
+                                {{if .IsVcsEnabled}}
+                                    <div class="card vcs-block">
+                                        <div class="card-header" id="headingTwo" data-toggle="collapse"
+                                             aria-expanded="true" aria-controls="collapseTwo">
+                                            <h5 class="mb-0">
+                                                <button class="btn btn-link collapsed" type="button">
+                                                    VCS info
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo"
+                                             data-parent="#accordionAutotestCreation">
+                                            <div class="card-body">
+                                                <div class="form-group vcs-login">
+                                                    <label for="vcsLogin">VCS login</label>
+                                                    <input name="vcsLogin" type="text" class="form-control"
+                                                           id="vcsLogin"
+                                                           placeholder="Enter vcs login">
+                                                    <div class="invalid-feedback vcs-login-validation">
+                                                        Please specify vsc login.
+                                                    </div>
+                                                </div>
+                                                <div class="form-group vcs-password">
+                                                    <label for="vcsPassword">VCS password (or API Token)</label>
+                                                    <input name="vcsPassword" type="password" class="form-control"
+                                                           id="vcsPassword"
+                                                           placeholder="Enter VCS password (or API Token)">
+                                                    <div class="invalid-feedback vcs-password-validation">
+                                                        Please specify VCS password (or API Token).
+                                                    </div>
+                                                </div>
 
-                                </form>
+                                                <a href="/admin/edp/autotest/overview">
+                                                    <button type="button" class="edp-submit-form-btn btn btn-primary">
+                                                        CANCEL
+                                                    </button>
+                                                </a>
 
-                            </div>
+                                                <button type="submit"
+                                                        class="create-autotest edp-submit-form-btn btn btn-primary">ADD
+                                                    AUTOTEST
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                {{end}}
+                            </form>
                         </div>
                     </div>
                 </div>
