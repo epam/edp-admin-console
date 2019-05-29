@@ -17,9 +17,13 @@
 package controllers
 
 import (
+	"edp-admin-console/models"
 	"edp-admin-console/service"
+	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/validation"
+	"log"
 	"net/http"
 )
 
@@ -63,4 +67,71 @@ func (this *CDPipelineRestController) GetStage() {
 
 	this.Data["json"] = stage
 	this.ServeJSON()
+}
+
+func (this *CDPipelineRestController) CreateCDPipeline() {
+	var cdPipelineCreateCommand models.CDPipelineCreateCommand
+	err := json.NewDecoder(this.Ctx.Request.Body).Decode(&cdPipelineCreateCommand)
+	if err != nil {
+		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	errMsg := validateCDPipelineRequestData(cdPipelineCreateCommand)
+	if errMsg != nil {
+		log.Printf("Failed to validate request data: %s", errMsg.Message)
+		http.Error(this.Ctx.ResponseWriter, errMsg.Message, http.StatusBadRequest)
+		return
+	}
+
+	_, pipelineErr := this.CDPipelineService.CreatePipeline(cdPipelineCreateCommand)
+	if pipelineErr != nil {
+		if pipelineErr.StatusCode == http.StatusFound {
+			http.Error(this.Ctx.ResponseWriter, pipelineErr.Message, http.StatusFound)
+			return
+		}
+		if pipelineErr.StatusCode == http.StatusLocked {
+			http.Error(this.Ctx.ResponseWriter, pipelineErr.Message, http.StatusLocked)
+			return
+		}
+
+		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	this.Ctx.ResponseWriter.WriteHeader(http.StatusCreated)
+}
+
+func validateCDPipelineRequestData(cdPipeline models.CDPipelineCreateCommand) *ErrMsg {
+	var isCDPipelineValid, isApplicationsValid, isStagesValid bool
+	errMsg := &ErrMsg{"An internal error has occurred on server while validating CD Pipeline's request body.", http.StatusInternalServerError}
+	valid := validation.Validation{}
+	isCDPipelineValid, err := valid.Valid(cdPipeline)
+
+	if err != nil {
+		return errMsg
+	}
+
+	if cdPipeline.Applications != nil {
+		for _, app := range cdPipeline.Applications {
+			isApplicationsValid, err = valid.Valid(app)
+			if err != nil {
+				return errMsg
+			}
+		}
+	}
+
+	if cdPipeline.Stages != nil {
+		for _, stage := range cdPipeline.Stages {
+			isStagesValid, err = valid.Valid(stage)
+			if err != nil {
+				return errMsg
+			}
+		}
+	}
+
+	if isCDPipelineValid && isApplicationsValid && isStagesValid {
+		return nil
+	}
+
+	return &ErrMsg{string(createErrorResponseBody(valid)), http.StatusBadRequest}
 }

@@ -17,11 +17,6 @@ type ReleaseBranchCreateCommand struct {
 	Commit string `json:"commit"`
 }
 
-type ReleaseBranchCreatePipelineCommand struct {
-	AppName    string
-	BranchName string
-}
-
 type CodebaseBranchDTO struct {
 	AppName     string `json:"appName"`
 	BranchName  string `json:"branchName"`

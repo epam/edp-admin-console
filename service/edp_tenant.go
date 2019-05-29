@@ -37,10 +37,6 @@ var (
 	wildcard          = beego.AppConfig.String("dnsWildcard")
 )
 
-func (this EDPTenantService) GetEDPVersion() (string, error) {
-	return beego.AppConfig.String("edpVersion"), nil
-}
-
 func (edpService EDPTenantService) GetEDPComponents() map[string]string {
 	var compWithLinks = make(map[string]string, len(edpComponentNames))
 	for _, val := range edpComponentNames {

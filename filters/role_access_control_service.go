@@ -31,6 +31,7 @@ func init() {
 		"GET /api/v1/edp/cd-pipeline/([^/]*)$":               {administrator, developer},
 		"GET /api/v1/edp/cd-pipeline/([^/]*)/stage/([^/]*)$": {administrator, developer},
 		"POST /api/v1/edp/codebase$":                         {administrator},
+		"POST /api/v1/edp/cd-pipeline$":                      {administrator},
 	}
 }
 

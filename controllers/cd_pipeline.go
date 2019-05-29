@@ -22,15 +22,13 @@ import (
 	"edp-admin-console/service"
 	"fmt"
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/validation"
 	"log"
 	"net/http"
-	"regexp"
 )
 
 type CDPipelineController struct {
 	beego.Controller
-	AppService       service.CodebaseService
+	CodebaseService  service.CodebaseService
 	PipelineService  service.CDPipelineService
 	EDPTenantService service.EDPTenantService
 	BranchService    service.BranchService
@@ -41,7 +39,7 @@ const paramWaitingForCdPipeline = "waitingforcdpipeline"
 func (this *CDPipelineController) GetContinuousDeliveryPage() {
 	var activeStatus = "active"
 	var appType = "application"
-	applications, err := this.AppService.GetAllCodebases(models.CodebaseCriteria{
+	applications, err := this.CodebaseService.GetAllCodebases(models.CodebaseCriteria{
 		Status: &activeStatus,
 		Type:   &appType,
 	})
@@ -79,7 +77,7 @@ func (this *CDPipelineController) GetCreateCDPipelinePage() {
 	flash := beego.ReadFromRequest(&this.Controller)
 	var activeStatus = "active"
 	var appType = "application"
-	applicationsWithReleaseBranches, err := this.AppService.GetAllCodebasesWithReleaseBranches(models.CodebaseCriteria{
+	applicationsWithReleaseBranches, err := this.CodebaseService.GetAllCodebasesWithReleaseBranches(models.CodebaseCriteria{
 		Status: &activeStatus,
 		Type:   &appType,
 	})
@@ -104,7 +102,12 @@ func (this *CDPipelineController) CreateCDPipeline() {
 	pipelineName := this.GetString("pipelineName")
 	stages := retrieveStagesFromRequest(this)
 
-	errMsg := validateRequestData(appNameCheckboxes, pipelineName, stages)
+	cdPipelineCreateCommand := models.CDPipelineCreateCommand{
+		Name:         pipelineName,
+		Applications: convertApplicationWithBranchesData(this, appNameCheckboxes),
+		Stages:       stages,
+	}
+	errMsg := validateCDPipelineRequestData(cdPipelineCreateCommand)
 	if errMsg != nil {
 		log.Printf("Request data is not valid: %s", errMsg.Message)
 		flash.Error(errMsg.Message)
@@ -112,33 +115,17 @@ func (this *CDPipelineController) CreateCDPipeline() {
 		this.Redirect("/admin/edp/cd-pipeline/create", 302)
 		return
 	}
+	log.Printf("Request data is receieved to create CD pipeline: %s. Applications: %v. Stages: %v",
+		cdPipelineCreateCommand.Name, cdPipelineCreateCommand.Applications, cdPipelineCreateCommand.Stages)
 
-	releaseBranchCommands := convertRequestReleaseBranchData(appNameCheckboxes, this)
-	log.Printf("Request data is receieved to create CD pipelines: %s, with %s name", releaseBranchCommands, pipelineName)
-
-	cdPipeline, err := this.PipelineService.GetCDPipelineByName(pipelineName)
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
-	if cdPipeline != nil {
-		errMsg := fmt.Sprintf("CD Pipeline %s is already exists.", cdPipeline.Name)
-		log.Printf(errMsg)
-		flash.Error(errMsg)
-		flash.Store(&this.Controller)
-		this.Redirect("/admin/edp/cd-pipeline/create", 302)
-		return
-	}
-
-	_, err = this.PipelineService.CreatePipeline(pipelineName, releaseBranchCommands)
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
-	_, err = this.PipelineService.CreateStages(pipelineName, stages)
-	if err != nil {
+	_, pipelineErr := this.PipelineService.CreatePipeline(cdPipelineCreateCommand)
+	if pipelineErr != nil {
+		if pipelineErr.StatusCode == http.StatusFound {
+			flash.Error(pipelineErr.Message)
+			flash.Store(&this.Controller)
+			this.Redirect("/admin/edp/cd-pipeline/create", http.StatusFound)
+			return
+		}
 		this.Abort("500")
 		return
 	}
@@ -188,61 +175,15 @@ func retrieveStagesFromRequest(this *CDPipelineController) []models.StageCreate 
 	return stages
 }
 
-func convertRequestReleaseBranchData(appNameCheckboxes []string, this *CDPipelineController) []models.ReleaseBranchCreatePipelineCommand {
-	var releaseBranchCommands []models.ReleaseBranchCreatePipelineCommand
+func convertApplicationWithBranchesData(this *CDPipelineController, appNameCheckboxes []string) []models.ApplicationWithBranch {
+	var applicationWithBranches []models.ApplicationWithBranch
 	for _, appName := range appNameCheckboxes {
-		releaseBranchCommands = append(releaseBranchCommands, models.ReleaseBranchCreatePipelineCommand{
-			AppName:    appName,
-			BranchName: this.GetString(appName),
+		applicationWithBranches = append(applicationWithBranches, models.ApplicationWithBranch{
+			ApplicationName: appName,
+			BranchName:      this.GetString(appName),
 		})
 	}
-	return releaseBranchCommands
-}
-
-func validateRequestData(applications []string, pipelineName string, stages []models.StageCreate) *ErrMsg {
-	var errorMessage string
-
-	match, _ := regexp.MatchString("^[a-z0-9]([-a-z0-9]*[a-z0-9])$", pipelineName)
-	if !match {
-		pipelineErrMsg := "Pipeline name may contain only: lower-case letters, numbers, dots and dashes and cannot start and end with dash and dot. Can not be empty."
-		log.Println(pipelineErrMsg)
-		errorMessage = pipelineErrMsg
-	}
-
-	if len(applications) == 0 {
-		checkboxErrMsg := "At least one checkbox must be checked"
-		log.Println(checkboxErrMsg)
-		errorMessage += checkboxErrMsg
-	}
-
-	valid := validation.Validation{}
-
-	if len(stages) == 0 {
-		stageErrMsg := "At least one stage must be added"
-		log.Println(stageErrMsg)
-		errorMessage += stageErrMsg
-	} else {
-		for _, stage := range stages {
-			_, err := valid.Valid(stage)
-			if err != nil {
-				return &ErrMsg{"An internal error has occurred on server while validating stage's form fields.", http.StatusInternalServerError}
-			}
-
-			if valid.Errors != nil {
-				stageErrMsg := fmt.Sprintf("Stage %s is not valid", stage.Name)
-				log.Println(stageErrMsg)
-				errorMessage += stageErrMsg
-			}
-		}
-	}
-
-	if len(errorMessage) > 0 {
-		return &ErrMsg{
-			Message:    errorMessage,
-			StatusCode: http.StatusBadRequest,
-		}
-	}
-	return nil
+	return applicationWithBranches
 }
 
 func addCdPipelineInProgressIfAny(cdPipelines []models.CDPipelineView, pipelineInProgress string) []models.CDPipelineView {

@@ -17,8 +17,19 @@ type CDPipelineView struct {
 type StageCreate struct {
 	Name            string `json:"name" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
 	Description     string `json:"description" valid:"Required"`
-	StepName        string `json:"stepName" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
+	StepName        string `json:"stepName" valid:"Required;Match(/^[A-z0-9-._]/)"`
 	QualityGateType string `json:"qualityGateType" valid:"Required"`
 	TriggerType     string `json:"triggerType" valid:"Required"`
-	Order           int    `json:"order"`
+	Order           int    `json:"order" valid:"Match(/^[0-9]$/)"`
+}
+
+type CDPipelineCreateCommand struct {
+	Name         string                  `json:"name" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
+	Applications []ApplicationWithBranch `json:"applications" valid:"Required"`
+	Stages       []StageCreate           `json:"stages" valid:"Required"`
+}
+
+type ApplicationWithBranch struct {
+	ApplicationName string `json:"appName" valid:"Required;Match(/^[a-z][a-z0-9-]*[a-z0-9]$/)"`
+	BranchName      string `json:"branchName" valid:"Required;Match(/^[a-z0-9][a-z0-9-._]*[a-z0-9]$/)"`
 }
