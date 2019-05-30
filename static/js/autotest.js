@@ -165,14 +165,6 @@ function isGitDataValid() {
     return isValid;
 }
 
-function isFieldValid(elementToValidate, regex) {
-    let check = function (value) {
-        return regex.test(value);
-    };
-
-    return !(!elementToValidate.val() || !check(elementToValidate.val()));
-}
-
 function isApplicationCodeSelected() {
     let $languageCheckboxElems = $('.language input');
     let $appLanguageErrEl = $('.appLangError');

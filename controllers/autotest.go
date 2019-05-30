@@ -20,7 +20,7 @@ type AutotestController struct {
 	BranchService    service.BranchService
 }
 
-const paramWaitingForAutotest = "waitingforautotest"
+const paramWaitingForAutotest = "waitingforcodebase"
 const AutotestType = "autotests"
 
 func (this *AutotestController) CreateAutotest() {
@@ -53,7 +53,7 @@ func (this *AutotestController) CreateAutotest() {
 	log.Printf("Autotest object is saved into k8s: %s", createdObject)
 	flash.Success("Autotest object is created.")
 	flash.Store(&this.Controller)
-	this.Redirect(fmt.Sprintf("/admin/edp/autotest/overview?%s=%s#autotestSuccessModal", paramWaitingForAutotest, codebase.Name), 302)
+	this.Redirect(fmt.Sprintf("/admin/edp/autotest/overview?%s=%s#codebaseSuccessModal", paramWaitingForAutotest, codebase.Name), 302)
 }
 
 func logAutotestRequestData(autotest models.Codebase) {
@@ -187,11 +187,12 @@ func (this *AutotestController) GetAutotestsOverviewPage() {
 		return
 	}
 
-	this.Data["Autotests"] = codebases
+	this.Data["Codebases"] = codebases
 	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["HasRights"] = isAdmin(this.GetSession("realm_roles").([]string))
-	this.TplName = "autotest.html"
+	this.Data["Type"] = autotestType
+	this.TplName = "codebase.html"
 }
 
 func (this *AutotestController) GetAutotestOverviewPage() {

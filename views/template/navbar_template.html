@@ -1,12 +1,6 @@
 <nav class="navbar navbar-expand navbar-dark bg-dark flex-column flex-row align-items-start p-0">
     <div class="navbar-collapse">
         <ul class="flex-column flex-row navbar-nav w-100 justify-content-between">
-            {{/*<li class="nav-item color-light">
-                <a class="nav-link pl-0" href="#">
-                    <i class="icon-dashboard"></i>
-                    <span class="link-name">DASHBOARD</span>
-                </a>
-            </li>*/}}
             <li class="nav-item">
                 <a class="nav-link pl-0" href="/admin/edp/cd-pipeline/overview">
                     <i class="icon-continuous_delivery"></i>
@@ -20,7 +14,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link pl-0" href="/cockpit-redirect-confirmation?edpTenant={{.EDPTenantName}}&anchor=service">
+                <a class="nav-link pl-0"
+                   href="/cockpit-redirect-confirmation?edpTenant={{.EDPTenantName}}&anchor=service">
                     <i class="icon-services"></i>
                     <span class="link-name">SERVICES</span>
                 </a>
@@ -29,6 +24,12 @@
                 <a class="nav-link pl-0" href="/admin/edp/autotest/overview">
                     <i class="icon-autotest"></i>
                     <span class="link-name">AUTOTESTS</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link pl-0" href="/admin/edp/library/overview">
+                    <i class="icon-apps"></i>
+                    <span class="link-name">LIBRARY</span>
                 </a>
             </li>
         </ul>

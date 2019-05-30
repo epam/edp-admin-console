@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="/static/css/index.css">
-    <link rel="stylesheet" href="/static/css/application-overview.css">
+    <link rel="stylesheet" href="/static/css/codebase-list.css">
 </head>
 <body>
 <main>
@@ -16,17 +16,35 @@
             {{template "template/navbar_template.html" .}}
         </aside>
         <div class="flex-fill pl-3 pr-3 wrapper">
-            {{if .Autotests}}
+            {{if .Codebases}}
                 <div class="d-flex edp-controls">
                     <div class="flex-fill">
-                        <h1>AUTOTESTS</h1>
+                        <h1>
+                            {{if eq .Type "application"}}
+                                Applications
+                            {{else if eq .Type "autotests"}}
+                                Autotests
+                            {{else}}
+                                Libraries
+                            {{end}}
+                        </h1>
                     </div>
                     {{if .HasRights}}
                         <div class="flex-fill">
                             <div class="float-right">
-                                <a href="/admin/edp/autotest/create">
-                                    <button class="btn btn-success">ADD AUTOTEST</button>
-                                </a>
+                                {{if eq .Type "application"}}
+                                    <a href="/admin/edp/application/create">
+                                        <button class="btn btn-success">CREATE APPLICATION</button>
+                                    </a>
+                                {{else if eq .Type "autotests"}}
+                                    <a href="/admin/edp/autotest/create">
+                                        <button class="btn btn-success">ADD AUTOTEST</button>
+                                    </a>
+                                {{else}}
+                                    <a href="/admin/edp/library/create">
+                                        <button class="btn btn-success">ADD LIBRARY</button>
+                                    </a>
+                                {{end}}
                             </div>
                         </div>
                     {{end}}
@@ -38,17 +56,17 @@
                         <th scope="col">Name</th>
                         <th scope="col">Language</th>
                         <th scope="col">Build Tool</th>
-                        <th scope="col"></th>
                     </tr>
                     </thead>
                     <tbody>
-                    {{range .Autotests}}
-                        <tr data-autotest-name="{{.Name}}" data-autotest-status="{{.Status}}">
-                            <td>
+
+                    {{range .Codebases}}
+                        <tr data-codebase-name="{{.Name}}" data-codebase-status="{{.Status}}">
+                            <td class="codebase-status" data-status="{{.Status}}">
                                 <img src="{{if eq .Status "created"}}/static/img/green_circle.svg{{else if eq .Status "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}"
                                      alt="" style="width:25px; height:25px;">
                             </td>
-                            <td class="autotest-name">
+                            <td class="codebase-name">
                                 <a href="/admin/edp/codebase/{{.Name}}/overview"
                                    class="{{if ne .Status "created"}}disabled{{end}}">
                                     {{.Name}}
@@ -56,35 +74,41 @@
                             </td>
                             <td>{{.Language}}</td>
                             <td>{{.BuildTool}}</td>
-                            <td>
-                                <button class="delete" data-toggle="modal" data-target="#exampleModal">
-                                    <i class="icon-trashcan"></i>
-                                </button>
-                            </td>
                         </tr>
                     {{end}}
                     </tbody>
                 </table>
             {{else}}
-                <div class="no-tenant no-app-message">
-                    <h1>Looks like there're not any autotests.</h1>
+                <div class="no-tenant no-codebase-message">
+                    <h1>Looks like there're not
+                        any {{if eq .Type "application"}}applications{{else if eq .Type "autotests"}}autotests{{else}}libraries{{end}}
+                        .</h1>
                     {{if .HasRights}}
-                        <a href="/admin/edp/autotest/create">
-                            <button class="btn btn-success">CREATE AUTOTEST</button>
-                        </a>
+                        {{if eq .Type "application"}}
+                            <a href="/admin/edp/application/create">
+                                <button class="btn btn-success">CREATE APPLICATION</button>
+                            </a>
+                        {{else if eq .Type "autotests"}}
+                            <a href="/admin/edp/autotest/create">
+                                <button class="btn btn-success">ADD AUTOTEST</button>
+                            </a>
+                        {{else}}
+                            <a href="/admin/edp/library/create">
+                                <button class="btn btn-success">ADD LIBRARY</button>
+                            </a>
+                        {{end}}
                     {{else}}
                         <p class="no-rights-msg">Please, contact EDP support team.</p>
                     {{end}}
                 </div>
             {{end}}
-
         </div>
     </section>
     {{template "template/footer_template.html" .}}
 
     <!-- Modal success -->
     <div class="modal fade" id="successPopup" tabindex="-1" role="dialog" aria-labelledby="successPopupLabel"
-         aria-hidden="true" data-backdrop="static" data-keyboard="false">
+         aria-hidden="true" data-display="{{ if .Success }}true{{ else }}false{{ end }}">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -107,6 +131,6 @@
 <script src="/static/js/popper.js"></script>
 <script src="/static/js/bootstrap.js"></script>
 <script src="/static/js/util.js"></script>
-<script src="/static/js/autotest-overview.js"></script>
+<script src="/static/js/codebase-overview.js"></script>
 </body>
 </html>
