@@ -27,7 +27,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
 	"log"
-	"net/http"
 	"sort"
 	"strings"
 	"time"
@@ -47,51 +46,33 @@ type ErrMsg struct {
 
 const OpenshiftProjectLink = "https://master.delivery.aws.main.edp.projects.epam.com/console/project/"
 
-func (this *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCreateCommand) (*k8s.CDPipeline, *ErrMsg) {
+func (this *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCreateCommand) (*k8s.CDPipeline, error) {
 	log.Printf("Start creating CD Pipeline: %v", cdPipeline)
 
-	canCreate, err := checkConditionToCreateCDPipeline(this.CodebaseService, this.BranchService)
-	if err != nil {
-		return nil, &ErrMsg{
-			Message: err.Error(),
-		}
-	}
-	log.Printf("An opportunity to create CD Pipeline: %v.", canCreate)
-
-	if !canCreate {
-		return nil, &ErrMsg{
-			Message:    "There're not ready applications or related branches",
-			StatusCode: http.StatusLocked,
-		}
+	relationErr := checkRelationBetweenApplicationAndBranch(this.CodebaseService, cdPipeline.Applications)
+	if relationErr != nil {
+		return nil, relationErr
 	}
 
 	cdPipelineReadModel, err := this.GetCDPipelineByName(cdPipeline.Name)
 	if err != nil {
-		return nil, &ErrMsg{
-			Message: err.Error(),
-		}
+		return nil, err
 	}
 
 	if cdPipelineReadModel != nil {
 		log.Printf("CD Pipeline %s is already exists in DB.", cdPipeline.Name)
-		return nil, &ErrMsg{
-			Message:    fmt.Sprintf("CD Pipeline %s is already exists.", cdPipeline.Name),
-			StatusCode: http.StatusFound,
-		}
+		return nil, models.ErrCDPipelineIsExists
 	}
 
 	edpRestClient := this.Clients.EDPRestClient
 	pipelineCR, err := getCDPipelineCR(edpRestClient, cdPipeline.Name, context.Namespace)
 	if err != nil {
-		return nil, &ErrMsg{}
+		return nil, err
 	}
 
 	if pipelineCR != nil {
 		log.Printf("CD Pipeline %s is already exists in k8s.", cdPipeline.Name)
-		return nil, &ErrMsg{
-			Message:    fmt.Sprintf("CD Pipeline %s is already exists.", cdPipeline.Name),
-			StatusCode: 302,
-		}
+		return nil, models.ErrCDPipelineIsExists
 	}
 
 	crd := &k8s.CDPipeline{
@@ -115,44 +96,32 @@ func (this *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCreate
 
 	if err != nil {
 		log.Printf("An error has occurred while creating CD Pipeline object in k8s: %s", err)
-		return nil, &ErrMsg{
-			Message: err.Error(),
-		}
+		return nil, err
 	}
 	log.Printf("Pipeline CR %v is saved into k8s", cdPipeline)
 
 	_, err = this.CreateStages(edpRestClient, cdPipeline)
 	if err != nil {
 		log.Printf("An error has occurred while creating Stages in k8s: %s", err)
-		return nil, &ErrMsg{
-			Message: err.Error(),
-		}
+		return nil, err
 	}
 	log.Printf("Stages for CD Pipeline %s were created in k8s: %v", cdPipeline.Name, cdPipeline.Stages)
 
 	return cdPipelineCr, nil
 }
 
-func checkConditionToCreateCDPipeline(codebaseService CodebaseService, branchService BranchService) (bool, error) {
-	var activeStatus = "active"
-	var codebaseType = "application"
+func checkRelationBetweenApplicationAndBranch(codebaseService CodebaseService, applications []models.ApplicationWithBranch) error {
+	for _, application := range applications {
+		codebase, err := codebaseService.GetCodebaseByCodebaseAndBranchNames(application.ApplicationName, application.BranchName)
+		if err != nil {
+			return err
+		}
 
-	codebases, err := codebaseService.GetAllCodebases(models.CodebaseCriteria{
-		Status: &activeStatus,
-		Type:   &codebaseType,
-	})
-	if err != nil {
-		return false, err
+		if codebase == nil {
+			return models.ErrNonValidRelatedBranch
+		}
 	}
-
-	branches, err := branchService.GetAllReleaseBranches(models.BranchCriteria{
-		Status: &activeStatus,
-	})
-	if err != nil {
-		return false, err
-	}
-
-	return len(codebases) > 0 && len(branches) > 0, nil
+	return nil
 }
 
 func (this *CDPipelineService) GetCDPipelineByName(pipelineName string) (*models.CDPipelineDTO, error) {

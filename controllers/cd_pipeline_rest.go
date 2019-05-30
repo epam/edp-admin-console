@@ -85,15 +85,14 @@ func (this *CDPipelineRestController) CreateCDPipeline() {
 
 	_, pipelineErr := this.CDPipelineService.CreatePipeline(cdPipelineCreateCommand)
 	if pipelineErr != nil {
-		if pipelineErr.StatusCode == http.StatusFound {
-			http.Error(this.Ctx.ResponseWriter, pipelineErr.Message, http.StatusFound)
+		if pipelineErr == models.ErrCDPipelineIsExists {
+			http.Error(this.Ctx.ResponseWriter, fmt.Sprintf("cd pipeline %v is already exists", cdPipelineCreateCommand.Name), http.StatusFound)
 			return
 		}
-		if pipelineErr.StatusCode == http.StatusLocked {
-			http.Error(this.Ctx.ResponseWriter, pipelineErr.Message, http.StatusLocked)
+		if pipelineErr == models.ErrNonValidRelatedBranch {
+			http.Error(this.Ctx.ResponseWriter, fmt.Sprintf("one or more applications have non valid branches: %v", cdPipelineCreateCommand.Applications), http.StatusBadRequest)
 			return
 		}
-
 		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -120,10 +120,16 @@ func (this *CDPipelineController) CreateCDPipeline() {
 
 	_, pipelineErr := this.PipelineService.CreatePipeline(cdPipelineCreateCommand)
 	if pipelineErr != nil {
-		if pipelineErr.StatusCode == http.StatusFound {
-			flash.Error(pipelineErr.Message)
+		if pipelineErr == models.ErrCDPipelineIsExists {
+			flash.Error(fmt.Sprintf("cd pipeline %v is already exists", cdPipelineCreateCommand.Name))
 			flash.Store(&this.Controller)
 			this.Redirect("/admin/edp/cd-pipeline/create", http.StatusFound)
+			return
+		}
+		if pipelineErr == models.ErrNonValidRelatedBranch {
+			flash.Error(fmt.Sprintf("one or more applications have non valid branches: %v", cdPipelineCreateCommand.Applications))
+			flash.Store(&this.Controller)
+			this.Redirect("/admin/edp/cd-pipeline/create", http.StatusBadRequest)
 			return
 		}
 		this.Abort("500")

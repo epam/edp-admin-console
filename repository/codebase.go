@@ -28,6 +28,7 @@ type ICodebaseEntityRepository interface {
 	GetAllCodebases(filterCriteria models.CodebaseCriteria) ([]models.CodebaseView, error)
 	GetCodebase(codebaseName string) (*models.CodebaseDetailInfo, error)
 	GetAllCodebasesWithReleaseBranches(criteria models.CodebaseCriteria) ([]models.CodebaseWithReleaseBranch, error)
+	GetCodebaseByCodebaseAndBranchNames(codebaseName, branchName string) (*models.CodebaseView, error)
 }
 
 const (
@@ -56,6 +57,15 @@ const (
 		"       left join action_log al on cal.action_log_id = al.id " +
 		"where cb.name = ? " +
 		"order by al.updated_at desc limit 1;"
+	SelectCodebaseByNameAndBranchName = "select c.name, cb.name branch_name, c.language, c.build_tool, c.status, al.event branch_status " +
+		"from codebase c " +
+		"		left join codebase_branch cb on c.id = cb.codebase_id " +
+		" 		left join codebase_branch_action_log cbal on cb.id = cbal.codebase_branch_id " +
+		"		left join action_log al on cbal.action_log_id = al.id " +
+		"where c.name = ? " +
+		"  and cb.name = ? " +
+		"  and status = 'active'" +
+		"  and al.event = 'created';"
 )
 
 type CodebaseEntityRepository struct {
@@ -207,4 +217,20 @@ func getCodebase(codebases []models.CodebaseWithReleaseBranch, codebaseName stri
 		}
 	}
 	return nil, nil
+}
+
+func (this CodebaseEntityRepository) GetCodebaseByCodebaseAndBranchNames(codebaseName, branchName string) (*models.CodebaseView, error) {
+	o := orm.NewOrm()
+	var codebase models.CodebaseView
+
+	err := o.Raw(SelectCodebaseByNameAndBranchName, codebaseName, branchName).QueryRow(&codebase)
+	if err != nil {
+		if err == orm.ErrNoRows {
+			log.Printf("Codebase entity wasn't found with %v codebase and %v branch names", codebaseName, branchName)
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &codebase, nil
 }

@@ -261,3 +261,14 @@ func convertData(codebase models.Codebase) k8s.CodebaseSpec {
 
 	return spec
 }
+
+func (this CodebaseService) GetCodebaseByCodebaseAndBranchNames(codebaseName, branchName string) (*models.CodebaseView, error) {
+	codebase, err := this.ICodebaseRepository.GetCodebaseByCodebaseAndBranchNames(codebaseName, branchName)
+	if err != nil {
+		log.Printf("An error has occurred while getting codebase object %s from database: %s", codebaseName, err)
+		return nil, err
+	}
+	log.Printf("Fetched codebase info: %+v", codebase)
+
+	return codebase, nil
+}
