@@ -113,44 +113,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card status-info">
-                        <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
-                             data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link" type="button">
-                                    Status info
-                                </button>
-                            </h5>
-                        </div>
-                        <div id="collapseTwo" class="collapse status" aria-labelledby="headingTwo"
-                             data-parent="#accordionCreateApplication">
-                            <div class="card-body">
-                                <div class="form-check">
-                                    <table class="edp-table">
-                                        <thead>
-                                        <tr>
-                                            <th scope="col">Message</th>
-                                            <th scope="col">Last Time Update</th>
-                                            <th scope="col">Username</th>
-                                            <th scope="col">Status</th>
-                                            <th scope="col">Available</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td>{{.Codebase.Message}}</td>
-                                            <td>{{.Codebase.LastTimeUpdate}}</td>
-                                            <td>{{.Codebase.UserName}}</td>
-                                            <td class="app-status"
-                                                data-status="{{.Codebase.Status}}">{{.Codebase.Status}}</td>
-                                            <td>{{.Codebase.Available}}</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
 
                     {{if ne (len .ReleaseBranches) 0}}
                         <div class="card">
@@ -205,6 +168,46 @@
                             class="modal-release-branch btn btn-primary {{if ne .Codebase.Status "created"}}button-disabled{{end}}"
                             aria-controls="">Create New Branch
                     </button>
+
+                    <div class="card status-info">
+                        <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
+                             data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" type="button">
+                                    Status info
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseTwo" class="collapse status" aria-labelledby="headingTwo"
+                             data-parent="#accordionCreateApplication">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <table class="edp-table">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">User</th>
+                                            <th scope="col">Action</th>
+                                            <th scope="col">Result</th>
+                                            <th scope="col">Message</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {{range .Codebase.ActionLog}}
+                                            <tr>
+                                                <td>{{date .LastTimeUpdate "d.m.Y H:m:s"}}</td>
+                                                <td>{{.UserName}}</td>
+                                                <td>{{.Action}}</td>
+                                                <td>{{.Result}}</td>
+                                                <td>{{.Message}}</td>
+                                            </tr>
+                                        {{end}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

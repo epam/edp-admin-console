@@ -32,31 +32,6 @@ type ICodebaseEntityRepository interface {
 }
 
 const (
-	SelectCodebase = "select cb.name, " +
-		"       cb.type              as cb_type, " +
-		"       al.event             as status_name, " +
-		"       cb.language, " +
-		"       cb.build_tool, " +
-		"       cb.framework, " +
-		"       cb.strategy, " +
-		"       cb.status            as available, " +
-		"       cb.repository_url    as git_url, " +
-		"       cb.route_site, " +
-		"       cb.route_path, " +
-		"       cb.database_kind     as db_kind, " +
-		"       cb.database_version  as db_version, " +
-		"       cb.database_capacity as db_capacity, " +
-		"       cb.database_storage  as db_storage, " +
-		"       cb.test_report_framework  as test_report_framework, " +
-		"       cb.description  	 as description, " +
-		"       al.username          as user_name, " +
-		"       al.detailed_message  as message, " +
-		"       al.updated_at        as last_time_update " +
-		"from codebase cb " +
-		"       left join codebase_action_log cal on cb.id = cal.codebase_id " +
-		"       left join action_log al on cal.action_log_id = al.id " +
-		"where cb.name = ? " +
-		"order by al.updated_at desc limit 1;"
 	SelectCodebaseByNameAndBranchName = "select c.name, cb.name branch_name, c.language, c.build_tool, c.status, al.event branch_status " +
 		"from codebase c " +
 		"		left join codebase_branch cb on c.id = cb.codebase_id " +
@@ -101,72 +76,21 @@ func (this CodebaseEntityRepository) GetAllCodebases(filterCriteria models.Codeb
 
 func (this CodebaseEntityRepository) GetCodebase(codebaseName string) (*models.CodebaseDetailInfo, error) {
 	o := orm.NewOrm()
-	var codebase models.CodebaseDetailInfo
-	var maps []orm.Params
+	codebase := models.CodebaseDetailInfo{Name: codebaseName}
 
-	_, err := o.Raw(SelectCodebase, codebaseName).Values(&maps)
+	err := o.Read(&codebase, "Name")
+
+	if err == orm.ErrNoRows {
+		return nil, nil
+	}
 
 	if err != nil {
 		return nil, err
 	}
 
-	if maps == nil {
-		return nil, nil
-	}
+	_, err = o.LoadRelated(&codebase, "ActionLog")
+	codebase.Available = codebase.Status == "active"
 
-	for _, row := range maps {
-		codebase = models.CodebaseDetailInfo{
-			Name:      row["name"].(string),
-			Type:      row["cb_type"].(string),
-			Status:    row["status_name"].(string),
-			Language:  row["language"].(string),
-			BuildTool: row["build_tool"].(string),
-			Strategy:  row["strategy"].(string),
-		}
-
-		if row["user_name"] != nil {
-			codebase.UserName = row["user_name"].(string)
-		}
-		if row["message"] != nil {
-			codebase.Message = row["message"].(string)
-		}
-
-		codebase.LastTimeUpdate = formatUnixTimestamp(row["last_time_update"].(string))
-
-		codebase.Available = row["available"] == "active"
-
-		if row["git_url"] != nil {
-			codebase.GitUrl = row["git_url"].(string)
-		}
-
-		if row["route_site"] != nil {
-			codebase.RouteSite = row["route_site"].(string)
-		}
-
-		if row["route_path"] != nil {
-			codebase.RoutePath = row["route_path"].(string)
-		}
-
-		if row["db_kind"] != nil && row["db_version"] != nil && row["db_capacity"] != nil && row["db_storage"] != nil {
-			codebase.DbKind = row["db_kind"].(string)
-			codebase.DbVersion = row["db_version"].(string)
-			codebase.DbCapacity = row["db_capacity"].(string)
-			codebase.DbStorage = row["db_storage"].(string)
-		}
-
-		if row["test_report_framework"] != nil {
-			codebase.TestReportFramework = row["test_report_framework"].(string)
-		}
-
-		if row["framework"] != nil {
-			codebase.Framework = row["framework"].(string)
-		}
-
-		if row["description"] != nil {
-			codebase.Description = row["description"].(string)
-		}
-
-	}
 	return &codebase, nil
 }
 

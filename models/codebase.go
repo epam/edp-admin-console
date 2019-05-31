@@ -16,6 +16,10 @@
 
 package models
 
+import (
+	"time"
+)
+
 type Codebase struct {
 	Name                string      `json:"name" valid:"Required;Match(/^[a-z][a-z0-9-]*[a-z0-9]$/)"`
 	Strategy            string      `json:"strategy"`
@@ -63,27 +67,43 @@ type CodebaseView struct {
 }
 
 type CodebaseDetailInfo struct {
-	Name                string `json:"name"`
-	Language            string `json:"language"`
-	BuildTool           string `json:"build_tool"`
-	Framework           string `json:"framework"`
-	Strategy            string `json:"strategy"`
-	GitUrl              string `json:"git_url"`
-	RouteSite           string `json:"route_site"`
-	RoutePath           string `json:"route_path"`
-	DbKind              string `json:"db_kind"`
-	DbVersion           string `json:"db_version"`
-	DbCapacity          string `json:"db_capacity"`
-	DbStorage           string `json:"db_storage"`
-	DelitionTime        string `json:"delition_time"`
-	Type                string `json:"type"`
-	Status              string `json:"status"`
-	LastTimeUpdate      string `json:"last_time_update"`
-	UserName            string `json:"user_name"`
-	Available           bool   `json:"available"`
-	Message             string `json:"message"`
-	TestReportFramework string `json:"testReportFramework"`
-	Description         string `json:"description"`
+	Id                  int          `json:"id" orm:"column(id)"`
+	Name                string       `json:"name" orm:"column(name)"`
+	Language            string       `json:"language" orm:"column(language)"`
+	BuildTool           string       `json:"build_tool" orm:"column(build_tool)"`
+	Framework           string       `json:"framework" orm:"column(framework)"`
+	Strategy            string       `json:"strategy" orm:"column(strategy)"`
+	GitUrl              string       `json:"git_url" orm:"column(repository_url)"`
+	RouteSite           string       `json:"route_site" orm:"column(route_site)"`
+	RoutePath           string       `json:"route_path" orm:"column(route_path)"`
+	DbKind              string       `json:"db_kind" orm:"column(database_kind)"`
+	DbVersion           string       `json:"db_version" orm:"column(database_version)"`
+	DbCapacity          string       `json:"db_capacity" orm:"column(database_capacity)"`
+	DbStorage           string       `json:"db_storage" orm:"column(database_storage)"`
+	DelitionTime        string       `json:"delition_time" orm:"-"`
+	Type                string       `json:"type" orm:"column(type)"`
+	Status              string       `json:"status" orm:"column(status)"`
+	Available           bool         `json:"available" orm:"-"`
+	TestReportFramework string       `json:"testReportFramework" orm:"column(test_report_framework)"`
+	Description         string       `json:"description" orm:"column(description)"`
+	ActionLog           []*ActionLog `json:"action_log" orm:"rel(m2m);rel_table(codebase_action_log)"`
+}
+
+func (c *CodebaseDetailInfo) TableName() string {
+	return "codebase"
+}
+
+type ActionLog struct {
+	Id             int       `json:"id" orm:"column(id)"`
+	LastTimeUpdate time.Time `json:"last_time_update" orm:"column(updated_at)"`
+	UserName       string    `json:"user_name" orm:"column(username)"`
+	Message        string    `json:"message" orm:"column(detailed_message)"`
+	Action         string    `json:"action" orm:"column(action_message)"`
+	Result         string    `json:"result" orm:"column(result)"`
+}
+
+func (a *ActionLog) TableName() string {
+	return "action_log"
 }
 
 type CodebaseWithReleaseBranch struct {
