@@ -231,6 +231,7 @@ func extractApplicationRequestData(this *ApplicationController) models.Codebase 
 			Storage:  this.GetString("dbPersistentStorage"),
 		}
 	}
+	codebase.Username = this.Ctx.Input.Session("username").(string)
 	return codebase
 }
 

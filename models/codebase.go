@@ -34,6 +34,7 @@ type Codebase struct {
 	Database            *Database   `json:"database,omitempty"`
 	Vcs                 *Vcs        `json:"vcs,omitempty"`
 	Description         *string     `json:"description,omitempty"`
+	Username            string      `json:"username"`
 }
 
 type Repository struct {

@@ -84,6 +84,7 @@ func (this CodebaseService) CreateCodebase(codebase models.Codebase) (*k8s.Codeb
 			Available:       false,
 			LastTimeUpdated: time.Now(),
 			Status:          "initialized",
+			Username:        codebase.Username,
 		},
 	}
 	log.Printf("CR was generated : %v. Waiting to save ...", crd)
@@ -103,7 +104,8 @@ func (this CodebaseService) CreateCodebase(codebase models.Codebase) (*k8s.Codeb
 	}
 
 	_, err = this.BranchService.CreateReleaseBranch(models.ReleaseBranchCreateCommand{
-		Name: "master",
+		Name:     "master",
+		Username: codebase.Username,
 	}, codebase.Name)
 	if err != nil {
 		log.Printf("Error has been occurred during the master branch creation: %v", err)

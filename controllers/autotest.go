@@ -112,7 +112,7 @@ func extractAutotestRequestData(this *AutotestController) models.Codebase {
 			Password: vcsPassword,
 		}
 	}
-
+	codebase.Username = this.Ctx.Input.Session("username").(string)
 	return codebase
 }
 

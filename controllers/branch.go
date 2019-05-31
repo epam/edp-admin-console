@@ -50,8 +50,9 @@ func (this *BranchController) CreateReleaseBranch() {
 
 func extractReleaseBranchRequestData(this *BranchController) models.ReleaseBranchCreateCommand {
 	return models.ReleaseBranchCreateCommand{
-		Name:   this.GetString("name"),
-		Commit: this.GetString("commit"),
+		Name:     this.GetString("name"),
+		Commit:   this.GetString("commit"),
+		Username: this.Ctx.Input.Session("username").(string),
 	}
 }
 

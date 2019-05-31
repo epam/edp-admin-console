@@ -66,6 +66,7 @@ func (this *BranchService) CreateReleaseBranch(branchInfo models.ReleaseBranchCr
 		Status: k8s.CodebaseBranchStatus{
 			Status:          "initialized",
 			LastTimeUpdated: time.Now(),
+			Username:        branchInfo.Username,
 		},
 	}
 
