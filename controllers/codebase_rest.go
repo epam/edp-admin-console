@@ -90,7 +90,8 @@ func (this *CodebaseRestController) GetCodebase() {
 func (this *CodebaseRestController) CreateCodebase() {
 	var codebase models.Codebase
 	err := json.NewDecoder(this.Ctx.Request.Body).Decode(&codebase)
-	codebase.Username = this.Ctx.Input.Session("username").(string)
+	usr, _ := this.Ctx.Input.Session("username").(string)
+	codebase.Username = usr
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return

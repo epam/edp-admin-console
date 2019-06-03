@@ -120,5 +120,5 @@ func getUserInfoFromToken(context *bgCtx.Context, token *oidc.IDToken) string {
 		log.Printf("Error has been occurred during the parsing token %+v", token)
 		context.Abort(200, "500")
 	}
-	return strings.Replace(string(*claim["name"]), "\"", "", -1)
+	return strings.Replace(string(*claim["preferred_username"]), "\"", "", -1)
 }

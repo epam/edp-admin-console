@@ -53,8 +53,10 @@ func AuthRestFilter(context *bgCtx.Context) {
 	log.Printf("Roles %s has been retrieved from the token", realmRoles)
 	resourceRoles := getResourceAccessValues(context, idToken)
 	log.Printf("ResourceAccess %s has been retrieved from the token", resourceRoles)
+	usr := getUserInfoFromToken(context, idToken)
 	context.Output.Session("resource_access", resourceRoles)
 	context.Output.Session("realm_roles", realmRoles)
+	context.Output.Session("username", usr)
 }
 
 func tryToRemoveBearerPrefix(token string) (string, error) {
