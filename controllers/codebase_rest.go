@@ -42,6 +42,12 @@ type ErrMsg struct {
 	StatusCode int
 }
 
+var codebaseTypes = map[string]string{
+	"application": "",
+	"autotests":   "",
+	"library":     "",
+}
+
 func (this *CodebaseRestController) GetCodebases() {
 	criteria, err := getFilterCriteria(this)
 	if err != nil {
@@ -59,9 +65,16 @@ func (this *CodebaseRestController) GetCodebases() {
 	this.ServeJSON()
 }
 
+func isTypeAcceptable(getParam string) bool {
+	if _, ok := codebaseTypes[getParam]; ok {
+		return true
+	}
+	return false
+}
+
 func getFilterCriteria(this *CodebaseRestController) (*models.CodebaseCriteria, error) {
 	codebaseType := this.GetString("type")
-	if codebaseType == "application" || codebaseType == "autotests" || codebaseType == "" {
+	if codebaseType == "" || isTypeAcceptable(codebaseType) {
 		return &models.CodebaseCriteria{
 			Type: &codebaseType,
 		}, nil
@@ -164,18 +177,18 @@ func validRequestData(codebase models.Codebase) *ErrMsg {
 		resErr = err
 	}
 
-	if codebase.Type != "autotests" && codebase.Type != "application" {
-		err := &validation.Error{Key: "repository", Message: "codebase type should be: autotests or application"}
+	if !isTypeAcceptable(codebase.Type) {
+		err := &validation.Error{Key: "repository", Message: "codebase type should be: application, autotests  or library"}
+		valid.Errors = append(valid.Errors, err)
+	}
+
+	if codebase.Type == "autotests" && codebase.Strategy != "clone" {
+		err := &validation.Error{Key: "repository", Message: "strategy for autotests must be 'clone'"}
 		valid.Errors = append(valid.Errors, err)
 	}
 
 	if codebase.Type == "autotests" && codebase.Repository == nil {
-		err := &validation.Error{Key: "repository", Message: "can't be null"}
-		valid.Errors = append(valid.Errors, err)
-	}
-
-	if codebase.Type == "autotests" && codebase.Strategy == "create" {
-		err := &validation.Error{Key: "repository", Message: "strategy must be 'clone'"}
+		err := &validation.Error{Key: "repository", Message: "repository for autotests can't be null"}
 		valid.Errors = append(valid.Errors, err)
 	}
 
