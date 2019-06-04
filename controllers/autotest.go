@@ -20,7 +20,6 @@ type AutotestController struct {
 	BranchService    service.BranchService
 }
 
-const paramWaitingForAutotest = "waitingforcodebase"
 const AutotestType = "autotests"
 
 func (this *AutotestController) CreateAutotest() {
@@ -53,7 +52,7 @@ func (this *AutotestController) CreateAutotest() {
 	log.Printf("Autotest object is saved into k8s: %s", createdObject)
 	flash.Success("Autotest object is created.")
 	flash.Store(&this.Controller)
-	this.Redirect(fmt.Sprintf("/admin/edp/autotest/overview?%s=%s#codebaseSuccessModal", paramWaitingForAutotest, codebase.Name), 302)
+	this.Redirect(fmt.Sprintf("/admin/edp/autotest/overview?%s=%s#codebaseSuccessModal", paramWaitingForCodebase, codebase.Name), 302)
 }
 
 func logAutotestRequestData(autotest models.Codebase) {
@@ -181,7 +180,7 @@ func (this *AutotestController) GetAutotestsOverviewPage() {
 	codebases, err := this.CodebaseService.GetAllCodebases(models.CodebaseCriteria{
 		Type: &autotestType,
 	})
-	codebases = addCodebaseInProgressIfAny(codebases, this.GetString(paramWaitingForAutotest))
+	codebases = addCodebaseInProgressIfAny(codebases, this.GetString(paramWaitingForCodebase))
 	if err != nil {
 		this.Abort("500")
 		return

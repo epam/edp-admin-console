@@ -51,15 +51,15 @@ func (this CodebaseService) CreateCodebase(codebase models.Codebase) (*k8s.Codeb
 		return nil, err
 	}
 
+	if codebaseCr != nil {
+		log.Printf("Codebase %s is already exists in k8s.", codebaseCr.Name)
+		return nil, errors.New("CODEBASE_ALREADY_EXISTS")
+	}
+
 	codebaseDb, err := this.GetCodebase(codebase.Name)
 	if err != nil {
 		log.Printf("An error has occurred while fetching Codebase entity from DB: %s", codebase.Name)
 		return nil, err
-	}
-
-	if codebaseCr != nil {
-		log.Printf("Codebase %s is already exists in k8s.", codebaseCr.Name)
-		return nil, errors.New("CODEBASE_ALREADY_EXISTS")
 	}
 
 	if codebaseDb != nil {

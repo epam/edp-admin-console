@@ -210,9 +210,7 @@ $(function () {
         if (isApplicationFieldValid && isLanguageSelected
             && (isGitValid && isRepoLoginValid && isRepoPasswordValid)
             && isVcsBlockValid) {
-            console.log("VALID");
-        } else {
-            console.log("NON VALID");
+            $('#createLibrary').submit();
         }
     });
 

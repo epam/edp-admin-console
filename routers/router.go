@@ -69,8 +69,9 @@ func init() {
 		beego.NSRouter("/codebase/:codebaseName/overview", &controllers.CodebaseController{CodebaseService: codebaseService, EDPTenantService: edpService, BranchService: branchService}, "get:GetCodebaseOverviewPage"),
 		beego.NSRouter("/codebase/:codebaseName/branch", &controllers.BranchController{BranchService: branchService}, "post:CreateReleaseBranch"),
 
-		beego.NSRouter("/library/overview", &controllers.LibraryController{EDPTenantService: edpService}, "get:GetLibraryListPage"),
-		beego.NSRouter("/library/create", &controllers.LibraryController{EDPTenantService: edpService}, "get:GetCreatePage"),
+		beego.NSRouter("/library/overview", &controllers.LibraryController{EDPTenantService: edpService, CodebaseService: codebaseService}, "get:GetLibraryListPage"),
+		beego.NSRouter("/library/create", &controllers.LibraryController{EDPTenantService: edpService, CodebaseService: codebaseService}, "get:GetCreatePage"),
+		beego.NSRouter("/library", &controllers.LibraryController{EDPTenantService: edpService, CodebaseService: codebaseService}, "post:Create"),
 	)
 	beego.AddNamespace(adminEdpNamespace)
 
