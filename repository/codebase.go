@@ -39,7 +39,7 @@ const (
 		"		left join action_log al on cbal.action_log_id = al.id " +
 		"where c.name = ? " +
 		"  and cb.name = ? " +
-		"  and status = 'active'" +
+		"  and c.status = 'active'" +
 		"  and al.event = 'created';"
 )
 
