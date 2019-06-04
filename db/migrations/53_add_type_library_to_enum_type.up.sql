@@ -1,0 +1,1 @@
+alter type codebase_type add value 'library';
