@@ -87,6 +87,7 @@ func (this CodebaseService) CreateCodebase(codebase models.Codebase) (*k8s.Codeb
 			Username:        codebase.Username,
 			Action:          "codebase_registration",
 			Result:          "success",
+			Value:           "inactive",
 		},
 	}
 	log.Printf("CR was generated : %v. Waiting to save ...", crd)
