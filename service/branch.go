@@ -69,6 +69,7 @@ func (this *BranchService) CreateReleaseBranch(branchInfo models.ReleaseBranchCr
 			Username:        branchInfo.Username,
 			Action:          "codebase_branch_registration",
 			Result:          "success",
+			Value:           "inactive",
 		},
 	}
 
