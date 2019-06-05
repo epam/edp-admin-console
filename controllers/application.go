@@ -34,9 +34,9 @@ type ApplicationController struct {
 }
 
 const (
-	paramWaitingForBranch = "waitingforbranch"
-	paramWaitingForApp    = "waitingforcodebase"
-	ApplicationType       = "application"
+	paramWaitingForBranch   = "waitingforbranch"
+	paramWaitingForCodebase = "waitingforcodebase"
+	ApplicationType         = "application"
 )
 
 func (this *ApplicationController) GetApplicationsOverviewPage() {
@@ -49,7 +49,7 @@ func (this *ApplicationController) GetApplicationsOverviewPage() {
 	applications, err := this.CodebaseService.GetAllCodebases(models.CodebaseCriteria{
 		Type: &appType,
 	})
-	applications = addCodebaseInProgressIfAny(applications, this.GetString(paramWaitingForApp))
+	applications = addCodebaseInProgressIfAny(applications, this.GetString(paramWaitingForCodebase))
 	if err != nil {
 		this.Abort("500")
 		return
@@ -170,7 +170,7 @@ func (this *ApplicationController) CreateApplication() {
 	log.Printf("Application object is saved into k8s: %s", createdObject)
 	flash.Success("Application object is created.")
 	flash.Store(&this.Controller)
-	this.Redirect(fmt.Sprintf("/admin/edp/application/overview?%s=%s#codebaseSuccessModal", paramWaitingForApp, codebase.Name), 302)
+	this.Redirect(fmt.Sprintf("/admin/edp/application/overview?%s=%s#codebaseSuccessModal", paramWaitingForCodebase, codebase.Name), 302)
 }
 
 func extractApplicationRequestData(this *ApplicationController) models.Codebase {
