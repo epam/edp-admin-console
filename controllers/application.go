@@ -35,7 +35,7 @@ type ApplicationController struct {
 
 const (
 	paramWaitingForBranch = "waitingforbranch"
-	paramWaitingForApp    = "waitingforapp"
+	paramWaitingForApp    = "waitingforcodebase"
 	ApplicationType       = "application"
 )
 
@@ -59,8 +59,9 @@ func (this *ApplicationController) GetApplicationsOverviewPage() {
 	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["HasRights"] = isAdmin(contextRoles)
-	this.Data["Applications"] = applications
-	this.TplName = "application.html"
+	this.Data["Codebases"] = applications
+	this.Data["Type"] = appType
+	this.TplName = "codebase.html"
 }
 
 func addCodebaseInProgressIfAny(codebases []models.CodebaseView, codebaseInProgress string) []models.CodebaseView {
@@ -169,7 +170,7 @@ func (this *ApplicationController) CreateApplication() {
 	log.Printf("Application object is saved into k8s: %s", createdObject)
 	flash.Success("Application object is created.")
 	flash.Store(&this.Controller)
-	this.Redirect(fmt.Sprintf("/admin/edp/application/overview?%s=%s", paramWaitingForApp, codebase.Name), 302)
+	this.Redirect(fmt.Sprintf("/admin/edp/application/overview?%s=%s#codebaseSuccessModal", paramWaitingForApp, codebase.Name), 302)
 }
 
 func extractApplicationRequestData(this *ApplicationController) models.Codebase {

@@ -1,0 +1,13 @@
+.form-error {
+    color: red;
+}
+
+.disabled {
+    pointer-events: none;
+    cursor: default;
+    color: grey;
+}
+
+.button-disabled {
+    display: none;
+}

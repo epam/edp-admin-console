@@ -385,17 +385,3 @@ function isDbBlockValid() {
     }
     return true;
 }
-
-function blockIsNotValid($block) {
-    $block.find('.card-header')
-        .addClass('invalid')
-        .removeClass('success')
-        .addClass('error');
-}
-
-function blockIsValid($block) {
-    $block.find('.card-header')
-        .removeClass('invalid')
-        .addClass('success')
-        .removeClass('error');
-}

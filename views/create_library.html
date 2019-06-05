@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EDP Admin Console</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/css/validation.css">
+</head>
+<body>
+<main>
+    {{template "template/header_template.html" .}}
+    <section class="content d-flex">
+        <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
+            {{template "template/navbar_template.html" .}}
+        </aside>
+        <div class="flex-fill pl-4 pr-4 wrapper">
+
+            <form class="edp-form" id="createAppForm" method="post" action="/admin/edp/library">
+                <h1>Add the library to receive:</h1>
+                <p>
+                <ul>
+                    <li>Codebase Project</li>
+                </ul>
+                </p>
+                <p>Pass all steps below to create your Library Project.</p>
+
+                {{ if .Error }}
+                    <div class="form-error">
+                        <p>{{ .Error }}</p>
+                    </div>
+                {{ end }}
+
+                <div class="accordion" id="accordionCreateApplication">
+                    <div class="card codebase-block">
+                        <div class="card-header" id="headingOne" data-toggle="collapse"
+                             data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button">
+                                    Codebase Info
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                             data-parent="#accordionCreateApplication">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="strategy">Codebase integration strategy
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Select the existing codebase for reproduction or create new codebase."></span>
+                                    </label>
+                                    <select class="form-control" id="strategy" name="strategy">
+                                        <option value="create">Create</option>
+                                        <option value="clone">Clone</option>
+                                    </select>
+                                </div>
+                                <div class="form-group repo-url hide-element">
+                                    <label for="gitRepoUrl">Git repository url
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Please specify URL to Codebase in the following format: http(s)://git.sample.com/sample.git"></span>
+                                    </label>
+                                    <input name="gitRepoUrl" type="text" class="form-control" id="gitRepoUrl"
+                                           placeholder="http(s)://git.sample.com/sample.git">
+                                    <div class="invalid-feedback git-url-validation">
+                                        Please specify URL to Codebase in the following format:
+                                        http(s)://git.sample.com/sample.git
+                                    </div>
+                                    <div class="repo-validation">
+                                        <div class="invalid-feedback git-repo-error">
+                                            Current repository doesn't exist.
+                                        </div>
+                                        <div class="invalid-feedback git-creds">
+                                            Invalid Url, login or password.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-check private-repo hide-element">
+                                    <input class="form-check-input" type="checkbox" value="true" id="isRepoPrivate"
+                                           name="isRepoPrivate">
+                                    <label class="form-check-label" for="isRepoPrivate">
+                                        Codebase requires authentication
+                                    </label>
+                                </div>
+                                <div class="form-group repoLogin hide-element">
+                                    <label for="site">Repository login
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Tooltip on top"></span>
+                                    </label>
+                                    <input name="repoLogin" type="text" class="form-control" id="repoLogin"
+                                           placeholder="Enter repository login ">
+                                    <div class="invalid-feedback repo-login-validation">
+                                        Please specify user to clone repository. User should have read role.
+                                    </div>
+                                </div>
+                                <div class="form-group repoPassword hide-element">
+                                    <label for="site">Repository password (or API Token)
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Tooltip on top"></span>
+                                    </label>
+                                    <input name="repoPassword" type="password" class="form-control" id="repoPassword"
+                                           placeholder="Enter repository password (or API Token)">
+                                    <div class="invalid-feedback repo-password-validation">
+                                        Please specify password (or API Token) to clone repository.
+                                    </div>
+                                </div>
+                                <button type="button" class="codebase-info-button edp-submit-form-btn btn btn-primary"
+                                        data-toggle="collapse"
+                                        data-target="#collapseTwo" aria-expanded="false"
+                                        aria-controls="collapseOne"
+                                >PROCEED TO LIBRARY INFO
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card library-block">
+                        <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
+                             data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" type="button">
+                                    Library info
+                                </button>
+                            </h5>
+                        </div>
+
+                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
+                             data-parent="#accordionCreateApplication">
+                            <div class="card-body">
+                                <div class="form-group app-name">
+                                    <label for="nameOfApp">Library Name
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Project name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters."></span>
+                                    </label>
+                                    <input name="nameOfApp" type="text" class="form-control" id="nameOfApp"
+                                           placeholder="Type your library name">
+                                    <div class="app-name-validation invalid-feedback regex-error">
+                                        Library name may contain only: lower-case letters, numbers and dashes
+                                        and cannot start and end with dash. Minimum 2 characters.
+                                    </div>
+                                    <div class="app-name-duplicate-validation invalid-feedback duplicate-msg">
+                                        Current library is already exists.
+                                    </div>
+                                </div>
+                                <p>Library code language
+                                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                          title="Select library language and build tool."></span>
+                                </p>
+                                <div class="form__input-wrapper">
+                                    <fieldset id="languageSelection" class="language">
+                                        <div class="d-flex">
+                                            <div class="form__radio-btn-wrapper">
+                                                <input name="appLang" type="radio" class="form__radio-btn"
+                                                       id="appLang-Java"
+                                                       value="Java" data-target=".formSubsection-java">
+                                                <label class="form__radio-label" for="appLang-Java">
+                                                    <img class="form__radio-label-icon" src="/static/img/java-logo.png"
+                                                         alt="logo">
+                                                    <span class="form__radio-label-text">Java</span>
+                                                </label>
+                                            </div>
+                                            <div class="form__radio-btn-wrapper">
+                                                <input name="appLang" type="radio" class="form__radio-btn"
+                                                       id="appLang-JavaScript" value="JavaScript"
+                                                       data-target=".formSubsection-js">
+                                                <label class="form__radio-label" for="appLang-JavaScript">
+                                                    <img class="form__radio-label-icon"
+                                                         src="/static/img/unofficial-java-script-logo-2.png" alt="logo">
+                                                    <span class="form__radio-label-text">JavaScript</span>
+                                                </label>
+                                            </div>
+                                            <div class="form__radio-btn-wrapper">
+                                                <input name="appLang" type="radio" class="form__radio-btn"
+                                                       id="appLang-DotNet" value="DotNet"
+                                                       data-target=".formSubsection-dotnet">
+                                                <label class="form__radio-label" for="appLang-DotNet">
+                                                    <img class="form__radio-label-icon"
+                                                         src="/static/img/dotNet.png" alt="logo">
+                                                    <span class="form__radio-label-text">DotNet</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <div class="invalid-feedback appLangError">
+                                    Please select library type.
+                                </div>
+                                <div class="form-group">
+                                    <div class="js-form-subsection form-subsection formSubsection-java">
+                                        <label for="buildTool">Select build tool
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Select library build tool."></span>
+                                        </label>
+                                        <select class="form-control java-build-tools" name="buildTool">
+                                            <option>Gradle</option>
+                                            <option>Maven</option>
+                                        </select>
+                                    </div>
+                                    <div class="js-form-subsection form-subsection formSubsection-js">
+                                        <label for="buildTool">Select build tool
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Select library build tool."></span>
+                                        </label>
+                                        <select class="form-control" name="buildTool">
+                                            <option>NPM</option>
+                                        </select>
+                                    </div>
+                                    <div class="js-form-subsection form-subsection formSubsection-dotnet">
+                                        <label for="buildTool">Select build tool
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Select library build tool."></span>
+                                        </label>
+                                        <select class="form-control" name="buildTool">
+                                            <option>dotnet</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-check multi-module hide-element">
+                                    <input class="form-check-input" type="checkbox" value="true" id="multiModule"
+                                           name="isMultiModule">
+                                    <label class="form-check-label" for="isMultiModule">
+                                        Multi-module project
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="The library has multi-module structure, in which there is API and a main library that implements the API."></span>
+                                    </label>
+                                </div>
+
+                                {{if .IsVcsEnabled}}
+                                    <button type="button" class="library-submit edp-submit-form-btn btn btn-primary"
+                                            data-toggle="collapse"
+                                            data-target="#collapseThree"
+                                            aria-expanded="false"
+                                            aria-controls="collapseTwo">PROCEED TO VCS INFO
+                                    </button>
+                                {{else}}
+                                    <a href="/admin/edp/library/overview">
+                                        <button type="button" class="edp-submit-form-btn btn btn-primary">
+                                            CANCEL
+                                        </button>
+                                    </a>
+
+                                    <button type="submit" class="create-library edp-submit-form-btn btn btn-primary">
+                                        ADD LIBRARY
+                                    </button>
+                                {{end}}
+
+                            </div>
+                        </div>
+                    </div>
+                    {{if .IsVcsEnabled}}
+                        <div class="card vcs-block">
+                            <div class="card-header collapsed" id="headingThree" data-toggle="collapse"
+                                 data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" type="button">
+                                        VCS info
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseThree" class="collapse" aria-labelledby="headingThree"
+                                 data-parent="#accordionCreateApplication">
+                                <div class="card-body">
+                                    <div class="form-group vcs-login">
+                                        <label for="vcsLogin">VCS login</label>
+                                        <input name="vcsLogin" type="text" class="form-control" id="vcsLogin"
+                                               placeholder="Enter vcs login">
+                                        <div class="invalid-feedback vcs-login-validation">
+                                            Please specify vsc login.
+                                        </div>
+                                    </div>
+                                    <div class="form-group vcs-password">
+                                        <label for="vcsPassword">VCS password (or API Token)</label>
+                                        <input name="vcsPassword" type="password" class="form-control" id="vcsPassword"
+                                               placeholder="Enter VCS password (or API Token)">
+                                        <div class="invalid-feedback vcs-password-validation">
+                                            Please specify VCS password (or API Token).
+                                        </div>
+                                    </div>
+
+                                    <a href="/admin/edp/library/overview">
+                                        <button type="button" class="edp-submit-form-btn btn btn-primary">
+                                            CANCEL
+                                        </button>
+                                    </a>
+
+                                    <button type="submit" class="create-library edp-submit-form-btn btn btn-primary">
+                                        ADD LIBRARY
+                                    </button>
+
+                                </div>
+                            </div>
+                        </div>
+                    {{end}}
+                </div>
+            </form>
+        </div>
+    </section>
+    {{template "template/footer_template.html" .}}
+
+    <!-- Modal confirmation -->
+    <div class="modal fade" id="confirmationPopup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">CONFIRMATION</h5>
+                    <button id="btn-cross-close" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Press continue for adding your Library. Status will be available on "Libraries" page.
+                    <p/>
+                    <table id="window-table" class="table table-bordered">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Parameter</th>
+                            <th scope="col">Value</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button id="btn-modal-close" type="button" class="btn btn-secondary btn-modal-close"
+                            data-dismiss="modal">CANCEL
+                    </button>
+                    <button id="create-application" type="button" class="edp-submit-form-btn btn btn-primary">CONTINUE
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script src="/static/js/jquery-3.3.1.js"></script>
+<script src="/static/js/popper.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/util.js"></script>
+<script src="/static/js/library.js"></script>
+</body>
+</html>
