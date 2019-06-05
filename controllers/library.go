@@ -22,20 +22,22 @@ type LibraryController struct {
 const LibraryType = "library"
 
 func (this *LibraryController) GetLibraryListPage() {
-	this.Data["Codebases"] = []models.CodebaseView{
-		{
-			Name:      "stub-name-01",
-			Language:  "java",
-			BuildTool: "maven",
-			Status:    "active",
-		},
-		{
-			Name:      "stub-name-02",
-			Language:  "java",
-			BuildTool: "maven",
-			Status:    "active",
-		},
+	flash := beego.ReadFromRequest(&this.Controller)
+	if flash.Data["success"] != "" {
+		this.Data["Success"] = true
 	}
+
+	var libraryType = "library"
+	codebases, err := this.CodebaseService.GetAllCodebases(models.CodebaseCriteria{
+		Type: &libraryType,
+	})
+	codebases = addCodebaseInProgressIfAny(codebases, this.GetString(paramWaitingForCodebase))
+	if err != nil {
+		this.Abort("500")
+		return
+	}
+
+	this.Data["Codebases"] = codebases
 	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["Username"] = this.Ctx.Input.Session("username")
 	this.Data["HasRights"] = isAdmin(this.GetSession("realm_roles").([]string))
