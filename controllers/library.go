@@ -17,6 +17,7 @@ type LibraryController struct {
 	beego.Controller
 	EDPTenantService service.EDPTenantService
 	CodebaseService  service.CodebaseService
+	BranchService    service.BranchService
 }
 
 const LibraryType = "library"

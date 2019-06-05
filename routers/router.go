@@ -63,7 +63,6 @@ func init() {
 		beego.NSRouter("/cd-pipeline/:pipelineName/overview", &controllers.CDPipelineController{EDPTenantService: edpService, BranchService: branchService, PipelineService: pipelineService}, "get:GetCDPipelineOverviewPage"),
 		beego.NSRouter("/autotest/overview", &controllers.AutotestController{EDPTenantService: edpService, CodebaseService: codebaseService, BranchService: branchService}, "get:GetAutotestsOverviewPage"),
 		beego.NSRouter("/autotest/create", &controllers.AutotestController{EDPTenantService: edpService, CodebaseService: codebaseService, BranchService: branchService}, "get:GetCreateAutotestPage"),
-		beego.NSRouter("/autotest/:testName/overview", &controllers.AutotestController{EDPTenantService: edpService, CodebaseService: codebaseService, BranchService: branchService}, "get:GetAutotestOverviewPage"),
 		beego.NSRouter("/autotest", &controllers.AutotestController{EDPTenantService: edpService, CodebaseService: codebaseService, BranchService: branchService}, "post:CreateAutotest"),
 
 		beego.NSRouter("/codebase/:codebaseName/overview", &controllers.CodebaseController{CodebaseService: codebaseService, EDPTenantService: edpService, BranchService: branchService}, "get:GetCodebaseOverviewPage"),

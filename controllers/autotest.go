@@ -193,25 +193,3 @@ func (this *AutotestController) GetAutotestsOverviewPage() {
 	this.Data["Type"] = autotestType
 	this.TplName = "codebase.html"
 }
-
-func (this *AutotestController) GetAutotestOverviewPage() {
-	testName := this.GetString(":testName")
-	codebases, err := this.CodebaseService.GetCodebase(testName)
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
-	branchEntities, err := this.BranchService.GetAllReleaseBranchesByAppName(testName)
-	branchEntities = addCodebaseBranchInProgressIfAny(branchEntities, this.GetString(paramWaitingForBranch))
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
-	this.Data["ReleaseBranches"] = branchEntities
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["Autotests"] = codebases
-	this.TplName = "codebase_overview.html"
-}

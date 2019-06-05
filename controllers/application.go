@@ -82,28 +82,6 @@ func addCodebaseInProgressIfAny(codebases []models.CodebaseView, codebaseInProgr
 	return codebases
 }
 
-func (this *ApplicationController) GetApplicationOverviewPage() {
-	appName := this.GetString(":appName")
-	application, err := this.CodebaseService.GetCodebase(appName)
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
-	branchEntities, err := this.BranchService.GetAllReleaseBranchesByAppName(appName)
-	branchEntities = addCodebaseBranchInProgressIfAny(branchEntities, this.GetString(paramWaitingForBranch))
-	if err != nil {
-		this.Abort("500")
-		return
-	}
-
-	this.Data["ReleaseBranches"] = branchEntities
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["Application"] = application
-	this.TplName = "codebase_overview.html"
-}
-
 func addCodebaseBranchInProgressIfAny(branches []models.ReleaseBranchView, branchInProgress string) []models.ReleaseBranchView {
 	if branchInProgress != "" {
 		for _, branch := range branches {
