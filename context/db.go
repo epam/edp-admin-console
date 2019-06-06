@@ -58,7 +58,7 @@ func InitDb() {
 	if err != nil {
 		log.Printf("Warning from db migration: %v", err)
 	}
-	orm.RegisterModel(new(query.Codebase), new(query.ActionLog), new(query.CodebaseBranch))
+	orm.RegisterModel(new(query.Codebase), new(query.ActionLog), new(query.CodebaseBranch), new(query.Service))
 }
 
 func checkErr(err error) {

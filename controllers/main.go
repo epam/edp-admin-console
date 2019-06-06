@@ -19,7 +19,6 @@ package controllers
 import (
 	"edp-admin-console/context"
 	"edp-admin-console/service"
-	"fmt"
 	"github.com/astaxie/beego"
 )
 
@@ -28,15 +27,7 @@ type MainController struct {
 	EDPTenantService service.EDPTenantService
 }
 
-func (this *MainController) Index() {
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.TplName = "index.html"
-}
-
-func (this *MainController) CockpitRedirectConfirmationPage() {
-	this.Data["Domain"] = fmt.Sprintf("https://edp-cockpit-%s-edp-cicd.%s", context.Tenant, beego.AppConfig.String("dnsWildcard"))
-	this.Data["Anchor"] = this.GetString("anchor")
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.TplName = "cockpit_redirect_confirmation.html"
+func (с *MainController) Index() {
+	с.Data["EDPVersion"] = context.EDPVersion
+	с.TplName = "index.html"
 }

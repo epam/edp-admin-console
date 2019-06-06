@@ -35,11 +35,14 @@ func init() {
 	codebaseRepository := repository.CodebaseRepository{}
 	branchRepository := repository.CodebaseBranchRepository{}
 	pipelineRepository := repository.CDPipelineRepository{}
+	serviceRepository := repository.ServiceCatalogRepository{}
+
 	edpService := service.EDPTenantService{Clients: clients}
 	clusterService := service.ClusterService{Clients: clients}
 	branchService := service.CodebaseBranchService{Clients: clients, IReleaseBranchRepository: branchRepository}
 	codebaseService := service.CodebaseService{Clients: clients, ICodebaseRepository: codebaseRepository, BranchService: branchService}
 	pipelineService := service.CDPipelineService{Clients: clients, ICDPipelineRepository: pipelineRepository, CodebaseService: codebaseService, BranchService: branchService}
+	catalogService := service.CatalogService{IServiceCatalogRepository: serviceRepository}
 
 	beego.Router("/auth/callback", &controllers.AuthController{}, "get:Callback")
 	beego.InsertFilter("/admin/*", beego.BeforeRouter, filters.AuthFilter)
@@ -49,7 +52,6 @@ func init() {
 
 	beego.ErrorController(&controllers.ErrorController{})
 	beego.Router("/", &controllers.MainController{EDPTenantService: edpService}, "get:Index")
-	beego.Router("/cockpit-redirect-confirmation", &controllers.MainController{}, "get:CockpitRedirectConfirmationPage")
 
 	adminEdpNamespace := beego.NewNamespace("/admin/edp",
 		beego.NSRouter("/overview", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPComponents"),
@@ -71,6 +73,8 @@ func init() {
 		beego.NSRouter("/library/overview", &controllers.LibraryController{EDPTenantService: edpService, CodebaseService: codebaseService}, "get:GetLibraryListPage"),
 		beego.NSRouter("/library/create", &controllers.LibraryController{EDPTenantService: edpService, CodebaseService: codebaseService}, "get:GetCreatePage"),
 		beego.NSRouter("/library", &controllers.LibraryController{EDPTenantService: edpService, CodebaseService: codebaseService}, "post:Create"),
+
+		beego.NSRouter("/service/overview", &controllers.ServiceController{CatalogService: catalogService}, "get:GetServicePage"),
 	)
 	beego.AddNamespace(adminEdpNamespace)
 
