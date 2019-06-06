@@ -7,6 +7,10 @@ $(function () {
         REPOSITORY_PASSWORD: /\w/
     };
 
+    !function () {
+        $('.form-group .js-form-subsection select').attr('disabled', true);
+    }();
+
     function validateInputField($el, $errEl, regex) {
         let isAppValid = isFieldValid($el, regex);
         $errEl.toggle(!isAppValid);
@@ -103,8 +107,10 @@ $(function () {
     });
 
     $('#languageSelection').on('change', function (e) {
+        let langDivEl = $($(e.target).data('target'));
         $('.js-form-subsection, .appLangError').hide();
-        $($(e.target).data('target')).show();
+        langDivEl.find('select').attr('disabled', false);
+        langDivEl.show();
     });
 
     $('#nameOfApp').focusout(function () {
