@@ -2,7 +2,8 @@ package controllers
 
 import (
 	"edp-admin-console/context"
-	"edp-admin-console/models"
+	"edp-admin-console/models/command"
+	"edp-admin-console/models/query"
 	"edp-admin-console/service"
 	"edp-admin-console/util"
 	"fmt"
@@ -17,121 +18,118 @@ type LibraryController struct {
 	beego.Controller
 	EDPTenantService service.EDPTenantService
 	CodebaseService  service.CodebaseService
-	BranchService    service.BranchService
+	BranchService    service.CodebaseBranchService
 }
 
-const LibraryType = "library"
-
-func (this *LibraryController) GetLibraryListPage() {
-	flash := beego.ReadFromRequest(&this.Controller)
+func (c *LibraryController) GetLibraryListPage() {
+	flash := beego.ReadFromRequest(&c.Controller)
 	if flash.Data["success"] != "" {
-		this.Data["Success"] = true
+		c.Data["Success"] = true
 	}
 
-	var libraryType = "library"
-	codebases, err := this.CodebaseService.GetAllCodebases(models.CodebaseCriteria{
-		Type: &libraryType,
+	codebases, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
+		Type: query.Library,
 	})
-	codebases = addCodebaseInProgressIfAny(codebases, this.GetString(paramWaitingForCodebase))
+	codebases = addCodebaseInProgressIfAny(codebases, c.GetString(paramWaitingForCodebase))
 	if err != nil {
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
-	this.Data["Codebases"] = codebases
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["HasRights"] = isAdmin(this.GetSession("realm_roles").([]string))
-	this.Data["Type"] = LibraryType
-	this.TplName = "codebase.html"
+	c.Data["Codebases"] = codebases
+	c.Data["EDPVersion"] = context.EDPVersion
+	c.Data["Username"] = c.Ctx.Input.Session("username")
+	c.Data["HasRights"] = isAdmin(c.GetSession("realm_roles").([]string))
+	c.Data["Type"] = query.Library
+	c.TplName = "codebase.html"
 }
 
-func (this *LibraryController) GetCreatePage() {
-	flash := beego.ReadFromRequest(&this.Controller)
+func (c *LibraryController) GetCreatePage() {
+	flash := beego.ReadFromRequest(&c.Controller)
 	if flash.Data["error"] != "" {
-		this.Data["Error"] = flash.Data["error"]
+		c.Data["Error"] = flash.Data["error"]
 	}
 
-	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue()
+	isVcsEnabled, err := c.EDPTenantService.GetVcsIntegrationValue()
 	if err != nil {
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["HasRights"] = isAdmin(this.GetSession("realm_roles").([]string))
-	this.Data["IsVcsEnabled"] = isVcsEnabled
-	this.TplName = "create_library.html"
+	c.Data["EDPVersion"] = context.EDPVersion
+	c.Data["Username"] = c.Ctx.Input.Session("username")
+	c.Data["HasRights"] = isAdmin(c.GetSession("realm_roles").([]string))
+	c.Data["IsVcsEnabled"] = isVcsEnabled
+	c.TplName = "create_library.html"
 }
 
-func (this *LibraryController) Create() {
+func (c *LibraryController) Create() {
 	flash := beego.NewFlash()
-	codebase := extractLibraryRequestData(this)
+	codebase := c.extractLibraryRequestData()
 	errMsg := validateLibraryRequestData(codebase)
 	if errMsg != nil {
 		log.Printf("Failed to validate library request data: %s", errMsg.Message)
 		flash.Error(errMsg.Message)
-		flash.Store(&this.Controller)
-		this.Redirect("/admin/edp/library/create", 302)
+		flash.Store(&c.Controller)
+		c.Redirect("/admin/edp/library/create", 302)
 		return
 	}
 	logLibraryRequestData(codebase)
 
-	createdObject, err := this.CodebaseService.CreateCodebase(codebase)
+	createdObject, err := c.CodebaseService.CreateCodebase(codebase)
 
 	if err != nil {
 		if err.Error() == "CODEBASE_ALREADY_EXISTS" {
 			flash.Error("Library %s is already exists.", codebase.Name)
-			flash.Store(&this.Controller)
-			this.Redirect("/admin/edp/library/create", 302)
+			flash.Store(&c.Controller)
+			c.Redirect("/admin/edp/library/create", 302)
 			return
 		}
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
 	log.Printf("Library object is saved into k8s: %s", createdObject)
 	flash.Success("Library object is created.")
-	flash.Store(&this.Controller)
-	this.Redirect(fmt.Sprintf("/admin/edp/library/overview?%s=%s#codebaseSuccessModal", paramWaitingForCodebase, codebase.Name), 302)
+	flash.Store(&c.Controller)
+	c.Redirect(fmt.Sprintf("/admin/edp/library/overview?%s=%s#codebaseSuccessModal", paramWaitingForCodebase, codebase.Name), 302)
 }
 
-func extractLibraryRequestData(this *LibraryController) models.Codebase {
-	library := models.Codebase{
-		Name:      this.GetString("nameOfApp"),
-		Lang:      this.GetString("appLang"),
-		BuildTool: this.GetString("buildTool"),
-		Strategy:  this.GetString("strategy"),
-		Type:      LibraryType,
+func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
+	library := command.CreateCodebase{
+		Name:      c.GetString("nameOfApp"),
+		Lang:      c.GetString("appLang"),
+		BuildTool: c.GetString("buildTool"),
+		Strategy:  c.GetString("strategy"),
+		Type:      "library",
 	}
 
-	repoUrl := this.GetString("gitRepoUrl")
+	repoUrl := c.GetString("gitRepoUrl")
 	if repoUrl != "" {
-		library.Repository = &models.Repository{
+		library.Repository = &command.Repository{
 			Url: repoUrl,
 		}
 
-		isRepoPrivate, _ := this.GetBool("isRepoPrivate", false)
+		isRepoPrivate, _ := c.GetBool("isRepoPrivate", false)
 		if isRepoPrivate {
-			library.Repository.Login = this.GetString("repoLogin")
-			library.Repository.Password = this.GetString("repoPassword")
+			library.Repository.Login = c.GetString("repoLogin")
+			library.Repository.Password = c.GetString("repoPassword")
 		}
 	}
 
-	vcsLogin := this.GetString("vcsLogin")
-	vcsPassword := this.GetString("vcsPassword")
+	vcsLogin := c.GetString("vcsLogin")
+	vcsPassword := c.GetString("vcsPassword")
 	if vcsLogin != "" && vcsPassword != "" {
-		library.Vcs = &models.Vcs{
+		library.Vcs = &command.Vcs{
 			Login:    vcsLogin,
 			Password: vcsPassword,
 		}
 	}
-	library.Username = this.Ctx.Input.Session("username").(string)
+	library.Username = c.Ctx.Input.Session("username").(string)
 	return library
 }
 
-func validateLibraryRequestData(library models.Codebase) *ErrMsg {
+func validateLibraryRequestData(library command.CreateCodebase) *ErrMsg {
 	valid := validation.Validation{}
 
 	_, err := valid.Valid(library)
@@ -162,7 +160,7 @@ func validateLibraryRequestData(library models.Codebase) *ErrMsg {
 	return &ErrMsg{string(createErrorResponseBody(valid)), http.StatusBadRequest}
 }
 
-func logLibraryRequestData(library models.Codebase) {
+func logLibraryRequestData(library command.CreateCodebase) {
 	var result strings.Builder
 	result.WriteString(fmt.Sprintf("Request data to create codebase CR is valid. name=%s, strategy=%s, lang=%s, buildTool=%s",
 		library.Name, library.Strategy, library.Lang, library.BuildTool))

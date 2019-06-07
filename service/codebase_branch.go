@@ -19,7 +19,8 @@ package service
 import (
 	"edp-admin-console/context"
 	"edp-admin-console/k8s"
-	"edp-admin-console/models"
+	"edp-admin-console/models/command"
+	"edp-admin-console/models/query"
 	"edp-admin-console/repository"
 	"errors"
 	"fmt"
@@ -32,14 +33,14 @@ import (
 	"time"
 )
 
-type BranchService struct {
+type CodebaseBranchService struct {
 	Clients                  k8s.ClientSet
-	IReleaseBranchRepository repository.IReleaseBranchRepository
+	IReleaseBranchRepository repository.ICodebaseBranchRepository
 }
 
-func (this *BranchService) CreateReleaseBranch(branchInfo models.ReleaseBranchCreateCommand, appName string) (*k8s.CodebaseBranch, error) {
+func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCodebaseBranch, appName string) (*k8s.CodebaseBranch, error) {
 	log.Println("Start creating CR for branch release...")
-	edpRestClient := this.Clients.EDPRestClient
+	edpRestClient := s.Clients.EDPRestClient
 
 	releaseBranchCR, err := getReleaseBranchCR(edpRestClient, branchInfo.Name, appName, context.Namespace)
 	if err != nil {
@@ -82,46 +83,16 @@ func (this *BranchService) CreateReleaseBranch(branchInfo models.ReleaseBranchCr
 	return result, nil
 }
 
-func (this *BranchService) GetReleaseBranch(appName string, branchName string) (*models.ReleaseBranchView, error) {
-	releaseBranch, err := this.IReleaseBranchRepository.GetReleaseBranch(appName, branchName)
-	if err != nil {
-		log.Printf("An error has occurred while getting branch entity %s-%s from database: %s", appName, branchName, err)
-		return nil, err
-	}
-
-	if releaseBranch != nil {
-		log.Printf("Fetched branch entity: {%+v}", releaseBranch)
-	}
-
-	return releaseBranch, nil
-}
-
-func (this *BranchService) GetAllReleaseBranchesByAppName(appName string) ([]models.ReleaseBranchView, error) {
-	releaseBranches, err := this.IReleaseBranchRepository.GetAllReleaseBranchesByAppName(appName)
-	if err != nil {
-		log.Printf("An error has occurred while getting branch entities for {%s} application: %s", appName, err)
-		return nil, err
-	}
-
-	if len(releaseBranches) != 0 {
-		edpTenantName := context.Tenant
-		createLinks(releaseBranches, appName, edpTenantName)
-		log.Printf("Fetched branch entities: {%s}. Count: {%s}", releaseBranches, string(len(releaseBranches)))
-	}
-
-	return releaseBranches, nil
-}
-
-func (this *BranchService) GetAllReleaseBranches(branchFilterCriteria models.BranchCriteria) ([]models.ReleaseBranchView, error) {
-	releaseBranches, err := this.IReleaseBranchRepository.GetAllReleaseBranches(branchFilterCriteria)
+func (s *CodebaseBranchService) GetCodebaseBranchesByCriteria(criteria query.CodebaseBranchCriteria) ([]query.CodebaseBranch, error) {
+	codebaseBranches, err := s.IReleaseBranchRepository.GetCodebaseBranchesByCriteria(criteria)
 	if err != nil {
 		log.Printf("An error has occurred while getting branch entities: %s", err)
 		return nil, err
 	}
-	return releaseBranches, nil
+	return codebaseBranches, nil
 }
 
-func convertBranchInfoData(branchInfo models.ReleaseBranchCreateCommand, appName string) k8s.CodebaseBranchSpec {
+func convertBranchInfoData(branchInfo command.CreateCodebaseBranch, appName string) k8s.CodebaseBranchSpec {
 	return k8s.CodebaseBranchSpec{
 		Name:         branchInfo.Name,
 		Commit:       branchInfo.Commit,
@@ -129,12 +100,12 @@ func convertBranchInfoData(branchInfo models.ReleaseBranchCreateCommand, appName
 	}
 }
 
-func createLinks(branchEntities []models.ReleaseBranchView, appName string, edpTenantName string) {
+func createBranchLinks(branches []*query.CodebaseBranch, cbName string, tenant string) {
 	wildcard := beego.AppConfig.String("dnsWildcard")
-	for index, branch := range branchEntities {
-		branch.VCSLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb?p=%s.git;a=shortlog;h=refs/heads/%s", "gerrit", edpTenantName, wildcard, appName, branch.Name)
-		branch.CICDLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s/view/%s", "jenkins", edpTenantName, wildcard, appName, strings.ToUpper(branch.Name))
-		branchEntities[index] = branch
+	for index, branch := range branches {
+		branch.VCSLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb?p=%s.git;a=shortlog;h=refs/heads/%s", "gerrit", tenant, wildcard, cbName, branch.Name)
+		branch.CICDLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s/view/%s", "jenkins", tenant, wildcard, cbName, strings.ToUpper(branch.Name))
+		branches[index] = branch
 	}
 }
 

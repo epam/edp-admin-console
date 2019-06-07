@@ -2,7 +2,8 @@ package controllers
 
 import (
 	"edp-admin-console/context"
-	"edp-admin-console/models"
+	"edp-admin-console/models/command"
+	"edp-admin-console/models/query"
 	"edp-admin-console/service"
 	"edp-admin-console/util"
 	"fmt"
@@ -13,117 +14,115 @@ import (
 	"strings"
 )
 
-type AutotestController struct {
+type AutotestsController struct {
 	beego.Controller
 	CodebaseService  service.CodebaseService
 	EDPTenantService service.EDPTenantService
-	BranchService    service.BranchService
+	BranchService    service.CodebaseBranchService
 }
 
-const AutotestType = "autotests"
-
-func (this *AutotestController) CreateAutotest() {
+func (c *AutotestsController) CreateAutotests() {
 	flash := beego.NewFlash()
-	codebase := extractAutotestRequestData(this)
-	errMsg := validateAutotestRequestData(codebase)
+	codebase := c.extractAutotestsRequestData()
+	errMsg := validateAutotestsRequestData(codebase)
 	if errMsg != nil {
-		log.Printf("Failed to validate autotest request data: %s", errMsg.Message)
+		log.Printf("Failed to validate autotests request data: %s", errMsg.Message)
 		flash := beego.NewFlash()
 		flash.Error(errMsg.Message)
-		flash.Store(&this.Controller)
-		this.Redirect("/admin/edp/autotest/create", 302)
+		flash.Store(&c.Controller)
+		c.Redirect("/admin/edp/autotest/create", 302)
 		return
 	}
-	logAutotestRequestData(codebase)
+	logAutotestsRequestData(codebase)
 
-	createdObject, err := this.CodebaseService.CreateCodebase(codebase)
+	createdObject, err := c.CodebaseService.CreateCodebase(codebase)
 
 	if err != nil {
 		if err.Error() == "CODEBASE_ALREADY_EXISTS" {
-			flash.Error("Autotest %s is already exists.", codebase.Name)
-			flash.Store(&this.Controller)
-			this.Redirect("/admin/edp/autotest/create", 302)
+			flash.Error("Autotests %s is already exists.", codebase.Name)
+			flash.Store(&c.Controller)
+			c.Redirect("/admin/edp/autotest/create", 302)
 			return
 		}
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
-	log.Printf("Autotest object is saved into k8s: %s", createdObject)
-	flash.Success("Autotest object is created.")
-	flash.Store(&this.Controller)
-	this.Redirect(fmt.Sprintf("/admin/edp/autotest/overview?%s=%s#codebaseSuccessModal", paramWaitingForCodebase, codebase.Name), 302)
+	log.Printf("Autotests object is saved into k8s: %s", createdObject)
+	flash.Success("Autotests object is created.")
+	flash.Store(&c.Controller)
+	c.Redirect(fmt.Sprintf("/admin/edp/autotest/overview?%s=%s#codebaseSuccessModal", paramWaitingForCodebase, codebase.Name), 302)
 }
 
-func logAutotestRequestData(autotest models.Codebase) {
+func logAutotestsRequestData(autotests command.CreateCodebase) {
 	var result strings.Builder
 	result.WriteString(fmt.Sprintf("Request data to create codebase CR is valid. name=%s, strategy=%s, lang=%s, buildTool=%s, testReportFramework=%s",
-		autotest.Name, autotest.Strategy, autotest.Lang, autotest.BuildTool, *autotest.TestReportFramework))
+		autotests.Name, autotests.Strategy, autotests.Lang, autotests.BuildTool, *autotests.TestReportFramework))
 
-	if autotest.Repository != nil {
-		result.WriteString(fmt.Sprintf(", repositoryUrl=%s, repositoryLogin=%s", autotest.Repository.Url, autotest.Repository.Login))
+	if autotests.Repository != nil {
+		result.WriteString(fmt.Sprintf(", repositoryUrl=%s, repositoryLogin=%s", autotests.Repository.Url, autotests.Repository.Login))
 	}
 
-	if autotest.Vcs != nil {
-		result.WriteString(fmt.Sprintf(", vcsLogin=%s", autotest.Vcs.Login))
+	if autotests.Vcs != nil {
+		result.WriteString(fmt.Sprintf(", vcsLogin=%s", autotests.Vcs.Login))
 	}
 
 	log.Println(result.String())
 }
 
-func extractAutotestRequestData(this *AutotestController) models.Codebase {
-	codebase := models.Codebase{
-		Name:      this.GetString("nameOfApp"),
-		Lang:      this.GetString("appLang"),
-		BuildTool: this.GetString("buildTool"),
+func (c *AutotestsController) extractAutotestsRequestData() command.CreateCodebase {
+	codebase := command.CreateCodebase{
+		Name:      c.GetString("nameOfApp"),
+		Lang:      c.GetString("appLang"),
+		BuildTool: c.GetString("buildTool"),
 		Strategy:  "clone",
-		Type:      AutotestType,
+		Type:      "autotests",
 	}
 
-	testReportFramework := this.GetString("testReportFramework")
+	testReportFramework := c.GetString("testReportFramework")
 	if testReportFramework != "" {
 		codebase.TestReportFramework = &testReportFramework
 	}
 
-	repoUrl := this.GetString("gitRepoUrl")
+	repoUrl := c.GetString("gitRepoUrl")
 	if repoUrl != "" {
-		codebase.Repository = &models.Repository{
+		codebase.Repository = &command.Repository{
 			Url: repoUrl,
 		}
 
-		isRepoPrivate, _ := this.GetBool("isRepoPrivate", false)
+		isRepoPrivate, _ := c.GetBool("isRepoPrivate", false)
 		if isRepoPrivate {
-			codebase.Repository.Login = this.GetString("repoLogin")
-			codebase.Repository.Password = this.GetString("repoPassword")
+			codebase.Repository.Login = c.GetString("repoLogin")
+			codebase.Repository.Password = c.GetString("repoPassword")
 		}
 	}
 
-	description := this.GetString("description")
+	description := c.GetString("description")
 	if description != "" {
 		codebase.Description = &description
 	}
 
-	vcsLogin := this.GetString("vcsLogin")
-	vcsPassword := this.GetString("vcsPassword")
+	vcsLogin := c.GetString("vcsLogin")
+	vcsPassword := c.GetString("vcsPassword")
 	if vcsLogin != "" && vcsPassword != "" {
-		codebase.Vcs = &models.Vcs{
+		codebase.Vcs = &command.Vcs{
 			Login:    vcsLogin,
 			Password: vcsPassword,
 		}
 	}
-	codebase.Username = this.Ctx.Input.Session("username").(string)
+	codebase.Username = c.Ctx.Input.Session("username").(string)
 	return codebase
 }
 
-func validateAutotestRequestData(autotest models.Codebase) *ErrMsg {
+func validateAutotestsRequestData(autotests command.CreateCodebase) *ErrMsg {
 	valid := validation.Validation{}
 
-	_, err := valid.Valid(autotest)
+	_, err := valid.Valid(autotests)
 
-	if autotest.Repository != nil {
-		_, err = valid.Valid(autotest.Repository)
+	if autotests.Repository != nil {
+		_, err = valid.Valid(autotests.Repository)
 
-		isAvailable := util.IsGitRepoAvailable(autotest.Repository.Url, autotest.Repository.Login, autotest.Repository.Password)
+		isAvailable := util.IsGitRepoAvailable(autotests.Repository.Url, autotests.Repository.Login, autotests.Repository.Password)
 
 		if !isAvailable {
 			err := &validation.Error{Key: "repository", Message: "Repository doesn't exist or invalid login and password."}
@@ -131,17 +130,17 @@ func validateAutotestRequestData(autotest models.Codebase) *ErrMsg {
 		}
 	}
 
-	if autotest.Description == nil {
+	if autotests.Description == nil {
 		err := &validation.Error{Key: "description", Message: "Description field can't be empty."}
 		valid.Errors = append(valid.Errors, err)
 	}
 
-	if autotest.Vcs != nil {
-		_, err = valid.Valid(autotest.Vcs)
+	if autotests.Vcs != nil {
+		_, err = valid.Valid(autotests.Vcs)
 	}
 
 	if err != nil {
-		return &ErrMsg{"An internal error has occurred on server while validating autotest's form fields.", http.StatusInternalServerError}
+		return &ErrMsg{"An internal error has occurred on server while validating autotests's form fields.", http.StatusInternalServerError}
 	}
 
 	if valid.Errors == nil {
@@ -151,45 +150,44 @@ func validateAutotestRequestData(autotest models.Codebase) *ErrMsg {
 	return &ErrMsg{string(createErrorResponseBody(valid)), http.StatusBadRequest}
 }
 
-func (this *AutotestController) GetCreateAutotestPage() {
-	flash := beego.ReadFromRequest(&this.Controller)
+func (c *AutotestsController) GetCreateAutotestsPage() {
+	flash := beego.ReadFromRequest(&c.Controller)
 	if flash.Data["error"] != "" {
-		this.Data["Error"] = flash.Data["error"]
+		c.Data["Error"] = flash.Data["error"]
 	}
 
-	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue()
+	isVcsEnabled, err := c.EDPTenantService.GetVcsIntegrationValue()
 	if err != nil {
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["HasRights"] = isAdmin(this.GetSession("realm_roles").([]string))
-	this.Data["IsVcsEnabled"] = isVcsEnabled
-	this.TplName = "create_autotest.html"
+	c.Data["EDPVersion"] = context.EDPVersion
+	c.Data["Username"] = c.Ctx.Input.Session("username")
+	c.Data["HasRights"] = isAdmin(c.GetSession("realm_roles").([]string))
+	c.Data["IsVcsEnabled"] = isVcsEnabled
+	c.TplName = "create_autotest.html"
 }
 
-func (this *AutotestController) GetAutotestsOverviewPage() {
-	flash := beego.ReadFromRequest(&this.Controller)
+func (c *AutotestsController) GetAutotestsOverviewPage() {
+	flash := beego.ReadFromRequest(&c.Controller)
 	if flash.Data["success"] != "" {
-		this.Data["Success"] = true
+		c.Data["Success"] = true
 	}
 
-	var autotestType = "autotests"
-	codebases, err := this.CodebaseService.GetAllCodebases(models.CodebaseCriteria{
-		Type: &autotestType,
+	codebases, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
+		Type: query.Autotests,
 	})
-	codebases = addCodebaseInProgressIfAny(codebases, this.GetString(paramWaitingForCodebase))
+	codebases = addCodebaseInProgressIfAny(codebases, c.GetString(paramWaitingForCodebase))
 	if err != nil {
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
-	this.Data["Codebases"] = codebases
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["HasRights"] = isAdmin(this.GetSession("realm_roles").([]string))
-	this.Data["Type"] = autotestType
-	this.TplName = "codebase.html"
+	c.Data["Codebases"] = codebases
+	c.Data["EDPVersion"] = context.EDPVersion
+	c.Data["Username"] = c.Ctx.Input.Session("username")
+	c.Data["HasRights"] = isAdmin(c.GetSession("realm_roles").([]string))
+	c.Data["Type"] = query.Autotests
+	c.TplName = "codebase.html"
 }

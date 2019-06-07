@@ -20,6 +20,7 @@ import (
 	"edp-admin-console/context"
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
+	"edp-admin-console/models/dto"
 	"edp-admin-console/repository"
 	"fmt"
 	"github.com/astaxie/beego"
@@ -36,7 +37,7 @@ type CDPipelineService struct {
 	Clients               k8s.ClientSet
 	ICDPipelineRepository repository.ICDPipelineRepository
 	CodebaseService       CodebaseService
-	BranchService         BranchService
+	BranchService         CodebaseBranchService
 }
 
 type ErrMsg struct {
@@ -46,15 +47,15 @@ type ErrMsg struct {
 
 const OpenshiftProjectLink = "https://master.%s/console/project/"
 
-func (this *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCreateCommand) (*k8s.CDPipeline, error) {
+func (s *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCreateCommand) (*k8s.CDPipeline, error) {
 	log.Printf("Start creating CD Pipeline: %v", cdPipeline)
 
-	relationErr := checkRelationBetweenApplicationAndBranch(this.CodebaseService, cdPipeline.Applications)
-	if relationErr != nil {
-		return nil, relationErr
+	exist := s.CodebaseService.checkAppAndBranch(cdPipeline.Applications)
+	if !exist {
+		return nil, models.ErrNonValidRelatedBranch
 	}
 
-	cdPipelineReadModel, err := this.GetCDPipelineByName(cdPipeline.Name)
+	cdPipelineReadModel, err := s.GetCDPipelineByName(cdPipeline.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +65,7 @@ func (this *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCreate
 		return nil, models.ErrCDPipelineIsExists
 	}
 
-	edpRestClient := this.Clients.EDPRestClient
+	edpRestClient := s.Clients.EDPRestClient
 	pipelineCR, err := getCDPipelineCR(edpRestClient, cdPipeline.Name, context.Namespace)
 	if err != nil {
 		return nil, err
@@ -100,7 +101,7 @@ func (this *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCreate
 	}
 	log.Printf("Pipeline CR %v is saved into k8s", cdPipeline)
 
-	_, err = this.CreateStages(edpRestClient, cdPipeline)
+	_, err = s.CreateStages(edpRestClient, cdPipeline)
 	if err != nil {
 		log.Printf("An error has occurred while creating Stages in k8s: %s", err)
 		return nil, err
@@ -110,23 +111,9 @@ func (this *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCreate
 	return cdPipelineCr, nil
 }
 
-func checkRelationBetweenApplicationAndBranch(codebaseService CodebaseService, applications []models.ApplicationWithBranch) error {
-	for _, application := range applications {
-		codebase, err := codebaseService.GetCodebaseByCodebaseAndBranchNames(application.ApplicationName, application.BranchName)
-		if err != nil {
-			return err
-		}
-
-		if codebase == nil {
-			return models.ErrNonValidRelatedBranch
-		}
-	}
-	return nil
-}
-
-func (this *CDPipelineService) GetCDPipelineByName(pipelineName string) (*models.CDPipelineDTO, error) {
+func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*models.CDPipelineDTO, error) {
 	log.Println("Start execution of GetCDPipelineByName method...")
-	cdPipeline, err := this.ICDPipelineRepository.GetCDPipelineByName(pipelineName)
+	cdPipeline, err := s.ICDPipelineRepository.GetCDPipelineByName(pipelineName)
 	if err != nil {
 		log.Printf("An error has occurred while getting CD Pipeline from database: %s", err)
 		return nil, err
@@ -134,7 +121,7 @@ func (this *CDPipelineService) GetCDPipelineByName(pipelineName string) (*models
 	if cdPipeline != nil {
 		createJenkinsLink(cdPipeline)
 
-		stages, err := this.GetCDPipelineStages(pipelineName)
+		stages, err := s.GetCDPipelineStages(pipelineName)
 		if err != nil {
 			log.Printf("An error has occurred while getting Stages: %s", err)
 			return nil, err
@@ -147,7 +134,7 @@ func (this *CDPipelineService) GetCDPipelineByName(pipelineName string) (*models
 	return cdPipeline, nil
 }
 
-func (this *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPipeline models.CDPipelineCreateCommand) ([]k8s.Stage, error) {
+func (s *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPipeline models.CDPipelineCreateCommand) ([]k8s.Stage, error) {
 	log.Printf("Start creating CR stages: %+v\n", cdPipeline.Stages)
 
 	err := checkStagesInK8s(edpRestClient, cdPipeline.Name, cdPipeline.Stages)
@@ -164,9 +151,9 @@ func (this *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPi
 	return stagesCr, nil
 }
 
-func (this *CDPipelineService) GetAllPipelines(filterCriteria models.CDPipelineCriteria) ([]models.CDPipelineView, error) {
+func (s *CDPipelineService) GetAllPipelines(filterCriteria models.CDPipelineCriteria) ([]models.CDPipelineView, error) {
 	log.Println("Start fetching all CD Pipelines...")
-	cdPipelines, err := this.ICDPipelineRepository.GetCDPipelines(filterCriteria)
+	cdPipelines, err := s.ICDPipelineRepository.GetCDPipelines(filterCriteria)
 	if err != nil {
 		log.Printf("An error has occurred while getting CD Pipelines from database: %s", err)
 		return nil, err
@@ -180,9 +167,9 @@ func (this *CDPipelineService) GetAllPipelines(filterCriteria models.CDPipelineC
 	return cdPipelines, nil
 }
 
-func (this *CDPipelineService) GetCDPipelineStages(cdPipelineName string) ([]models.CDPipelineStageView, error) {
+func (s *CDPipelineService) GetCDPipelineStages(cdPipelineName string) ([]models.CDPipelineStageView, error) {
 	log.Printf("Start fetching all stages for %v CD Pipeline...", cdPipelineName)
-	stages, err := this.ICDPipelineRepository.GetCDPipelineStages(cdPipelineName)
+	stages, err := s.ICDPipelineRepository.GetCDPipelineStages(cdPipelineName)
 	if err != nil {
 		log.Printf("An error has occurred while getting Stages from database: %s", err)
 		return nil, err
@@ -203,9 +190,9 @@ func sortStagesByOrder(stages []models.CDPipelineStageView) {
 	})
 }
 
-func (this *CDPipelineService) GetStage(cdPipelineName, stageName string) (*models.StageView, error) {
+func (s *CDPipelineService) GetStage(cdPipelineName, stageName string) (*models.StageView, error) {
 	log.Printf("Start fetching Stage by CD Pipeline %s and Stage %s names...", cdPipelineName, stageName)
-	stage, err := this.ICDPipelineRepository.GetStage(cdPipelineName, stageName)
+	stage, err := s.ICDPipelineRepository.GetStage(cdPipelineName, stageName)
 	if err != nil {
 		log.Printf("An error has occurred while getting Stage from database: %s", err)
 		return nil, err
@@ -265,7 +252,7 @@ func createJenkinsLink(cdPipeline *models.CDPipelineDTO) {
 	createLinksForBranchEntities(cdPipeline.CodebaseBranches)
 }
 
-func createLinksForBranchEntities(branchEntities []models.CodebaseBranchDTO) {
+func createLinksForBranchEntities(branchEntities []dto.CodebaseBranchDTO) {
 	wildcard := beego.AppConfig.String("dnsWildcard")
 	for index, branch := range branchEntities {
 		branch.BranchLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb?p=%s.git;a=shortlog;h=refs/heads/%s", "gerrit", context.Tenant, wildcard, branch.AppName, branch.BranchName)

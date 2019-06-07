@@ -1,11 +1,13 @@
 package models
 
+import "edp-admin-console/models/dto"
+
 type CDPipelineDTO struct {
-	Name             string                `json:"name"`
-	Status           string                `json:"status"`
-	JenkinsLink      string                `json:"jenkinsLink"`
-	CodebaseBranches []CodebaseBranchDTO   `json:"codebaseBranches"`
-	Stages           []CDPipelineStageView `json:"stages"`
+	Name             string                  `json:"name"`
+	Status           string                  `json:"status"`
+	JenkinsLink      string                  `json:"jenkinsLink"`
+	CodebaseBranches []dto.CodebaseBranchDTO `json:"codebaseBranches"`
+	Stages           []CDPipelineStageView   `json:"stages"`
 }
 
 type CDPipelineView struct {

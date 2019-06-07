@@ -20,6 +20,8 @@ import (
 	"edp-admin-console/context"
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
+	"edp-admin-console/models/command"
+	"edp-admin-console/models/query"
 	"edp-admin-console/repository"
 	"errors"
 	"fmt"
@@ -33,8 +35,8 @@ import (
 
 type CodebaseService struct {
 	Clients             k8s.ClientSet
-	ICodebaseRepository repository.ICodebaseEntityRepository
-	BranchService       BranchService
+	ICodebaseRepository repository.ICodebaseRepository
+	BranchService       CodebaseBranchService
 }
 
 const (
@@ -42,10 +44,10 @@ const (
 	CodebasePlural = "codebases"
 )
 
-func (this CodebaseService) CreateCodebase(codebase models.Codebase) (*k8s.Codebase, error) {
+func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*k8s.Codebase, error) {
 	log.Printf("Start creating Codebase resource: %v ...", codebase)
 
-	codebaseCr, err := this.GetCodebaseCR(codebase.Name)
+	codebaseCr, err := s.GetCodebaseCR(codebase.Name)
 	if err != nil {
 		log.Printf("An error has occurred while fetching Codebase CR from k8s: %s", codebase.Name)
 		return nil, err
@@ -56,7 +58,7 @@ func (this CodebaseService) CreateCodebase(codebase models.Codebase) (*k8s.Codeb
 		return nil, errors.New("CODEBASE_ALREADY_EXISTS")
 	}
 
-	codebaseDb, err := this.GetCodebase(codebase.Name)
+	codebaseDb, err := s.GetCodebaseByName(codebase.Name)
 	if err != nil {
 		log.Printf("An error has occurred while fetching Codebase entity from DB: %s", codebase.Name)
 		return nil, err
@@ -67,8 +69,8 @@ func (this CodebaseService) CreateCodebase(codebase models.Codebase) (*k8s.Codeb
 		return nil, errors.New("CODEBASE_ALREADY_EXISTS")
 	}
 
-	edpClient := this.Clients.EDPRestClient
-	coreClient := this.Clients.CoreClient
+	edpClient := s.Clients.EDPRestClient
+	coreClient := s.Clients.CoreClient
 
 	crd := &k8s.Codebase{
 		TypeMeta: metav1.TypeMeta{
@@ -106,7 +108,7 @@ func (this CodebaseService) CreateCodebase(codebase models.Codebase) (*k8s.Codeb
 		return &k8s.Codebase{}, err
 	}
 
-	_, err = this.BranchService.CreateReleaseBranch(models.ReleaseBranchCreateCommand{
+	_, err = s.BranchService.CreateCodebaseBranch(command.CreateCodebaseBranch{
 		Name:     "master",
 		Username: codebase.Username,
 	}, codebase.Name)
@@ -117,8 +119,8 @@ func (this CodebaseService) CreateCodebase(codebase models.Codebase) (*k8s.Codeb
 	return result, nil
 }
 
-func (this CodebaseService) GetCodebaseCR(codebaseName string) (*k8s.Codebase, error) {
-	edpClient := this.Clients.EDPRestClient
+func (s CodebaseService) GetCodebaseCR(codebaseName string) (*k8s.Codebase, error) {
+	edpClient := s.Clients.EDPRestClient
 
 	result := &k8s.Codebase{}
 	err := edpClient.Get().Namespace(context.Namespace).Resource(CodebasePlural).Name(codebaseName).Do().Into(result)
@@ -136,37 +138,34 @@ func (this CodebaseService) GetCodebaseCR(codebaseName string) (*k8s.Codebase, e
 	return result, nil
 }
 
-func (this *CodebaseService) GetAllCodebases(criteria models.CodebaseCriteria) ([]models.CodebaseView, error) {
-	codebases, err := this.ICodebaseRepository.GetAllCodebases(criteria)
+func (s *CodebaseService) GetCodebasesByCriteria(criteria query.CodebaseCriteria) ([]*query.Codebase, error) {
+	codebases, err := s.ICodebaseRepository.GetCodebasesByCriteria(criteria)
 	if err != nil {
-		log.Printf("An error has occurred while getting codebase objects from database: %s", err)
+		log.Printf("An error has occurred while getting codebase objects: %s", err)
 		return nil, err
 	}
-	log.Printf("Fetched codebases. Count: %v. Rows: %v", len(codebases), codebases)
+	log.Printf("Fetched codebases. Count: %v. Values: %v", len(codebases), codebases)
 
 	return codebases, nil
 }
 
-func (this CodebaseService) GetCodebase(codebaseName string) (*models.CodebaseDetailInfo, error) {
-	codebase, err := this.ICodebaseRepository.GetCodebase(codebaseName)
+func (s CodebaseService) GetCodebaseByName(name string) (*query.Codebase, error) {
+	codebase, err := s.ICodebaseRepository.GetCodebaseByName(name)
 	if err != nil {
-		log.Printf("An error has occurred while getting codebase object %s from database: %s", codebaseName, err)
+		log.Printf("An error has occurred while getting codebase object %s: %s", name, err)
 		return nil, err
 	}
 	log.Printf("Fetched codebase info: %+v", codebase)
 
+	if codebase != nil {
+		createBranchLinks(codebase.CodebaseBranch, codebase.Name, context.Tenant)
+	}
+
 	return codebase, nil
 }
 
-func (this CodebaseService) GetAllCodebasesWithReleaseBranches(criteria models.CodebaseCriteria) ([]models.CodebaseWithReleaseBranch, error) {
-	codebases, err := this.ICodebaseRepository.GetAllCodebasesWithReleaseBranches(criteria)
-	if err != nil {
-		log.Printf("An error has occurred while getting all codebase objects: %s", err)
-		return nil, err
-	}
-	log.Printf("Fetched codebases info: {%+v}", codebases)
-
-	return codebases, nil
+func (s CodebaseService) ExistCodebaseAndBranch(cbName, brName string) bool {
+	return s.ICodebaseRepository.ExistCodebaseAndBranch(cbName, brName)
 }
 
 func createSecret(namespace string, secret *v1.Secret, coreClient *coreV1Client.CoreV1Client) (*v1.Secret, error) {
@@ -178,7 +177,7 @@ func createSecret(namespace string, secret *v1.Secret, coreClient *coreV1Client.
 	return createdSecret, nil
 }
 
-func createTempSecrets(namespace string, codebase models.Codebase, coreClient *coreV1Client.CoreV1Client) error {
+func createTempSecrets(namespace string, codebase command.CreateCodebase, coreClient *coreV1Client.CoreV1Client) error {
 	if codebase.Repository != nil && (codebase.Repository.Login != "" && codebase.Repository.Password != "") {
 		repoSecretName := fmt.Sprintf("repository-codebase-%s-temp", codebase.Name)
 		tempRepoSecret := getSecret(repoSecretName, codebase.Repository.Login, codebase.Repository.Password)
@@ -218,7 +217,7 @@ func getSecret(name string, username string, password string) *v1.Secret {
 	}
 }
 
-func convertData(codebase models.Codebase) k8s.CodebaseSpec {
+func convertData(codebase command.CreateCodebase) k8s.CodebaseSpec {
 	spec := k8s.CodebaseSpec{
 		Lang:      codebase.Lang,
 		Framework: codebase.Framework,
@@ -267,13 +266,13 @@ func convertData(codebase models.Codebase) k8s.CodebaseSpec {
 	return spec
 }
 
-func (this CodebaseService) GetCodebaseByCodebaseAndBranchNames(codebaseName, branchName string) (*models.CodebaseView, error) {
-	codebase, err := this.ICodebaseRepository.GetCodebaseByCodebaseAndBranchNames(codebaseName, branchName)
-	if err != nil {
-		log.Printf("An error has occurred while getting codebase object %s from database: %s", codebaseName, err)
-		return nil, err
-	}
-	log.Printf("Fetched codebase info: %+v", codebase)
+func (s CodebaseService) checkAppAndBranch(apps []models.ApplicationWithBranch) bool {
+	for _, app := range apps {
+		exist := s.ICodebaseRepository.ExistActiveCodebaseAndBranch(app.ApplicationName, app.BranchName)
 
-	return codebase, nil
+		if !exist {
+			return false
+		}
+	}
+	return true
 }

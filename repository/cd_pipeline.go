@@ -18,6 +18,7 @@ package repository
 
 import (
 	"edp-admin-console/models"
+	"edp-admin-console/models/dto"
 	"edp-admin-console/repository/sql_builder"
 	"github.com/astaxie/beego/orm"
 )
@@ -86,7 +87,7 @@ func (this CDPipelineRepository) GetCDPipelineByName(pipelineName string) (*mode
 	for _, row := range maps {
 		cdPipeline.Name = row["pipeline_name"].(string)
 		cdPipeline.Status = row["status"].(string)
-		cdPipeline.CodebaseBranches = append(cdPipeline.CodebaseBranches, models.CodebaseBranchDTO{
+		cdPipeline.CodebaseBranches = append(cdPipeline.CodebaseBranches, dto.CodebaseBranchDTO{
 			AppName:    row["app_name"].(string),
 			BranchName: row["branch_name"].(string),
 		})

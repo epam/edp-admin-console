@@ -18,35 +18,53 @@ package controllers
 
 import (
 	"edp-admin-console/context"
+	"edp-admin-console/models/query"
 	"edp-admin-console/service"
 	"github.com/astaxie/beego"
+	"log"
 )
 
 type CodebaseController struct {
 	beego.Controller
 	CodebaseService  service.CodebaseService
 	EDPTenantService service.EDPTenantService
-	BranchService    service.BranchService
+	BranchService    service.CodebaseBranchService
 }
 
-func (this *CodebaseController) GetCodebaseOverviewPage() {
-	codebaseName := this.GetString(":codebaseName")
-	codebase, err := this.CodebaseService.GetCodebase(codebaseName)
+func (c *CodebaseController) GetCodebaseOverviewPage() {
+	codebaseName := c.GetString(":codebaseName")
+	codebase, err := c.CodebaseService.GetCodebaseByName(codebaseName)
 	if err != nil {
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
-	branchEntities, err := this.BranchService.GetAllReleaseBranchesByAppName(codebaseName)
-	branchEntities = addCodebaseBranchInProgressIfAny(branchEntities, this.GetString(paramWaitingForBranch))
+	codebase.CodebaseBranch = addCodebaseBranchInProgressIfAny(codebase.CodebaseBranch, c.GetString(paramWaitingForBranch))
 	if err != nil {
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
-	this.Data["ReleaseBranches"] = branchEntities
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["Codebase"] = codebase
-	this.TplName = "codebase_overview.html"
+	c.Data["EDPVersion"] = context.EDPVersion
+	c.Data["Username"] = c.Ctx.Input.Session("username")
+	c.Data["Codebase"] = codebase
+	c.TplName = "codebase_overview.html"
+}
+
+func addCodebaseBranchInProgressIfAny(branches []*query.CodebaseBranch, branchInProgress string) []*query.CodebaseBranch {
+	if branchInProgress != "" {
+		for _, branch := range branches {
+			if branch.Name == branchInProgress {
+				return branches
+			}
+		}
+
+		log.Println("Adding branch " + branchInProgress + " which is going to be created to the list.")
+		branch := query.CodebaseBranch{
+			Name:   branchInProgress,
+			Status: "inactive",
+		}
+		branches = append(branches, &branch)
+	}
+	return branches
 }

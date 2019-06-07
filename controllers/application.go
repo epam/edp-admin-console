@@ -18,7 +18,8 @@ package controllers
 
 import (
 	"edp-admin-console/context"
-	"edp-admin-console/models"
+	"edp-admin-console/models/command"
+	"edp-admin-console/models/query"
 	"edp-admin-console/service"
 	"edp-admin-console/util"
 	"fmt"
@@ -30,41 +31,39 @@ type ApplicationController struct {
 	beego.Controller
 	CodebaseService  service.CodebaseService
 	EDPTenantService service.EDPTenantService
-	BranchService    service.BranchService
+	BranchService    service.CodebaseBranchService
 }
 
 const (
 	paramWaitingForBranch   = "waitingforbranch"
 	paramWaitingForCodebase = "waitingforcodebase"
-	ApplicationType         = "application"
 )
 
-func (this *ApplicationController) GetApplicationsOverviewPage() {
-	flash := beego.ReadFromRequest(&this.Controller)
+func (c *ApplicationController) GetApplicationsOverviewPage() {
+	flash := beego.ReadFromRequest(&c.Controller)
 	if flash.Data["success"] != "" {
-		this.Data["Success"] = true
+		c.Data["Success"] = true
 	}
 
-	var appType = "application"
-	applications, err := this.CodebaseService.GetAllCodebases(models.CodebaseCriteria{
-		Type: &appType,
+	applications, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
+		Type: query.App,
 	})
-	applications = addCodebaseInProgressIfAny(applications, this.GetString(paramWaitingForCodebase))
+	applications = addCodebaseInProgressIfAny(applications, c.GetString(paramWaitingForCodebase))
 	if err != nil {
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
-	contextRoles := this.GetSession("realm_roles").([]string)
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["HasRights"] = isAdmin(contextRoles)
-	this.Data["Codebases"] = applications
-	this.Data["Type"] = appType
-	this.TplName = "codebase.html"
+	contextRoles := c.GetSession("realm_roles").([]string)
+	c.Data["EDPVersion"] = context.EDPVersion
+	c.Data["Username"] = c.Ctx.Input.Session("username")
+	c.Data["HasRights"] = isAdmin(contextRoles)
+	c.Data["Codebases"] = applications
+	c.Data["Type"] = query.App
+	c.TplName = "codebase.html"
 }
 
-func addCodebaseInProgressIfAny(codebases []models.CodebaseView, codebaseInProgress string) []models.CodebaseView {
+func addCodebaseInProgressIfAny(codebases []*query.Codebase, codebaseInProgress string) []*query.Codebase {
 	if codebaseInProgress != "" {
 		for _, codebase := range codebases {
 			if codebase.Name == codebaseInProgress {
@@ -73,91 +72,73 @@ func addCodebaseInProgressIfAny(codebases []models.CodebaseView, codebaseInProgr
 		}
 
 		log.Printf("Adding codebase %s which is going to be created to the list.", codebaseInProgress)
-		app := models.CodebaseView{
+		app := query.Codebase{
 			Name:   codebaseInProgress,
-			Status: "in_progress",
+			Status: query.Inactive,
 		}
-		codebases = append(codebases, app)
+		codebases = append(codebases, &app)
 	}
 	return codebases
 }
 
-func addCodebaseBranchInProgressIfAny(branches []models.ReleaseBranchView, branchInProgress string) []models.ReleaseBranchView {
-	if branchInProgress != "" {
-		for _, branch := range branches {
-			if branch.Name == branchInProgress {
-				return branches
-			}
-		}
-
-		log.Println("Adding branch " + branchInProgress + " which is going to be created to the list.")
-		app := models.ReleaseBranchView{
-			Name:  branchInProgress,
-			Event: "In progress",
-		}
-		branches = append(branches, app)
-	}
-	return branches
-}
-
-func (this *ApplicationController) GetCreateApplicationPage() {
-	flash := beego.ReadFromRequest(&this.Controller)
-	isVcsEnabled, err := this.EDPTenantService.GetVcsIntegrationValue()
+func (c *ApplicationController) GetCreateApplicationPage() {
+	flash := beego.ReadFromRequest(&c.Controller)
+	isVcsEnabled, err := c.EDPTenantService.GetVcsIntegrationValue()
 
 	if err != nil {
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
 	if flash.Data["error"] != "" {
-		this.Data["Error"] = flash.Data["error"]
+		c.Data["Error"] = flash.Data["error"]
 	}
 
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["IsVcsEnabled"] = isVcsEnabled
-	this.TplName = "create_application.html"
+	c.Data["EDPVersion"] = context.EDPVersion
+	c.Data["Username"] = c.Ctx.Input.Session("username")
+	c.Data["IsVcsEnabled"] = isVcsEnabled
+	c.TplName = "create_application.html"
 }
 
-func (this *ApplicationController) CreateApplication() {
+func (c *ApplicationController) CreateApplication() {
 	flash := beego.NewFlash()
-	codebase := extractApplicationRequestData(this)
+	codebase := extractApplicationRequestData(c)
 	errMsg := validRequestData(codebase)
 	if errMsg != nil {
 		log.Printf("Failed to validate request data: %s", errMsg.Message)
 		flash.Error(errMsg.Message)
-		flash.Store(&this.Controller)
-		this.Redirect("/admin/edp/application/create", 302)
+		flash.Store(&c.Controller)
+		c.Redirect("/admin/edp/application/create", 302)
 		return
 	}
 	logRequestData(codebase)
 
-	createdObject, err := this.CodebaseService.CreateCodebase(codebase)
+	createdObject, err := c.CodebaseService.CreateCodebase(codebase)
 
 	if err != nil {
 		if err.Error() == "CODEBASE_ALREADY_EXISTS" {
 			flash.Error("Application %s name is already exists.", codebase.Name)
-			flash.Store(&this.Controller)
-			this.Redirect("/admin/edp/application/create", 302)
+			flash.Store(&c.Controller)
+			c.Redirect("/admin/edp/application/create", 302)
 			return
 		}
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
 	log.Printf("Application object is saved into k8s: %s", createdObject)
 	flash.Success("Application object is created.")
-	flash.Store(&this.Controller)
-	this.Redirect(fmt.Sprintf("/admin/edp/application/overview?%s=%s#codebaseSuccessModal", paramWaitingForCodebase, codebase.Name), 302)
+	flash.Store(&c.Controller)
+	c.Redirect(fmt.Sprintf("/admin/edp/application/overview?%s=%s#codebaseSuccessModal", paramWaitingForCodebase, codebase.Name), 302)
 }
 
-func extractApplicationRequestData(this *ApplicationController) models.Codebase {
-	codebase := models.Codebase{
+func extractApplicationRequestData(this *ApplicationController) command.CreateCodebase {
+	codebase := command.CreateCodebase{
 		Lang:      this.GetString("appLang"),
 		BuildTool: this.GetString("buildTool"),
 		Name:      this.GetString("nameOfApp"),
 		Strategy:  this.GetString("strategy"),
-		Type:      ApplicationType,
+		Type:      "application",
 	}
 
 	framework := this.GetString("framework")
@@ -171,7 +152,7 @@ func extractApplicationRequestData(this *ApplicationController) models.Codebase 
 
 	repoUrl := this.GetString("gitRepoUrl")
 	if repoUrl != "" {
-		codebase.Repository = &models.Repository{
+		codebase.Repository = &command.Repository{
 			Url: repoUrl,
 		}
 
@@ -185,7 +166,7 @@ func extractApplicationRequestData(this *ApplicationController) models.Codebase 
 	vcsLogin := this.GetString("vcsLogin")
 	vcsPassword := this.GetString("vcsPassword")
 	if vcsLogin != "" && vcsPassword != "" {
-		codebase.Vcs = &models.Vcs{
+		codebase.Vcs = &command.Vcs{
 			Login:    vcsLogin,
 			Password: vcsPassword,
 		}
@@ -193,7 +174,7 @@ func extractApplicationRequestData(this *ApplicationController) models.Codebase 
 
 	needRoute, _ := this.GetBool("needRoute", false)
 	if needRoute {
-		codebase.Route = &models.Route{
+		codebase.Route = &command.Route{
 			Site: this.GetString("routeSite"),
 		}
 		if len(this.GetString("routePath")) > 0 {
@@ -203,7 +184,7 @@ func extractApplicationRequestData(this *ApplicationController) models.Codebase 
 
 	needDb, _ := this.GetBool("needDb", false)
 	if needDb {
-		codebase.Database = &models.Database{
+		codebase.Database = &command.Database{
 			Kind:     this.GetString("database"),
 			Version:  this.GetString("dbVersion"),
 			Capacity: this.GetString("dbCapacity") + this.GetString("capacityExt"),

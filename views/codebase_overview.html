@@ -115,7 +115,7 @@
                     </div>
 
 
-                    {{if ne (len .ReleaseBranches) 0}}
+                    {{if ne (len .Codebase.CodebaseBranch) 0}}
                         <div class="card">
                             <div class="card-header" id="headingThree"
                                  aria-expanded="true" aria-controls="collapseThree">
@@ -138,21 +138,21 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            {{range .ReleaseBranches}}
-                                                <tr data-branch-name="{{.Name}}" data-branch-status="{{.Event}}">
+                                            {{range .Codebase.CodebaseBranch}}
+                                                <tr data-branch-name="{{.Name}}" data-branch-status="{{.Status}}">
                                                     <td>
-                                                        <img src="{{if eq .Event "created"}}/static/img/green_circle.svg{{else if eq .Event "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}"
+                                                        <img src="{{if eq .Status "active"}}/static/img/green_circle.svg{{else if eq .Status "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}"
                                                              alt="" style="width:25px; height:25px;">
                                                     </td>
                                                     <td>{{.Name}}</td>
                                                     <td>
                                                         <a href="{{.VCSLink}}" target="_blank" rel="noopener noreferrer"
-                                                           class="{{if ne .Event "created"}}disabled{{end}}">Link</a>
+                                                           class="{{if ne .Status "active"}}disabled{{end}}">Link</a>
                                                     </td>
                                                     <td>
                                                         <a href="{{.CICDLink}}" target="_blank"
                                                            rel="noopener noreferrer"
-                                                           class="{{if ne .Event "created"}}disabled{{end}}">Link</a>
+                                                           class="{{if ne .Status "active"}}disabled{{end}}">Link</a>
                                                     </td>
                                                 </tr>
                                             {{end}}

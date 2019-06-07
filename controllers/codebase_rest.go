@@ -17,7 +17,8 @@
 package controllers
 
 import (
-	"edp-admin-console/models"
+	"edp-admin-console/models/command"
+	"edp-admin-console/models/query"
 	"edp-admin-console/service"
 	"edp-admin-console/util"
 	"encoding/json"
@@ -42,103 +43,97 @@ type ErrMsg struct {
 	StatusCode int
 }
 
-var codebaseTypes = map[string]string{
-	"application": "",
-	"autotests":   "",
-	"library":     "",
-}
-
-func (this *CodebaseRestController) GetCodebases() {
-	criteria, err := getFilterCriteria(this)
+func (c *CodebaseRestController) GetCodebases() {
+	criteria, err := getFilterCriteria(c)
 	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusBadRequest)
+		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	codebases, err := this.CodebaseService.GetAllCodebases(*criteria)
+	codebases, err := c.CodebaseService.GetCodebasesByCriteria(*criteria)
 	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	this.Data["json"] = codebases
-	this.ServeJSON()
+	c.Data["json"] = codebases
+	c.ServeJSON()
 }
 
 func isTypeAcceptable(getParam string) bool {
-	if _, ok := codebaseTypes[getParam]; ok {
+	if _, ok := query.CodebaseTypes[getParam]; ok {
 		return true
 	}
 	return false
 }
 
-func getFilterCriteria(this *CodebaseRestController) (*models.CodebaseCriteria, error) {
+func getFilterCriteria(this *CodebaseRestController) (*query.CodebaseCriteria, error) {
 	codebaseType := this.GetString("type")
 	if codebaseType == "" || isTypeAcceptable(codebaseType) {
-		return &models.CodebaseCriteria{
-			Type: &codebaseType,
+		return &query.CodebaseCriteria{
+			Type: query.CodebaseTypes[codebaseType],
 		}, nil
 	}
 	return nil, errors.New("type is not valid")
 }
 
-func (this *CodebaseRestController) GetCodebase() {
-	codebaseName := this.GetString(":codebaseName")
-	codebase, err := this.CodebaseService.GetCodebase(codebaseName)
+func (c *CodebaseRestController) GetCodebase() {
+	codebaseName := c.GetString(":codebaseName")
+	codebase, err := c.CodebaseService.GetCodebaseByName(codebaseName)
 	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if codebase == nil {
 		nonAppMsg := fmt.Sprintf("Please check codebase name. It seems there're not %s codebase.", codebaseName)
-		http.Error(this.Ctx.ResponseWriter, nonAppMsg, http.StatusNotFound)
+		http.Error(c.Ctx.ResponseWriter, nonAppMsg, http.StatusNotFound)
 		return
 	}
 
-	this.Data["json"] = codebase
-	this.ServeJSON()
+	c.Data["json"] = codebase
+	c.ServeJSON()
 }
 
-func (this *CodebaseRestController) CreateCodebase() {
-	var codebase models.Codebase
-	err := json.NewDecoder(this.Ctx.Request.Body).Decode(&codebase)
-	usr, _ := this.Ctx.Input.Session("username").(string)
+func (c *CodebaseRestController) CreateCodebase() {
+	var codebase command.CreateCodebase
+	err := json.NewDecoder(c.Ctx.Request.Body).Decode(&codebase)
+	usr, _ := c.Ctx.Input.Session("username").(string)
 	codebase.Username = usr
 	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	errMsg := validRequestData(codebase)
 	if errMsg != nil {
 		log.Printf("Failed to validate request data: %s", errMsg.Message)
-		http.Error(this.Ctx.ResponseWriter, errMsg.Message, http.StatusBadRequest)
+		http.Error(c.Ctx.ResponseWriter, errMsg.Message, http.StatusBadRequest)
 		return
 	}
 	logRequestData(codebase)
 
-	createdObject, err := this.CodebaseService.CreateCodebase(codebase)
+	createdObject, err := c.CodebaseService.CreateCodebase(codebase)
 
 	if err != nil {
 		if err.Error() == "CODEBASE_ALREADY_EXISTS" {
 			errMsg := fmt.Sprintf("Codebase resource with %s name is already exists.", codebase.Name)
-			http.Error(this.Ctx.ResponseWriter, errMsg, http.StatusBadRequest)
+			http.Error(c.Ctx.ResponseWriter, errMsg, http.StatusBadRequest)
 			return
 		}
 		errMsg := fmt.Sprintf("Failed to create codebase resource: %v", err.Error())
-		http.Error(this.Ctx.ResponseWriter, errMsg, http.StatusInternalServerError)
+		http.Error(c.Ctx.ResponseWriter, errMsg, http.StatusInternalServerError)
 		return
 	}
 
 	log.Printf("Codebase resource is saved into k8s: %+v", createdObject)
 
-	location := fmt.Sprintf("%s/%s", this.Ctx.Input.URL(), uuid.NewV4().String())
-	this.Ctx.ResponseWriter.WriteHeader(200)
-	this.Ctx.Output.Header("Location", location)
+	location := fmt.Sprintf("%s/%s", c.Ctx.Input.URL(), uuid.NewV4().String())
+	c.Ctx.ResponseWriter.WriteHeader(200)
+	c.Ctx.Output.Header("Location", location)
 }
 
-func validRequestData(codebase models.Codebase) *ErrMsg {
+func validRequestData(codebase command.CreateCodebase) *ErrMsg {
 	valid := validation.Validation{}
 	var resErr error
 
@@ -224,7 +219,7 @@ func extractErrors(valid validation.Validation) []string {
 	return errMap
 }
 
-func logRequestData(app models.Codebase) {
+func logRequestData(app command.CreateCodebase) {
 	var result strings.Builder
 	result.WriteString(fmt.Sprintf("Request data to create CR is valid. name=%s, strategy=%s, lang=%s, buildTool=%s, multiModule=%s, framework=%s",
 		app.Name, app.Strategy, app.Lang, app.BuildTool, app.MultiModule, app.Framework))

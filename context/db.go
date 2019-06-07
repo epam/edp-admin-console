@@ -17,7 +17,7 @@
 package context
 
 import (
-	"edp-admin-console/models"
+	"edp-admin-console/models/query"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
@@ -58,7 +58,7 @@ func InitDb() {
 	if err != nil {
 		log.Printf("Warning from db migration: %v", err)
 	}
-	orm.RegisterModel(new(models.CodebaseDetailInfo), new(models.ActionLog))
+	orm.RegisterModel(new(query.Codebase), new(query.ActionLog), new(query.CodebaseBranch))
 }
 
 func checkErr(err error) {

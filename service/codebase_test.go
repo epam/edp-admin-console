@@ -30,40 +30,40 @@ func (mock *ApplicationEntityRepositoryMock) GetAllApplicationsWithReleaseBranch
 
 func TestShouldReturnApplications(t *testing.T) {
 	repositoryMock := new(ApplicationEntityRepositoryMock)
-	repositoryMock.On("GetAllCodebases", mock.Anything).Return(createApplications(), nil)
+	repositoryMock.On("GetCodebasesByCriteria", mock.Anything).Return(createApplications(), nil)
 	appService := CodebaseService{ICodebaseRepository: repositoryMock}
 
-	applications, err := appService.GetAllCodebases(models.CodebaseCriteria{})
+	applications, err := appService.GetCodebasesByCriteria(models.CodebaseCriteria{})
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(applications), "they should be equal")
 }
 
 func TestShouldReturnErrorFromGetAllApplications(t *testing.T) {
 	repositoryMock := new(ApplicationEntityRepositoryMock)
-	repositoryMock.On("GetAllCodebases", mock.Anything).Return(createApplications(), errors.New("internal error"))
+	repositoryMock.On("GetCodebasesByCriteria", mock.Anything).Return(createApplications(), errors.New("internal error"))
 	appService := CodebaseService{ICodebaseRepository: repositoryMock}
 
-	applications, err := appService.GetAllCodebases(models.CodebaseCriteria{})
+	applications, err := appService.GetCodebasesByCriteria(models.CodebaseCriteria{})
 	assert.Error(t, err)
 	assert.Nil(t, applications)
 }
 
 func TestShouldReturnApplication(t *testing.T) {
 	repositoryMock := new(ApplicationEntityRepositoryMock)
-	repositoryMock.On("GetCodebase", mock.Anything, mock.Anything).Return(&models.ApplicationInfo{}, nil)
+	repositoryMock.On("GetCodebaseByName", mock.Anything, mock.Anything).Return(&models.ApplicationInfo{}, nil)
 	appService := CodebaseService{ICodebaseRepository: repositoryMock}
 
-	application, err := appService.GetCodebase(mock.Anything)
+	application, err := appService.GetCodebaseByName(mock.Anything)
 	assert.Nil(t, err)
 	assert.NotNil(t, application)
 }
 
 func TestShouldReturnErrorFromGetAllApplication(t *testing.T) {
 	repositoryMock := new(ApplicationEntityRepositoryMock)
-	repositoryMock.On("GetCodebase", mock.Anything, mock.Anything).Return(&models.ApplicationInfo{}, errors.New("internal error"))
+	repositoryMock.On("GetCodebaseByName", mock.Anything, mock.Anything).Return(&models.ApplicationInfo{}, errors.New("internal error"))
 	appService := CodebaseService{ICodebaseRepository: repositoryMock}
 
-	application, err := appService.GetCodebase(mock.Anything)
+	application, err := appService.GetCodebaseByName(mock.Anything)
 	assert.NotNil(t, err)
 	assert.Nil(t, application)
 }

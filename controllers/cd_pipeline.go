@@ -19,6 +19,7 @@ package controllers
 import (
 	"edp-admin-console/context"
 	"edp-admin-console/models"
+	"edp-admin-console/models/query"
 	"edp-admin-console/service"
 	"fmt"
 	"github.com/astaxie/beego"
@@ -31,137 +32,133 @@ type CDPipelineController struct {
 	CodebaseService  service.CodebaseService
 	PipelineService  service.CDPipelineService
 	EDPTenantService service.EDPTenantService
-	BranchService    service.BranchService
+	BranchService    service.CodebaseBranchService
 }
 
 const paramWaitingForCdPipeline = "waitingforcdpipeline"
 
-func (this *CDPipelineController) GetContinuousDeliveryPage() {
-	var activeStatus = "active"
-	var appType = "application"
-	applications, err := this.CodebaseService.GetAllCodebases(models.CodebaseCriteria{
-		Status: &activeStatus,
-		Type:   &appType,
+func (c *CDPipelineController) GetContinuousDeliveryPage() {
+	applications, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
+		Status: query.Active,
+		Type:   query.App,
 	})
 	if err != nil {
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
-	branches, err := this.BranchService.GetAllReleaseBranches(models.BranchCriteria{
-		Status: &activeStatus,
+	branches, err := c.BranchService.GetCodebaseBranchesByCriteria(query.CodebaseBranchCriteria{
+		Status: "active",
 	})
 	if err != nil {
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
-	cdPipelines, err := this.PipelineService.GetAllPipelines(models.CDPipelineCriteria{})
+	cdPipelines, err := c.PipelineService.GetAllPipelines(models.CDPipelineCriteria{})
 	if err != nil {
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
-	cdPipelines = addCdPipelineInProgressIfAny(cdPipelines, this.GetString(paramWaitingForCdPipeline))
+	cdPipelines = addCdPipelineInProgressIfAny(cdPipelines, c.GetString(paramWaitingForCdPipeline))
 
-	contextRoles := this.GetSession("realm_roles").([]string)
-	this.Data["ActiveApplicationsAndBranches"] = len(applications) > 0 && len(branches) > 0
-	this.Data["CDPipelines"] = cdPipelines
-	this.Data["Applications"] = applications
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["HasRights"] = isAdmin(contextRoles)
-	this.TplName = "continuous_delivery.html"
+	contextRoles := c.GetSession("realm_roles").([]string)
+	c.Data["ActiveApplicationsAndBranches"] = len(applications) > 0 && len(branches) > 0
+	c.Data["CDPipelines"] = cdPipelines
+	c.Data["Applications"] = applications
+	c.Data["EDPVersion"] = context.EDPVersion
+	c.Data["Username"] = c.Ctx.Input.Session("username")
+	c.Data["HasRights"] = isAdmin(contextRoles)
+	c.TplName = "continuous_delivery.html"
 }
 
-func (this *CDPipelineController) GetCreateCDPipelinePage() {
-	flash := beego.ReadFromRequest(&this.Controller)
-	var activeStatus = "active"
-	var appType = "application"
-	applicationsWithReleaseBranches, err := this.CodebaseService.GetAllCodebasesWithReleaseBranches(models.CodebaseCriteria{
-		Status: &activeStatus,
-		Type:   &appType,
+func (c *CDPipelineController) GetCreateCDPipelinePage() {
+	flash := beego.ReadFromRequest(&c.Controller)
+	apps, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
+		Status: query.Active,
+		Type:   query.App,
 	})
 	if err != nil {
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
 	if flash.Data["error"] != "" {
-		this.Data["Error"] = flash.Data["error"]
+		c.Data["Error"] = flash.Data["error"]
 	}
 
-	this.Data["ApplicationsWithReleaseBranches"] = applicationsWithReleaseBranches
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.TplName = "create_cd_pipeline.html"
+	c.Data["Apps"] = apps
+	c.Data["EDPVersion"] = context.EDPVersion
+	c.Data["Username"] = c.Ctx.Input.Session("username")
+	c.TplName = "create_cd_pipeline.html"
 }
 
-func (this *CDPipelineController) CreateCDPipeline() {
+func (c *CDPipelineController) CreateCDPipeline() {
 	flash := beego.NewFlash()
-	appNameCheckboxes := this.GetStrings("app")
-	pipelineName := this.GetString("pipelineName")
-	stages := retrieveStagesFromRequest(this)
+	appNameCheckboxes := c.GetStrings("app")
+	pipelineName := c.GetString("pipelineName")
+	stages := retrieveStagesFromRequest(c)
 
 	cdPipelineCreateCommand := models.CDPipelineCreateCommand{
 		Name:         pipelineName,
-		Applications: convertApplicationWithBranchesData(this, appNameCheckboxes),
+		Applications: convertApplicationWithBranchesData(c, appNameCheckboxes),
 		Stages:       stages,
 	}
 	errMsg := validateCDPipelineRequestData(cdPipelineCreateCommand)
 	if errMsg != nil {
 		log.Printf("Request data is not valid: %s", errMsg.Message)
 		flash.Error(errMsg.Message)
-		flash.Store(&this.Controller)
-		this.Redirect("/admin/edp/cd-pipeline/create", 302)
+		flash.Store(&c.Controller)
+		c.Redirect("/admin/edp/cd-pipeline/create", 302)
 		return
 	}
 	log.Printf("Request data is receieved to create CD pipeline: %s. Applications: %v. Stages: %v",
 		cdPipelineCreateCommand.Name, cdPipelineCreateCommand.Applications, cdPipelineCreateCommand.Stages)
 
-	_, pipelineErr := this.PipelineService.CreatePipeline(cdPipelineCreateCommand)
+	_, pipelineErr := c.PipelineService.CreatePipeline(cdPipelineCreateCommand)
 	if pipelineErr != nil {
 		if pipelineErr == models.ErrCDPipelineIsExists {
 			flash.Error(fmt.Sprintf("cd pipeline %v is already exists", cdPipelineCreateCommand.Name))
-			flash.Store(&this.Controller)
-			this.Redirect("/admin/edp/cd-pipeline/create", http.StatusFound)
+			flash.Store(&c.Controller)
+			c.Redirect("/admin/edp/cd-pipeline/create", http.StatusFound)
 			return
 		}
 		if pipelineErr == models.ErrNonValidRelatedBranch {
 			flash.Error(fmt.Sprintf("one or more applications have non valid branches: %v", cdPipelineCreateCommand.Applications))
-			flash.Store(&this.Controller)
-			this.Redirect("/admin/edp/cd-pipeline/create", http.StatusBadRequest)
+			flash.Store(&c.Controller)
+			c.Redirect("/admin/edp/cd-pipeline/create", http.StatusBadRequest)
 			return
 		}
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Redirect(fmt.Sprintf("/admin/edp/cd-pipeline/overview?%s=%s#cdPipelineSuccessModal", paramWaitingForCdPipeline, pipelineName), 302)
+	c.Data["EDPVersion"] = context.EDPVersion
+	c.Data["Username"] = c.Ctx.Input.Session("username")
+	c.Redirect(fmt.Sprintf("/admin/edp/cd-pipeline/overview?%s=%s#cdPipelineSuccessModal", paramWaitingForCdPipeline, pipelineName), 302)
 }
 
-func (this *CDPipelineController) GetCDPipelineOverviewPage() {
-	pipelineName := this.GetString(":pipelineName")
+func (c *CDPipelineController) GetCDPipelineOverviewPage() {
+	pipelineName := c.GetString(":pipelineName")
 
-	cdPipeline, err := this.PipelineService.GetCDPipelineByName(pipelineName)
+	cdPipeline, err := c.PipelineService.GetCDPipelineByName(pipelineName)
 	if err != nil {
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
-	stages, err := this.PipelineService.GetCDPipelineStages(pipelineName)
+	stages, err := c.PipelineService.GetCDPipelineStages(pipelineName)
 	if err != nil {
-		this.Abort("500")
+		c.Abort("500")
 		return
 	}
 
 	cdPipeline.Stages = stages
 
-	this.Data["CDPipeline"] = cdPipeline
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.TplName = "cd_pipeline_overview.html"
+	c.Data["CDPipeline"] = cdPipeline
+	c.Data["EDPVersion"] = context.EDPVersion
+	c.Data["Username"] = c.Ctx.Input.Session("username")
+	c.TplName = "cd_pipeline_overview.html"
 }
 
 func retrieveStagesFromRequest(this *CDPipelineController) []models.StageCreate {

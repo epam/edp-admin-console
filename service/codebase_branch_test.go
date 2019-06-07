@@ -30,8 +30,8 @@ func (mock *ReleaseBranchRepositoryMock) GetReleaseBranch(appName, branchName st
 
 func TestShouldReturnBranch(t *testing.T) {
 	repositoryMock := new(ReleaseBranchRepositoryMock)
-	repositoryMock.On("GetReleaseBranch", mock.Anything, mock.Anything, mock.Anything).Return(&models.ReleaseBranchView{}, nil)
-	branchService := BranchService{IReleaseBranchRepository: repositoryMock}
+	repositoryMock.On("GetBranchByCodebaseAndName", mock.Anything, mock.Anything, mock.Anything).Return(&models.ReleaseBranchView{}, nil)
+	branchService := CodebaseBranchService{IReleaseBranchRepository: repositoryMock}
 
 	branchEntity, err := branchService.GetReleaseBranch(mock.Anything, mock.Anything)
 	assert.Nil(t, err)
@@ -40,8 +40,8 @@ func TestShouldReturnBranch(t *testing.T) {
 
 func TestShouldReturnErrorBranch(t *testing.T) {
 	repositoryMock := new(ReleaseBranchRepositoryMock)
-	repositoryMock.On("GetReleaseBranch", mock.Anything, mock.Anything, mock.Anything).Return(&models.ReleaseBranchView{}, errors.New("internal error"))
-	branchService := BranchService{IReleaseBranchRepository: repositoryMock}
+	repositoryMock.On("GetBranchByCodebaseAndName", mock.Anything, mock.Anything, mock.Anything).Return(&models.ReleaseBranchView{}, errors.New("internal error"))
+	branchService := CodebaseBranchService{IReleaseBranchRepository: repositoryMock}
 
 	branchEntity, err := branchService.GetReleaseBranch(mock.Anything, mock.Anything)
 	assert.NotNil(t, err)
@@ -50,8 +50,8 @@ func TestShouldReturnErrorBranch(t *testing.T) {
 
 func TestShouldReturnAllBranch(t *testing.T) {
 	repositoryMock := new(ReleaseBranchRepositoryMock)
-	repositoryMock.On("GetAllReleaseBranches", mock.Anything, mock.Anything).Return(createBranchEntities(), nil)
-	branchService := BranchService{IReleaseBranchRepository: repositoryMock}
+	repositoryMock.On("GetCodebaseBranchesByCriteria", mock.Anything, mock.Anything).Return(createBranchEntities(), nil)
+	branchService := CodebaseBranchService{IReleaseBranchRepository: repositoryMock}
 
 	branchEntity, err := branchService.GetAllReleaseBranches(models.BranchCriteria{})
 	assert.Nil(t, err)
@@ -60,8 +60,8 @@ func TestShouldReturnAllBranch(t *testing.T) {
 
 func TestShouldReturnErrorAllBranch(t *testing.T) {
 	repositoryMock := new(ReleaseBranchRepositoryMock)
-	repositoryMock.On("GetAllReleaseBranches", mock.Anything, mock.Anything).Return(createBranchEntities(), errors.New("internal error"))
-	branchService := BranchService{IReleaseBranchRepository: repositoryMock}
+	repositoryMock.On("GetCodebaseBranchesByCriteria", mock.Anything, mock.Anything).Return(createBranchEntities(), errors.New("internal error"))
+	branchService := CodebaseBranchService{IReleaseBranchRepository: repositoryMock}
 
 	branchEntity, err := branchService.GetAllReleaseBranches(models.BranchCriteria{})
 	assert.NotNil(t, err)
@@ -71,7 +71,7 @@ func TestShouldReturnErrorAllBranch(t *testing.T) {
 func TestShouldReturnAllReleaseBranchesByAppName(t *testing.T) {
 	repositoryMock := new(ReleaseBranchRepositoryMock)
 	repositoryMock.On("GetAllReleaseBranchesByAppName", mock.Anything).Return([]models.ReleaseBranchView{}, nil)
-	branchService := BranchService{IReleaseBranchRepository: repositoryMock}
+	branchService := CodebaseBranchService{IReleaseBranchRepository: repositoryMock}
 
 	branchEntity, err := branchService.GetAllReleaseBranchesByAppName(mock.Anything)
 	assert.Nil(t, err)
@@ -81,7 +81,7 @@ func TestShouldReturnAllReleaseBranchesByAppName(t *testing.T) {
 func TestShouldReturnErrorAllReleaseBranchesByAppName(t *testing.T) {
 	repositoryMock := new(ReleaseBranchRepositoryMock)
 	repositoryMock.On("GetAllReleaseBranchesByAppName", mock.Anything).Return([]models.ReleaseBranchView{}, errors.New("internal error"))
-	branchService := BranchService{IReleaseBranchRepository: repositoryMock}
+	branchService := CodebaseBranchService{IReleaseBranchRepository: repositoryMock}
 
 	branchEntity, err := branchService.GetAllReleaseBranchesByAppName(mock.Anything)
 	assert.NotNil(t, err)
