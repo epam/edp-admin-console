@@ -56,7 +56,7 @@ func AuthFilter(context *bgCtx.Context) {
 	log.Printf("ResourceAccess %s has been retrieved from the token", resourceRoles)
 	context.Output.Session("resource_access", resourceRoles)
 	context.Output.Session("realm_roles", realmRoles)
-	username := getUserInfoFromToken(context, idToken)
+	username := getUserInfoFromToken(context, idToken, "name")
 	log.Printf("Username {%s} has been fetched from token", username)
 	context.Output.Session("username", username)
 }
@@ -113,12 +113,12 @@ func startAuth(context *bgCtx.Context) {
 	context.Redirect(http.StatusFound, authConfig.Oauth2Config.AuthCodeURL(state))
 }
 
-func getUserInfoFromToken(context *bgCtx.Context, token *oidc.IDToken) string {
+func getUserInfoFromToken(context *bgCtx.Context, token *oidc.IDToken, userKey string) string {
 	var claim map[string]*json.RawMessage
 	err := token.Claims(&claim)
 	if err != nil {
 		log.Printf("Error has been occurred during the parsing token %+v", token)
 		context.Abort(200, "500")
 	}
-	return strings.Replace(string(*claim["preferred_username"]), "\"", "", -1)
+	return strings.Replace(string(*claim[userKey]), "\"", "", -1)
 }
