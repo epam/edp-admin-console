@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css?family=Oswald:500&display=swap');
 @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro");
 @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro");
 @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro");
@@ -7681,3 +7682,52 @@ button.delete {
     .stages .step-status p {
       font-weight: 600;
       text-align: left; }
+
+.btn {
+  border-radius: 3px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  line-height: 24px;
+}
+
+.btn-success,
+.btn-primary {
+  background-color: #CEDB56;
+  border:none;
+  color: #ffffff;
+}
+
+.btn-success:hover,
+.btn-success:focus,
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #A9B447;
+  color: #ffffff;
+}
+
+.btn-success.disabled,
+.btn-success:disabled,
+.btn-primary:disabled {
+  background-color: #D7DCAB;
+  color: #ffffff;
+}
+
+
+.btn-secondary {
+  background-color: #CCCCCC;
+  border:none;
+  color: #ffffff;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: #A7A7A7;
+  color: #ffffff;
+}
+
+.btn-secondary.disabled {
+  background-color: #E7E7E7;
+  border:none;
+  color: #CCCCCC;
+}
