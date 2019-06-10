@@ -29,8 +29,33 @@ import (
 
 func init() {
 	log.Printf("Start application in %s mode with %s EDP version...", beego.AppConfig.String("runmode"), context.EDPVersion)
-	context.InitDb()
-	context.InitAuth()
+	authEnabled, err := beego.AppConfig.Bool("keycloakAuthEnabled")
+	if err != nil {
+		log.Printf("Cannot read property keycloakAuthEnabled: %v. Set default: true", err)
+		authEnabled = true
+	}
+
+	if authEnabled {
+		context.InitAuth()
+		beego.Router("/auth/callback", &controllers.AuthController{}, "get:Callback")
+		beego.InsertFilter("/admin/*", beego.BeforeRouter, filters.AuthFilter)
+		beego.InsertFilter("/api/v1/edp/*", beego.BeforeRouter, filters.AuthRestFilter)
+		beego.InsertFilter("/admin/edp/*", beego.BeforeRouter, filters.RoleAccessControlFilter)
+		beego.InsertFilter("/api/v1/edp/*", beego.BeforeRouter, filters.RoleAccessControlRestFilter)
+	} else {
+		beego.InsertFilter("/*", beego.BeforeRouter, filters.StubAuthFilter)
+	}
+
+	dbEnable, err := beego.AppConfig.Bool("dbEnabled")
+	if err != nil {
+		log.Printf("Cannot read property dbEnabled: %v. Set default: true", err)
+		dbEnable = true
+	}
+
+	if dbEnable {
+		context.InitDb()
+	}
+
 	clients := k8s.CreateOpenShiftClients()
 	codebaseRepository := repository.CodebaseRepository{}
 	branchRepository := repository.CodebaseBranchRepository{}
@@ -43,12 +68,6 @@ func init() {
 	codebaseService := service.CodebaseService{Clients: clients, ICodebaseRepository: codebaseRepository, BranchService: branchService}
 	pipelineService := service.CDPipelineService{Clients: clients, ICDPipelineRepository: pipelineRepository, CodebaseService: codebaseService, BranchService: branchService}
 	catalogService := service.CatalogService{IServiceCatalogRepository: serviceRepository}
-
-	beego.Router("/auth/callback", &controllers.AuthController{}, "get:Callback")
-	beego.InsertFilter("/admin/*", beego.BeforeRouter, filters.AuthFilter)
-	beego.InsertFilter("/api/v1/edp/*", beego.BeforeRouter, filters.AuthRestFilter)
-	beego.InsertFilter("/admin/edp/*", beego.BeforeRouter, filters.RoleAccessControlFilter)
-	beego.InsertFilter("/api/v1/edp/*", beego.BeforeRouter, filters.RoleAccessControlRestFilter)
 
 	beego.ErrorController(&controllers.ErrorController{})
 	beego.Router("/", &controllers.MainController{EDPTenantService: edpService}, "get:Index")
