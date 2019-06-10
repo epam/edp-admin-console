@@ -48,12 +48,12 @@ func (CodebaseRepository) GetCodebasesByCriteria(criteria query.CodebaseCriteria
 		All(&codebases)
 
 	for _, c := range codebases {
-		_, err = o.LoadRelated(c, "ActionLog")
+		_, err = o.LoadRelated(c, "ActionLog", false, 100, 0, "LastTimeUpdate")
 		if err != nil {
 			return nil, err
 		}
 
-		_, err = o.LoadRelated(c, "CodebaseBranch")
+		_, err = o.LoadRelated(c, "CodebaseBranch", false, 100, 0, "Name")
 		if err != nil {
 			return nil, err
 		}
@@ -76,13 +76,13 @@ func (CodebaseRepository) GetCodebaseByName(name string) (*query.Codebase, error
 		return nil, err
 	}
 
-	_, err = o.LoadRelated(&codebase, "ActionLog")
+	_, err = o.LoadRelated(&codebase, "ActionLog", false, 100, 0, "LastTimeUpdate")
 
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = o.LoadRelated(&codebase, "CodebaseBranch")
+	_, err = o.LoadRelated(&codebase, "CodebaseBranch", false, 100, 0, "Name")
 
 	if err != nil {
 		return nil, err
