@@ -18,15 +18,8 @@
         <div class="flex-fill pl-4 pr-4 wrapper">
 
             <form class="edp-form" id="createAppForm" method="post" action="/admin/edp/application">
-                <h1>Add the application to receive:</h1>
-                <p>
-                    <ul>
-                        <li>Gerrit Project</li>
-                        <li>Code Review</li>
-                        <li>Jenkins Pipelines</li>
-                    </ul>
-                </p>
-                <p>Pass all steps below to create your Application.</p>
+                <h1>Create Application</h1>
+                <p>Add the application to receive: Gerrit Project, Code Review, Jenkins Pipelines. Pass all steps below to create your Application.</p>
 
                 {{ if .Error }}
                     <div class="form-error">
@@ -109,7 +102,7 @@
                                         data-toggle="collapse"
                                         data-target="#collapseTwo" aria-expanded="false"
                                         aria-controls="collapseOne"
-                                >PROCEED TO APPLICATION INFO
+                                >Proceed
                                 </button>
                             </div>
                         </div>
@@ -285,7 +278,7 @@
                                         data-toggle="collapse"
                                         data-target="{{if .IsVcsEnabled}}#collapseThree{{else}}#collapseFour{{end}}"
                                         aria-expanded="false"
-                                        aria-controls="collapseTwo">{{if .IsVcsEnabled}}PROCEED TO VCS INFO{{else}}PROCEED TO EXPOSING SERVICE INFO{{end}}
+                                        aria-controls="collapseTwo">{{if .IsVcsEnabled}}Proceed{{else}}Proceed{{end}}
                                 </button>
                             </div>
                         </div>
@@ -323,7 +316,7 @@
                                         data-toggle="collapse"
                                         data-target="#collapseFour" aria-expanded="false"
                                         aria-controls="collapseThree"
-                                >PROCEED TO INGRESS INFO
+                                >Proceed
                                 </button>
                             </div>
                         </div>
@@ -377,7 +370,7 @@
                                         data-toggle="collapse"
                                         data-target="#collapseFive" aria-expanded="false"
                                         aria-controls="collapseFour"
-                                >PROCEED TO DATABASE
+                                >Proceed
                                 </button>
                             </div>
                         </div>
@@ -453,7 +446,7 @@
                                         class="db-submit edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
                                         aria-expanded="false"
-                                        aria-controls="">CREATE APPLICATION
+                                        aria-controls="">Create Application
                                 </button>
                             </div>
                         </div>
