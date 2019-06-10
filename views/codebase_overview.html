@@ -18,7 +18,7 @@
         </aside>
         <div class="flex-fill pl-4 pr-4 wrapper">
 
-            <div class="edp-form" id="createAppForm">
+            <div class="codebase-overview-block" id="createAppForm">
                 <h1>{{.Codebase.Name}} {{.Codebase.Type}}</h1>
 
                 <div class="accordion" id="accordionCreateApplication">
@@ -165,7 +165,7 @@
                     {{end}}
 
                     <button type="button"
-                            class="modal-release-branch btn btn-primary {{if ne .Codebase.Status "active"}}button-disabled{{end}}"
+                            class="button-indent modal-release-branch btn btn-primary {{if ne .Codebase.Status "active"}}button-disabled{{end}}"
                             aria-controls="">Create New Branch
                     </button>
 
@@ -182,14 +182,14 @@
                              data-parent="#accordionCreateApplication">
                             <div class="card-body">
                                 <div class="form-check">
-                                    <table class="edp-table">
+                                    <table class="action-log-table edp-table">
                                         <thead>
                                         <tr>
-                                            <th scope="col">Date</th>
-                                            <th scope="col">User</th>
-                                            <th scope="col">Action</th>
-                                            <th scope="col">Result</th>
-                                            <th scope="col">Message</th>
+                                            <th scope="col" style="width: 20%">Date</th>
+                                            <th scope="col" style="width: 25%">User</th>
+                                            <th scope="col" style="width: 22.5%">Action</th>
+                                            <th scope="col" style="width: 10%">Result</th>
+                                            <th scope="col" style="width: 22.5%">Message</th>
                                         </tr>
                                         </thead>
                                         <tbody>
