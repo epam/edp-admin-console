@@ -23,8 +23,9 @@ import (
 
 // +k8s:openapi-gen=true
 type CDPipelineSpec struct {
-	Name           string   `json:"name"`
-	CodebaseBranch []string `json:"codebase_branch"`
+	Name               string   `json:"name"`
+	CodebaseBranch     []string `json:"codebase_branch"`
+	ThirdPartyServices []string `json:"services"`
 }
 
 // +k8s:openapi-gen=true

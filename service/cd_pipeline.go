@@ -214,8 +214,9 @@ func convertPipelineData(cdPipeline models.CDPipelineCreateCommand) k8s.CDPipeli
 		codebaseBranches = append(codebaseBranches, fmt.Sprintf("%s-%s", v.ApplicationName, v.BranchName))
 	}
 	return k8s.CDPipelineSpec{
-		Name:           cdPipeline.Name,
-		CodebaseBranch: codebaseBranches,
+		Name:               cdPipeline.Name,
+		CodebaseBranch:     codebaseBranches,
+		ThirdPartyServices: cdPipeline.ThirdPartyServices,
 	}
 }
 

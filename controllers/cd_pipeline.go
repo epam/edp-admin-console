@@ -107,12 +107,14 @@ func (c *CDPipelineController) CreateCDPipeline() {
 	flash := beego.NewFlash()
 	appNameCheckboxes := c.GetStrings("app")
 	pipelineName := c.GetString("pipelineName")
+	serviceCheckboxes := c.GetStrings("service")
 	stages := retrieveStagesFromRequest(c)
 
 	cdPipelineCreateCommand := models.CDPipelineCreateCommand{
-		Name:         pipelineName,
-		Applications: convertApplicationWithBranchesData(c, appNameCheckboxes),
-		Stages:       stages,
+		Name:               pipelineName,
+		Applications:       convertApplicationWithBranchesData(c, appNameCheckboxes),
+		ThirdPartyServices: serviceCheckboxes,
+		Stages:             stages,
 	}
 	errMsg := validateCDPipelineRequestData(cdPipelineCreateCommand)
 	if errMsg != nil {
@@ -122,8 +124,8 @@ func (c *CDPipelineController) CreateCDPipeline() {
 		c.Redirect("/admin/edp/cd-pipeline/create", 302)
 		return
 	}
-	log.Printf("Request data is receieved to create CD pipeline: %s. Applications: %v. Stages: %v",
-		cdPipelineCreateCommand.Name, cdPipelineCreateCommand.Applications, cdPipelineCreateCommand.Stages)
+	log.Printf("Request data is receieved to create CD pipeline: %s. Applications: %v. Stages: %v. Services: %v",
+		cdPipelineCreateCommand.Name, cdPipelineCreateCommand.Applications, cdPipelineCreateCommand.Stages, cdPipelineCreateCommand.ThirdPartyServices)
 
 	_, pipelineErr := c.PipelineService.CreatePipeline(cdPipelineCreateCommand)
 	if pipelineErr != nil {

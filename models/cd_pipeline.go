@@ -26,9 +26,10 @@ type StageCreate struct {
 }
 
 type CDPipelineCreateCommand struct {
-	Name         string                  `json:"name" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
-	Applications []ApplicationWithBranch `json:"applications" valid:"Required"`
-	Stages       []StageCreate           `json:"stages" valid:"Required"`
+	Name               string                  `json:"name" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
+	Applications       []ApplicationWithBranch `json:"applications" valid:"Required"`
+	ThirdPartyServices []string                `json:"services"`
+	Stages             []StageCreate           `json:"stages" valid:"Required"`
 }
 
 type ApplicationWithBranch struct {
