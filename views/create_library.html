@@ -232,15 +232,17 @@
                                             aria-controls="collapseTwo">PROCEED TO VCS INFO
                                     </button>
                                 {{else}}
-                                    <a href="/admin/edp/library/overview">
-                                        <button type="button" class="edp-submit-form-btn btn btn-primary">
-                                            CANCEL
-                                        </button>
-                                    </a>
+                                    <div class="form-buttons-footer">
+                                        <a href="/admin/edp/library/overview">
+                                            <button type="button" class="edp-submit-form-btn btn btn-secondary">
+                                                CANCEL
+                                            </button>
+                                        </a>
 
-                                    <button type="submit" class="create-library edp-submit-form-btn btn btn-primary">
-                                        ADD LIBRARY
-                                    </button>
+                                        <button type="submit" class="create-library edp-submit-form-btn btn btn-primary">
+                                            ADD LIBRARY
+                                        </button>
+                                    </div>
                                 {{end}}
 
                             </div>
@@ -275,17 +277,17 @@
                                             Please specify VCS password (or API Token).
                                         </div>
                                     </div>
+                                    <div class="form-buttons-footer">
+                                        <a href="/admin/edp/library/overview">
+                                            <button type="button" class="edp-submit-form-btn btn btn-secondary">
+                                                CANCEL
+                                            </button>
+                                        </a>
 
-                                    <a href="/admin/edp/library/overview">
-                                        <button type="button" class="edp-submit-form-btn btn btn-primary">
-                                            CANCEL
+                                        <button type="submit" class="create-library edp-submit-form-btn btn btn-primary">
+                                            ADD LIBRARY
                                         </button>
-                                    </a>
-
-                                    <button type="submit" class="create-library edp-submit-form-btn btn btn-primary">
-                                        ADD LIBRARY
-                                    </button>
-
+                                    </div>
                                 </div>
                             </div>
                         </div>

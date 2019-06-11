@@ -15,27 +15,36 @@
         <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
             {{template "template/navbar_template.html" .}}
         </aside>
-        <div class="flex-fill pl-3 pr-3 wrapper">
+        <div class="flex-fill pl-4 pr-4 wrapper">
 
-            <div class="edp-form" id="createPipelineForm">
-                <h1>Select which applications within this pipeline user wants to deploy:</h1>
+            <form class="edp-form" id="createCDCR" method="post" action="/admin/edp/cd-pipeline">
+                <h1>Create CD Pipeline</h1>
+                <p>Select which applications within this pipeline user wants to deploy:</p>
+
+                {{if .Error}}
+                    <div class="backend-validation-error">
+                        {{.Error}}
+                    </div>
+                {{end}}
+
                 <div class="accordion" id="accordionCreatePipeline">
-                    <div class="card">
+
+                    <div class="card pipeline">
                         <div class="card-header" id="headingOne" data-toggle="collapse"
                              aria-expanded="true" aria-controls="collapseOne">
                             <h5 class="mb-0">
                                 <button class="btn btn-link collapsed" type="button">
-                                    Pipeline info
+                                    Pipeline
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
-                             data-parent="#accordionCreatePipeline">
+                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne">
                             <div class="card-body">
                                 <form id="createCDCR" method="post" action="/admin/edp/cd-pipeline">
                                     <div class="form-group pipeline-name">
                                         <label for="pipelineName">Pipeline Name:</label>
-                                        <input name="pipelineName" type="text" class="form-control" id="pipelineName"
+                                        <input name="pipelineName" type="text" class="form-control"
+                                               id="pipelineName"
                                                placeholder="Enter pipeline name ">
                                         <div class="invalid-feedback pipeline-name">
                                             Pipeline name may contain only: lower-case letters, numbers and dashes
@@ -44,70 +53,123 @@
                                             and end with dash and dot. Can not be empty.
                                         </div>
                                     </div>
-
-                                    {{range .Apps}}
-                                        <div class="row">
-                                            <div class="form-group col-sm-4">
-                                                <div class="custom-control custom-checkbox application-checkbox">
-                                                    <input type="checkbox" class="custom-control-input app-checkbox"
-                                                           id="{{.Name}}"
-                                                           name="app" value="{{.Name}}">
-                                                    <label class="custom-control-label"
-                                                           for="{{.Name}}">{{.Name}}</label>
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group col-sm-8">
-                                                <select title="Release Branches"
-                                                        class="release-branch selectpicker select-{{.Name}} form-control"
-                                                        name="{{.Name}}" disabled>
-                                                    {{range $i, $rb := .CodebaseBranch}}
-                                                        <option value="{{.Name}}">{{.Name}}</option>
-                                                    {{end}}
-                                                </select>
-                                            </div>
-                                        </div>
-                                    {{end}}
-                                    <div class="invalid-feedback app-checkbox-error">
-                                        At least one checkbox must be checked.
-                                    </div>
-
-                                    <div class="invalid-feedback stage-error">
-                                        At least one stage must be added.
-                                    </div>
-
-                                    <div class="stages-list">
-
-                                    </div>
-
-                                    {{if .Error}}
-                                        <div class="backend-validation-error">
-                                            {{.Error}}
-                                        </div>
-                                    {{end}}
-
-                                    <div class="form-group">
-                                        <button type="button"
-                                                class="add-stage-modal edp-submit-form-btn btn btn-primary">
-                                            ADD STAGE
-                                        </button>
-                                    </div>
-
-                                    <a href="/admin/edp/cd-pipeline/overview">
-                                        <button type="button" class="edp-submit-form-btn btn btn-primary">CANCEL
-                                        </button>
-                                    </a>
-                                    <button type="submit"
-                                            class="create-cd-pipeline edp-submit-form-btn btn btn-primary">CREATE CD
-                                        PIPELINE
-                                    </button>
-
                                 </form>
                             </div>
                         </div>
                     </div>
+
+                    <div class="card applications">
+                        <div class="card-header" id="headingTwo" data-toggle="collapse"
+                             aria-expanded="true" aria-controls="collapseTwo">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button">
+                                    Applications
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo">
+                            <div class="card-body">
+
+                                {{range .Apps}}
+                                    <div class="row">
+                                        <div class="form-group col-sm-4">
+                                            <div class="custom-control custom-checkbox application-checkbox">
+                                                <input type="checkbox" class="custom-control-input app-checkbox"
+                                                       id="{{.Name}}"
+                                                       name="app" value="{{.Name}}">
+                                                <label class="custom-control-label"
+                                                       for="{{.Name}}">{{.Name}}</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-8">
+                                            <select title="Release Branches"
+                                                    class="release-branch selectpicker select-{{.Name}} form-control"
+                                                    name="{{.Name}}" disabled>
+                                                {{range $i, $rb := .CodebaseBranch}}
+                                                    <option value="{{.Name}}">{{.Name}}</option>
+                                                {{end}}
+                                            </select>
+                                        </div>
+                                    </div>
+                                {{end}}
+                                <div class="invalid-feedback app-checkbox-error">
+                                    At least one checkbox must be checked.
+                                </div>
+
+                                <div class="invalid-feedback stage-error">
+                                    At least one stage must be added.
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card stages">
+                        <div class="card-header" id="headingThree" data-toggle="collapse"
+                             aria-expanded="true" aria-controls="collapseThree">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button">
+                                    Stages
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseThree" class="collapse show" aria-labelledby="headingThree">
+                            <div class="card-body">
+
+                                <div class="stages-list">
+
+                                </div>
+
+                                {{if .Error}}
+                                    <div class="backend-validation-error">
+                                        {{.Error}}
+                                    </div>
+                                {{end}}
+
+                                <div class="form-group">
+                                    <button type="button"
+                                            class="add-stage-modal edp-submit-form-btn btn btn-primary">
+                                        Add stage
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card services">
+                        <div class="card-header collapsed" id="headingFour" data-toggle="collapse"
+                             data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button">
+                                    Services
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseFour" class="collapse" aria-labelledby="headingFour"
+                             data-parent="#accordionCreatePipeline">
+                            <div class="card-body">
+
+                                SERVICES
+
+                                <div class="form-buttons-footer">
+                                    <a href="/admin/edp/cd-pipeline/overview">
+                                        <button type="button" class="edp-submit-form-btn btn btn-secondary">Cancel
+                                        </button>
+                                    </a>
+                                    <button type="submit"
+                                            class="create-cd-pipeline edp-submit-form-btn btn btn-primary">Create CD
+                                        Pipeline
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-            </div>
+            </form>
         </div>
     </section>
     {{template "template/footer_template.html" .}}
@@ -204,9 +266,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="add-stage btn btn-secondary">ADD STAGE</button>
-                    <button type="button" class="confirm-edit-stage btn btn-secondary" style="display: none">EDIT
+
+                 <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-modal-close" data-dismiss="modal">CANCEL</button>
+                    <button type="button" class="add-stage btn btn-primary">ADD STAGE</button>
+                    <button type="button" class="confirm-edit-stage btn btn-primary" style="display: none">EDIT
                         STAGE
                     </button>
                 </div>

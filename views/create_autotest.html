@@ -175,14 +175,16 @@
                                     </div>
 
                                     {{if not .IsVcsEnabled}}
+                                    <div class="form-buttons-footer">
                                         <a href="/admin/edp/autotest/overview">
-                                            <button type="button" class="edp-submit-form-btn btn btn-primary">CANCEL
+                                            <button type="button" class="edp-submit-form-btn btn btn-secondary">CANCEL
                                             </button>
                                         </a>
 
                                         <button type="submit"
                                                 class="create-autotest edp-submit-form-btn btn btn-primary">ADD AUTOTEST
                                         </button>
+                                    </div>
                                     {{end}}
 
                                 </div>
@@ -218,16 +220,18 @@
                                                     </div>
                                                 </div>
 
-                                                <a href="/admin/edp/autotest/overview">
-                                                    <button type="button" class="edp-submit-form-btn btn btn-primary">
-                                                        CANCEL
-                                                    </button>
-                                                </a>
+                                                <div class="form-buttons-footer">
+                                                    <a href="/admin/edp/autotest/overview">
+                                                        <button type="button" class="edp-submit-form-btn btn btn-secondary">
+                                                            CANCEL
+                                                        </button>
+                                                    </a>
 
-                                                <button type="submit"
-                                                        class="create-autotest edp-submit-form-btn btn btn-primary">ADD
-                                                    AUTOTEST
-                                                </button>
+                                                    <button type="submit"
+                                                            class="create-autotest edp-submit-form-btn btn btn-primary">ADD
+                                                        AUTOTEST
+                                                    </button>
+                                                </div>
 
                                             </div>
                                         </div>

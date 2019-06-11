@@ -88,9 +88,7 @@
                 </table>
             {{else}}
                 <div class="no-tenant no-codebase-message">
-                    <h1>Looks like there're not
-                        any {{if eq .Type "application"}}applications{{else if eq .Type "autotests"}}autotests{{else}}libraries{{end}}
-                        .</h1>
+                    <h1>Looks like there're not any {{if eq .Type "application"}}applications{{else if eq .Type "autotests"}}autotests{{else}}libraries{{end}}.</h1>
                     {{if .HasRights}}
                         {{if eq .Type "application"}}
                             <a href="/admin/edp/application/create">

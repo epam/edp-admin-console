@@ -1,7 +1,13 @@
 .modal-size {
     width: 800px;
-    height: 550px
+    height: 550px;
 }
+
+.modal-size-adding-stages {
+    width: 700px;
+    height: 550px;
+}
+
 
 .non-valid-input {
     border: 1px solid red;
