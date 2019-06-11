@@ -1,0 +1,1 @@
+alter table cd_pipeline_third_party_service drop constraint service_fk;

@@ -151,7 +151,24 @@
                              data-parent="#accordionCreatePipeline">
                             <div class="card-body">
 
-                                SERVICES
+                                <div class="left-padding form-group">
+                                    {{if .Services}}
+                                        {{range .Services}}
+                                            <div class="row">
+                                                <div class="custom-control custom-checkbox service-checkbox">
+                                                    <input type="checkbox"
+                                                           class="custom-control-input service-checkbox"
+                                                           id="{{.Name}}"
+                                                           name="service" value="{{.Name}}">
+                                                    <label class="custom-control-label"
+                                                           for="{{.Name}}">{{.Name}}</label>
+                                                </div>
+                                            </div>
+                                        {{end}}
+                                    {{else}}
+                                        There're no available services.
+                                    {{end}}
+                                </div>
 
                                 <div class="form-buttons-footer">
                                     <a href="/admin/edp/cd-pipeline/overview">
@@ -267,7 +284,7 @@
                     </div>
                 </div>
 
-                 <div class="modal-footer">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-modal-close" data-dismiss="modal">CANCEL</button>
                     <button type="button" class="add-stage btn btn-primary">ADD STAGE</button>
                     <button type="button" class="confirm-edit-stage btn btn-primary" style="display: none">EDIT

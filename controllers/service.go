@@ -6,13 +6,13 @@ import (
 	"github.com/astaxie/beego"
 )
 
-type ServiceController struct {
+type ThirdPartyServiceController struct {
 	beego.Controller
-	CatalogService service.CatalogService
+	ThirdPartyService service.ThirdPartyService
 }
 
-func (s *ServiceController) GetServicePage() {
-	services, err := s.CatalogService.GetAllServices()
+func (s *ThirdPartyServiceController) GetServicePage() {
+	services, err := s.ThirdPartyService.GetAllServices()
 	if err != nil {
 		s.Abort("500")
 		return

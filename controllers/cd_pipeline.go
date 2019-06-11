@@ -29,10 +29,11 @@ import (
 
 type CDPipelineController struct {
 	beego.Controller
-	CodebaseService  service.CodebaseService
-	PipelineService  service.CDPipelineService
-	EDPTenantService service.EDPTenantService
-	BranchService    service.CodebaseBranchService
+	CodebaseService   service.CodebaseService
+	PipelineService   service.CDPipelineService
+	EDPTenantService  service.EDPTenantService
+	BranchService     service.CodebaseBranchService
+	ThirdPartyService service.ThirdPartyService
 }
 
 const paramWaitingForCdPipeline = "waitingforcdpipeline"
@@ -88,6 +89,13 @@ func (c *CDPipelineController) GetCreateCDPipelinePage() {
 		c.Data["Error"] = flash.Data["error"]
 	}
 
+	services, err := c.ThirdPartyService.GetAllServices()
+	if err != nil {
+		c.Abort("500")
+		return
+	}
+
+	c.Data["Services"] = services
 	c.Data["Apps"] = apps
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")

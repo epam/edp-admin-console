@@ -6,12 +6,12 @@ import (
 	"log"
 )
 
-type CatalogService struct {
+type ThirdPartyService struct {
 	IServiceCatalogRepository repository.IServiceCatalogRepository
 }
 
-func (s CatalogService) GetAllServices() ([]query.Service, error) {
-	log.Println("Start execution of GetCDPipelineByName method...")
+func (s ThirdPartyService) GetAllServices() ([]query.ThirdPartyService, error) {
+	log.Println("Start execution of GetAllServices method...")
 	services, err := s.IServiceCatalogRepository.GetAllServices()
 	if err != nil {
 		log.Printf("An error has occurred while getting services from database: %s", err)

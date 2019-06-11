@@ -6,18 +6,18 @@ import (
 )
 
 type IServiceCatalogRepository interface {
-	GetAllServices() ([]query.Service, error)
+	GetAllServices() ([]query.ThirdPartyService, error)
 }
 
 type ServiceCatalogRepository struct {
 	IServiceCatalogRepository
 }
 
-func (ServiceCatalogRepository) GetAllServices() ([]query.Service, error) {
+func (ServiceCatalogRepository) GetAllServices() ([]query.ThirdPartyService, error) {
 	o := orm.NewOrm()
-	var services []query.Service
+	var services []query.ThirdPartyService
 
-	_, err := o.QueryTable(new(query.Service)).All(&services)
+	_, err := o.QueryTable(new(query.ThirdPartyService)).All(&services)
 	if err != nil {
 		if err == orm.ErrNoRows {
 			return nil, nil

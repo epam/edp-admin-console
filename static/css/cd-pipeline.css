@@ -16,3 +16,7 @@
 .backend-validation-error {
     color: red;
 }
+
+.left-padding {
+    margin-left: 18px;
+}
