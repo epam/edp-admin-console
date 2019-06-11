@@ -39,6 +39,11 @@ func (c *CodebaseController) GetCodebaseOverviewPage() {
 		return
 	}
 
+	if codebase == nil {
+		c.Abort("404")
+		return
+	}
+
 	codebase.CodebaseBranch = addCodebaseBranchInProgressIfAny(codebase.CodebaseBranch, c.GetString(paramWaitingForBranch))
 	if err != nil {
 		c.Abort("500")
