@@ -7741,3 +7741,24 @@ button.delete {
 .form-buttons-footer .btn-secondary  {
   margin-right: 10px;
 }
+
+.navbar-dark .nav-item {
+  background-color: #464547;
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left: #464547;
+}
+
+.navbar-dark .nav-item:hover {
+  background-color: #3B3B3B;
+}
+
+.navbar-dark .nav-item.active {
+  background-color: #3B3B3B;
+}
+
+li.nav-item.active {
+  border-left: #76CDD8;
+  border-left-style: solid;
+  border-left-width: 3px;
+}

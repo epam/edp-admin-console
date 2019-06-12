@@ -37,6 +37,7 @@ func (this *EDPTenantController) GetEDPComponents() {
 	this.Data["EDPTenantName"] = context.Tenant
 	this.Data["EDPVersion"] = context.EDPVersion
 	this.Data["EDPComponents"] = components
+	this.Data["Type"] = "overview"
 	this.TplName = "edp_components.html"
 }
 

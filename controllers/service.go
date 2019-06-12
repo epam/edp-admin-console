@@ -21,5 +21,6 @@ func (s *ServiceController) GetServicePage() {
 	s.Data["EDPVersion"] = context.EDPVersion
 	s.Data["Username"] = s.Ctx.Input.Session("username")
 	s.Data["Services"] = services
+	s.Data["Type"] = "services"
 	s.TplName = "service.html"
 }

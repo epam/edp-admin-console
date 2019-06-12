@@ -69,6 +69,7 @@ func (c *CDPipelineController) GetContinuousDeliveryPage() {
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["HasRights"] = isAdmin(contextRoles)
+	c.Data["Type"] = "delivery"
 	c.TplName = "continuous_delivery.html"
 }
 
@@ -90,6 +91,7 @@ func (c *CDPipelineController) GetCreateCDPipelinePage() {
 	c.Data["Apps"] = apps
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
+	c.Data["Type"] = "delivery"
 	c.TplName = "create_cd_pipeline.html"
 }
 
@@ -158,6 +160,7 @@ func (c *CDPipelineController) GetCDPipelineOverviewPage() {
 	c.Data["CDPipeline"] = cdPipeline
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
+	c.Data["Type"] = "delivery"
 	c.TplName = "cd_pipeline_overview.html"
 }
 
