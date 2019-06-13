@@ -166,7 +166,7 @@ func (c *AutotestsController) GetCreateAutotestsPage() {
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["HasRights"] = isAdmin(c.GetSession("realm_roles").([]string))
 	c.Data["IsVcsEnabled"] = isVcsEnabled
-	c.Data["Type"] = "autotests"
+	c.Data["Type"] = query.Autotests
 	c.TplName = "create_autotest.html"
 }
 

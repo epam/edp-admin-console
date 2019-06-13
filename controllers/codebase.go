@@ -53,6 +53,7 @@ func (c *CodebaseController) GetCodebaseOverviewPage() {
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["Codebase"] = codebase
+	c.Data["Type"] = codebase.Type
 	c.TplName = "codebase_overview.html"
 }
 

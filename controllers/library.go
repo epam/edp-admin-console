@@ -60,7 +60,7 @@ func (c *LibraryController) GetCreatePage() {
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["HasRights"] = isAdmin(c.GetSession("realm_roles").([]string))
 	c.Data["IsVcsEnabled"] = isVcsEnabled
-	c.Data["Type"] = "library"
+	c.Data["Type"] = query.Library
 	c.TplName = "create_library.html"
 }
 

@@ -111,27 +111,11 @@
         </div>
     </section>
     {{template "template/footer_template.html" .}}
+    {{template "template/modal_success_template.html" .}}
+
 
     <!-- Modal success -->
-    <div class="modal fade" id="successPopup" tabindex="-1" role="dialog" aria-labelledby="successPopupLabel"
-         aria-hidden="true" data-display="{{ if .Success }}true{{ else }}false{{ end }}">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="successPopupLabel">Success</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Provisioning has been started.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">OK</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 </main>
 <script src="/static/js/jquery-3.3.1.js"></script>
 <script src="/static/js/popper.js"></script>
