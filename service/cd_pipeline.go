@@ -20,7 +20,7 @@ import (
 	"edp-admin-console/context"
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
-	"edp-admin-console/models/dto"
+	"edp-admin-console/models/query"
 	"edp-admin-console/repository"
 	"fmt"
 	"github.com/astaxie/beego"
@@ -111,7 +111,7 @@ func (s *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCreateCom
 	return cdPipelineCr, nil
 }
 
-func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*models.CDPipelineDTO, error) {
+func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDPipeline, error) {
 	log.Println("Start execution of GetCDPipelineByName method...")
 	cdPipeline, err := s.ICDPipelineRepository.GetCDPipelineByName(pipelineName)
 	if err != nil {
@@ -120,14 +120,15 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*models.CD
 	}
 	if cdPipeline != nil {
 		createJenkinsLink(cdPipeline)
-
-		stages, err := s.GetCDPipelineStages(pipelineName)
-		if err != nil {
-			log.Printf("An error has occurred while getting Stages: %s", err)
-			return nil, err
+		if len(cdPipeline.Stage) != 0 {
+			sortStagesByOrder(cdPipeline.Stage)
+			createOpenshiftProjectLinks(cdPipeline.Stage, cdPipeline.Name)
+			log.Printf("Fetched Stages. Count: {%v}. Rows: {%v}", len(cdPipeline.Stage), cdPipeline.Stage)
 		}
-		cdPipeline.Stages = stages
-
+		for i, branch := range cdPipeline.CodebaseBranch {
+			branch.AppName = branch.Codebase.Name
+			cdPipeline.CodebaseBranch[i] = branch
+		}
 		log.Printf("Fetched CD Pipeline from DB: %v", cdPipeline)
 	}
 
@@ -151,9 +152,9 @@ func (s *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPipel
 	return stagesCr, nil
 }
 
-func (s *CDPipelineService) GetAllPipelines(filterCriteria models.CDPipelineCriteria) ([]models.CDPipelineView, error) {
+func (s *CDPipelineService) GetAllPipelines(criteria query.CDPipelineCriteria) ([]*query.CDPipeline, error) {
 	log.Println("Start fetching all CD Pipelines...")
-	cdPipelines, err := s.ICDPipelineRepository.GetCDPipelines(filterCriteria)
+	cdPipelines, err := s.ICDPipelineRepository.GetCDPipelines(criteria)
 	if err != nil {
 		log.Printf("An error has occurred while getting CD Pipelines from database: %s", err)
 		return nil, err
@@ -167,24 +168,7 @@ func (s *CDPipelineService) GetAllPipelines(filterCriteria models.CDPipelineCrit
 	return cdPipelines, nil
 }
 
-func (s *CDPipelineService) GetCDPipelineStages(cdPipelineName string) ([]models.CDPipelineStageView, error) {
-	log.Printf("Start fetching all stages for %v CD Pipeline...", cdPipelineName)
-	stages, err := s.ICDPipelineRepository.GetCDPipelineStages(cdPipelineName)
-	if err != nil {
-		log.Printf("An error has occurred while getting Stages from database: %s", err)
-		return nil, err
-	}
-
-	if len(stages) != 0 {
-		sortStagesByOrder(stages)
-		createOpenshiftProjectLinks(stages, cdPipelineName)
-		log.Printf("Fetched Stages. Count: {%v}. Rows: {%v}", len(stages), stages)
-	}
-
-	return stages, nil
-}
-
-func sortStagesByOrder(stages []models.CDPipelineStageView) {
+func sortStagesByOrder(stages []*query.Stage) {
 	sort.Slice(stages, func(i, j int) bool {
 		return stages[i].Order < stages[j].Order
 	})
@@ -201,7 +185,7 @@ func (s *CDPipelineService) GetStage(cdPipelineName, stageName string) (*models.
 	return stage, nil
 }
 
-func createOpenshiftProjectLinks(stages []models.CDPipelineStageView, cdPipelineName string) {
+func createOpenshiftProjectLinks(stages []*query.Stage, cdPipelineName string) {
 	for index, stage := range stages {
 		stage.OpenshiftProjectLink = fmt.Sprintf(OpenshiftProjectLink+"%s-%s-%s", beego.AppConfig.String("dnsWildcard"), context.Tenant, cdPipelineName, stage.Name)
 		stages[index] = stage
@@ -237,7 +221,7 @@ func getCDPipelineCR(edpRestClient *rest.RESTClient, pipelineName string, namesp
 	return cdPipeline, nil
 }
 
-func createJenkinsLinks(cdPipelines []models.CDPipelineView) {
+func createJenkinsLinks(cdPipelines []*query.CDPipeline) {
 	wildcard := beego.AppConfig.String("dnsWildcard")
 	for index, pipeline := range cdPipelines {
 		pipeline.JenkinsLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s", "jenkins", context.Tenant, wildcard, fmt.Sprintf("%s-%s", pipeline.Name, "cd-pipeline"))
@@ -246,18 +230,18 @@ func createJenkinsLinks(cdPipelines []models.CDPipelineView) {
 	}
 }
 
-func createJenkinsLink(cdPipeline *models.CDPipelineDTO) {
+func createJenkinsLink(cdPipeline *query.CDPipeline) {
 	wildcard := beego.AppConfig.String("dnsWildcard")
 	cdPipeline.JenkinsLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s", "jenkins", context.Tenant, wildcard, fmt.Sprintf("%s-%s", cdPipeline.Name, "cd-pipeline"))
 	log.Printf("Created CD Pipeline Jenkins link %v", cdPipeline.JenkinsLink)
-	createLinksForBranchEntities(cdPipeline.CodebaseBranches)
+	createLinksForBranchEntities(cdPipeline.CodebaseBranch)
 }
 
-func createLinksForBranchEntities(branchEntities []dto.CodebaseBranchDTO) {
+func createLinksForBranchEntities(branchEntities []*query.CodebaseBranch) {
 	wildcard := beego.AppConfig.String("dnsWildcard")
 	for index, branch := range branchEntities {
-		branch.BranchLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb?p=%s.git;a=shortlog;h=refs/heads/%s", "gerrit", context.Tenant, wildcard, branch.AppName, branch.BranchName)
-		branch.JenkinsLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s/view/%s", "jenkins", context.Tenant, wildcard, branch.AppName, strings.ToUpper(branch.BranchName))
+		branch.VCSLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb?p=%s.git;a=shortlog;h=refs/heads/%s", "gerrit", context.Tenant, wildcard, branch.Codebase.Name, branch.Name)
+		branch.CICDLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s/view/%s", "jenkins", context.Tenant, wildcard, branch.Codebase.Name, strings.ToUpper(branch.Name))
 		branchEntities[index] = branch
 	}
 }

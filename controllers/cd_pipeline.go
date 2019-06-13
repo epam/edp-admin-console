@@ -56,7 +56,7 @@ func (c *CDPipelineController) GetContinuousDeliveryPage() {
 		return
 	}
 
-	cdPipelines, err := c.PipelineService.GetAllPipelines(models.CDPipelineCriteria{})
+	cdPipelines, err := c.PipelineService.GetAllPipelines(query.CDPipelineCriteria{})
 	if err != nil {
 		c.Abort("500")
 		return
@@ -159,14 +159,6 @@ func (c *CDPipelineController) GetCDPipelineOverviewPage() {
 		return
 	}
 
-	stages, err := c.PipelineService.GetCDPipelineStages(pipelineName)
-	if err != nil {
-		c.Abort("500")
-		return
-	}
-
-	cdPipeline.Stages = stages
-
 	c.Data["CDPipeline"] = cdPipeline
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
@@ -202,7 +194,7 @@ func convertApplicationWithBranchesData(this *CDPipelineController, appNameCheck
 	return applicationWithBranches
 }
 
-func addCdPipelineInProgressIfAny(cdPipelines []models.CDPipelineView, pipelineInProgress string) []models.CDPipelineView {
+func addCdPipelineInProgressIfAny(cdPipelines []*query.CDPipeline, pipelineInProgress string) []*query.CDPipeline {
 	if pipelineInProgress != "" {
 		for _, pipeline := range cdPipelines {
 			if pipeline.Name == pipelineInProgress {
@@ -211,11 +203,11 @@ func addCdPipelineInProgressIfAny(cdPipelines []models.CDPipelineView, pipelineI
 		}
 
 		log.Println("Adding CD Pipeline " + pipelineInProgress + " which is going to be created to the list.")
-
-		cdPipelines = append(cdPipelines, models.CDPipelineView{
+		pipeline := query.CDPipeline{
 			Name:   pipelineInProgress,
 			Status: "In progress",
-		})
+		}
+		cdPipelines = append(cdPipelines, &pipeline)
 	}
 	return cdPipelines
 }

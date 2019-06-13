@@ -82,6 +82,8 @@ func (this *CDPipelineRestController) CreateCDPipeline() {
 		http.Error(this.Ctx.ResponseWriter, errMsg.Message, http.StatusBadRequest)
 		return
 	}
+	log.Printf("Request data is receieved to create CD pipeline: %s. Applications: %v. Stages: %v. Services: %v",
+		cdPipelineCreateCommand.Name, cdPipelineCreateCommand.Applications, cdPipelineCreateCommand.Stages, cdPipelineCreateCommand.ThirdPartyServices)
 
 	_, pipelineErr := this.CDPipelineService.CreatePipeline(cdPipelineCreateCommand)
 	if pipelineErr != nil {

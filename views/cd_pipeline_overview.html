@@ -52,17 +52,17 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {{range .CDPipeline.CodebaseBranches}}
+                                        {{range .CDPipeline.CodebaseBranch}}
                                             <tr>
                                                 <td>
-                                                    {{.AppName}}
+                                                    {{.Codebase.Name}}
                                                 </td>
                                                 <td>
-                                                    <a href="{{.BranchLink}}" target="_blank"
+                                                    <a href="{{.VCSLink}}" target="_blank"
                                                        rel="noopener noreferrer">{{.BranchName}}</a>
                                                 </td>
                                                 <td>
-                                                    <a href="{{.JenkinsLink}}" target="_blank"
+                                                    <a href="{{.CICDLink}}" target="_blank"
                                                        rel="noopener noreferrer">Link</a>
                                                 </td>
                                             </tr>
@@ -73,7 +73,7 @@
                             </div>
                         </div>
 
-                        {{if .CDPipeline.Stages}}
+                        {{if .CDPipeline.Stage}}
                             <div class="card stages-info">
                                 <div class="card-header" id="headingTwo"
                                      aria-expanded="true" aria-controls="collapseTwo">
@@ -98,7 +98,7 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                {{range .CDPipeline.Stages}}
+                                                {{range .CDPipeline.Stage}}
                                                     <tr>
                                                         <td>{{.Name}}</td>
                                                         <td>{{.Description}}</td>

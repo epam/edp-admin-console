@@ -18,29 +18,18 @@ package repository
 
 import (
 	"edp-admin-console/models"
-	"edp-admin-console/models/dto"
-	"edp-admin-console/repository/sql_builder"
+	"edp-admin-console/models/query"
 	"github.com/astaxie/beego/orm"
 )
 
 type ICDPipelineRepository interface {
-	GetCDPipelineByName(pipelineName string) (*models.CDPipelineDTO, error)
-	GetCDPipelines(filterCriteria models.CDPipelineCriteria) ([]models.CDPipelineView, error)
-	GetCDPipelineStages(pipelineName string) ([]models.CDPipelineStageView, error)
+	GetCDPipelineByName(pipelineName string) (*query.CDPipeline, error)
+	GetCDPipelines(criteria query.CDPipelineCriteria) ([]*query.CDPipeline, error)
+	GetCDPipelineStages(pipelineName string) ([]*query.Stage, error)
 	GetStage(cdPipelineName, stageName string) (*models.StageView, error)
 }
 
 const (
-	SelectCDPipelineByName = "select cdp.name as pipeline_name, cb.name as branch_name, c.name as app_name, cdp.status " +
-		"from cd_pipeline cdp " +
-		"		left join cd_pipeline_codebase_branch cpcb on cdp.id = cpcb.cd_pipeline_id " +
-		"		left join codebase_branch cb on cpcb.codebase_branch_id = cb.id " +
-		"		left join codebase c on cb.codebase_id = c.id " +
-		"where cdp.name = ?;"
-	SelectStagesByName = "select cs.name, cs.description, cs.trigger_type, cs.quality_gate, cs.jenkins_step_name, cs.\"order\" " +
-		"from cd_stage cs " +
-		"		left join cd_pipeline cp on cs.cd_pipeline_id = cp.id " +
-		"where cp.name = ?;"
 	SelectStageByCDPipelineAndStageNames = "select cs.name stage_name, " +
 		"	cp.name pipeline_name, " +
 		"	cs.description, " +
@@ -69,58 +58,63 @@ type CDPipelineRepository struct {
 	ICDPipelineRepository
 }
 
-func (this CDPipelineRepository) GetCDPipelineByName(pipelineName string) (*models.CDPipelineDTO, error) {
+func (this CDPipelineRepository) GetCDPipelineByName(pipelineName string) (*query.CDPipeline, error) {
 	o := orm.NewOrm()
-	var cdPipeline models.CDPipelineDTO
-	var maps []orm.Params
+	cdPipeline := query.CDPipeline{Name: pipelineName}
 
-	_, err := o.Raw(SelectCDPipelineByName, pipelineName).Values(&maps)
+	err := o.Read(&cdPipeline, "Name")
+
+	if err == orm.ErrNoRows {
+		return nil, nil
+	}
 
 	if err != nil {
 		return nil, err
 	}
 
-	if maps == nil {
-		return nil, nil
+	_, err = o.LoadRelated(&cdPipeline, "CodebaseBranch", false, 100, 0, "Name")
+	if err != nil {
+		return nil, err
 	}
 
-	for _, row := range maps {
-		cdPipeline.Name = row["pipeline_name"].(string)
-		cdPipeline.Status = row["status"].(string)
-		cdPipeline.CodebaseBranches = append(cdPipeline.CodebaseBranches, dto.CodebaseBranchDTO{
-			AppName:    row["app_name"].(string),
-			BranchName: row["branch_name"].(string),
-		})
+	for _, c := range cdPipeline.CodebaseBranch {
+		_, err = o.LoadRelated(c, "Codebase", false, 100, 0, "Name")
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	_, err = o.LoadRelated(&cdPipeline, "Stage", false, 100, 0, "Name")
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = o.LoadRelated(&cdPipeline, "ThirdPartyService", false, 100, 0, "Name")
+	if err != nil {
+		return nil, err
 	}
 
 	return &cdPipeline, nil
 }
 
-func (this CDPipelineRepository) GetCDPipelines(filterCriteria models.CDPipelineCriteria) ([]models.CDPipelineView, error) {
+func (this CDPipelineRepository) GetCDPipelines(criteria query.CDPipelineCriteria) ([]*query.CDPipeline, error) {
 	o := orm.NewOrm()
-	var pipelines []models.CDPipelineView
+	var pipelines []*query.CDPipeline
 
-	selectAllCDPipelinesQuery := sql_builder.GetAllCDPipelinesQuery(filterCriteria)
-	_, err := o.Raw(selectAllCDPipelinesQuery).QueryRows(&pipelines)
+	qs := o.QueryTable(new(query.CDPipeline))
 
-	if err != nil {
-		return nil, err
+	if criteria.Status != "" {
+		qs = qs.Filter("status", criteria.Status)
 	}
 
+	_, err := qs.OrderBy("name").All(&pipelines)
+	if err != nil {
+		if err == orm.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
 	return pipelines, nil
-}
-
-func (this CDPipelineRepository) GetCDPipelineStages(pipelineName string) ([]models.CDPipelineStageView, error) {
-	o := orm.NewOrm()
-	var stages []models.CDPipelineStageView
-
-	_, err := o.Raw(SelectStagesByName, pipelineName).QueryRows(&stages)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return stages, nil
 }
 
 func (this CDPipelineRepository) GetStage(cdPipelineName, stageName string) (*models.StageView, error) {

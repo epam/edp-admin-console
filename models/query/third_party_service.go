@@ -6,3 +6,7 @@ type ThirdPartyService struct {
 	Description string `json:"description" orm:"column(description)"`
 	Version     string `json:"version" orm:"column(version)"`
 }
+
+func (cb *ThirdPartyService) TableName() string {
+	return "third_party_service"
+}
