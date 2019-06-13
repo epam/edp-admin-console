@@ -1,5 +1,5 @@
 hash: 7c900e5536151a6c9792677fe43fbb8e6c355a10526ac5ca76f1169cb0ccda7d
-updated: 2019-06-18T12:15:24.4158926+03:00
+updated: 2019-06-19T12:14:53.6262423+03:00
 imports:
 - name: github.com/astaxie/beego
   version: 1b6edafc96ad27b6515fafeccd7339dda3e997b1
@@ -363,9 +363,10 @@ testImports:
   subpackages:
   - difflib
 - name: github.com/stretchr/objx
-  version: c61a9dfcced1815e7d40e214d00d1a8669a9f58c
+  version: cbeaeb16a013161a98496fad62933b1d21786672
 - name: github.com/stretchr/testify
-  version: c679ae2cc0cb27ec3293fea7e254e47386f05d69
+  version: f6abca593680b2315d2075e0f5e2a9751e3f431a
   subpackages:
   - assert
   - mock
+  - require

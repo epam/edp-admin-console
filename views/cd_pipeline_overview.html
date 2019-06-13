@@ -32,43 +32,45 @@
 
                 <div class="accordion" id="accordionCreateApplication">
                     <div class="card">
-                        <div class="card-header" id="headingOne"
-                             aria-expanded="true" aria-controls="collapseOne">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link" type="button">
-                                    Applications
-                                </button>
-                            </h5>
-                        </div>
-                        <div id="collapseOne" class="show" aria-labelledby="headingOne">
-                            <div class="card-body">
-                                <div class="form-check">
-                                    <table class="edp-table">
-                                        <thead>
-                                        <tr>
-                                            <th scope="col">Application</th>
-                                            <th scope="col">Branch</th>
-                                            <th scope="col">Jenkins</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {{range .CDPipeline.CodebaseBranch}}
+                        <div class="card applications-info">
+                            <div class="card-header" id="headingOne"
+                                 aria-expanded="true" aria-controls="collapseOne">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link" type="button">
+                                        Applications
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseOne" class="show" aria-labelledby="headingOne">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <table class="edp-table">
+                                            <thead>
                                             <tr>
-                                                <td>
-                                                    {{.Codebase.Name}}
-                                                </td>
-                                                <td>
-                                                    <a href="{{.VCSLink}}" target="_blank"
-                                                       rel="noopener noreferrer">{{.BranchName}}</a>
-                                                </td>
-                                                <td>
-                                                    <a href="{{.CICDLink}}" target="_blank"
-                                                       rel="noopener noreferrer">Link</a>
-                                                </td>
+                                                <th scope="col">Application</th>
+                                                <th scope="col">Branch</th>
+                                                <th scope="col">Jenkins</th>
                                             </tr>
-                                        {{end}}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                            {{range .CDPipeline.CodebaseBranch}}
+                                                <tr>
+                                                    <td>
+                                                        {{.Codebase.Name}}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{.VCSLink}}" target="_blank"
+                                                           rel="noopener noreferrer">{{.Name}}</a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{.CICDLink}}" target="_blank"
+                                                           rel="noopener noreferrer">Link</a>
+                                                    </td>
+                                                </tr>
+                                            {{end}}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -106,9 +108,46 @@
                                                         <td>{{.QualityGate}}</td>
                                                         <td>{{.JenkinsStepName}}</td>
                                                         <td>
-                                                            <a href="{{.OpenShiftProjectLink}}" target="_blank"
+                                                            <a href="{{.OpenshiftProjectLink}}" target="_blank"
                                                                rel="noopener noreferrer">OpenShift Link</a>
                                                         </td>
+                                                    </tr>
+                                                {{end}}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {{end}}
+
+                        {{if .CDPipeline.ThirdPartyService}}
+                            <div class="card third-party-service-info">
+                                <div class="card-header" id="headingThree"
+                                     aria-expanded="true" aria-controls="collapseThree">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" type="button">
+                                            Third Party Services
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseThree" class="show" aria-labelledby="headingThree">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <table class="edp-table">
+                                                <thead>
+                                                <tr>
+                                                    <th scope="col">Name</th>
+                                                    <th scope="col">Description</th>
+                                                    <th scope="col">Version</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {{range .CDPipeline.ThirdPartyService}}
+                                                    <tr>
+                                                        <td>{{.Name}}</td>
+                                                        <td>{{.Description}}</td>
+                                                        <td>{{.Version}}</td>
                                                     </tr>
                                                 {{end}}
                                                 </tbody>
