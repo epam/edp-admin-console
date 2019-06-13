@@ -58,6 +58,12 @@ func InitDb() {
 	if err != nil {
 		log.Printf("Warning from db migration: %v", err)
 	}
+	debug, err := beego.AppConfig.Bool("ormDebug")
+	if err != nil {
+		log.Printf("Cannot read orm debug config. Set to false %v", err)
+		debug = false
+	}
+	orm.Debug = debug
 	orm.RegisterModel(new(query.Codebase), new(query.ActionLog), new(query.CodebaseBranch), new(query.ThirdPartyService))
 }
 

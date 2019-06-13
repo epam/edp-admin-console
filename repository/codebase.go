@@ -48,7 +48,8 @@ func (CodebaseRepository) GetCodebasesByCriteria(criteria query.CodebaseCriteria
 		All(&codebases)
 
 	for _, c := range codebases {
-		_, err = o.LoadRelated(c, "ActionLog", false, 100, 0, "LastTimeUpdate")
+
+		err = loadRelatedActionLog(c)
 		if err != nil {
 			return nil, err
 		}
@@ -76,7 +77,7 @@ func (CodebaseRepository) GetCodebaseByName(name string) (*query.Codebase, error
 		return nil, err
 	}
 
-	_, err = o.LoadRelated(&codebase, "ActionLog", false, 100, 0, "LastTimeUpdate")
+	err = loadRelatedActionLog(&codebase)
 
 	if err != nil {
 		return nil, err
@@ -89,6 +90,19 @@ func (CodebaseRepository) GetCodebaseByName(name string) (*query.Codebase, error
 	}
 
 	return &codebase, nil
+}
+
+func loadRelatedActionLog(codebase *query.Codebase) error {
+	o := orm.NewOrm()
+
+	_, err := o.QueryTable(new(query.ActionLog)).
+		Filter("codebase__codebase_id", codebase.Id).
+		OrderBy("LastTimeUpdate").
+		Distinct().
+		All(&codebase.ActionLog, "LastTimeUpdate", "UserName",
+			"Message", "Action", "Result")
+
+	return err
 }
 
 func (CodebaseRepository) ExistActiveCodebaseAndBranch(cbName, brName string) bool {
