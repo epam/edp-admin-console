@@ -2076,7 +2076,7 @@ pre {
   background-color: #ffffff;
   background-clip: padding-box;
   border: 1px solid #ced4da;
-  border-radius: 0;
+  border-radius: 3px;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; }
   @media screen and (prefers-reduced-motion: reduce) {
     .form-control {
@@ -2437,7 +2437,7 @@ textarea.form-control {
     text-decoration: none; }
   .btn:focus, .btn.focus {
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(118, 205, 216, 0.25); }
+    box-shadow: 0 0 0 0.2rem ; }
   .btn.disabled, .btn:disabled {
     opacity: 0.65; }
   .btn:not(:disabled):not(.disabled) {
@@ -2458,7 +2458,6 @@ fieldset:disabled a.btn {
   text-align: center;
   }
   .btn-primary:hover {
-    color: #212529;
     background-color: #A9B447;
     }
   .btn-primary:focus, .btn-primary.focus {
@@ -2468,12 +2467,11 @@ fieldset:disabled a.btn {
     background-color: #D7DCAB;}
   .btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active,
   .show > .btn-primary.dropdown-toggle {
-    color: #212529;
-    background-color: #4ebfcd;
-    border-color: #44bbca; }
+    background-color: #A9B447;
+    border-color: #A9B447; }
     .btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,
     .show > .btn-primary.dropdown-toggle:focus {
-      box-shadow: 0 0 0 0.2rem rgba(118, 205, 216, 0.5); }
+      box-shadow: 0 0 0 0.2rem ; }
 
 .btn-secondary {
   color: #212529;
@@ -7302,9 +7300,7 @@ button.delete {
     .edp-form .card-body {
       padding: 1.125rem;
       border-radius: 0 0 3px 3px !important;
-      border-bottom: 1px solid rgba(34, 34, 34, 0.125);
-      border-left: 1px solid rgba(34, 34, 34, 0.125);
-      border-right: 1px solid rgba(34, 34, 34, 0.125); }
+    }
       .edp-form .card-body > p {
         margin-bottom: 0.3125rem; }
     .edp-form .card-header {
@@ -7319,17 +7315,14 @@ button.delete {
       line-height: 21px;
       border-radius: 3px 3px 0 0 !important;
       background-color: #76CDD8;
-      border-top: 1px solid rgba(34, 34, 34, 0.125);
-      border-left: 1px solid rgba(34, 34, 34, 0.125);
-      border-right: 1px solid rgba(34, 34, 34, 0.125);
       background-image: url("assets/icons/ic-arrow-up-16px.png");
       background-repeat: no-repeat;
       background-position: 98% 50%;
       }
       .edp-form .card-header.collapsed {
-        border: 1px solid rgba(34, 34, 34, 0.125);
         color: #222222;
-        background-color: #FFFFFF }
+        background-color: #FFFFFF;
+        box-shadow: 0 6px 20px -5px rgba(34,34,34,0.26);}
         .edp-form .card-header.collapsed .btn {
           color: #222222; }
         .edp-form .card-header.collapsed {
@@ -7466,6 +7459,23 @@ button.delete {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%); }
+
+.card-header  .tooltip-icon {
+    border-color: #FFFFFF;
+}
+
+.card-header  .tooltip-icon:after {
+    color: #FFFFFF;
+}
+
+.card-header.collapsed  .tooltip-icon {
+    border-color: #cccccc;
+}
+
+.card-header.collapsed  .tooltip-icon:after {
+    color: #cccccc;
+}
+
 
 .stages {
   background-color: #ebeef0; }
