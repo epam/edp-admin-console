@@ -23,17 +23,17 @@
                                 <h1>
                                     Applications
                                 </h1>
-                                <p>Please find list your applications</p>
+                                <p>Please find below the list of your applications</p>
                             {{else if eq .Type "autotests"}}
                                 <h1>
                                     Autotests
                                 </h1>
-                                <p>Please find list your autotests</p>
+                                <p>Please find below the list of your autotests</p>
                             {{else}}
                                 <h1>
                                     Libraries
                                 </h1>
-                                <p>Please find list your libraries</p>
+                                <p>Please find below the list of your libraries</p>
                             {{end}}
                     </div>
                     {{if .HasRights}}
@@ -88,7 +88,7 @@
                 </table>
             {{else}}
                 <div class="no-tenant no-codebase-message">
-                    <h1>Looks like there're not any {{if eq .Type "application"}}applications{{else if eq .Type "autotests"}}autotests{{else}}libraries{{end}}.</h1>
+                    <h1>Looks like there are no any {{if eq .Type "application"}}applications{{else if eq .Type "autotests"}}autotests{{else}}libraries{{end}}.</h1>
                     {{if .HasRights}}
                         {{if eq .Type "application"}}
                             <a href="/admin/edp/application/create">
