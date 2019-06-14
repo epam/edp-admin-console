@@ -49,6 +49,14 @@
   font-weight: normal;
   font-style: normal; }
 
+@font-face {
+  font-family: 'icomoon';
+  src: url("./assets/icomoon/icomoon.eot?rkcn6x");
+  src: url("./assets/icomoon/icomoon.eot?rkcn6x#iefix") format("embedded-opentype"), url("./assets/icomoon/icomoon.ttf?rkcn6x") format("truetype"), url("./assets/icomoon/icomoon.woff?rkcn6x") format("woff"), url("./assets/icomoon/icomoon.svg?rkcn6x#icomoon") format("svg");
+  font-weight: normal;
+  font-style: normal; }
+
+
 [class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'icomoon' !important;
@@ -79,6 +87,34 @@
 
 .icon-services:before {
   content: "\e909"; }
+
+@font-face {
+  font-family: 'Glyphicons Halflings';
+
+  src: url('./assets/glyphicons/glyphicons-halflings-regular.eot');
+  src: url('./assets/glyphicons/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('./assets/glyphicons/glyphicons-halflings-regular.woff2') format('woff2'), url('./assets/glyphicons/glyphicons-halflings-regular.woff') format('woff'), url('./assets/glyphicons/glyphicons-halflings-regular.ttf') format('truetype'), url('./assets/glyphicons/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+}
+
+.glyphicon {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  font-family: 'Glyphicons Halflings';
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.glyphicon-ok-circle:before {
+  content: "\e089";
+}
+
+.glyphicon-warning-sign:before {
+  content: "\e107";
+}
 
 @font-face {
   font-family: 'Icons';
@@ -7771,4 +7807,46 @@ li.nav-item.active {
   border-left: #76CDD8;
   border-left-style: solid;
   border-left-width: 3px;
+}
+
+.alert-success {
+  height: 80px;
+  width: 428px;
+  border-radius: 3px;
+  background-color: #FFFFFF;
+  box-shadow: 0 6px 20px -5px rgba(34,34,34,0.26);
+}
+
+.alert-success .alert-icon {
+  height: 80px;
+  width: 52px;
+  border-radius: 3px 0 0 3px;
+  background-color: #CEDB56;
+  top:-13px;
+  left:-21px;
+  padding-top: 30px;
+  text-align: center;
+  color:white;
+  font-size: 22px;
+}
+
+
+.alert-error .alert-icon {
+  height: 80px;
+  width: 52px;
+  border-radius: 3px 0 0 3px;
+  background-color: #D35D47;
+  top:-13px;
+  left:-21px;
+  padding-top: 30px;
+  text-align: center;
+  color:white;
+  font-size: 22px;
+}
+
+.alert-success span[data-notify="message"],
+.alert-error span[data-notify="message"]{
+  color: black;
+  top: -16px;
+  position: relative;
 }
