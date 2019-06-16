@@ -15,99 +15,83 @@
         <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
             {{template "template/navbar_template.html" .}}
         </aside>
-        <div class="flex-fill pl-3 pr-3 wrapper">
-            {{if .Codebases}}
-                <div class="d-flex edp-controls">
-                    <div class="flex-fill">
-                            {{if eq .Type "application"}}
-                                <h1>
-                                    Applications
-                                </h1>
-                                <p>Please find below the list of your applications</p>
-                            {{else if eq .Type "autotests"}}
-                                <h1>
-                                    Autotests
-                                </h1>
-                                <p>Please find below the list of your autotests</p>
-                            {{else}}
-                                <h1>
-                                    Libraries
-                                </h1>
-                                <p>Please find below the list of your libraries</p>
-                            {{end}}
-                    </div>
-                    {{if .HasRights}}
-                        <div class="flex-fill">
-                            <div class="float-right">
-                                {{if eq .Type "application"}}
-                                    <a href="/admin/edp/application/create">
-                                        <button class="btn btn-primary">Create</button>
-                                    </a>
-                                {{else if eq .Type "autotests"}}
-                                    <a href="/admin/edp/autotest/create">
-                                        <button class="btn btn-primary">Create</button>
-                                    </a>
-                                {{else}}
-                                    <a href="/admin/edp/library/create">
-                                        <button class="btn btn-primary">Create</button>
-                                    </a>
-                                {{end}}
-                            </div>
-                        </div>
-                    {{end}}
-                </div>
-                <table class="table edp-table">
-                    <thead>
-                    <tr>
-                        <th scope="col" style="width: 15%">Status</th>
-                        <th scope="col" style="width: 30%">Name</th>
-                        <th scope="col" style="width: 25%">Language</th>
-                        <th scope="col" style="width: 20%">Build Tool</th>
-                        <th scope="col" style="width: 10%"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
+        <div class="flex-fill pl-4 pr-4 wrapper">
+            <div class="d-flex edp-form wide">
+                <div class="flex-fill">
 
-                    {{range .Codebases}}
-                        <tr data-codebase-name="{{.Name}}" data-codebase-status="{{.Status}}">
-                            <td class="codebase-status" data-status="{{.Status}}">
-                                <img src="{{if eq .Status "active"}}/static/img/green_circle.svg{{else if eq .Status "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}"
-                                     alt="" style="width:25px; height:25px;">
-                            </td>
-                            <td class="codebase-name">
-                                <a href="/admin/edp/codebase/{{.Name}}/overview">
-                                    {{.Name}}
-                                </a>
-                            </td>
-                            <td>{{.Language}}</td>
-                            <td>{{.BuildTool}}</td>
-                            <td></td>
-                        </tr>
-                    {{end}}
-                    </tbody>
-                </table>
-            {{else}}
-                <div class="no-tenant no-codebase-message">
-                    <h1>Looks like there are no any {{if eq .Type "application"}}applications{{else if eq .Type "autotests"}}autotests{{else}}libraries{{end}}.</h1>
-                    {{if .HasRights}}
-                        {{if eq .Type "application"}}
-                            <a href="/admin/edp/application/create">
-                                <button class="btn btn-success">CREATE APPLICATION</button>
-                            </a>
-                        {{else if eq .Type "autotests"}}
-                            <a href="/admin/edp/autotest/create">
-                                <button class="btn btn-success">ADD AUTOTEST</button>
-                            </a>
-                        {{else}}
-                            <a href="/admin/edp/library/create">
-                                <button class="btn btn-success">ADD LIBRARY</button>
-                            </a>
-                        {{end}}
+                    {{if eq .Type "application"}}
+                        <h1>
+                            Applications
+                        </h1>
+                    {{else if eq .Type "autotests"}}
+                        <h1>
+                            Autotests
+                        </h1>
                     {{else}}
-                        <p class="no-rights-msg">Please, contact EDP support team.</p>
+                        <h1>
+                            Libraries
+                        </h1>
+                    {{end}}
+                    {{if .Codebases}}
+                        <p>Please find the list of your {{if eq .Type "application"}}applications{{else if eq .Type "autotests"}}autotests{{else}}libraries{{end}}.</p>
+                    {{else}}
+                        <p>Looks like there're no any {{if eq .Type "application"}}applications{{else if eq .Type "autotests"}}autotests{{else}}libraries{{end}}.</p>
                     {{end}}
                 </div>
-            {{end}}
+                {{if .HasRights}}
+                    <div class="flex-fill">
+                        <div class="float-right">
+                            {{if eq .Type "application"}}
+                                <a href="/admin/edp/application/create">
+                                    <button class="btn btn-primary">Create</button>
+                                </a>
+                            {{else if eq .Type "autotests"}}
+                                <a href="/admin/edp/autotest/create">
+                                    <button class="btn btn-primary">Create</button>
+                                </a>
+                            {{else}}
+                                <a href="/admin/edp/library/create">
+                                    <button class="btn btn-primary">Create</button>
+                                </a>
+                            {{end}}
+                        </div>
+                    </div>
+                {{end}}
+            </div>
+            {{if .Codebases}}
+                <div class="edp-table-container">
+                    <table class="table edp-table">
+                        <thead>
+                        <tr>
+                            <th scope="col" style="width: 15%">Status</th>
+                            <th scope="col" style="width: 30%">Name</th>
+                            <th scope="col" style="width: 25%">Language</th>
+                            <th scope="col" style="width: 20%">Build Tool</th>
+                            <th scope="col" style="width: 10%"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        {{range .Codebases}}
+                            <tr data-codebase-name="{{.Name}}" data-codebase-status="{{.Status}}">
+                                <td class="codebase-status" data-status="{{.Status}}">
+                                    <img src="{{if eq .Status "active"}}/static/img/green_circle.svg{{else if eq .Status "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}"
+                                         alt="" style="width:25px; height:25px;">
+                                </td>
+                                <td class="codebase-name">
+                                    <a href="/admin/edp/codebase/{{.Name}}/overview">
+                                        {{.Name}}
+                                    </a>
+                                </td>
+                                <td>{{.Language}}</td>
+                                <td>{{.BuildTool}}</td>
+                                <td></td>
+                            </tr>
+                        {{end}}
+                        </tbody>
+                    </table>
+                </div>
+               {{end}}
         </div>
     </section>
     {{template "template/footer_template.html" .}}

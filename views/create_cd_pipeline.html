@@ -18,8 +18,11 @@
         <div class="flex-fill pl-4 pr-4 wrapper">
 
             <form class="edp-form" id="createCDCR" method="post" action="/admin/edp/cd-pipeline">
-                <h1>Create CD Pipeline</h1>
-                <p>Select which application user wants to deploy within this pipeline:</p>
+                <h1>
+                    <a href="/admin/edp/cd-pipeline/overview" class="edp-back-link"></a>
+                    Create CD Pipeline
+                </h1>
+                <p>Select which applications within this pipeline user wants to deploy.</p>
 
                 {{if .Error}}
                     <div class="backend-validation-error">

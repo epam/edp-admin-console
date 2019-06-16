@@ -15,206 +15,216 @@
         <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
             {{template "template/navbar_template.html" .}}
         </aside>
-        <div class="flex-fill pl-3 pr-3 wrapper">
+        <div class="flex-fill pl-4 pr-4 wrapper">
 
-            <div class="edp-form" id="createPipelineForm">
+            <form class="edp-form"id="createAutotest" method="post" action="/admin/edp/autotest">
+                <h1>
+                    <a href="/admin/edp/autotest/overview" class="edp-back-link"></a>
+                    Create Autotest
+                </h1>
+                <p>Add the autotest to receive: Gerrit Project, Code Review, Jenkins Pipelines. Pass all steps below to create your Autotest.</p>
+
+                {{ if .Error }}
+                    <div class="form-error">
+                        <p>{{ .Error }}</p>
+                    </div>
+                {{ end }}
                 <div class="accordion" id="accordionAutotestCreation">
                     <div class="card">
-                        <div class="card-header" id="headingOne" data-toggle="collapse"
-                             aria-expanded="true" aria-controls="collapseOne">
+                        <div class="card-header" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                             <h5 class="mb-0">
                                 <button class="btn btn-link collapsed" type="button">
-                                    Adding Autotests
+                                    Codebase Info
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
-                             data-parent="#accordionAutotestCreation">
-                            <form id="createAutotest" method="post" action="/admin/edp/autotest">
-                                <div class="card-body">
-
-                                    {{ if .Error }}
-                                        <div class="form-error">
-                                            <p>{{ .Error }}</p>
-                                        </div>
-                                    {{ end }}
-
-                                    <div class="form-group repo-url">
+                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionAutotestCreation">
+                            <div class="card-body">
+                                <div class="form-group repo-url">
                                         <label for="gitRepoUrl">Git Repository URL
-                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Please specify URL to Codebase in the following format: http(s)://git.sample.com/sample.git"></span>
-                                        </label>
-                                        <input name="gitRepoUrl" type="text" class="form-control" id="gitRepoUrl"
-                                               placeholder="http(s)://git.sample.com/sample.git">
-                                        <div class="git-url-validation invalid-feedback">
-                                            Please specify URL to Codebase in the following format:
-                                            http(s)://git.sample.com/sample.git
-                                        </div>
-                                        <div class="repo-validation">
-                                            <div class="invalid-feedback git-repo-error">
-                                                Current repository doesn't exist.
-                                            </div>
-                                            <div class="invalid-feedback git-creds">
-                                                Invalid Url, login or password.
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-check private-repo">
-                                        <input class="form-check-input" type="checkbox" value="true" id="isRepoPrivate"
-                                               name="isRepoPrivate">
-                                        <label class="form-check-label" for="isRepoPrivate">
-                                            Codebase Authentication
-                                        </label>
-                                    </div>
-
-                                    <div class="repo-credentials hide-element">
-                                        <div class="form-group repoLogin">
-                                            <label for="site">Repository Login
-                                                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                      title="Tooltip on top"></span>
-                                            </label>
-                                            <input name="repoLogin" type="text" class="form-control" id="repoLogin"
-                                                   placeholder="Enter repository login ">
-                                            <div class="repo-login-validation invalid-feedback">
-                                                Please specify user to clone repository. User should have read role.
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group repoPassword">
-                                            <label for="site">Repository password (or API Token)
-                                                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                      title="Tooltip on top"></span>
-                                            </label>
-                                            <input name="repoPassword" type="password" class="form-control"
-                                                   id="repoPassword"
-                                                   placeholder="Enter repository password (or API Token)">
-                                            <div class="repo-password-validation invalid-feedback">
-                                                Please specify password (or API Token) to clone repository.
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group app-name">
-                                        <label for="nameOfApp">Autotest Name
-                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Project name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters."></span>
-                                        </label>
-                                        <input name="nameOfApp" type="text" class="form-control" id="nameOfApp"
-                                               placeholder="Type your autotests name">
-                                        <div class="app-name-validation invalid-feedback regex-error">
-                                            Autotests name may contain only: lower-case letters, numbers and dashes
-                                            and cannot start and end with dash. Minimum 2 characters.
-                                        </div>
-                                        <div class="app-name-duplicate-validation">
-                                            <div class="invalid-feedback duplicate-msg">
-                                                Current autotest is already exists.
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group autotest-description">
-                                        <label for="description">Description
-                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Can not be empty."></span>
-                                        </label>
-                                        <input name="description" type="text" class="form-control" id="description"
-                                               placeholder="Enter autotests description">
-                                        <div class="description-validation invalid-feedback regex-error">
-                                            Can not be empty. Can contain only letters or numbers.
-                                        </div>
-                                    </div>
-
-                                    <p>Autotest code language
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Select autotests language and build tool."></span>
-                                    </p>
-                                    <div class="form__input-wrapper">
-                                        <fieldset id="languageSelection" class="language">
-                                            <div class="d-flex">
-                                                <div class="form__radio-btn-wrapper">
-                                                    <input name="appLang" type="radio" class="form__radio-btn"
-                                                           id="appLang-Java"
-                                                           value="Java" data-target=".formSubsection-java">
-                                                    <label class="form__radio-label" for="appLang-Java">
-                                                        <img class="form__radio-label-icon"
-                                                             src="/static/img/java-logo.png"
-                                                             alt="logo">
-                                                        <span class="form__radio-label-text">Java</span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </fieldset>
+                                              title="Please specify URL to Codebase in the following format: http(s)://git.sample.com/sample.git"></span>
+                                    </label>
+                                    <input name="gitRepoUrl" type="text" class="form-control" id="gitRepoUrl"
+                                           placeholder="http(s)://git.sample.com/sample.git">
+                                    <div class="git-url-validation invalid-feedback">
+                                        Please specify URL to Codebase in the following format:
+                                        http(s)://git.sample.com/sample.git
                                     </div>
-                                    <div class="invalid-feedback appLangError">
-                                        Please select autotests type.
-                                    </div>
-
-                                    <div class="form-group">
-                                        <div class="js-form-subsection form-subsection formSubsection-java">
-                                            <label for="buildTool">Select Build Tool
-                                                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                      title="Select autotests build tool."></span>
-                                            </label>
-                                            <select class="form-control java-build-tools" name="buildTool">
-                                                <option>Maven</option>
-                                            </select>
+                                    <div class="repo-validation">
+                                        <div class="invalid-feedback git-repo-error">
+                                            Current repository doesn't exist.
+                                        </div>
+                                        <div class="invalid-feedback git-creds">
+                                            Invalid Url, login or password.
                                         </div>
                                     </div>
-
-                                    <div class="form-group">
-                                        <div class="js-form-subsection-autotest-framework">
-                                            <label for="testReportFramework">Autotest Report Framework
-                                                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                      title="Autotest Report Framework"></span>
-                                            </label>
-                                            <select class="form-control java-build-tools" name="testReportFramework">
-                                                <option value="allure">Allure</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    {{if not .IsVcsEnabled}}
-                                    <div class="form-buttons-footer-left">
-                                        <button type="submit"
-                                                class="create-autotest edp-submit-form-btn btn btn-primary">ADD AUTOTEST
-                                        </button>
-                                    </div>
-                                    {{end}}
-
                                 </div>
-                                {{if .IsVcsEnabled}}
-                                    <div class="card vcs-block">
-                                        <div class="card-header" id="headingTwo" data-toggle="collapse"
-                                             aria-expanded="true" aria-controls="collapseTwo">
-                                            <h5 class="mb-0">
-                                                <button class="btn btn-link collapsed" type="button">
-                                                    VCS info
-                                                </button>
-                                            </h5>
-                                        </div>
-                                        <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo"
-                                             data-parent="#accordionAutotestCreation">
-                                            <div class="card-body">
-                                                <div class="form-group vcs-login">
-                                                    <label for="vcsLogin">VCS Login</label>
-                                                    <input name="vcsLogin" type="text" class="form-control"
-                                                           id="vcsLogin"
-                                                           placeholder="Enter vcs login">
-                                                    <div class="invalid-feedback vcs-login-validation">
-                                                        Please specify vsc login.
-                                                    </div>
-                                                </div>
-                                                <div class="form-group vcs-password">
-                                                    <label for="vcsPassword">VCS Password (or API Token)</label>
-                                                    <input name="vcsPassword" type="password" class="form-control"
-                                                           id="vcsPassword"
-                                                           placeholder="Enter VCS Password (or API Token)">
-                                                    <div class="invalid-feedback vcs-password-validation">
-                                                        Please specify VCS Password (or API Token).
-                                                    </div>
-                                                </div>
 
+                                <div class="form-check private-repo">
+                                    <input class="form-check-input" type="checkbox" value="true" id="isRepoPrivate"
+                                           name="isRepoPrivate">
+                                    <label class="form-check-label" for="isRepoPrivate">
+                                            Codebase Authentication
+                                    </label>
+                                </div>
+
+                                <div class="repo-credentials hide-element">
+                                    <div class="form-group repoLogin">
+                                            <label for="site">Repository Login
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Tooltip on top"></span>
+                                        </label>
+                                        <input name="repoLogin" type="text" class="form-control" id="repoLogin"
+                                               placeholder="Enter repository login ">
+                                        <div class="repo-login-validation invalid-feedback">
+                                            Please specify user to clone repository. User should have read role.
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group repoPassword">
+                                        <label for="site">Repository password (or API Token)
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Tooltip on top"></span>
+                                        </label>
+                                        <input name="repoPassword" type="password" class="form-control"
+                                               id="repoPassword"
+                                               placeholder="Enter repository password (or API Token)">
+                                        <div class="repo-password-validation invalid-feedback">
+                                            Please specify password (or API Token) to clone repository.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group app-name">
+                                        <label for="nameOfApp">Autotests Name
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Project name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters."></span>
+                                    </label>
+                                    <input name="nameOfApp" type="text" class="form-control" id="nameOfApp"
+                                           placeholder="Type your autotests name">
+                                    <div class="app-name-validation invalid-feedback regex-error">
+                                        Autotests name may contain only: lower-case letters, numbers and dashes
+                                        and cannot start and end with dash. Minimum 2 characters.
+                                    </div>
+                                    <div class="app-name-duplicate-validation">
+                                        <div class="invalid-feedback duplicate-msg">
+                                            Current autotest is already exists.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group autotest-description">
+                                    <label for="description">Description
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Can not be empty."></span>
+                                    </label>
+                                    <input name="description" type="text" class="form-control" id="description"
+                                           placeholder="Enter autotests description">
+                                    <div class="description-validation invalid-feedback regex-error">
+                                        Can not be empty. Can contain only letters or numbers.
+                                    </div>
+                                </div>
+
+                                    <p>Autotests code language
+                                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                          title="Select autotests language and build tool."></span>
+                                </p>
+                                <div class="form__input-wrapper">
+                                    <fieldset id="languageSelection" class="language">
+                                        <div class="d-flex">
+                                            <div class="form__radio-btn-wrapper">
+                                                <input name="appLang" type="radio" class="form__radio-btn"
+                                                       id="appLang-Java"
+                                                       value="Java" data-target=".formSubsection-java">
+                                                <label class="form__radio-label" for="appLang-Java">
+                                                    <img class="form__radio-label-icon"
+                                                         src="/static/img/java-logo.png"
+                                                         alt="logo">
+                                                    <span class="form__radio-label-text">Java</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <div class="invalid-feedback appLangError">
+                                    Please select autotests type.
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="js-form-subsection form-subsection formSubsection-java">
+                                            <label for="buildTool">Select Build Tool
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Select autotests build tool."></span>
+                                        </label>
+                                        <select class="form-control java-build-tools" name="buildTool">
+                                            <option>Maven</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="js-form-subsection-autotest-framework">
+                                            <label for="testReportFramework">Autotest Report Framework
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                      title="Autotest Report Framework"></span>
+                                        </label>
+                                        <select class="form-control java-build-tools" name="testReportFramework">
+                                            <option value="allure">Allure</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{if .IsVcsEnabled}}
+                                    <button type="button" class="repo-submit edp-submit-form-btn btn btn-primary"
+                                            data-toggle="collapse"
+                                            data-target="#collapseTwo" aria-expanded="false"
+                                            aria-controls="collapseOne"
+                                    >Proceed
+                                    </button>
+                                {{else}}
+                                    <button type="submit"
+                                            class="create-autotest edp-submit-form-btn btn btn-primary">Add
+                                    </button>
+
+                                {{end}}
+
+                            </div>
+                        </div>
+                    </div>
+                    {{if .IsVcsEnabled}}
+                        <div class="card vcs-block">
+                            <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
+                                 data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" type="button">
+                                        VCS info
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
+                                 data-parent="#accordionAutotestCreation">
+                                <div class="card-body">
+                                    <div class="form-group vcs-login">
+                                                    <label for="vcsLogin">VCS Login</label>
+                                        <input name="vcsLogin" type="text" class="form-control"
+                                               id="vcsLogin"
+                                               placeholder="Enter vcs login">
+                                        <div class="invalid-feedback vcs-login-validation">
+                                            Please specify vsc login.
+                                        </div>
+                                    </div>
+                                    <div class="form-group vcs-password">
+                                                    <label for="vcsPassword">VCS Password (or API Token)</label>
+                                        <input name="vcsPassword" type="password" class="form-control"
+                                               id="vcsPassword"
+                                                           placeholder="Enter VCS Password (or API Token)">
+                                        <div class="invalid-feedback vcs-password-validation">
+                                                        Please specify VCS Password (or API Token).
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="create-autotest edp-submit-form-btn btn btn-primary">Add</button>
                                                 <div class="form-buttons-footer-left">
                                                     <button type="submit"
                                                             class="create-autotest edp-submit-form-btn btn btn-primary">ADD
@@ -222,15 +232,12 @@
                                                     </button>
                                                 </div>
 
-                                            </div>
-                                        </div>
-                                    </div>
-                                {{end}}
-                            </form>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    {{end}}
                 </div>
-            </div>
+            </form>
         </div>
     </section>
     {{template "template/footer_template.html" .}}

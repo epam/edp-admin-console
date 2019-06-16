@@ -4,6 +4,12 @@
 <nav class="navbar navbar-expand navbar-dark bg-dark flex-column flex-row align-items-start p-0">
     <div class="navbar-collapse">
         <ul class="flex-column flex-row navbar-nav w-100 justify-content-between">
+            <li class="nav-item {{if eq .Type "overview"}}active{{end}}" >
+                <a class="nav-link pl-0" href="/admin/edp/overview">
+                    <i class="icon-dashboard"></i>
+                    <span class="link-name">OVERVIEW</span>
+                </a>
+            </li>
             <li class="nav-item {{if eq .Type "delivery"}}active{{end}}" >
                 <a class="nav-link pl-0" href="/admin/edp/cd-pipeline/overview">
                     <i class="icon-continuous_delivery"></i>

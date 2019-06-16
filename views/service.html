@@ -15,14 +15,19 @@
             {{template "template/navbar_template.html" .}}
         </aside>
         <div class="flex-fill pl-3 pr-3 wrapper">
-            {{if .Services}}
-                <div class="d-flex edp-controls">
-                    <div class="flex-fill">
-                        <h1>
-                            Services
-                        </h1>
-                    </div>
+            <div class="d-flex edp-form wide">
+                <div class="flex-fill">
+                    <h1>
+                        Services
+                    </h1>
+                    {{if .Services}}
+                        <p>Please find the list of your services.</p>
+                    {{else}}
+                        <p>Looks like there're no any services.</p>
+                    {{end}}
                 </div>
+            </div>
+            {{if .Services}}
                 <table class="table edp-table">
                     <thead>
                     <tr>
@@ -46,10 +51,6 @@
                     {{end}}
                     </tbody>
                 </table>
-            {{else}}
-                <div class="no-tenant no-codebase-message">
-                    <h1>Looks like there are no any services.</h1>
-                </div>
             {{end}}
         </div>
     </section>

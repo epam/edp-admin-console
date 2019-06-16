@@ -18,10 +18,20 @@
         </aside>
         <div class="flex-fill pl-4 pr-4 wrapper">
 
-            <div class="codebase-overview-block" id="createAppForm">
-                <h1>{{.Codebase.Name}} {{.Codebase.Type}}</h1>
+            <div class="edp-form wide col-12 nosidepadding" id="createAppForm">
+                <h1>
+                    {{if eq .Type "application"}}
+                        <a href="/admin/edp/application/overview" class="edp-back-link"></a>
+                    {{else if eq .Type "autotests"}}
+                        <a href="/admin/edp/autotest/overview" class="edp-back-link"></a>
+                    {{else}}
+                        <a href="/admin/edp/library/overview" class="edp-back-link"></a>
+                    {{end}}
+                    {{.TypeCaption}} "{{.Codebase.Name}}"
+                </h1>
+                <p>Please find the details about your {{.TypeSingular}}. You can manage branches of your {{.TypeSingular}} and see all events happened to it.</p>
 
-                <div class="accordion" id="accordionCreateApplication">
+                <div class="accordion col-6 nosidepadding" id="accordionCreateApplication">
                     <div class="card">
                         <div class="card-header" id="headingOne"
                              aria-expanded="true" aria-controls="collapseOne">
@@ -34,141 +44,128 @@
 
                         <div id="collapseOne" class="show" aria-labelledby="headingOne">
                             <div class="card-body">
-                                <div class="form-check">
-                                    <table class="edp-table">
-                                        <thead>
-                                        <tr>
-                                            <th scope="col">Property</th>
-                                            <th scope="col">Value</th>
-                                        </tr>
-                                        </thead>
+                                <table class="edp-card-table">
                                         <tbody>
-                                        <tr>
-                                            <td>Language</td>
+                                        <tr >
+                                            <th style="width: 25%">Language</th>
                                             <td>{{.Codebase.Language}}</td>
                                         </tr>
                                         <tr>
-                                            <td>Build Tool</td>
+                                            <th>Build Tool</th>
                                             <td>{{.Codebase.BuildTool}}</td>
                                         </tr>
                                         {{if .Codebase.Framework}}
                                             <tr>
-                                                <td>Framework</td>
+                                                <th>Framework</th>
                                                 <td>{{.Codebase.Framework}}</td>
                                             </tr>
                                         {{end}}
                                         <tr>
-                                            <td>Strategy</td>
+                                            <th>Strategy</th>
                                             <td>{{.Codebase.Strategy}}</td>
                                         </tr>
                                         {{if .Codebase.TestReportFramework }}
                                             <tr>
-                                                <td>Test Report Framework</td>
+                                                <th>Test Report Framework</th>
                                                 <td>{{.Codebase.TestReportFramework}}</td>
                                             </tr>
                                         {{end}}
                                         {{if .Codebase.GitUrl }}
                                             <tr>
-                                                <td>Git Url</td>
+                                                <th>Git Url</th>
                                                 <td>{{.Codebase.GitUrl}}</td>
                                             </tr>
                                         {{end}}
                                         {{if ne (len .Codebase.Description) 0}}
                                             <tr>
-                                                <td>Description</td>
+                                                <th>Description</th>
                                                 <td>{{.Codebase.Description}}</td>
                                             </tr>
                                         {{end}}
                                         {{if and .Codebase.RouteSite .Codebase.RoutePath }}
                                             <tr>
-                                                <td>Expose Service Site</td>
+                                                <th>Expose Service Site</th>
                                                 <td>{{.Codebase.RouteSite}}</td>
                                             </tr>
                                             <tr>
-                                                <td>Expose Service Path</td>
+                                                <th>Expose Service Path</th>
                                                 <td>{{.Codebase.RoutePath}}</td>
                                             </tr>
                                         {{end}}
                                         {{if and .Codebase.DbKind .Codebase.DbVersion .Codebase.DbCapacity .Codebase.DbStorage }}
                                             <tr>
-                                                <td>Db Kind</td>
+                                                <th>Db Kind</th>
                                                 <td>{{.Codebase.DbKind}}</td>
                                             </tr>
                                             <tr>
-                                                <td>Db Version</td>
+                                                <th>Db Version</th>
                                                 <td>{{.Codebase.DbVersion}}</td>
                                             </tr>
                                             <tr>
-                                                <td>Db Capacity</td>
+                                                <th>Db Capacity</th>
                                                 <td>{{.Codebase.DbCapacity}}</td>
                                             </tr>
                                             <tr>
-                                                <td>Db Storage</td>
+                                                <th>Db Storage</th>
                                                 <td>{{.Codebase.DbStorage}}</td>
                                             </tr>
                                         {{end}}
                                         </tbody>
                                     </table>
-                                </div>
                             </div>
                         </div>
                     </div>
 
 
-                    {{if ne (len .Codebase.CodebaseBranch) 0}}
+                    {{if and (eq .Codebase.Status "active") (ne (len .Codebase.CodebaseBranch) 0) }}
                         <div class="card">
                             <div class="card-header" id="headingThree"
                                  aria-expanded="true" aria-controls="collapseThree">
                                 <h5 class="mb-0">
                                     <button class="btn btn-link" type="button">
-                                        Release Branches
+                                        Branches
                                     </button>
                                 </h5>
                             </div>
                             <div id="collapseThree" class="show route" aria-labelledby="headingThree">
                                 <div class="card-body">
-                                    <div class="form-check">
-                                        <table class="edp-table">
-                                            <thead>
-                                            <tr>
-                                                <th scope="col">Status</th>
-                                                <th scope="col">Branch</th>
-                                                <th scope="col">VCS</th>
-                                                <th scope="col">CI/CD</th>
+                                    <table class="edp-card-table">
+                                        <tbody>
+                                        <tr>
+                                            <th scope="col">Status</th>
+                                            <th scope="col">Branch</th>
+                                            <th scope="col">VCS</th>
+                                            <th scope="col">CI</th>
+                                        </tr>
+                                        {{range .Codebase.CodebaseBranch}}
+                                            <tr data-branch-name="{{.Name}}" data-branch-status="{{.Status}}">
+                                                <td>
+                                                    <img src="{{if eq .Status "active"}}/static/img/green_circle.svg{{else if eq .Status "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}"
+                                                         alt="" style="width:25px; height:25px;">
+                                                </td>
+                                                <td>{{.Name}}</td>
+                                                <td>
+                                                    <a href="{{.VCSLink}}" target="_blank" rel="noopener noreferrer"
+                                                       class="edp-link {{if ne .Status "active"}}disabled{{end}}">Link</a>
+                                                </td>
+                                                <td>
+                                                    <a href="{{.CICDLink}}" target="_blank"
+                                                       rel="noopener noreferrer"
+                                                       class="edp-link {{if ne .Status "active"}}disabled{{end}}">Link</a>
+                                                </td>
                                             </tr>
-                                            </thead>
-                                            <tbody>
-                                            {{range .Codebase.CodebaseBranch}}
-                                                <tr data-branch-name="{{.Name}}" data-branch-status="{{.Status}}">
-                                                    <td>
-                                                        <img src="{{if eq .Status "active"}}/static/img/green_circle.svg{{else if eq .Status "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}"
-                                                             alt="" style="width:25px; height:25px;">
-                                                    </td>
-                                                    <td>{{.Name}}</td>
-                                                    <td>
-                                                        <a href="{{.VCSLink}}" target="_blank" rel="noopener noreferrer"
-                                                           class="{{if ne .Status "active"}}disabled{{end}}">Link</a>
-                                                    </td>
-                                                    <td>
-                                                        <a href="{{.CICDLink}}" target="_blank"
-                                                           rel="noopener noreferrer"
-                                                           class="{{if ne .Status "active"}}disabled{{end}}">Link</a>
-                                                    </td>
-                                                </tr>
-                                            {{end}}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                        {{end}}
+                                        </tbody>
+                                    </table>
+                                    <div class="form-group"></div>
+                                    <button type="button" class="modal-release-branch btn btn-primary" aria-controls="">Create</button>
                                 </div>
                             </div>
                         </div>
                     {{end}}
+                </div>
 
-                    <button type="button"
-                            class="button-indent modal-release-branch btn btn-primary {{if ne .Codebase.Status "active"}}button-disabled{{end}}"
-                            aria-controls="">Create New Branch
-                    </button>
-
+                <div class="accordion">
                     <div class="card status-info">
                         <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
                              data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
@@ -181,9 +178,8 @@
                         <div id="collapseTwo" class="collapse status" aria-labelledby="headingTwo"
                              data-parent="#accordionCreateApplication">
                             <div class="card-body">
-                                <div class="form-check">
-                                    <table class="action-log-table edp-table">
-                                        <thead>
+                                <table class="action-log-table edp-card-table">
+                                    <tbody>
                                         <tr>
                                             <th scope="col" style="width: 20%">Date</th>
                                             <th scope="col" style="width: 25%">User</th>
@@ -191,20 +187,17 @@
                                             <th scope="col" style="width: 10%">Result</th>
                                             <th scope="col" style="width: 22.5%">Message</th>
                                         </tr>
-                                        </thead>
-                                        <tbody>
-                                        {{range .Codebase.ActionLog}}
-                                            <tr>
-                                                <td>{{.LastTimeUpdate.Format "02.01.2006 15:04:05 (UTC-07)" }}</td>
-                                                <td>{{.UserName}}</td>
-                                                <td>{{.Action}}</td>
-                                                <td>{{.Result}}</td>
-                                                <td>{{.Message}}</td>
-                                            </tr>
-                                        {{end}}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                    {{range .Codebase.ActionLog}}
+                                        <tr>
+                                            <td>{{.LastTimeUpdate.Format "02.01.2006 15:04:05 (UTC-07)" }}</td>
+                                            <td>{{.UserName}}</td>
+                                            <td>{{.Action}}</td>
+                                            <td>{{.Result}}</td>
+                                            <td>{{.Message}}</td>
+                                        </tr>
+                                    {{end}}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -219,7 +212,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">CREATE NEW RELEASE BRANCH</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Create New Branch</h5>
                     <button id="btn-cross-close" type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -228,16 +221,18 @@
                     <form id="create-branch-action" action="/admin/edp/codebase/{{.Codebase.Name}}/branch"
                           method="post">
                         <div class="form-group">
-                            <p>Branch Name:</p>
+                            <label for="site">Branch Name</label>
                             <input type="text" class="form-control" id="branchName" name="name"
                                    placeholder="Enter Branch Name">
-                            <div class="error-block branch-exists-modal form-error" style="display: none;"></div>
+                            <div class="error-block branch-exists-modal invalid-feedback" style="display: none;"></div>
                             <div class="invalid-feedback branch-name">
                                 Branch name may contain only: lower-case letters, numbers, dots and dashes and cannot
                                 start and end with dash and dot. Can not be empty.
                             </div>
+                        </div>
 
-                            <p>From Commit Hash:</p>
+                        <div class="form-group">
+                            <label>From Commit Hash</label>
                             <input type="text" class="form-control" id="commitNumber" name="commit"
                                    placeholder="Enter Commit">
                             <div class="invalid-feedback commit-message">
@@ -248,10 +243,10 @@
                 </div>
                 <div class="modal-footer">
                     <button id="btn-modal-close" type="button" class="btn btn-secondary btn-modal-close"
-                            data-dismiss="modal">CANCEL
+                            data-dismiss="modal">Cancel
                     </button>
                     <button id="create-release-branch" type="button" class="edp-submit-form-btn btn btn-primary">
-                        PROCEED
+                        Proceed
                     </button>
                 </div>
             </div>

@@ -91,25 +91,3 @@
     padding-right: 25px;
     padding-left: 11px;
 }
-
-.no-tenant {
-    font-size: 1.5rem;
-    margin-bottom: 0.875rem;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.no-tenant p {
-    font-size: 1.25rem;
-    margin-bottom: 0;
-    color: #222222;
-}
-
-.no-tenant {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 5.125rem;
-    font-family: "MuseoSans", sans-serif;
-    margin: 10%;
-}

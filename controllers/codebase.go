@@ -54,6 +54,20 @@ func (c *CodebaseController) GetCodebaseOverviewPage() {
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["Codebase"] = codebase
 	c.Data["Type"] = codebase.Type
+	switch codebase.Type {
+		case "application": {
+			c.Data["TypeCaption"] = "Application"
+			c.Data["TypeSingular"] = "application"
+		}
+		case "autotests": {
+			c.Data["TypeCaption"] = "Autotests codebase"
+			c.Data["TypeSingular"] = "autotests codebase"
+		}
+		case "library": {
+			c.Data["TypeCaption"] = "Library"
+			c.Data["TypeSingular"] = "library"
+		}
+	}
 	c.TplName = "codebase_overview.html"
 }
 

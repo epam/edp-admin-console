@@ -15,27 +15,38 @@
         <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
             {{template "template/navbar_template.html" .}}
         </aside>
-        <div class="flex-fill pl-3 pr-3 wrapper">
+        <div class="flex-fill pl-4 pr-4 wrapper">
 
-            {{if .Applications}}
-                <div class="d-flex edp-controls">
-                    <div class="flex-fill">
-                        <h1>CD Pipelines</h1>
-                    </div>
-                    {{if .HasRights}}
-                        <div class="flex-fill">
-                            <div class="float-right">
-                                <a href="/admin/edp/cd-pipeline/create">
-                                    <button class="btn btn-success"
-                                            {{if not .ActiveApplicationsAndBranches}}disabled{{end}}>Create
-                                    </button>
-                                </a>
-                            </div>
-                        </div>
+            <div class="d-flex  edp-form wide">
+                <div class="flex-fill">
+                    <h1>CD Pipelines</h1>
+                    {{if .ActiveApplicationsAndBranches}}
+                        {{if .CDPipelines}}
+                            <p>Please find your list of CD pipelines.</p>
+                        {{else}}
+                            <p>Looks like there're no CD pipelines.</p>
+                        {{end}}
+                    {{else}}
+                        {{if .Applications}}
+                            <p>Looks like there're no active branches in applications.</p>
+                        {{else}}
+                            <p>Looks like there're no applications.</p>
+                        {{end}}
                     {{end}}
                 </div>
-                {{if .ActiveApplicationsAndBranches}}
-                    {{if .CDPipelines}}
+                {{if .HasRights}}
+                    <div class="flex-fill">
+                        <div class="float-right">
+                            <a href="/admin/edp/cd-pipeline/create">
+                                <button class="btn btn-success" {{if not .ActiveApplicationsAndBranches}}disabled{{end}}>Create</button>
+                            </a>
+                        </div>
+                    </div>
+                {{end}}
+            </div>
+            {{if .ActiveApplicationsAndBranches}}
+                {{if .CDPipelines }}
+                    <div class="edp-table-container">
                         <table class="table edp-table">
                             <thead>
                             <tr>
@@ -58,31 +69,15 @@
                                     <td>
                                         <a href="{{.JenkinsLink}}" target="_blank"
                                            rel="noopener noreferrer"
-                                           class="{{if ne .Status "created"}}disabled{{end}}">Link</a>
+                                           class="edp-link {{if ne .Status "created"}}disabled{{end}}">Link</a>
                                     </td>
                                 </tr>
                             {{end}}
                             </tbody>
                         </table>
-                    {{end}}
-                {{else}}
-                    <div class="no-app-message">
-                        <h1>Looks like there are no any release branches.</h1>
                     </div>
                 {{end}}
-            {{else}}
-                <div class="no-app-message">
-                    <h1>Looks like there are no any applications.</h1>
-                    {{if .HasRights}}
-                        <a href="/admin/edp/application/create">
-                            <button class="btn btn-success">CREATE APPLICATION</button>
-                        </a>
-                    {{else}}
-                        <p class="no-rights-msg">Please, contact EDP support team.</p>
-                    {{end}}
-                </div>
             {{end}}
-
         </div>
     </section>
     {{template "template/footer_template.html" .}}

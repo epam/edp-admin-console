@@ -1,14 +1,3 @@
-.no-app-message {
-    width: 50%;
-    margin: 10% auto auto;
-    text-align: center;
-}
-
-.disabled {
-    pointer-events: none;
-    cursor: default;
-    color: grey;
-}
 
 .status-width {
     width: 10%;

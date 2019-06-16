@@ -18,7 +18,10 @@
         <div class="flex-fill pl-4 pr-4 wrapper">
 
             <form class="edp-form" id="createAppForm" method="post" action="/admin/edp/application">
-                <h1>Create Application</h1>
+                <h1>
+                    <a href="/admin/edp/application/overview" class="edp-back-link"></a>
+                    Create Application
+                </h1>
                 <p>Add the application to receive: Gerrit Project, Code Review, Jenkins Pipelines. Pass all steps below to create your Application.</p>
 
                 {{ if .Error }}
