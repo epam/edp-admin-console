@@ -7747,9 +7747,12 @@ button.delete {
 .btn-success:hover,
 .btn-success:focus,
 .btn-primary:hover,
-.btn-primary:focus {
-  background-color: #A9B447;
-  color: #ffffff;
+.btn-primary:focus,
+.btn-primary:active,
+.btn-success:active {
+  background-color: #A9B447 !important;
+  color: #ffffff !important;
+  border:none !important;
 }
 
 .btn-success.disabled,
@@ -7757,6 +7760,7 @@ button.delete {
 .btn-primary:disabled {
   background-color: #D7DCAB;
   color: #ffffff;
+  border:none !important;
 }
 
 
@@ -7849,4 +7853,9 @@ li.nav-item.active {
   color: black;
   top: -16px;
   position: relative;
+}
+
+.form-buttons-footer-block {
+  padding-top: 1rem;
+
 }
