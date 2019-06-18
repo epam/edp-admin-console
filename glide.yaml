@@ -19,3 +19,5 @@ import:
   version: v4.10.0
 - package: github.com/golang-migrate/migrate
   version: v3.5.4
+- package: github.com/openshift/client-go
+  version: v3.9.0

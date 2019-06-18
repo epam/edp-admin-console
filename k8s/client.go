@@ -17,6 +17,7 @@
 package k8s
 
 import (
+	appsV1Client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -35,6 +36,7 @@ type ClientSet struct {
 	CoreClient    *coreV1Client.CoreV1Client
 	StorageClient *storageV1Client.StorageV1Client
 	EDPRestClient *rest.RESTClient
+	AppsV1Client  *appsV1Client.AppsV1Client
 }
 
 func init() {
@@ -63,10 +65,17 @@ func CreateOpenShiftClients() ClientSet {
 		panic(err)
 	}
 
+	openshiftAppClient, err := getOpenshiftApplicationClient()
+	if err != nil {
+		log.Printf("An error has occurred while getting oenshift application resource client: %s", err)
+		panic(err)
+	}
+
 	return ClientSet{
 		CoreClient:    coreClient,
 		StorageClient: storageClient,
 		EDPRestClient: crClient,
+		AppsV1Client:  openshiftAppClient,
 	}
 }
 
@@ -105,6 +114,23 @@ func getApplicationClient() (*rest.RESTClient, error) {
 	}
 
 	clientset, err := createCrdClient(config)
+	if err != nil {
+		return nil, err
+	}
+	return clientset, nil
+}
+
+func getOpenshiftApplicationClient() (*appsV1Client.AppsV1Client, error) {
+	var config *rest.Config
+	var err error
+
+	config, err = k8sConfig.ClientConfig()
+
+	if err != nil {
+		return nil, err
+	}
+
+	clientset, err := appsV1Client.NewForConfig(config)
 	if err != nil {
 		return nil, err
 	}
