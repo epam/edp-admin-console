@@ -34,14 +34,15 @@
 
                     <div class="card pipeline">
                         <div class="card-header" id="headingOne" data-toggle="collapse"
-                             aria-expanded="true" aria-controls="collapseOne">
+                             aria-expanded="true" aria-controls="collapseOne" data-target="#collapseOne">
                             <h5 class="mb-0">
                                 <button class="btn btn-link collapsed" type="button">
                                     Pipeline
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne">
+                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                             data-parent="#accordionCreatePipeline">
                             <div class="card-body">
                                 <form id="createCDCR" method="post" action="/admin/edp/cd-pipeline">
                                     <div class="form-group pipeline-name">
@@ -56,6 +57,12 @@
                                             and end with dash and dot. Can not be empty.
                                         </div>
                                     </div>
+                                    <button type="button" class="edp-submit-form-btn btn btn-primary"
+                                            data-toggle="collapse"
+                                            data-target="#collapseTwo" aria-expanded="false"
+                                            aria-controls="collapseOne">
+                                        Proceed
+                                    </button>
                                 </form>
                             </div>
                         </div>
@@ -70,9 +77,11 @@
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo">
-                            <div class="card-body">
 
+                        <div id="collapseTwo" class="collapse"
+                             aria-expanded="false" aria-controls="collapseTwo"
+                             data-parent="#accordionCreatePipeline">
+                            <div class="card-body">
                                 {{range .Apps}}
                                     <div class="row">
                                         <div class="form-group col-sm-4">
@@ -99,7 +108,12 @@
                                 <div class="invalid-feedback app-checkbox-error">
                                     At least one checkbox must be checked.
                                 </div>
-
+                                <button type="button" class="edp-submit-form-btn btn btn-primary"
+                                        data-toggle="collapse"
+                                        data-target="#collapseThree" aria-expanded="false"
+                                        aria-controls="collapseTwo">
+                                    Proceed
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -113,7 +127,9 @@
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree">
+
+                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree"
+                             data-parent="#accordionCreatePipeline">
                             <div class="card-body">
 
                                 <div class="stages-list">
@@ -136,7 +152,6 @@
                                 <div class="invalid-feedback stage-error">
                                     At least one stage must be added.
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -150,6 +165,7 @@
                                 </button>
                             </h5>
                         </div>
+
                         <div id="collapseFour" class="collapse" aria-labelledby="headingFour"
                              data-parent="#accordionCreatePipeline">
                             <div class="card-body">

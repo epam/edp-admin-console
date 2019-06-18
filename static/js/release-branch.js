@@ -16,9 +16,11 @@ $(function () {
                 $('#releaseBranchModal').modal('show');
             }
             if (anchor === '#branchSuccessModal') {
-                $('#successPopup').modal('show');
+               // $('#successPopup').modal('show');
+                showNotification(true);
             }
         }
+
         let branchName = getUrlParameter('waitingforbranch');
         if (branchName) {
             let branchStatus = $("tr[data-branch-name='"+branchName+"']").attr("data-branch-status");
@@ -27,6 +29,9 @@ $(function () {
                 setTimeout(function () {
                     location.reload();
                 }, delayTime);
+            }
+            else {
+                showNotification(true);
             }
         }
         window.history.replaceState({}, document.title, uri);
@@ -108,4 +113,19 @@ function handleCommitHashValidation() {
         $('.invalid-feedback.commit-message').hide();
     }
     return isCommitValid;
+}
+
+function showNotification(ok, delay) {
+    $.notify({
+            icon: ok ? 'glyphicon glyphicon-ok-circle alert-icon' : 'glyphicon gglyphicon-warning-sign alert-icon',
+            message: ok ? 'Provisioning has been started.' : 'Provisioning has been failed.'
+        },
+        {
+            type: ok ? 'success' : 'error',
+            delay: delay ? delay: 5000,
+            animate: {
+                enter: 'animated fadeInRight',
+                exit: 'animated fadeOutRight'
+            }
+        });
 }

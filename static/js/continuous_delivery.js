@@ -4,7 +4,8 @@ $(function () {
         let anchor = $(location).attr('hash');
         if (anchor) {
             if (anchor === '#cdPipelineSuccessModal') {
-                $('#successPopup').modal('show');
+               // $('#successPopup').modal('show');
+                showNotification(true);
             }
             location.hash = '';
         }
@@ -12,13 +13,16 @@ $(function () {
         let pipelineName = getUrlParameter('waitingforcdpipeline');
         if (pipelineName) {
             let status = getCDPipelineStatus(pipelineName);
-            if (status === STATUS.CREATED || status === STATUS.FAILED) {
-                window.history.replaceState({}, document.title, window.location.pathname);
-            } else {
+            if (status == STATUS.CREATED || status == STATUS.FAILED)
+            {
+                showNotification(status == STATUS.CREATED);
+            }
+            else {
                 setTimeout(function () {
                     location.reload();
                 }, delayTime);
             }
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
     });
 });
@@ -38,4 +42,19 @@ function getCDPipelineStatus(pipelineName) {
         }
     });
     return status;
+}
+
+function showNotification(ok, delay) {
+    $.notify({
+            icon: ok ? 'glyphicon glyphicon-ok-circle alert-icon' : 'glyphicon gglyphicon-warning-sign alert-icon',
+            message: ok ? 'Provisioning has been started.' : 'Provisioning has been failed.'
+        },
+        {
+            type: ok ? 'success' : 'error',
+            delay: delay ? delay: 5000,
+            animate: {
+                enter: 'animated fadeInRight',
+                exit: 'animated fadeOutRight'
+            }
+        });
 }

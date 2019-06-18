@@ -11,19 +11,7 @@ $(function () {
         let anchor = $(location).attr('hash');
         if (anchor) {
             if (anchor === '#codebaseSuccessModal') {
-                // $('#successPopup').modal('show');
-                $.notify({
-                        icon: 'glyphicon glyphicon-ok-circle alert-icon',
-                        message: "Provisioning has been started."
-                    },
-                    {
-                        type: 'success',
-                        delay: 10000,
-                        animate: {
-                            enter:'animated fadeInRight',
-                            exit: 'animated fadeOutRight'
-                        }
-                    });
+                showNotification(true);
             }
             location.hash = '';
         }
@@ -33,36 +21,9 @@ $(function () {
         if (codebaseName) {
             let status = $("tr[data-codebase-name='" + codebaseName + "']").attr("data-codebase-status");
 
-            if (status == STATUS.CREATED)
+            if (status == STATUS.CREATED || status == STATUS.FAILED)
             {
-                $.notify({
-                        icon: 'glyphicon glyphicon-ok-circle alert-icon',
-                        message: "Provisioning has been finished."
-                    },
-                    {
-                        type: 'success',
-                        delay: 5000,
-                        animate: {
-                            enter:'animated fadeInRight',
-                            exit: 'animated fadeOutRight'
-                        }
-                    });
-            }
-            else
-            if (status == STATUS.FAILED) {
-                $.notify({
-                        icon: 'glyphicon gglyphicon-warning-sign alert-icon',
-                        message: "Provisioning has been failed."
-                    },
-                    {
-                        type: 'error',
-                        delay: 5000,
-                        animate: {
-                            enter:'animated fadeInRight',
-                            exit: 'animated fadeOutRight'
-                        }
-                    });
-
+                showNotification(status == STATUS.CREATED);
             }
             else {
                 uri += "?waitingforcodebase=" + codebaseName;
@@ -74,3 +35,19 @@ $(function () {
         window.history.replaceState({}, document.title, uri);
     });
 });
+
+
+function showNotification(ok, delay) {
+    $.notify({
+            icon: ok ? 'glyphicon glyphicon-ok-circle alert-icon' : 'glyphicon gglyphicon-warning-sign alert-icon',
+            message: ok ? 'Provisioning has been started.' : 'Provisioning has been failed.'
+        },
+        {
+            type: ok ? 'success' : 'error',
+            delay: delay ? delay: 5000,
+            animate: {
+                enter: 'animated fadeInRight',
+                exit: 'animated fadeOutRight'
+            }
+        });
+}
