@@ -1,7 +1,7 @@
 package query
 
 type CDPipeline struct {
-	Id                int                  `json:"-" orm:"column(id)"`
+	Id                int                  `json:"id" orm:"column(id)"`
 	Name              string               `json:"name" orm:"column(name)"`
 	Status            string               `json:"status" orm:"column(status)"`
 	JenkinsLink       string               `json:"jenkinsLink" orm:"-"`

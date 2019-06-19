@@ -1,7 +1,7 @@
 package query
 
 type CodebaseBranch struct {
-	Id         int       `json:"-" orm:"column(id)"`
+	Id         int       `json:"id" orm:"column(id)"`
 	Name       string    `json:"branchName" orm:"column(name)"`
 	FromCommit string    `json:"from_commit" orm:"column(from_commit)"`
 	Status     string    `json:"status" orm:"column(status)"`

@@ -1,7 +1,7 @@
 package query
 
 type Stage struct {
-	Id                   int         `json:"-" orm:"column(id)"`
+	Id                   int         `json:"id" orm:"column(id)"`
 	Name                 string      `json:"name" orm:"column(name)"`
 	Description          string      `json:"description" orm:"column(description)"`
 	TriggerType          string      `json:"triggerType" orm:"column(trigger_type)"`
