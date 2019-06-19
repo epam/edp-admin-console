@@ -17,19 +17,18 @@
             {{template "template/navbar_template.html" .}}
         </aside>
         <div class="flex-fill pl-4 pr-4 wrapper">
-
             <div class="edp-form wide col-12 nosidepadding" id="createAppForm">
-                <h1>
+                <h1 class="edp-form-header">
                     {{if eq .Type "application"}}
-                        <a href="/admin/edp/application/overview" class="edp-back-link"></a>
+                    <a href="/admin/edp/application/overview" class="edp-back-link"></a>
                     {{else if eq .Type "autotests"}}
-                        <a href="/admin/edp/autotest/overview" class="edp-back-link"></a>
+                    <a href="/admin/edp/autotest/overview" class="edp-back-link"></a>
                     {{else}}
-                        <a href="/admin/edp/library/overview" class="edp-back-link"></a>
+                    <a href="/admin/edp/library/overview" class="edp-back-link"></a>
                     {{end}}
                     {{.TypeCaption}} "{{.Codebase.Name}}"
                 </h1>
-                <p>Please find the details about your {{.TypeSingular}}. You can manage branches of your {{.TypeSingular}} and see all events happened to it.</p>
+                <p>Find below the {{.TypeSingular}} details, manage branches and track all the happened actions.</p>
 
                 <div class="accordion col-6 nosidepadding" id="accordionCreateApplication">
                     <div class="card">
@@ -37,7 +36,7 @@
                              aria-expanded="true" aria-controls="collapseOne">
                             <h5 class="mb-0">
                                 <button class="btn btn-link" type="button">
-                                    Properties Info
+                                    General Info
                                 </button>
                             </h5>
                         </div>

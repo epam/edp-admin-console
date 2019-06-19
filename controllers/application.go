@@ -97,7 +97,7 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["IsVcsEnabled"] = isVcsEnabled
-	c.Data["Type"] = "applications"
+	c.Data["Type"] = query.App
 	c.TplName = "create_application.html"
 }
 

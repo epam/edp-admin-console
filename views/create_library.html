@@ -18,8 +18,11 @@
         <div class="flex-fill pl-4 pr-4 wrapper">
 
             <form class="edp-form" id="createLibrary" method="post" action="/admin/edp/library">
-                <h1>Add Library:</h1>
-                <p>Pass all steps below to add specified library to your project.</p>
+                <h1 class="edp-form-header">
+                    <a href="/admin/edp/library/overview" class="edp-back-link"></a>
+                    Add Library
+                </h1>
+                <p>Pass all the steps below to add specified library to your project.</p>
 
                 {{ if .Error }}
                     <div class="form-error">
@@ -41,7 +44,7 @@
                              data-parent="#accordionCreateApplication">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="strategy">Codebase integration strategy
+                                    <label for="strategy">Codebase Integration Strategy
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                                               title="Select the existing codebase for reproduction or create new codebase."></span>
                                     </label>
@@ -70,7 +73,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-check private-repo hide-element">
+                                <div class="form-check private-repo hide-element form-group">
                                     <input class="form-check-input" type="checkbox" value="true" id="isRepoPrivate"
                                            name="isRepoPrivate">
                                     <label class="form-check-label" for="isRepoPrivate">
@@ -113,7 +116,7 @@
                              data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                             <h5 class="mb-0">
                                 <button class="btn btn-link" type="button">
-                                    Library info
+                                    Library Info
                                 </button>
                             </h5>
                         </div>
@@ -136,7 +139,8 @@
                                         Current library is already exists.
                                     </div>
                                 </div>
-                                <p>Library code language
+                                <p class="form-group">
+                                    Library Code Language
                                     <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                                           title="Select library language and build tool."></span>
                                 </p>
@@ -224,12 +228,12 @@
                                             data-toggle="collapse"
                                             data-target="#collapseThree"
                                             aria-expanded="false"
-                                            aria-controls="collapseTwo">PROCEED TO VCS INFO
+                                            aria-controls="collapseTwo">Proceed to VCS Info
                                     </button>
                                 {{else}}
                                     <div class="form-buttons-footer-left">
                                         <button type="submit" class="create-library edp-submit-form-btn btn btn-primary">
-                                            ADD LIBRARY
+                                            Add Library
                                         </button>
                                     </div>
                                 {{end}}
@@ -243,7 +247,7 @@
                                  data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                                 <h5 class="mb-0">
                                     <button class="btn btn-link collapsed" type="button">
-                                        VCS info
+                                        VCS Info
                                     </button>
                                 </h5>
                             </div>
@@ -268,7 +272,7 @@
                                     </div>
                                     <div class="form-buttons-footer-left">
                                         <button type="submit" class="create-library edp-submit-form-btn btn btn-primary">
-                                            ADD LIBRARY
+                                            Add Library
                                         </button>
                                     </div>
                                 </div>
@@ -306,9 +310,10 @@
                 </div>
                 <div class="modal-footer-left">
                     <button id="btn-modal-close" type="button" class="btn btn-secondary btn-modal-close"
-                            data-dismiss="modal">CANCEL
+                            data-dismiss="modal">Cancel
                     </button>
-                    <button id="create-application" type="button" class="edp-submit-form-btn btn btn-primary">CONTINUE
+                    <button id="create-application" type="button" class="edp-submit-form-btn btn btn-primary">
+                        Continue
                     </button>
                 </div>
             </div>
