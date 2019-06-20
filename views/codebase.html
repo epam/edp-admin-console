@@ -33,7 +33,7 @@
                         </h1>
                     {{end}}
                     {{if .Codebases}}
-                        <p>Please find the list of your {{if eq .Type "application"}}applications{{else if eq .Type "autotests"}}autotests{{else}}libraries{{end}}.</p>
+                        <p> Please find below the list of {{if eq .Type "application"}}applications{{else if eq .Type "autotests"}}autotests{{else}}libraries{{end}}.</p>
                     {{else}}
                         <p>Looks like there're no any {{if eq .Type "application"}}applications{{else if eq .Type "autotests"}}autotests{{else}}libraries{{end}}.</p>
                     {{end}}

@@ -98,6 +98,7 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["IsVcsEnabled"] = isVcsEnabled
 	c.Data["Type"] = query.App
+	c.Data["CodeBaseIntegrationStrategy"] = true
 	c.TplName = "create_application.html"
 }
 

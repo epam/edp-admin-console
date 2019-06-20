@@ -61,6 +61,8 @@ func (c *LibraryController) GetCreatePage() {
 	c.Data["HasRights"] = isAdmin(c.GetSession("realm_roles").([]string))
 	c.Data["IsVcsEnabled"] = isVcsEnabled
 	c.Data["Type"] = query.Library
+	c.Data["CodeBaseIntegrationStrategy"] = true
+
 	c.TplName = "create_library.html"
 }
 

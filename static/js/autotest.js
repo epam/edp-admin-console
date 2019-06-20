@@ -5,18 +5,16 @@ $(function () {
         $($(e.target).data('target')).show();
     });
 
-    $('#isRepoPrivate').change(function () {
-        let $repositoryCredsEl = $('.repo-credentials');
-        let $credInputElems = $repositoryCredsEl.find('.repoLogin input, .repoPassword input');
-        let $repoErrElems = $('.repo-login-validation, .repo-password-validation');
 
+    $('#isRepoPrivate').change(function () {
+        let $login = $('.repoLogin'), $pass = $('.repoPassword');
         if ($(this).is(':checked')) {
-            $repositoryCredsEl.removeClass('hide-element');
+            $login.add($pass).removeClass('hide-element');
         } else {
-            $repoErrElems.hide();
-            $repositoryCredsEl.addClass('hide-element');
-            $credInputElems.removeClass('is-invalid');
-            $credInputElems.val('');
+            $login.add($pass).addClass('hide-element');
+            $login.add($pass).find('.invalid-feedback').hide();
+            $login.add($pass).find('input').removeClass('is-invalid');
+
         }
     });
 
