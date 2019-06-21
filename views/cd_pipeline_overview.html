@@ -164,6 +164,49 @@
                             </div>
                         {{end}}
 
+                        {{if .CDPipeline.CodebaseStageMatrix}}
+                            <div class="card stages-info">
+                                <div class="card-header" id="headingTwo"
+                                     aria-expanded="true" aria-controls="collapseTwo">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" type="button">
+                                            Deployed versions
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseTwo" class="show" aria-labelledby="headingTwo">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <table class="edp-table">
+                                                <thead>
+                                                <tr>
+                                                    <th scope="col">App/Stage</th>
+                                                    {{range .CDPipeline.Stage}}
+                                                        <th>{{.Name}}</th>
+                                                    {{end}}
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {{$pipeline := .CDPipeline}}
+                                                {{range $i, $codebase := $pipeline.CodebaseBranch}}
+                                                    <tr>
+                                                        <th>{{$codebase.AppName}}</th>
+                                                        {{range $i, $stage := $pipeline.Stage}}
+                                                            {{$version := $pipeline.GetCDCodebaseStageMatrixValue $codebase $stage  }}
+                                                            <td>{{$version.DockerVersion }}</td>
+
+                                                        {{end}}
+                                                    </tr>
+                                                {{end}}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {{end}}
+
+
                     </div>
                 </div>
             </div>

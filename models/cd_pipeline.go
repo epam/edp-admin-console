@@ -8,6 +8,23 @@ type CDPipelineDTO struct {
 	JenkinsLink      string                  `json:"jenkinsLink"`
 	CodebaseBranches []dto.CodebaseBranchDTO `json:"codebaseBranches"`
 	Stages           []CDPipelineStageView   `json:"stages"`
+	CodebaseStageMatrix map[CDCodebaseStageMatrixKey]CDCodebaseStageMatrixValue `json:"codebaseStageMatrix"`
+}
+
+type CDCodebaseStageMatrixKey struct {
+	CodebaseBranch dto.CodebaseBranchDTO `json:"codebaseBranch"`
+	Stage CDPipelineStageView `json:"stage"`
+}
+
+type CDCodebaseStageMatrixValue struct {
+	DockerVersion string `json:"dockerVersion"`
+}
+
+func (c *CDPipelineDTO) getCDCodebaseStageMatrixValue(codebase dto.CodebaseBranchDTO, stage CDPipelineStageView) CDCodebaseStageMatrixValue {
+	return c.CodebaseStageMatrix[CDCodebaseStageMatrixKey{
+		CodebaseBranch: codebase,
+		Stage:     stage,
+	}]
 }
 
 type CDPipelineView struct {

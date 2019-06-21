@@ -24,6 +24,7 @@ import (
 	"edp-admin-console/repository"
 	"fmt"
 	"github.com/astaxie/beego"
+	appsV1Client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
@@ -130,6 +131,11 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 			cdPipeline.CodebaseBranch[i] = branch
 		}
 
+		matrix, err := fillCodebaseStageMatrix(s.Clients.AppsV1Client, cdPipeline)
+		if err == nil {
+			cdPipeline.CodebaseStageMatrix = matrix;
+		}
+
 		for _, stage := range cdPipeline.Stage {
 			if stage.QualityGate == "autotests" {
 				autotests, err := s.getStagesAutotests(cdPipeline.Name, stage.Name)
@@ -213,10 +219,46 @@ func (s *CDPipelineService) GetStage(cdPipelineName, stageName string) (*models.
 
 func createOpenshiftProjectLinks(stages []*query.Stage, cdPipelineName string) {
 	for index, stage := range stages {
-		stage.OpenshiftProjectLink = fmt.Sprintf(OpenshiftProjectLink+"%s-%s-%s", beego.AppConfig.String("dnsWildcard"), context.Tenant, cdPipelineName, stage.Name)
+		stage.OpenshiftProjectName = fmt.Sprintf("%s-%s-%s", context.Tenant, cdPipelineName, stage.Name)
+		stage.OpenshiftProjectLink = fmt.Sprintf(OpenshiftProjectLink+stage.OpenshiftProjectName, beego.AppConfig.String("dnsWildcard"))
 		stages[index] = stage
 	}
 }
+
+func fillCodebaseStageMatrix(ocClient *appsV1Client.AppsV1Client, cdPipeline *query.CDPipeline) (map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, error) {
+	var matrix = make(map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, len(cdPipeline.CodebaseBranch) * len(cdPipeline.Stage))
+	for _, stage := range cdPipeline.Stage {
+		dcs, err := ocClient.DeploymentConfigs(stage.OpenshiftProjectName).List(metav1.ListOptions{});
+		if err != nil {
+			log.Printf("An error has occurred while getting project from OpenShift: %s", err)
+			return nil, err
+		}
+		for _, codebase := range cdPipeline.CodebaseBranch {
+			var key = query.CDCodebaseStageMatrixKey{
+				CodebaseBranch: codebase,
+				Stage: stage,
+			}
+			var value = query.CDCodebaseStageMatrixValue{
+				DockerVersion: "no deploy",
+			}
+			for _, dc := range dcs.Items {
+				for _, container := range dc.Spec.Template.Spec.Containers {
+					if (container.Name == codebase.AppName) {
+						var containerImage = container.Image;
+						var delimeter = strings.LastIndex(containerImage, ":")
+						if (delimeter > 0){
+							value.DockerVersion = string(containerImage[(delimeter+1): len(containerImage)])
+						}
+					}
+				}
+			}
+			matrix[key] = value;
+		}
+
+	}
+	return matrix, nil;
+}
+
 
 func convertPipelineData(cdPipeline models.CDPipelineCreateCommand) k8s.CDPipelineSpec {
 	var codebaseBranches []string

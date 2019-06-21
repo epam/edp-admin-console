@@ -8,7 +8,25 @@ type CDPipeline struct {
 	CodebaseBranch    []*CodebaseBranch    `json:"codebaseBranches" orm:"rel(m2m);rel_table(cd_pipeline_codebase_branch)"`
 	Stage             []*Stage             `json:"stages" orm:"reverse(many)"`
 	ThirdPartyService []*ThirdPartyService `json:"services" orm:"rel(m2m);rel_table(cd_pipeline_third_party_service)"`
+	CodebaseStageMatrix map[CDCodebaseStageMatrixKey]CDCodebaseStageMatrixValue `json:"codebaseStageMatrix" orm:"-"`
 }
+
+type CDCodebaseStageMatrixKey struct {
+	CodebaseBranch *CodebaseBranch `json:"codebaseBranch"`
+	Stage *Stage `json:"stage"`
+}
+
+type CDCodebaseStageMatrixValue struct {
+	DockerVersion string `json:"dockerVersion"`
+}
+
+func (c *CDPipeline) GetCDCodebaseStageMatrixValue(codebase *CodebaseBranch, stage *Stage) CDCodebaseStageMatrixValue {
+	return c.CodebaseStageMatrix[CDCodebaseStageMatrixKey{
+		CodebaseBranch: codebase,
+		Stage:     stage,
+	}]
+}
+
 
 type CDPipelineCriteria struct {
 	Status Status
