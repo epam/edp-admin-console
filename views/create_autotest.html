@@ -49,14 +49,14 @@
                              data-parent="#accordionCreateCodebase">
                             <div class="card-body">
                                 <div class="form-group app-name">
-                                    <label for="nameOfApp">Autotests Name
+                                    <label for="nameOfApp">Autotest Name
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Project name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters."></span>
+                                              title="Autotest name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters."></span>
                                     </label>
                                     <input name="nameOfApp" type="text" class="form-control" id="nameOfApp"
-                                           placeholder="Type your autotests name">
+                                           placeholder="Type your autotest name">
                                     <div class="app-name-validation invalid-feedback regex-error">
-                                        Autotests name may contain only: lower-case letters, numbers and dashes
+                                        Autotest name may contain only: lower-case letters, numbers and dashes
                                         and cannot start and end with dash. Minimum 2 characters.
                                     </div>
                                     <div class="app-name-duplicate-validation">
@@ -69,18 +69,18 @@
                                 <div class="form-group autotest-description">
                                     <label for="description">Description
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Can not be empty."></span>
+                                              title="Autotest description can not be empty."></span>
                                     </label>
                                     <input name="description" type="text" class="form-control" id="description"
-                                           placeholder="Enter autotests description">
+                                           placeholder="Enter autotest description">
                                     <div class="description-validation invalid-feedback regex-error">
                                         Can not be empty. Can contain only letters or numbers.
                                     </div>
                                 </div>
 
-                                <p class="form-group">Autotests Code Language
+                                <p class="form-group">Autotest Code Language
                                     <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                          title="Select autotests language and build tool."></span>
+                                          title="Select autotest language and build tool."></span>
                                 </p>
                                 <div class="form__input-wrapper">
                                     <fieldset id="languageSelection" class="language">
@@ -100,7 +100,7 @@
                                     </fieldset>
                                 </div>
                                 <div class="invalid-feedback appLangError">
-                                    Please select autotests type.
+                                    Please select autotest type.
                                 </div>
 
                                 <div class="form-group">
@@ -131,14 +131,15 @@
                                 {{if .IsVcsEnabled}}
                                 <button type="button" class="repo-submit edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
-                                        data-target="#collapseTwo" aria-expanded="false"
-                                        aria-controls="collapseOne">
+                                        data-target="#collapseVCS"
+                                        aria-expanded="false"
+                                        aria-controls="collapseTwo">
                                     Proceed
                                 </button>
                                 {{else}}
                                 <button type="submit"
                                         class="create-autotest edp-submit-form-btn btn btn-primary">
-                                    Add Autotest
+                                    Create
                                 </button>
                                 {{end}}
                             </div>
@@ -146,13 +147,14 @@
                     </div>
 
                     {{if .IsVcsEnabled}}
-                    {{template "template/accordion_vcs_template.html" .}}
+                        {{template "template/accordion_vcs_template.html" .}}
                     {{end}}
                 </div>
             </form>
         </div>
     </section>
     {{template "template/footer_template.html" .}}
+    {{template "template/modal_confirmation_template.html" .}}
 
 </main>
 <script src="/static/js/jquery-3.3.1.js"></script>

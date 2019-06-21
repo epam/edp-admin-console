@@ -94,6 +94,10 @@ $(function () {
         }
     });
 
+
+    $('.tooltip-icon').add('[data-toggle="tooltip"]').tooltip();
+
+
     $('#isRepoPrivate').change(function () {
         let $login = $('.repoLogin'), $pass = $('.repoPassword');
         if ($(this).is(':checked')) {
@@ -219,5 +223,7 @@ $(function () {
             $('#createLibrary').submit();
         }
     });
+
+
 
 });

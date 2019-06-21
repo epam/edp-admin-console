@@ -103,6 +103,8 @@ $(function () {
         }
     });
 
+    $('.tooltip-icon').tooltip();
+
 });
 
 let REGEX = {

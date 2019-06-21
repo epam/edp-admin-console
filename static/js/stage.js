@@ -74,6 +74,7 @@ $(function () {
         handleStepNameValidation();
     });
 
+    $('.tooltip-icon').tooltip();
 });
 
 function validateFields() {

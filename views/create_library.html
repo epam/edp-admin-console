@@ -20,9 +20,11 @@
             <form class="edp-form" id="createLibrary" method="post" action="/admin/edp/library">
                 <h1 class="edp-form-header">
                     <a href="/admin/edp/library/overview" class="edp-back-link"></a>
-                    Add Library
+                    Create Library
                 </h1>
-                <p>Pass all the steps below to add specified library to your project.</p>
+                <p>
+                    To create a library, pass all the steps below and receive the following: Gerrit Project, Code Review, Jenkins Pipelines.
+                </p>
 
                 {{ if .Error }}
                     <div class="form-error">
@@ -149,14 +151,15 @@
                                 {{if .IsVcsEnabled}}
                                     <button type="button" class="library-submit edp-submit-form-btn btn btn-primary"
                                             data-toggle="collapse"
-                                            data-target="#collapseThree"
+                                            data-target="#collapseVCS"
                                             aria-expanded="false"
-                                            aria-controls="collapseTwo">Proceed
+                                            aria-controls="collapseTwo">
+                                        Proceed
                                     </button>
                                 {{else}}
                                     <div class="form-buttons-footer-left">
                                         <button type="submit" class="create-library edp-submit-form-btn btn btn-primary">
-                                            Add Library
+                                            Create
                                         </button>
                                     </div>
                                 {{end}}
@@ -172,41 +175,7 @@
         </div>
     </section>
     {{template "template/footer_template.html" .}}
-
-    <!-- Modal confirmation -->
-    <div class="modal fade" id="confirmationPopup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-         aria-hidden="true" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">CONFIRMATION</h5>
-                    <button id="btn-cross-close" type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Press continue for adding your Library. Status will be available on "Libraries" page.
-                    <p/>
-                    <table id="window-table" class="table table-bordered">
-                        <thead class="thead-dark">
-                        <tr>
-                            <th scope="col">Parameter</th>
-                            <th scope="col">Value</th>
-                        </tr>
-                        </thead>
-                    </table>
-                </div>
-                <div class="modal-footer-left">
-                    <button id="btn-modal-close" type="button" class="btn btn-secondary btn-modal-close"
-                            data-dismiss="modal">Cancel
-                    </button>
-                    <button id="create-application" type="button" class="edp-submit-form-btn btn btn-primary">
-                        Continue
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    {{template "template/modal_confirmation_template.html" .}}
 </main>
 <script src="/static/js/jquery-3.3.1.js"></script>
 <script src="/static/js/popper.js"></script>

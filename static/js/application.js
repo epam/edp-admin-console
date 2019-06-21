@@ -44,7 +44,7 @@ $(function () {
             })
     });
 
-    $('[data-toggle="tooltip"]').tooltip();
+    $('.tooltip-icon').tooltip();
 
     $('#strategy').change(function () {
         if (this.value === 'clone') {
