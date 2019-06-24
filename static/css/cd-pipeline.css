@@ -20,3 +20,11 @@
 .left-padding {
     margin-left: 18px;
 }
+
+.autotests {
+    display: none;
+}
+
+.scroll-y {
+    overflow-y: scroll;
+}

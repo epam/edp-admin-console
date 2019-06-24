@@ -95,11 +95,21 @@ func (c *CDPipelineController) GetCreateCDPipelinePage() {
 		return
 	}
 
+	autotests, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
+		Status: query.Active,
+		Type:   query.Autotests,
+	})
+	if err != nil {
+		c.Abort("500")
+		return
+	}
+
 	c.Data["Services"] = services
 	c.Data["Apps"] = apps
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["Type"] = "delivery"
+	c.Data["Autotests"] = autotests
 	c.TplName = "create_cd_pipeline.html"
 }
 
