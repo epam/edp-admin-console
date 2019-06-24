@@ -81,9 +81,11 @@ $(function () {
 
     $('.java-build-tools').change(function () {
         if (this.value === 'Maven') {
+            $('#multiModule').attr("disabled", false);
             $('.multi-module').removeClass('hide-element');
         } else {
             $('.multi-module').addClass('hide-element');
+            $('#multiModule').attr("disabled", true);
         }
     });
 
@@ -92,6 +94,9 @@ $(function () {
     $('#collapseTwo .card-body .form__input-wrapper #subFormWrapper .form__radio-btn-wrapper .form__radio-btn').click(function () {
         $(this).parents('.card-body').find('.appLangError').hide();
         $('.framework').prop('checked', false);
+        $('.multi-module').addClass('hide-element');
+        $('.java-build-tools').val("Gradle");
+        $('#multiModule').prop( "checked", false ).attr("disabled", true);
         var $target = $(this).data('target');
         $target = $target.substring(1, $target.length);
 
