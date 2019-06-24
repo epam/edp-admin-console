@@ -25,8 +25,8 @@ import (
 type ICDPipelineRepository interface {
 	GetCDPipelineByName(pipelineName string) (*query.CDPipeline, error)
 	GetCDPipelines(criteria query.CDPipelineCriteria) ([]*query.CDPipeline, error)
-	GetCDPipelineStages(pipelineName string) ([]*query.Stage, error)
 	GetStage(cdPipelineName, stageName string) (*models.StageView, error)
+	GetStagesAutotests(cdPipelineName, stageName string) ([]models.Autotests, error)
 }
 
 const (
@@ -52,6 +52,14 @@ const (
 		"where cp.name = ? " +
 		"  and cs.name = ? " +
 		"  and cb.codebase_id = in_cds.codebase_id;"
+	SelectAutotestsForStage = "select cs.name, aut_code.name, cs.quality_gate " +
+		"from cd_stage cs " +
+		"	left join cd_pipeline cp on cs.cd_pipeline_id = cp.id " +
+		"	left join cd_stage_codebase csc on cs.id = csc.cd_stage_id " +
+		"	left join codebase aut_code on aut_code.id = csc.codebase_id " +
+		"where cp.name = ? " +
+		"  and cs.name = ? " +
+		"  and cs.quality_gate = 'autotests';"
 )
 
 type CDPipelineRepository struct {
@@ -151,4 +159,14 @@ func (this CDPipelineRepository) GetStage(cdPipelineName, stageName string) (*mo
 	}
 
 	return &stage, nil
+}
+
+func (this CDPipelineRepository) GetStagesAutotests(cdPipelineName, stageName string) ([]models.Autotests, error) {
+	o := orm.NewOrm()
+	var autotests []models.Autotests
+	_, err := o.Raw(SelectAutotestsForStage, cdPipelineName, stageName).QueryRows(&autotests)
+	if err != nil {
+		return nil, err
+	}
+	return autotests, nil
 }

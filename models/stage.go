@@ -9,6 +9,7 @@ type StageView struct {
 	Order           string             `json:"order"`
 	JenkinsStepName string             `json:"jenkinsStepName"`
 	Applications    []ApplicationStage `json:"applications"`
+	Autotests       []Autotests        `json:"autotests"`
 }
 
 type ApplicationStage struct {
@@ -26,4 +27,8 @@ type CDPipelineStageView struct {
 	JenkinsStepName      string `json:"jenkinsStepName"`
 	Order                int    `json:"order"`
 	OpenshiftProjectLink string `json:"openshiftProjectLink"`
+}
+
+type Autotests struct {
+	Name       string `json:"name"`
 }

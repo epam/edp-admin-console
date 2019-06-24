@@ -181,7 +181,21 @@ func (s *CDPipelineService) GetStage(cdPipelineName, stageName string) (*models.
 		log.Printf("An error has occurred while getting Stage from database: %s", err)
 		return nil, err
 	}
-	log.Printf("Fetched Stage: {%v}", stage)
+
+	if stage == nil {
+		log.Printf("Couldn't find Stage by %v name and %v CD Pipeline name", stageName, cdPipelineName)
+		return nil, nil
+	}
+
+	autotests, err := s.getStagesAutotests(cdPipelineName, stageName)
+	if err != nil {
+		log.Printf("An error has occurred while fetching Autotests from database: %s", err)
+		return nil, err
+	}
+	stage.Autotests = autotests
+
+	log.Printf("Fetched Stage: {%v}, Autotests: {%v}", stage, autotests)
+
 	return stage, nil
 }
 
@@ -311,4 +325,15 @@ func checkStagesInK8s(edpRestClient *rest.RESTClient, cdPipelineName string, sta
 		}
 	}
 	return nil
+}
+
+func (s *CDPipelineService) getStagesAutotests(cdPipelineName, stageName string) ([]models.Autotests, error) {
+	log.Printf("Start fetching Autotests by CD Pipeline %s and Stage %s names...", cdPipelineName, stageName)
+	stage, err := s.ICDPipelineRepository.GetStagesAutotests(cdPipelineName, stageName)
+	if err != nil {
+		log.Printf("An error has occurred while getting Autotests from database: %s", err)
+		return nil, err
+	}
+	log.Printf("Fetched Autotests: {%v}", stage)
+	return stage, nil
 }
