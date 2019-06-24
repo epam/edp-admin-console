@@ -187,9 +187,14 @@ func retrieveStagesFromRequest(this *CDPipelineController) []models.StageCreate 
 			TriggerType:     this.GetString(stageName + "-triggerType"),
 			Order:           index,
 		}
+
+		if stage.QualityGateType == "autotests" {
+			stage.Autotests = this.GetStrings(stageName + "-autotests")
+		}
+
 		stages = append(stages, stage)
 	}
-	log.Printf("Stages are fetched from request: %s", stages)
+	log.Printf("Stages are fetched from request: %v", stages)
 	return stages
 }
 

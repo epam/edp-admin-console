@@ -123,6 +123,12 @@ func validateCDPipelineRequestData(cdPipeline models.CDPipelineCreateCommand) *E
 
 	if cdPipeline.Stages != nil {
 		for _, stage := range cdPipeline.Stages {
+
+			if (stage.QualityGateType == "autotests" && stage.Autotests == nil) ||
+				(stage.QualityGateType == "manual" && stage.Autotests != nil) {
+				isStagesValid = false
+			}
+
 			isStagesValid, err = valid.Valid(stage)
 			if err != nil {
 				return errMsg

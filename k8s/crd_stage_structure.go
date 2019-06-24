@@ -7,13 +7,14 @@ import (
 
 // +k8s:openapi-gen=true
 type StageSpec struct {
-	Name        string `json:"name"`
-	CdPipeline  string `json:"cdPipeline"`
-	Description string `json:"description"`
-	QualityGate string `json:"qualityGate"`
-	TriggerType string `json:"triggerType"`
-	Order       int    `json:"order"`
-	JenkinsStep string `json:"jenkinsStep"`
+	Name        string   `json:"name"`
+	CdPipeline  string   `json:"cdPipeline"`
+	Description string   `json:"description"`
+	QualityGate string   `json:"qualityGate"`
+	TriggerType string   `json:"triggerType"`
+	Order       int      `json:"order"`
+	JenkinsStep string   `json:"jenkinsStep"`
+	Autotests   []string `json:"autotests"`
 }
 
 // +k8s:openapi-gen=true

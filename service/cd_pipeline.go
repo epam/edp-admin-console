@@ -264,6 +264,7 @@ func createCrd(cdPipelineName string, stage models.StageCreate) k8s.Stage {
 			TriggerType: stage.TriggerType,
 			Order:       stage.Order,
 			CdPipeline:  cdPipelineName,
+			Autotests:   stage.Autotests,
 		},
 		Status: k8s.StageStatus{
 			LastTimeUpdated: time.Now(),
