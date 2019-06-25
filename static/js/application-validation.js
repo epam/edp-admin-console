@@ -95,7 +95,7 @@ $(function () {
         }
 
         if (isValid) {
-            createTableWithValue($('#createAppForm').serializeArray());
+            createConfirmTable('#createAppForm');
             $('#confirmationPopup').modal('show');
         }
     });

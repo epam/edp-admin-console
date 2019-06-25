@@ -109,7 +109,7 @@ $(function () {
         });
     });
 
-    $('#create-application').click(function () {
+    $('#btn-modal-continue').click(function () {
         $('#createAppForm').submit();
         $('#confirmationPopup').modal('hide');
         $(".window-table-body").remove();
@@ -120,70 +120,6 @@ $(function () {
     });
 
 });
-
-/*service functions*/
-
-function createTableWithValue($formData) {
-    var isVcsEnabled = $('.vcs-block').length !== 0;
-    var isNeedRoute = isArrayContainName($formData, 'needRoute');
-    var isNeedDb = isArrayContainName($formData, 'needDb');
-    var isStrategyClone = getValueByName($formData, 'strategy') === "clone";
-    var isRepositoryPrivate = isArrayContainName($formData, 'isRepoPrivate');
-    var vcsIntegrationEnabled =  isVcsEnabled ? "&#10004;" : "&#10008;";
-    var isAppMultiModule = isArrayContainName($formData, 'isMultiModule') ? "&#10004;" : "&#10008;";
-    var table = $("#window-table");
-
-    $('<tbody class="window-table-body">' +
-        '<tr><td>Name</td><td>' + getValueByName($formData, 'nameOfApp') + '</td></tr>' +
-        '<tr><td>Code language</td><td>' + getValueByName($formData, 'appLang') + '</td></tr>' +
-        '<tr><td>Framework</td><td>' + getValueByName($formData, 'framework') + '</td></tr>' +
-        '<tr><td>Build tool</td><td>' + getValueByName($formData, 'buildTool') + '</td></tr>' +
-        '<tr><td>Integration with VCS is enabled</td><td>' + vcsIntegrationEnabled + '</td></tr>').appendTo(table);
-
-    $('<tr><td>Multi-module project</td><td>' + isAppMultiModule + '</td></tr>').appendTo(table);
-
-    $('<tr><td class="font-weight-bold text-center" colspan="2">CODEBASE</td></tr>' +
-        '<tr><td>Integration method</td><td>' + getValueByName($formData, 'strategy') + '</td></tr>').appendTo(table);
-
-    if (isStrategyClone) {
-        $('<tr><td>Repository url</td><td>' + getValueByName($formData, 'gitRepoUrl') + '</td></tr>').appendTo(table);
-
-        if (isRepositoryPrivate) {
-            $('<tr><td>Login</td><td>' + getValueByName($formData, 'repoLogin') + '</td></tr>').appendTo(table);
-        }
-    }
-
-    if (isVcsEnabled) {
-        $('<tr><td class="font-weight-bold text-center" colspan="2">VCS</td></tr>' +
-            '<tr><td>VCS Login</td><td>' + getValueByName($formData, 'vcsLogin') + '</td></tr>').appendTo(table)
-    }
-
-    if (isNeedRoute) {
-        $('<tr><td class="font-weight-bold text-center" colspan="2">EXPOSING SERVICE INFO</td></tr>' +
-            '<tr><td>Exposing service name</td><td>' + getValueByName($formData, 'routeSite') + '</td></tr>').appendTo(table);
-
-        if (getValueByName($formData, 'routePath')) {
-            $('<tr><td>Exposing service path</td><td>' + getValueByName($formData, 'routePath') + '</td></tr>').appendTo(table)
-        }
-    }
-
-    if (isNeedDb) {
-        $('<tr><td class="font-weight-bold text-center" colspan="2">DATABASE</td></tr>' +
-            '<tr><td>Database</td><td>' + getValueByName($formData, 'database') + '</td></tr>' +
-            '<tr><td>Version</td><td>' + getValueByName($formData, 'dbVersion') + '</td></tr>' +
-            '<tr><td>Capacity</td><td>' + getValueByName($formData, 'dbCapacity') + getValueByName($formData, 'capacityExt') + '</td></tr>' +
-            '<tr><td>Persistent storage</td><td>' + getValueByName($formData, 'dbPersistentStorage') + '</td></tr>').appendTo(table)
-    }
-
-}
-
-function getValueByName(array, name) {
-    return array.find(x => x.name === name).value
-}
-
-function isArrayContainName(array, name) {
-    return array.find(x => x.name === name)
-}
 
 function toggleFields() {
     var toggleInputs = function (bool) {

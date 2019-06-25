@@ -55,6 +55,9 @@ $(function () {
         $('#stage-creation').modal('show');
     });
 
+
+
+
 });
 
 function isAppCheckboxesValid() {

@@ -220,10 +220,23 @@ $(function () {
         if (isApplicationFieldValid && isLanguageSelected
             && (isGitValid && isRepoLoginValid && isRepoPasswordValid)
             && isVcsBlockValid) {
-            $('#createLibrary').submit();
+
+            //$('#createLibrary').submit();
+
+            createConfirmTable('#createLibrary');
+            $('#confirmationPopup').modal('show');
         }
     });
 
 
+    $('#btn-modal-continue').click(function () {
+        $('#createLibrary').submit();
+        $('#confirmationPopup').modal('hide');
+        $(".window-table-body").remove();
+    });
+
+    $("#btn-cross-close, #btn-modal-close").click(function () {
+        $(".window-table-body").remove();
+    });
 
 });

@@ -99,8 +99,21 @@ $(function () {
         isVcsBlockValid = $('.vcs-block').length == 0 ? true : isVcsLoginValid && isVcsPasswordValid;
 
         if (isGitValid && isAppValid && isDescValid && isApplicationValid && isVcsBlockValid) {
-            $('#createAutotest').submit();
+            //$('#createAutotest').submit();
+
+            createConfirmTable('#createAutotest');
+            $('#confirmationPopup').modal('show');
         }
+    });
+
+    $('#btn-modal-continue').click(function () {
+        $('#createAutotest').submit();
+        $('#confirmationPopup').modal('hide');
+        $(".window-table-body").remove();
+    });
+
+    $("#btn-cross-close, #btn-modal-close").click(function () {
+        $(".window-table-body").remove();
     });
 
     $('.tooltip-icon').tooltip();
