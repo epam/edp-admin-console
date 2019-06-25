@@ -17,7 +17,7 @@
         </aside>
         <div class="flex-fill pl-4 pr-4 wrapper">
 
-            <div class="edp-form">
+            <div class="edp-form cd-pipeline-overview-table">
                 <div class="row">
                     <h1 class="col-md-3">CD Pipeline: </h1>
                     <h1>{{.CDPipeline.Name}}</h1>
@@ -95,17 +95,23 @@
                                                     <th scope="col">Description</th>
                                                     <th scope="col">Trigger Type</th>
                                                     <th scope="col">Quality Gate</th>
+                                                    <th scope="col">Autotests</th>
                                                     <th scope="col">Jenkins Step Name</th>
                                                     <th scope="col">OpenShift Project</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
                                                 {{range .CDPipeline.Stage}}
-                                                    <tr>
+                                                    <tr valign="top">
                                                         <td>{{.Name}}</td>
                                                         <td>{{.Description}}</td>
                                                         <td>{{.TriggerType}}</td>
                                                         <td>{{.QualityGate}}</td>
+                                                        <td>
+                                                            {{range .Autotests}}
+                                                                <a href="/admin/edp/codebase/{{.Name}}/overview">{{.Name}}</a></br>
+                                                            {{end}}
+                                                        </td>
                                                         <td>{{.JenkinsStepName}}</td>
                                                         <td>
                                                             <a href="{{.OpenshiftProjectLink}}" target="_blank"

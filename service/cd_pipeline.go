@@ -129,6 +129,18 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 			branch.AppName = branch.Codebase.Name
 			cdPipeline.CodebaseBranch[i] = branch
 		}
+
+		for _, stage := range cdPipeline.Stage {
+			if stage.QualityGate == "autotests" {
+				autotests, err := s.getStagesAutotests(cdPipeline.Name, stage.Name)
+				if err != nil {
+					return nil, err
+				}
+				stage.Autotests = autotests
+				log.Printf("Fetched Autotests %v for Stage %v", autotests, stage.Name)
+			}
+		}
+
 		log.Printf("Fetched CD Pipeline from DB: %v", cdPipeline)
 	}
 
