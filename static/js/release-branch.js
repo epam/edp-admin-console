@@ -1,7 +1,7 @@
 $(function () {
 
     let STATUS = {
-        IN_PROGRESS: 'In Progress'
+        IN_PROGRESS: 'inactive'
     };
     let delayTime = 10000;
 
@@ -16,7 +16,6 @@ $(function () {
                 $('#releaseBranchModal').modal('show');
             }
             if (anchor === '#branchSuccessModal') {
-               // $('#successPopup').modal('show');
                 showNotification(true);
             }
         }
@@ -24,14 +23,11 @@ $(function () {
         let branchName = getUrlParameter('waitingforbranch');
         if (branchName) {
             let branchStatus = $("tr[data-branch-name='"+branchName+"']").attr("data-branch-status");
-            if (status != STATUS.IN_PROGRESS) {
+            if (branchStatus === STATUS.IN_PROGRESS) {
                 uri += "?waitingforbranch="+branchName;
                 setTimeout(function () {
                     location.reload();
                 }, delayTime);
-            }
-            else {
-                showNotification(true);
             }
         }
         window.history.replaceState({}, document.title, uri);

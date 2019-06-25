@@ -1,9 +1,7 @@
 $(function () {
 
     let STATUS = {
-        CREATED: 'created',
-        FAILED: 'failed',
-        IN_PROGRESS: 'in_progress'
+        IN_PROGRESS: 'inactive'
     };
     let delayTime = 10000;
 
@@ -20,12 +18,7 @@ $(function () {
         let codebaseName = getUrlParameter('waitingforcodebase');
         if (codebaseName) {
             let status = $("tr[data-codebase-name='" + codebaseName + "']").attr("data-codebase-status");
-
-            if (status == STATUS.CREATED || status == STATUS.FAILED)
-            {
-                showNotification(status == STATUS.CREATED);
-            }
-            else {
+            if (status === STATUS.IN_PROGRESS) {
                 uri += "?waitingforcodebase=" + codebaseName;
                 setTimeout(function () {
                     location.reload();

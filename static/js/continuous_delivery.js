@@ -1,10 +1,10 @@
 $(function () {
 
     $(document).ready(function () {
+        let uri = window.location.pathname;
         let anchor = $(location).attr('hash');
         if (anchor) {
             if (anchor === '#cdPipelineSuccessModal') {
-               // $('#successPopup').modal('show');
                 showNotification(true);
             }
             location.hash = '';
@@ -13,23 +13,20 @@ $(function () {
         let pipelineName = getUrlParameter('waitingforcdpipeline');
         if (pipelineName) {
             let status = getCDPipelineStatus(pipelineName);
-            if (status == STATUS.CREATED || status == STATUS.FAILED)
-            {
-                showNotification(status == STATUS.CREATED);
-            }
-            else {
+            if (status === STATUS.IN_PROGRESS) {
+                uri += "?waitingforcdpipeline="+pipelineName;
                 setTimeout(function () {
                     location.reload();
                 }, delayTime);
             }
-            window.history.replaceState({}, document.title, window.location.pathname);
+
+            window.history.replaceState({}, document.title, uri);
         }
     });
 });
 
 let STATUS = {
-    CREATED: 'created',
-    FAILED: 'failed'
+    IN_PROGRESS: 'inactive'
 };
 let delayTime = 3000;
 
@@ -51,7 +48,7 @@ function showNotification(ok, delay) {
         },
         {
             type: ok ? 'success' : 'error',
-            delay: delay ? delay: 5000,
+            delay: delay ? delay : 5000,
             animate: {
                 enter: 'animated fadeInRight',
                 exit: 'animated fadeOutRight'

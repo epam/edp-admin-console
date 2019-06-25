@@ -220,7 +220,7 @@ func addCdPipelineInProgressIfAny(cdPipelines []*query.CDPipeline, pipelineInPro
 		log.Println("Adding CD Pipeline " + pipelineInProgress + " which is going to be created to the list.")
 		pipeline := query.CDPipeline{
 			Name:   pipelineInProgress,
-			Status: "In progress",
+			Status: "inactive",
 		}
 		cdPipelines = append(cdPipelines, &pipeline)
 	}
