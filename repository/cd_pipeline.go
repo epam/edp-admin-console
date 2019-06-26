@@ -52,7 +52,7 @@ const (
 		"where cp.name = ? " +
 		"  and cs.name = ? " +
 		"  and cb.codebase_id = in_cds.codebase_id;"
-	SelectAutotestsForStage = "select cs.name, aut_code.name, cs.quality_gate " +
+	SelectAutotestsForStage = "select cs.name, aut_code.name, cs.quality_gate, aut_code.test_report_framework, aut_code.build_tool " +
 		"from cd_stage cs " +
 		"	left join cd_pipeline cp on cs.cd_pipeline_id = cp.id " +
 		"	left join cd_stage_codebase csc on cs.id = csc.cd_stage_id " +
