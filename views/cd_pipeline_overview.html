@@ -17,34 +17,35 @@
         </aside>
         <div class="flex-fill pl-4 pr-4 wrapper">
 
-            <div class="edp-form cd-pipeline-overview-table">
-                <div class="row">
-                    <h1 class="col-md-3">CD Pipeline: </h1>
-                    <h1>{{.CDPipeline.Name}}</h1>
-                </div>
-                <div class="row">
-                    <h1 class="col-md-3">Jenkins: </h1>
-                    <h1>
-                        <a href="{{.CDPipeline.JenkinsLink}}" target="_blank"
-                           rel="noopener noreferrer">Link to Jenkins</a>
+            <div class="edp-form wide nosidepadding cd-pipeline-overview-table" >
+                    <h1 class="edp-form-header">
+                        <a href="/admin/edp//cd-pipeline/overview" class="edp-back-link"></a>
+                        CD Pipeline:
+                        <a href="{{.CDPipeline.JenkinsLink}}" target="_blank" class="edp-link" rel="noopener noreferrer">
+                            {{.CDPipeline.Name}}
+                        </a>
                     </h1>
-                </div>
+                <p>
+                    Find below the Pipeline details.
+                </p>
 
                 <div class="accordion" id="accordionCreateApplication">
                     <div class="card">
                         <div class="card applications-info">
-                            <div class="card-header" id="headingOne"
+                            <div class="card-header static" id="headingOne"
                                  aria-expanded="true" aria-controls="collapseOne">
                                 <h5 class="mb-0">
                                     <button class="btn btn-link" type="button">
                                         Applications
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Applications which are deployed on the stages below."></span>
                                     </button>
                                 </h5>
                             </div>
                             <div id="collapseOne" class="show" aria-labelledby="headingOne">
                                 <div class="card-body">
                                     <div class="form-check">
-                                        <table class="edp-table">
+                                        <table class="table edp-table">
                                             <thead>
                                             <tr>
                                                 <th scope="col">Application</th>
@@ -59,11 +60,11 @@
                                                         {{.Codebase.Name}}
                                                     </td>
                                                     <td>
-                                                        <a href="{{.VCSLink}}" target="_blank"
+                                                        <a href="{{.VCSLink}}" target="_blank" class="edp-link"
                                                            rel="noopener noreferrer">{{.Name}}</a>
                                                     </td>
                                                     <td>
-                                                        <a href="{{.CICDLink}}" target="_blank"
+                                                        <a href="{{.CICDLink}}" target="_blank" class="edp-link"
                                                            rel="noopener noreferrer">Link</a>
                                                     </td>
                                                 </tr>
@@ -77,22 +78,23 @@
 
                         {{if .CDPipeline.Stage}}
                             <div class="card stages-info">
-                                <div class="card-header" id="headingTwo"
+                                <div class="card-header static" id="headingTwo"
                                      aria-expanded="true" aria-controls="collapseTwo">
                                     <h5 class="mb-0">
                                         <button class="btn btn-link" type="button">
                                             Stages
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Stages which are created for the pipeline."></span>
                                         </button>
                                     </h5>
                                 </div>
                                 <div id="collapseTwo" class="show" aria-labelledby="headingTwo">
                                     <div class="card-body">
                                         <div class="form-check">
-                                            <table class="edp-table">
+                                            <table class="table edp-table">
                                                 <thead>
                                                 <tr>
                                                     <th scope="col">Name</th>
-                                                    <th scope="col">Description</th>
                                                     <th scope="col">Trigger Type</th>
                                                     <th scope="col">Quality Gate</th>
                                                     <th scope="col">Autotests</th>
@@ -103,19 +105,25 @@
                                                 <tbody>
                                                 {{range .CDPipeline.Stage}}
                                                     <tr valign="top">
-                                                        <td>{{.Name}}</td>
-                                                        <td>{{.Description}}</td>
+                                                        <td>
+                                                            {{.Name}}
+                                                            {{if .Description}}
+                                                              <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                            title="{{.Description}}"></span>
+                                                            {{end}}
+                                                        </td>
                                                         <td>{{.TriggerType}}</td>
                                                         <td>{{.QualityGate}}</td>
                                                         <td>
                                                             {{range .Autotests}}
-                                                                <a href="/admin/edp/codebase/{{.Name}}/overview">{{.Name}}</a></br>
+                                                                <a href="/admin/edp/codebase/{{.Name}}/overview" class="edp-link">
+                                                                    {{.Name}} </a></br>
                                                             {{end}}
                                                         </td>
                                                         <td>{{.JenkinsStepName}}</td>
                                                         <td>
-                                                            <a href="{{.OpenshiftProjectLink}}" target="_blank"
-                                                               rel="noopener noreferrer">OpenShift Link</a>
+                                                            <a href="{{.OpenshiftProjectLink}}" target="_blank" class="edp-link"
+                                                               rel="noopener noreferrer">Link</a>
                                                         </td>
                                                     </tr>
                                                 {{end}}
@@ -129,30 +137,36 @@
 
                         {{if .CDPipeline.ThirdPartyService}}
                             <div class="card third-party-service-info">
-                                <div class="card-header" id="headingThree"
+                                <div class="card-header static" id="headingThree"
                                      aria-expanded="true" aria-controls="collapseThree">
                                     <h5 class="mb-0">
                                         <button class="btn btn-link" type="button">
                                             Third Party Services
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Third Party Services which are deployed on the stages."></span>
                                         </button>
                                     </h5>
                                 </div>
                                 <div id="collapseThree" class="show" aria-labelledby="headingThree">
                                     <div class="card-body">
                                         <div class="form-check">
-                                            <table class="edp-table">
+                                            <table class="table edp-table">
                                                 <thead>
                                                 <tr>
                                                     <th scope="col">Name</th>
-                                                    <th scope="col">Description</th>
                                                     <th scope="col">Version</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
                                                 {{range .CDPipeline.ThirdPartyService}}
                                                     <tr>
-                                                        <td>{{.Name}}</td>
-                                                        <td>{{.Description}}</td>
+                                                        <td>
+                                                            {{.Name}}
+                                                            {{if .Description}}
+                                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                                  title="{{.Description}}"></span>
+                                                            {{end}}
+                                                        </td>
                                                         <td>{{.Version}}</td>
                                                     </tr>
                                                 {{end}}
@@ -166,21 +180,23 @@
 
                         {{if .CDPipeline.CodebaseStageMatrix}}
                             <div class="card stages-info">
-                                <div class="card-header" id="headingTwo"
+                                <div class="card-header static" id="headingTwo"
                                      aria-expanded="true" aria-controls="collapseTwo">
                                     <h5 class="mb-0">
                                         <button class="btn btn-link" type="button">
                                             Deployed versions
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Versions of the deployed artifacts."></span>
                                         </button>
                                     </h5>
                                 </div>
                                 <div id="collapseTwo" class="show" aria-labelledby="headingTwo">
                                     <div class="card-body">
                                         <div class="form-check">
-                                            <table class="edp-table">
+                                            <table class="table edp-table">
                                                 <thead>
                                                 <tr>
-                                                    <th scope="col">App/Stage</th>
+                                                    <th scope="col">Application/Stage</th>
                                                     {{range .CDPipeline.Stage}}
                                                         <th>{{.Name}}</th>
                                                     {{end}}
@@ -194,7 +210,6 @@
                                                         {{range $i, $stage := $pipeline.Stage}}
                                                             {{$version := $pipeline.GetCDCodebaseStageMatrixValue $codebase $stage  }}
                                                             <td>{{$version.DockerVersion }}</td>
-
                                                         {{end}}
                                                     </tr>
                                                 {{end}}
@@ -205,8 +220,6 @@
                                 </div>
                             </div>
                         {{end}}
-
-
                     </div>
                 </div>
             </div>
@@ -215,8 +228,12 @@
     {{template "template/footer_template.html" .}}
 
 </main>
+
 <script src="/static/js/jquery-3.3.1.js"></script>
 <script src="/static/js/popper.js"></script>
 <script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/util.js"></script>
+<script src="/static/js/pipeline-overview.js"></script>
+
 </body>
 </html>

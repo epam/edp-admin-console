@@ -92,6 +92,13 @@
 
 .icon-trashcan:before {
     content: "\e903";
+    color: #B6C0C8;
+}
+
+.icon-trashcan:hover:before,
+.icon-trashcan:hover:active {
+    content: "\e903";
+    color: #f15c43;
 }
 
 .icon-continuous_delivery:before {
@@ -10562,6 +10569,10 @@ button.delete .icon-trashcan {
     background-image: url("assets/icons/ic-arrow-up-16px.png");
     background-repeat: no-repeat;
     background-position: 98% 50%;
+}
+
+.edp-form .card-header.static {
+    background-image: none; !important;
 }
 
 .edp-form .card-header.collapsed {

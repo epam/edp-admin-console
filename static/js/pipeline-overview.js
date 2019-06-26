@@ -1,0 +1,3 @@
+$(function () {
+    $('.tooltip-icon').tooltip();
+});
