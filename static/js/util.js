@@ -129,3 +129,17 @@ function createConfirmTable(formName) {
     }));
 
 }
+
+function _sendGetRequest(async, url, successCallback, failCallback) {
+    $.ajax({
+        url: url,
+        contentType: "application/json",
+        async: async,
+        success: function (resp) {
+            successCallback(resp);
+        },
+        error: function (resp) {
+            failCallback(resp);
+        },
+    });
+}

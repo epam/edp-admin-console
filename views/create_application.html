@@ -53,12 +53,10 @@
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                                               title="Application name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters."></span>
                                     </label>
-                                    <input name="nameOfApp" type="text" class="form-control" id="nameOfApp"
+                                    <input name="nameOfApp" type="text" class="codebase-name form-control" id="nameOfApp"
                                            placeholder="Type your application name">
-                                    <div class="app-name-validation">
-                                        <div class="invalid-feedback regex-error">
-                                            Application name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters.
-                                        </div>
+                                    <div class="codebase-name-validation invalid-feedback regex-error">
+                                        Application name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters.
                                     </div>
                                     <div class="app-name-duplicate-validation">
                                         <div class="invalid-feedback duplicate-msg">
@@ -71,7 +69,7 @@
                                           title="Select application language/framework and build tool."></span>
                                 </p>
                                 <div class="form__input-wrapper">
-                                    <fieldset id="subFormWrapper" class="language">
+                                    <fieldset id="languageSelection" class="language">
                                         <div class="d-flex">
                                             <div class="form__radio-btn-wrapper">
                                                 <input name="appLang" type="radio" class="form__radio-btn"
@@ -202,7 +200,7 @@
                                               title="The application has multi-module structure, in which there is API and a main application that implements the API."></span>
                                     </label>
                                 </div>
-                                <button type="button" class="main-info-submit edp-submit-form-btn btn btn-primary"
+                                <button type="button" class="application-submit edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
                                         data-target="{{if .IsVcsEnabled}}#collapseVCS{{else}}#collapseFour{{end}}"
                                         aria-expanded="false"
@@ -244,7 +242,7 @@
                                     </label>
                                     <input name="routeSite" type="text" class="form-control" id="routeSite"
                                            placeholder="Enter exposing service name">
-                                    <div class="invalid-feedback">
+                                    <div class="route-site invalid-feedback">
                                         Site names may only contain lower-case letters, numbers, and dashes. They may not start or end with a dash. Min 2 characters.
                                     </div>
                                 </div>
@@ -255,7 +253,7 @@
                                     </label>
                                     <input name="routePath" type="text" class="form-control" id="routePath"
                                            placeholder="Enter exposing service path ">
-                                    <div class="invalid-feedback">
+                                    <div class="route-path invalid-feedback">
                                         Path must start with /
                                     </div>
                                 </div>
@@ -319,7 +317,7 @@
                                             <option value="Ti">Ti</option>
                                         </select>
                                     </div>
-                                    <div class="invalid-feedback">
+                                    <div class="capacity-error invalid-feedback">
                                         Please specify database capacity.
                                     </div>
                                 </div>
@@ -358,8 +356,7 @@
 <script src="/static/js/popper.js"></script>
 <script src="/static/js/bootstrap.js"></script>
 <script src="/static/js/util.js"></script>
-<script src="/static/js/application.js"></script>
-<script src="/static/js/application-validation.js"></script>
+<script src="/static/js/codebase-validation.js"></script>
 <script src="/static/js/bootstrap-notify.js"></script>
 </body>
 </html>

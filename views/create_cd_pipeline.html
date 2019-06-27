@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="/static/css/index.css">
     <link rel="stylesheet" href="/static/css/cd-pipeline.css">
+    <link rel="stylesheet" href="/static/css/validation.css">
 </head>
 <body>
 <main>
@@ -32,7 +33,7 @@
 
                 <div class="accordion" id="accordionCreatePipeline">
 
-                    <div class="card pipeline">
+                    <div class="card pipeline-block">
                         <div class="card-header" id="headingOne" data-toggle="collapse"
                              aria-expanded="true" aria-controls="collapseOne" data-target="#collapseOne">
                             <h5 class="mb-0">
@@ -50,14 +51,14 @@
                                         <input name="pipelineName" type="text" class="form-control"
                                                id="pipelineName"
                                                placeholder="Enter pipeline name ">
-                                        <div class="invalid-feedback pipeline-name">
+                                        <div class="invalid-feedback pipeline-name-validation">
                                             Pipeline name may contain only: lower-case letters, numbers and dashes
                                             and
                                             cannot start
                                             and end with dash and dot. Can not be empty.
                                         </div>
                                     </div>
-                                    <button type="button" class="edp-submit-form-btn btn btn-primary"
+                                    <button type="button" class="pipeline-info-button edp-submit-form-btn btn btn-primary"
                                             data-toggle="collapse"
                                             data-target="#collapseTwo" aria-expanded="false"
                                             aria-controls="collapseOne">
@@ -68,7 +69,7 @@
                         </div>
                     </div>
 
-                    <div class="card applications">
+                    <div class="card application-block">
                         <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
                              aria-expanded="false" aria-controls="collapseTwo" data-target="#collapseTwo">
                             <h5 class="mb-0">
@@ -108,7 +109,7 @@
                                 <div class="invalid-feedback app-checkbox-error">
                                     At least one checkbox must be checked.
                                 </div>
-                                <button type="button" class="edp-submit-form-btn btn btn-primary"
+                                <button type="button" class="application-info-button edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
                                         data-target="#collapseThree" aria-expanded="false"
                                         aria-controls="collapseTwo">
@@ -118,7 +119,7 @@
                         </div>
                     </div>
 
-                    <div class="card stages">
+                    <div class="card stage-block">
                         <div class="card-header collapsed" id="headingThree" data-toggle="collapse"
                              aria-expanded="false" aria-controls="collapseThree" data-target="#collapseThree">
                             <h5 class="mb-0">
@@ -143,14 +144,19 @@
                                 {{end}}
 
                                 <div class="form-group">
-                                    <button type="button" class="add-stage-modal edp-submit-form-btn btn btn-primary">
-                                        Add
-                                    </button>
+                                    <button type="button" class="add-stage-modal circle plus"></button>
                                 </div>
 
                                 <div class="invalid-feedback stage-error">
                                     At least one stage must be added.
                                 </div>
+
+                                <button type="button" class="stage-info-button edp-submit-form-btn btn btn-primary"
+                                        data-toggle="collapse"
+                                        data-target="#collapseThree" aria-expanded="false"
+                                        aria-controls="collapseTwo">
+                                    Proceed
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -351,6 +357,7 @@
 <script src="/static/js/jquery-3.3.1.js"></script>
 <script src="/static/js/popper.js"></script>
 <script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/util.js"></script>
 <script src="/static/js/cd-pipeline.js"></script>
 <script src="/static/js/stage.js"></script>
 <script src="/static/js/bootstrap-notify.js"></script>

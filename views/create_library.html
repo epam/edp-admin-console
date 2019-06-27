@@ -36,7 +36,7 @@
 
                     {{template "template/accordion_codebase_template.html" .}}
 
-                    <div class="card library-block">
+                    <div class="card main-block">
                         <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
                              data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                             <h5 class="mb-0">
@@ -54,9 +54,9 @@
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                                               title="Project name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters."></span>
                                     </label>
-                                    <input name="nameOfApp" type="text" class="form-control" id="nameOfApp"
+                                    <input name="nameOfApp" type="text" class="codebase-name form-control" id="nameOfApp"
                                            placeholder="Type your library name">
-                                    <div class="app-name-validation invalid-feedback regex-error">
+                                    <div class="codebase-name-validation invalid-feedback regex-error">
                                         Library name may contain only: lower-case letters, numbers and dashes
                                         and cannot start and end with dash. Minimum 2 characters.
                                     </div>
@@ -182,7 +182,7 @@
 <script src="/static/js/popper.js"></script>
 <script src="/static/js/bootstrap.js"></script>
 <script src="/static/js/util.js"></script>
-<script src="/static/js/library.js"></script>
+<script src="/static/js/codebase-validation.js"></script>
 <script src="/static/js/bootstrap-notify.js"></script>
 </body>
 </html>

@@ -53,9 +53,9 @@
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                                               title="Autotest name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters."></span>
                                     </label>
-                                    <input name="nameOfApp" type="text" class="form-control" id="nameOfApp"
+                                    <input name="nameOfApp" type="text" class="codebase-name form-control" id="nameOfApp"
                                            placeholder="Type your autotest name">
-                                    <div class="app-name-validation invalid-feedback regex-error">
+                                    <div class="codebase-name-validation invalid-feedback regex-error">
                                         Autotest name may contain only: lower-case letters, numbers and dashes
                                         and cannot start and end with dash. Minimum 2 characters.
                                     </div>
@@ -129,7 +129,7 @@
 
 
                                 {{if .IsVcsEnabled}}
-                                <button type="button" class="repo-submit edp-submit-form-btn btn btn-primary"
+                                <button type="button" class="autotest-submit edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
                                         data-target="#collapseVCS"
                                         aria-expanded="false"
@@ -161,7 +161,7 @@
 <script src="/static/js/popper.js"></script>
 <script src="/static/js/bootstrap.js"></script>
 <script src="/static/js/util.js"></script>
-<script src="/static/js/autotest.js"></script>
+<script src="/static/js/codebase-validation.js"></script>
 <script src="/static/js/bootstrap-notify.js"></script>
 </body>
 </html>
