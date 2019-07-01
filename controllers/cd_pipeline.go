@@ -189,7 +189,28 @@ func retrieveStagesFromRequest(this *CDPipelineController) []models.StageCreate 
 		}
 
 		if stage.QualityGateType == "autotests" {
-			stage.Autotests = this.GetStrings(stageName + "-autotests")
+			autotestsFromRequest := this.GetStrings(stageName + "-autotests")
+			for _, autotest := range autotestsFromRequest {
+
+				autBranch := this.GetString(autotest + "-" + stage.Name + "-autotestBranch")
+
+				if stage.Autotests == nil {
+					stage.Autotests = []models.AutotestCreate{
+						{
+							AutotestName: autotest,
+							BranchName:   autBranch,
+						},
+					}
+					continue
+				}
+
+				stage.Autotests = append(stage.Autotests, models.AutotestCreate{
+					AutotestName: autotest,
+					BranchName:   autBranch,
+				})
+
+			}
+
 		}
 
 		stages = append(stages, stage)

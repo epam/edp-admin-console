@@ -1,20 +1,21 @@
 package k8s
 
 import (
+	"edp-admin-console/models"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"time"
 )
 
 // +k8s:openapi-gen=true
 type StageSpec struct {
-	Name        string   `json:"name"`
-	CdPipeline  string   `json:"cdPipeline"`
-	Description string   `json:"description"`
-	QualityGate string   `json:"qualityGate"`
-	TriggerType string   `json:"triggerType"`
-	Order       int      `json:"order"`
-	JenkinsStep string   `json:"jenkinsStep"`
-	Autotests   []string `json:"autotests"`
+	Name        string                  `json:"name"`
+	CdPipeline  string                  `json:"cdPipeline"`
+	Description string                  `json:"description"`
+	QualityGate string                  `json:"qualityGate"`
+	TriggerType string                  `json:"triggerType"`
+	Order       int                     `json:"order"`
+	JenkinsStep string                  `json:"jenkinsStep"`
+	Autotests   []models.AutotestCreate `json:"autotests"`
 }
 
 // +k8s:openapi-gen=true
