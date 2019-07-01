@@ -3,17 +3,17 @@ package models
 import "edp-admin-console/models/dto"
 
 type CDPipelineDTO struct {
-	Name             string                  `json:"name"`
-	Status           string                  `json:"status"`
-	JenkinsLink      string                  `json:"jenkinsLink"`
-	CodebaseBranches []dto.CodebaseBranchDTO `json:"codebaseBranches"`
-	Stages           []CDPipelineStageView   `json:"stages"`
+	Name                string                                                  `json:"name"`
+	Status              string                                                  `json:"status"`
+	JenkinsLink         string                                                  `json:"jenkinsLink"`
+	CodebaseBranches    []dto.CodebaseBranchDTO                                 `json:"codebaseBranches"`
+	Stages              []CDPipelineStageView                                   `json:"stages"`
 	CodebaseStageMatrix map[CDCodebaseStageMatrixKey]CDCodebaseStageMatrixValue `json:"codebaseStageMatrix"`
 }
 
 type CDCodebaseStageMatrixKey struct {
 	CodebaseBranch dto.CodebaseBranchDTO `json:"codebaseBranch"`
-	Stage CDPipelineStageView `json:"stage"`
+	Stage          CDPipelineStageView   `json:"stage"`
 }
 
 type CDCodebaseStageMatrixValue struct {
@@ -23,7 +23,7 @@ type CDCodebaseStageMatrixValue struct {
 func (c *CDPipelineDTO) getCDCodebaseStageMatrixValue(codebase dto.CodebaseBranchDTO, stage CDPipelineStageView) CDCodebaseStageMatrixValue {
 	return c.CodebaseStageMatrix[CDCodebaseStageMatrixKey{
 		CodebaseBranch: codebase,
-		Stage:     stage,
+		Stage:          stage,
 	}]
 }
 
@@ -34,13 +34,18 @@ type CDPipelineView struct {
 }
 
 type StageCreate struct {
-	Name            string   `json:"name" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
-	Description     string   `json:"description" valid:"Required"`
-	StepName        string   `json:"stepName" valid:"Required;Match(/^[A-z0-9-._]/)"`
-	QualityGateType string   `json:"qualityGateType" valid:"Required"`
-	TriggerType     string   `json:"triggerType" valid:"Required"`
-	Order           int      `json:"order" valid:"Match(/^[0-9]$/)"`
-	Autotests       []string `json:"autotests"`
+	Name            string           `json:"name" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
+	Description     string           `json:"description" valid:"Required"`
+	StepName        string           `json:"stepName" valid:"Required;Match(/^[A-z0-9-._]/)"`
+	QualityGateType string           `json:"qualityGateType" valid:"Required"`
+	TriggerType     string           `json:"triggerType" valid:"Required"`
+	Order           int              `json:"order" valid:"Match(/^[0-9]$/)"`
+	Autotests       []AutotestCreate `json:"autotests"`
+}
+
+type AutotestCreate struct {
+	AutotestName string `json:"autotestName"`
+	BranchName   string `json:"branchName"`
 }
 
 type CDPipelineCreateCommand struct {
