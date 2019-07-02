@@ -34,18 +34,18 @@ type CDPipelineView struct {
 }
 
 type StageCreate struct {
-	Name            string           `json:"name" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
-	Description     string           `json:"description" valid:"Required"`
-	StepName        string           `json:"stepName" valid:"Required;Match(/^[A-z0-9-._]/)"`
-	QualityGateType string           `json:"qualityGateType" valid:"Required"`
-	TriggerType     string           `json:"triggerType" valid:"Required"`
-	Order           int              `json:"order" valid:"Match(/^[0-9]$/)"`
-	Autotests       []AutotestCreate `json:"autotests"`
+	Name            string     `json:"name" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
+	Description     string     `json:"description" valid:"Required"`
+	StepName        string     `json:"stepName" valid:"Required;Match(/^[A-z0-9-._]/)"`
+	QualityGateType string     `json:"qualityGateType" valid:"Required"`
+	TriggerType     string     `json:"triggerType" valid:"Required"`
+	Order           int        `json:"order" valid:"Match(/^[0-9]$/)"`
+	Autotests       []Autotest `json:"autotests"`
 }
 
-type AutotestCreate struct {
-	AutotestName string `json:"autotestName"`
-	BranchName   string `json:"branchName"`
+type Autotest struct {
+	Name       string `json:"autotestName"`
+	BranchName string `json:"branchName"`
 }
 
 type CDPipelineCreateCommand struct {

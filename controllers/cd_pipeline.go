@@ -77,8 +77,9 @@ func (c *CDPipelineController) GetContinuousDeliveryPage() {
 func (c *CDPipelineController) GetCreateCDPipelinePage() {
 	flash := beego.ReadFromRequest(&c.Controller)
 	apps, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
-		Status: query.Active,
-		Type:   query.App,
+		BranchStatus: query.Active,
+		Status:       query.Active,
+		Type:         query.App,
 	})
 	if err != nil {
 		c.Abort("500")
@@ -96,8 +97,9 @@ func (c *CDPipelineController) GetCreateCDPipelinePage() {
 	}
 
 	autotests, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
-		Status: query.Active,
-		Type:   query.Autotests,
+		BranchStatus: query.Active,
+		Status:       query.Active,
+		Type:         query.Autotests,
 	})
 	if err != nil {
 		c.Abort("500")
@@ -195,18 +197,18 @@ func retrieveStagesFromRequest(this *CDPipelineController) []models.StageCreate 
 				autBranch := this.GetString(autotest + "-" + stage.Name + "-autotestBranch")
 
 				if stage.Autotests == nil {
-					stage.Autotests = []models.AutotestCreate{
+					stage.Autotests = []models.Autotest{
 						{
-							AutotestName: autotest,
-							BranchName:   autBranch,
+							Name:       autotest,
+							BranchName: autBranch,
 						},
 					}
 					continue
 				}
 
-				stage.Autotests = append(stage.Autotests, models.AutotestCreate{
-					AutotestName: autotest,
-					BranchName:   autBranch,
+				stage.Autotests = append(stage.Autotests, models.Autotest{
+					Name:       autotest,
+					BranchName: autBranch,
 				})
 
 			}

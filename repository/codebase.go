@@ -54,7 +54,7 @@ func (CodebaseRepository) GetCodebasesByCriteria(criteria query.CodebaseCriteria
 			return nil, err
 		}
 
-		_, err = o.LoadRelated(c, "CodebaseBranch", false, 100, 0, "Name")
+		err = loadRelatedCodebaseBranch(c, criteria.BranchStatus)
 		if err != nil {
 			return nil, err
 		}
@@ -101,6 +101,22 @@ func loadRelatedActionLog(codebase *query.Codebase) error {
 		Distinct().
 		All(&codebase.ActionLog, "LastTimeUpdate", "UserName",
 			"Message", "Action", "Result")
+
+	return err
+}
+
+func loadRelatedCodebaseBranch(codebase *query.Codebase, status query.Status) error {
+	o := orm.NewOrm()
+
+	qs := o.QueryTable(new(query.CodebaseBranch))
+
+	if status != "" {
+		qs = qs.Filter("status", status)
+	}
+
+	_, err := qs.Filter("codebase_id", codebase.Id).
+		OrderBy("Name").
+		All(&codebase.CodebaseBranch, "Id", "Name", "FromCommit", "Status")
 
 	return err
 }

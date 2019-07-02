@@ -27,8 +27,9 @@ func (c *Codebase) TableName() string {
 }
 
 type CodebaseCriteria struct {
-	Status Status
-	Type   CodebaseType
+	BranchStatus Status
+	Status       Status
+	Type         CodebaseType
 }
 
 type CodebaseType string
