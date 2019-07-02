@@ -33,4 +33,7 @@ type Autotests struct {
 	Name                string `json:"name"`
 	TestReportFramework string `json:"testReportFramework" orm:"column(test_report_framework)"`
 	BuildTool           string `json:"buildTool" orm:"column(build_tool)"`
+	BranchName          string `json:"branchName" orm:"column(branch_name)"`
+	VCSLink             string `json:"-"`
+	CICDLink            string `json:"-"`
 }

@@ -226,7 +226,7 @@ func createOpenshiftProjectLinks(stages []*query.Stage, cdPipelineName string) {
 }
 
 func fillCodebaseStageMatrix(ocClient *appsV1Client.AppsV1Client, cdPipeline *query.CDPipeline) (map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, error) {
-	var matrix = make(map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, len(cdPipeline.CodebaseBranch) * len(cdPipeline.Stage))
+	var matrix = make(map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, len(cdPipeline.CodebaseBranch)*len(cdPipeline.Stage))
 	for _, stage := range cdPipeline.Stage {
 		dcs, err := ocClient.DeploymentConfigs(stage.OpenshiftProjectName).List(metav1.ListOptions{});
 		if err != nil {
@@ -236,7 +236,7 @@ func fillCodebaseStageMatrix(ocClient *appsV1Client.AppsV1Client, cdPipeline *qu
 		for _, codebase := range cdPipeline.CodebaseBranch {
 			var key = query.CDCodebaseStageMatrixKey{
 				CodebaseBranch: codebase,
-				Stage: stage,
+				Stage:          stage,
 			}
 			var value = query.CDCodebaseStageMatrixValue{
 				DockerVersion: "no deploy",
@@ -246,8 +246,8 @@ func fillCodebaseStageMatrix(ocClient *appsV1Client.AppsV1Client, cdPipeline *qu
 					if (container.Name == codebase.AppName) {
 						var containerImage = container.Image;
 						var delimeter = strings.LastIndex(containerImage, ":")
-						if (delimeter > 0){
-							value.DockerVersion = string(containerImage[(delimeter+1): len(containerImage)])
+						if (delimeter > 0) {
+							value.DockerVersion = string(containerImage[(delimeter + 1):len(containerImage)])
 						}
 					}
 				}
@@ -258,7 +258,6 @@ func fillCodebaseStageMatrix(ocClient *appsV1Client.AppsV1Client, cdPipeline *qu
 	}
 	return matrix, nil;
 }
-
 
 func convertPipelineData(cdPipeline models.CDPipelineCreateCommand) k8s.CDPipelineSpec {
 	var codebaseBranches []string
@@ -383,11 +382,25 @@ func checkStagesInK8s(edpRestClient *rest.RESTClient, cdPipelineName string, sta
 
 func (s *CDPipelineService) getStagesAutotests(cdPipelineName, stageName string) ([]models.Autotests, error) {
 	log.Printf("Start fetching Autotests by CD Pipeline %s and Stage %s names...", cdPipelineName, stageName)
-	stage, err := s.ICDPipelineRepository.GetStagesAutotests(cdPipelineName, stageName)
+	autotests, err := s.ICDPipelineRepository.GetStagesAutotests(cdPipelineName, stageName)
 	if err != nil {
 		log.Printf("An error has occurred while getting Autotests from database: %s", err)
 		return nil, err
 	}
-	log.Printf("Fetched Autotests: {%v}", stage)
-	return stage, nil
+
+	createLinks(autotests)
+
+	log.Printf("Fetched Autotests: {%v}", autotests)
+	return autotests, nil
+}
+
+func createLinks(autotests []models.Autotests) {
+	wildcard := beego.AppConfig.String("dnsWildcard")
+
+	if autotests != nil {
+		for i := range autotests {
+			autotests[i].VCSLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb?p=%s.git;a=shortlog;h=refs/heads/%s", "gerrit", context.Tenant, wildcard, autotests[i].Name, autotests[i].BranchName)
+			autotests[i].CICDLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s/view/%s", "jenkins", context.Tenant, wildcard, autotests[i].Name, strings.ToUpper(autotests[i].BranchName))
+		}
+	}
 }
