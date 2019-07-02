@@ -115,9 +115,20 @@
                                                         <td>{{.TriggerType}}</td>
                                                         <td>{{.QualityGate}}</td>
                                                         <td>
-                                                            {{range .Autotests}}
-                                                                <a href="/admin/edp/codebase/{{.Name}}/overview" class="edp-link">
-                                                                    {{.Name}} </a></br>
+                                                            {{if .Autotests}}
+                                                                <table>
+                                                                    {{range .Autotests}}
+                                                                        <tr>
+                                                                            <th>
+                                                                                <a href="/admin/edp/codebase/{{.Name}}/overview" class="edp-link">
+                                                                                    {{.Name}} </a>
+                                                                            </th>
+                                                                            <th>
+                                                                                {{.BranchName}}
+                                                                            </th>
+                                                                        </tr>
+                                                                    {{end}}
+                                                                </table>
                                                             {{end}}
                                                         </td>
                                                         <td>{{.JenkinsStepName}}</td>
