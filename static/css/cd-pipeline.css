@@ -28,3 +28,12 @@
 .scroll-y {
     overflow-y: scroll;
 }
+
+.autotests-branches-select {
+    height: 25px;
+    padding: 0 0.75rem;
+}
+
+.autotests-branches-div {
+    margin-left: 5px;
+}

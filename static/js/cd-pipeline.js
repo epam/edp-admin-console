@@ -53,10 +53,8 @@ $(function () {
 
     $('.add-stage-modal').click(function () {
         $('#stage-creation').modal('show');
+        disableSelectElems();
     });
-
-
-
 
 });
 
@@ -75,4 +73,15 @@ function checkPipelineName(pipelineName) {
 
 function isStageAdded() {
     return $('.stages-list .stage-info').length > 0;
+}
+
+function disableSelectElems() {
+    $.each($('.autotests-checkbox'), function() {
+        let $selectEl = $('select[name="' + $(this).attr('value') + '-autotestBranch"]');
+        if (!$(this).is(':checked')) {
+            $selectEl.attr('disabled', 'disabled');
+        } else {
+            $selectEl.removeAttr('disabled');
+        }
+    });
 }

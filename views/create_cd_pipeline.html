@@ -278,28 +278,36 @@
                                 </label>
 
                                 {{if .Autotests}}
+                                    <table>
                                         {{range $autotest := .Autotests}}
-                                            {{if .CodebaseBranch}}
-                                            <div class="row" style="margin-left: 2px">
-                                                <div class="custom-control custom-checkbox autotests-checkbox-info">
-                                                    <input type="checkbox"
-                                                           class="custom-control-input autotests-checkbox"
-                                                           id="{{.Name}}-checkbox"
-                                                           name="autotests-checkbox" value="{{.Name}}">
-                                                    <label class="custom-control-label"
-                                                           for="{{.Name}}-checkbox">{{.Name}}</label>
-                                                </div>
-
-                                                <div class="custom-checkbox autotest-branch" style="margin-left:10px">
-                                                    <select class="{{.Name}}-branch" id="autotestBranch" name="{{$autotest.Name}}-autotestBranch">
-                                                        {{range .CodebaseBranch}}
-                                                            <option value="{{.Name}}">{{.Name}}</option>
-                                                        {{end}}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            {{end}}
+                                            <tr>
+                                                <th>
+                                                    <div class="custom-control custom-checkbox autotests-checkbox-info">
+                                                        <input type="checkbox"
+                                                               class="custom-control-input autotests-checkbox"
+                                                               id="{{.Name}}-checkbox"
+                                                               name="autotests-checkbox" value="{{.Name}}"
+                                                               {{if not .CodebaseBranch}}disabled{{end}}>
+                                                        <label class="custom-control-label"
+                                                               for="{{.Name}}-checkbox">{{.Name}}</label>
+                                                    </div>
+                                                </th>
+                                                <th>
+                                                    <div class="custom-checkbox autotest-branch autotests-branches-div">
+                                                        <select class="{{.Name}}-branch form-control autotests-branches-select" id="autotestBranch" name="{{$autotest.Name}}-autotestBranch">
+                                                            {{if .CodebaseBranch}}
+                                                                {{range .CodebaseBranch}}
+                                                                    <option value="{{.Name}}">{{.Name}}</option>
+                                                                {{end}}
+                                                            {{else}}
+                                                                <option>no active branches</option>
+                                                            {{end}}
+                                                        </select>
+                                                    </div>
+                                                </th>
+                                            </tr>
                                         {{end}}
+                                    </table>
                                 {{end}}
 
                             </div>
