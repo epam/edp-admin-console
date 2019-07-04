@@ -57,7 +57,7 @@ const (
 		"	left join cd_pipeline cp on cs.cd_pipeline_id = cp.id " +
 		"	left join cd_stage_codebase_branch cscb on cs.id = cscb.cd_stage_id " +
 		"	left join codebase_branch cb on cscb.codebase_branch_id = cb.id " +
-		"	left join codebase aut_code on aut_code.id = cb.id " +
+		"	left join codebase aut_code on aut_code.id = cb.codebase_id " +
 		"where cp.name = ? " +
 		"  and cs.name = ? " +
 		"  and cs.quality_gate = 'autotests';"
