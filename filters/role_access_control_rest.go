@@ -14,6 +14,7 @@ func RoleAccessControlRestFilter(context *bgCtx.Context) {
 	isPageAvailable := IsPageAvailable(fmt.Sprintf("%s %s", context.Input.Method(), context.Input.URI()), contextRoles)
 
 	if !isPageAvailable {
+		log.Printf("Access to %v is denied", context.Input.URI())
 		http.Error(context.ResponseWriter, "Forbidden.", http.StatusForbidden)
 		return
 	}

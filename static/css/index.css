@@ -51,6 +51,8 @@
     font-family: 'icomoon';
     src: url("./assets/icomoon/icomoon.eot?rkcn6x");
     src: url("./assets/icomoon/icomoon.eot?rkcn6x#iefix") format("embedded-opentype"), url("./assets/icomoon/icomoon.ttf?rkcn6x") format("truetype"), url("./assets/icomoon/icomoon.woff?rkcn6x") format("woff"), url("./assets/icomoon/icomoon.svg?rkcn6x#icomoon") format("svg");
+    src: url('./assets/icomoon/icomoon.eot?14ijkd#iefix') format('embedded-opentype'),
+    url('assets/icomoon/icomoon-pencil.woff?14ijkd') format('woff');
     font-weight: normal;
     font-style: normal;
 }
@@ -62,7 +64,6 @@
     font-weight: normal;
     font-style: normal;
 }
-
 
 [class^="icon-"], [class*=" icon-"] {
     /* use !important to prevent issues with browser extensions that change fonts */
@@ -98,6 +99,17 @@
 .icon-trashcan:hover:before,
 .icon-trashcan:hover:active {
     content: "\e903";
+    color: #f15c43;
+}
+
+.icon-pencil:before {
+    content: "\e905";
+    color: #B6C0C8;
+}
+
+.icon-pencil:hover:before,
+.icon-pencil:hover:active {
+    content: "\e905";
     color: #f15c43;
 }
 

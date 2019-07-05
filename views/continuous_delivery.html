@@ -53,6 +53,7 @@
                                 <th class="status-width" scope="col">Status</th>
                                 <th scope="col">Name</th>
                                 <th scope="col">Jenkins</th>
+                                <th scope="col"></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -70,6 +71,14 @@
                                         <a href="{{.JenkinsLink}}" target="_blank"
                                            rel="noopener noreferrer"
                                            class="edp-link {{if ne .Status "active"}}disabled{{end}}">Link</a>
+                                    </td>
+                                    <td>
+                                        <a href="/admin/edp/cd-pipeline/{{.Name}}/update"
+                                            class="{{if ne .Status "active"}}disabled{{end}}">
+                                            <button class="delete">
+                                                <i class="icon-pencil"></i>
+                                            </button>
+                                        </a>
                                     </td>
                                 </tr>
                             {{end}}

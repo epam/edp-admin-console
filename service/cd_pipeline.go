@@ -53,7 +53,7 @@ func (s *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCreateCom
 
 	exist := s.CodebaseService.checkAppAndBranch(cdPipeline.Applications)
 	if !exist {
-		return nil, models.ErrNonValidRelatedBranch
+		return nil, models.NewNonValidRelatedBranchError()
 	}
 
 	cdPipelineReadModel, err := s.GetCDPipelineByName(cdPipeline.Name)
@@ -63,18 +63,18 @@ func (s *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCreateCom
 
 	if cdPipelineReadModel != nil {
 		log.Printf("CD Pipeline %s is already exists in DB.", cdPipeline.Name)
-		return nil, models.ErrCDPipelineIsExists
+		return nil, models.NewCDPipelineExistsError()
 	}
 
 	edpRestClient := s.Clients.EDPRestClient
-	pipelineCR, err := getCDPipelineCR(edpRestClient, cdPipeline.Name, context.Namespace)
+	pipelineCR, err := s.getCDPipelineCR(cdPipeline.Name)
 	if err != nil {
 		return nil, err
 	}
 
 	if pipelineCR != nil {
 		log.Printf("CD Pipeline %s is already exists in k8s.", cdPipeline.Name)
-		return nil, models.ErrCDPipelineIsExists
+		return nil, models.NewCDPipelineExistsError()
 	}
 
 	crd := &k8s.CDPipeline{
@@ -133,7 +133,7 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 
 		matrix, err := fillCodebaseStageMatrix(s.Clients.AppsV1Client, cdPipeline)
 		if err == nil {
-			cdPipeline.CodebaseStageMatrix = matrix;
+			cdPipeline.CodebaseStageMatrix = matrix
 		}
 
 		for _, stage := range cdPipeline.Stage {
@@ -186,6 +186,76 @@ func (s *CDPipelineService) GetAllPipelines(criteria query.CDPipelineCriteria) (
 	return cdPipelines, nil
 }
 
+func (s *CDPipelineService) UpdatePipeline(pipeline models.CDPipelineUpdateCommand) error {
+	log.Printf("Start updating CD Pipeline: %v", pipeline.Name)
+
+	if pipeline.Applications != nil {
+		exist := s.CodebaseService.checkAppAndBranch(pipeline.Applications)
+		if !exist {
+			return models.NewNonValidRelatedBranchError()
+		}
+	}
+
+	cdPipelineReadModel, err := s.GetCDPipelineByName(pipeline.Name)
+	if err != nil {
+		return err
+	}
+
+	if cdPipelineReadModel == nil {
+		log.Printf("CD Pipeline %s doesn't exist in DB.", pipeline.Name)
+		return models.NewCDPipelineDoesNotExistError()
+	}
+
+	pipelineCR, err := s.getCDPipelineCR(pipeline.Name)
+	if err != nil {
+		return err
+	}
+
+	if pipelineCR == nil {
+		log.Printf("CD Pipeline %s doesn't exist in k8s.", pipeline.Name)
+		return models.NewCDPipelineDoesNotExistError()
+	}
+
+	if pipeline.Applications != nil {
+		err := s.updateApplications(pipelineCR, pipeline.Applications)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Printf("CD Pipeline %v has been updated with new data; %v", pipeline.Name, pipeline)
+
+	return nil
+}
+
+func (s *CDPipelineService) updateApplications(crToUpdate *k8s.CDPipeline, applications []models.ApplicationWithBranch) error {
+	log.Printf("Start updating Autotest for CD Pipeline: %v. New Applications: %v", crToUpdate.Spec.Name, applications)
+
+	edpRestClient := s.Clients.EDPRestClient
+	var codebaseBranches []string
+	for _, v := range applications {
+		codebaseBranches = append(codebaseBranches, fmt.Sprintf("%s-%s", v.ApplicationName, v.BranchName))
+	}
+
+	crToUpdate.Spec.CodebaseBranch = codebaseBranches
+
+	err := edpRestClient.Put().
+		Namespace(context.Namespace).
+		Resource("cdpipelines").
+		Name(crToUpdate.Spec.Name).
+		Body(crToUpdate).
+		Do().
+		Into(crToUpdate)
+
+	if err != nil {
+		log.Printf("An error has occurred while updating CD Pipeline object in k8s: %s", err)
+		return err
+	}
+	log.Printf("Applications for CD Pipeline %v has been updated", crToUpdate.Spec.Name)
+
+	return nil
+}
+
 func sortStagesByOrder(stages []*query.Stage) {
 	sort.Slice(stages, func(i, j int) bool {
 		return stages[i].Order < stages[j].Order
@@ -228,7 +298,7 @@ func createOpenshiftProjectLinks(stages []*query.Stage, cdPipelineName string) {
 func fillCodebaseStageMatrix(ocClient *appsV1Client.AppsV1Client, cdPipeline *query.CDPipeline) (map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, error) {
 	var matrix = make(map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, len(cdPipeline.CodebaseBranch)*len(cdPipeline.Stage))
 	for _, stage := range cdPipeline.Stage {
-		dcs, err := ocClient.DeploymentConfigs(stage.OpenshiftProjectName).List(metav1.ListOptions{});
+		dcs, err := ocClient.DeploymentConfigs(stage.OpenshiftProjectName).List(metav1.ListOptions{})
 		if err != nil {
 			log.Printf("An error has occurred while getting project from OpenShift: %s", err)
 			return nil, err
@@ -243,20 +313,20 @@ func fillCodebaseStageMatrix(ocClient *appsV1Client.AppsV1Client, cdPipeline *qu
 			}
 			for _, dc := range dcs.Items {
 				for _, container := range dc.Spec.Template.Spec.Containers {
-					if (container.Name == codebase.AppName) {
-						var containerImage = container.Image;
+					if container.Name == codebase.AppName {
+						var containerImage = container.Image
 						var delimeter = strings.LastIndex(containerImage, ":")
-						if (delimeter > 0) {
+						if delimeter > 0 {
 							value.DockerVersion = string(containerImage[(delimeter + 1):len(containerImage)])
 						}
 					}
 				}
 			}
-			matrix[key] = value;
+			matrix[key] = value
 		}
 
 	}
-	return matrix, nil;
+	return matrix, nil
 }
 
 func convertPipelineData(cdPipeline models.CDPipelineCreateCommand) k8s.CDPipelineSpec {
@@ -271,9 +341,11 @@ func convertPipelineData(cdPipeline models.CDPipelineCreateCommand) k8s.CDPipeli
 	}
 }
 
-func getCDPipelineCR(edpRestClient *rest.RESTClient, pipelineName string, namespace string) (*k8s.CDPipeline, error) {
+func (s *CDPipelineService) getCDPipelineCR(pipelineName string) (*k8s.CDPipeline, error) {
+	edpRestClient := s.Clients.EDPRestClient
 	cdPipeline := &k8s.CDPipeline{}
-	err := edpRestClient.Get().Namespace(namespace).Resource("cdpipelines").Name(pipelineName).Do().Into(cdPipeline)
+
+	err := edpRestClient.Get().Namespace(context.Namespace).Resource("cdpipelines").Name(pipelineName).Do().Into(cdPipeline)
 
 	if k8serrors.IsNotFound(err) {
 		log.Printf("Pipeline resource %s doesn't exist.", pipelineName)

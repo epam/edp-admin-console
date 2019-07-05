@@ -37,3 +37,7 @@
 .autotests-branches-div {
     margin-left: 5px;
 }
+
+.cd-pipeline-applications {
+    display: none;
+}

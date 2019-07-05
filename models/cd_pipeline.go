@@ -55,6 +55,13 @@ type CDPipelineCreateCommand struct {
 	Stages             []StageCreate           `json:"stages" valid:"Required"`
 }
 
+type CDPipelineUpdateCommand struct {
+	Name               string                  `json:"name" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
+	Applications       []ApplicationWithBranch `json:"applications"`
+	ThirdPartyServices []string                `json:"services"`
+	Stages             []StageCreate           `json:"stages"`
+}
+
 type ApplicationWithBranch struct {
 	ApplicationName string `json:"appName" valid:"Required;Match(/^[a-z][a-z0-9-]*[a-z0-9]$/)"`
 	BranchName      string `json:"branchName" valid:"Required;Match(/^[a-z0-9][a-z0-9-._]*[a-z0-9]$/)"`

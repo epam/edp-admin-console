@@ -23,6 +23,7 @@ import (
 	"edp-admin-console/service"
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/validation"
 	"log"
 	"net/http"
 )
@@ -115,6 +116,81 @@ func (c *CDPipelineController) GetCreateCDPipelinePage() {
 	c.TplName = "create_cd_pipeline.html"
 }
 
+func (c *CDPipelineController) GetEditCDPipelinePage() {
+	flash := beego.ReadFromRequest(&c.Controller)
+	pipelineName := c.GetString(":name")
+
+	cdPipeline, err := c.PipelineService.GetCDPipelineByName(pipelineName)
+	if err != nil {
+		c.Abort("500")
+		return
+	}
+
+	applications, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
+		BranchStatus: query.Active,
+		Status:       query.Active,
+		Type:         query.App,
+	})
+	if err != nil {
+		c.Abort("500")
+		return
+	}
+
+	if flash.Data["error"] != "" {
+		c.Data["Error"] = flash.Data["error"]
+	}
+	c.Data["CDPipeline"] = cdPipeline
+	c.Data["Apps"] = applications
+	c.Data["Type"] = "delivery"
+	c.TplName = "edit_cd_pipeline.html"
+}
+
+func (c *CDPipelineController) UpdateCDPipeline() {
+	flash := beego.NewFlash()
+	appNameCheckboxes := c.GetStrings("app")
+	pipelineName := c.GetString(":name")
+
+	pipelineUpdateCommand := models.CDPipelineUpdateCommand{
+		Name:         pipelineName,
+		Applications: convertApplicationWithBranchesData(c, appNameCheckboxes),
+	}
+
+	errMsg := validateCDPipelineUpdateRequestData(pipelineUpdateCommand)
+	if errMsg != nil {
+		log.Printf("Request data is not valid: %s", errMsg.Message)
+		flash.Error(errMsg.Message)
+		flash.Store(&c.Controller)
+		c.Redirect(fmt.Sprintf("/admin/edp/cd-pipeline/%s/update", pipelineName), 302)
+		return
+	}
+	log.Printf("Request data is receieved to update CD pipeline: %s. Applications: %v. Stages: %v. Services: %v",
+		pipelineName, pipelineUpdateCommand.Applications, pipelineUpdateCommand.Stages, pipelineUpdateCommand.ThirdPartyServices)
+
+	err := c.PipelineService.UpdatePipeline(pipelineUpdateCommand)
+	if err != nil {
+
+		switch err.(type) {
+		case *models.CDPipelineDoesNotExistError:
+			flash.Error(fmt.Sprintf("cd pipeline %v doesn't exist", pipelineName))
+			flash.Store(&c.Controller)
+			c.Redirect(fmt.Sprintf("/admin/edp/cd-pipeline/%s/update", pipelineName), http.StatusFound)
+			return
+		case *models.NonValidRelatedBranchError:
+			flash.Error(fmt.Sprintf("one or more applications have non valid branches: %v", pipelineUpdateCommand.Applications))
+			flash.Store(&c.Controller)
+			c.Redirect(fmt.Sprintf("/admin/edp/cd-pipeline/%s/update", pipelineName), http.StatusBadRequest)
+			return
+		default:
+			c.Abort("500")
+			return
+		}
+	}
+
+	c.Data["EDPVersion"] = context.EDPVersion
+	c.Data["Username"] = c.Ctx.Input.Session("username")
+	c.Redirect("/admin/edp/cd-pipeline/overview#cdPipelineSuccessModal", 302)
+}
+
 func (c *CDPipelineController) CreateCDPipeline() {
 	flash := beego.NewFlash()
 	appNameCheckboxes := c.GetStrings("app")
@@ -141,20 +217,23 @@ func (c *CDPipelineController) CreateCDPipeline() {
 
 	_, pipelineErr := c.PipelineService.CreatePipeline(cdPipelineCreateCommand)
 	if pipelineErr != nil {
-		if pipelineErr == models.ErrCDPipelineIsExists {
+
+		switch pipelineErr.(type) {
+		case *models.CDPipelineExistsError:
 			flash.Error(fmt.Sprintf("cd pipeline %v is already exists", cdPipelineCreateCommand.Name))
 			flash.Store(&c.Controller)
 			c.Redirect("/admin/edp/cd-pipeline/create", http.StatusFound)
 			return
-		}
-		if pipelineErr == models.ErrNonValidRelatedBranch {
+		case *models.NonValidRelatedBranchError:
 			flash.Error(fmt.Sprintf("one or more applications have non valid branches: %v", cdPipelineCreateCommand.Applications))
 			flash.Store(&c.Controller)
 			c.Redirect("/admin/edp/cd-pipeline/create", http.StatusBadRequest)
 			return
+		default:
+			c.Abort("500")
+			return
 		}
-		c.Abort("500")
-		return
+
 	}
 
 	c.Data["EDPVersion"] = context.EDPVersion
@@ -248,4 +327,47 @@ func addCdPipelineInProgressIfAny(cdPipelines []*query.CDPipeline, pipelineInPro
 		cdPipelines = append(cdPipelines, &pipeline)
 	}
 	return cdPipelines
+}
+
+func validateCDPipelineUpdateRequestData(cdPipeline models.CDPipelineUpdateCommand) *ErrMsg {
+	isApplicationsValid := true
+	isCDPipelineValid := true
+	isStagesValid := true
+	errMsg := &ErrMsg{"An internal error has occurred on server while validating CD Pipeline's request body.", http.StatusInternalServerError}
+	valid := validation.Validation{}
+	isCDPipelineValid, err := valid.Valid(cdPipeline)
+
+	if err != nil {
+		return errMsg
+	}
+
+	if cdPipeline.Applications != nil {
+		for _, app := range cdPipeline.Applications {
+			isApplicationsValid, err = valid.Valid(app)
+			if err != nil {
+				return errMsg
+			}
+		}
+	}
+
+	if cdPipeline.Stages != nil {
+		for _, stage := range cdPipeline.Stages {
+
+			if (stage.QualityGateType == "autotests" && stage.Autotests == nil) ||
+				(stage.QualityGateType == "manual" && stage.Autotests != nil) {
+				isStagesValid = false
+			}
+
+			isStagesValid, err = valid.Valid(stage)
+			if err != nil {
+				return errMsg
+			}
+		}
+	}
+
+	if isCDPipelineValid && isApplicationsValid && isStagesValid {
+		return nil
+	}
+
+	return &ErrMsg{string(createErrorResponseBody(valid)), http.StatusBadRequest}
 }
