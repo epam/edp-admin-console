@@ -14,7 +14,7 @@
         <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
             {{template "template/navbar_template.html" .}}
         </aside>
-        <div class="flex-fill pl-3 pr-3 wrapper">
+        <div class="flex-fill pl-4 pr-4 wrapper">
             <div class="d-flex edp-form wide">
                 <div class="flex-fill">
                     <h1>
@@ -28,29 +28,31 @@
                 </div>
             </div>
             {{if .Services}}
-                <table class="table edp-table">
-                    <thead>
-                    <tr>
-                        <th></th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Version</th>
-                        <th scope="col">Description</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-
-                    {{range .Services}}
+                <div class="edp-table-container">
+                    <table class="table edp-table">
+                        <thead>
                         <tr>
-                            <td width="25px">
-                                <img src="/static/img/{{.Name}}.svg" alt="{{.Name}}" height="45" width="42">
-                            </td>
-                            <td>{{.Name}}</td>
-                            <td>{{.Version}}</td>
-                            <td>{{.Description}}</td>
+                            <th></th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Version</th>
+                            <th scope="col">Description</th>
                         </tr>
-                    {{end}}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+
+                        {{range .Services}}
+                            <tr>
+                                <td width="25px">
+                                    <img src="/static/img/{{.Name}}.svg" alt="{{.Name}}" height="45" width="42">
+                                </td>
+                                <td>{{.Name}}</td>
+                                <td>{{.Version}}</td>
+                                <td>{{.Description}}</td>
+                            </tr>
+                        {{end}}
+                        </tbody>
+                    </table>
+                </div>
             {{end}}
         </div>
     </section>
