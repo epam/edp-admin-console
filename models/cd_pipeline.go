@@ -48,16 +48,9 @@ type Autotest struct {
 	BranchName string `json:"branchName"`
 }
 
-type CDPipelineCreateCommand struct {
+type CDPipelineCommand struct {
 	Name               string                  `json:"name" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
 	Applications       []ApplicationWithBranch `json:"applications" valid:"Required"`
-	ThirdPartyServices []string                `json:"services"`
-	Stages             []StageCreate           `json:"stages" valid:"Required"`
-}
-
-type CDPipelineUpdateCommand struct {
-	Name               string                  `json:"name" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
-	Applications       []ApplicationWithBranch `json:"applications"`
 	ThirdPartyServices []string                `json:"services"`
 	Stages             []StageCreate           `json:"stages"`
 }

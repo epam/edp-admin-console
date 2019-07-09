@@ -150,7 +150,7 @@ func (c *CDPipelineController) UpdateCDPipeline() {
 	appNameCheckboxes := c.GetStrings("app")
 	pipelineName := c.GetString(":name")
 
-	pipelineUpdateCommand := models.CDPipelineUpdateCommand{
+	pipelineUpdateCommand := models.CDPipelineCommand{
 		Name:         pipelineName,
 		Applications: convertApplicationWithBranchesData(c, appNameCheckboxes),
 	}
@@ -198,7 +198,7 @@ func (c *CDPipelineController) CreateCDPipeline() {
 	serviceCheckboxes := c.GetStrings("service")
 	stages := retrieveStagesFromRequest(c)
 
-	cdPipelineCreateCommand := models.CDPipelineCreateCommand{
+	cdPipelineCreateCommand := models.CDPipelineCommand{
 		Name:               pipelineName,
 		Applications:       convertApplicationWithBranchesData(c, appNameCheckboxes),
 		ThirdPartyServices: serviceCheckboxes,
@@ -329,7 +329,7 @@ func addCdPipelineInProgressIfAny(cdPipelines []*query.CDPipeline, pipelineInPro
 	return cdPipelines
 }
 
-func validateCDPipelineUpdateRequestData(cdPipeline models.CDPipelineUpdateCommand) *ErrMsg {
+func validateCDPipelineUpdateRequestData(cdPipeline models.CDPipelineCommand) *ErrMsg {
 	isApplicationsValid := true
 	isCDPipelineValid := true
 	isStagesValid := true

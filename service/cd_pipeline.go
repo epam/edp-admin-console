@@ -48,7 +48,7 @@ type ErrMsg struct {
 
 const OpenshiftProjectLink = "https://master.%s/console/project/"
 
-func (s *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCreateCommand) (*k8s.CDPipeline, error) {
+func (s *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCommand) (*k8s.CDPipeline, error) {
 	log.Printf("Start creating CD Pipeline: %v", cdPipeline)
 
 	exist := s.CodebaseService.checkAppAndBranch(cdPipeline.Applications)
@@ -136,15 +136,9 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 			cdPipeline.CodebaseStageMatrix = matrix
 		}
 
-		for _, stage := range cdPipeline.Stage {
-			if stage.QualityGate == "autotests" {
-				autotests, err := s.getStagesAutotests(cdPipeline.Name, stage.Name)
-				if err != nil {
-					return nil, err
-				}
-				stage.Autotests = autotests
-				log.Printf("Fetched Autotests %v for Stage %v", autotests, stage.Name)
-			}
+		err = s.getStageAutotests(cdPipeline)
+		if err != nil {
+			return nil, err
 		}
 
 		log.Printf("Fetched CD Pipeline from DB: %v", cdPipeline)
@@ -153,7 +147,7 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 	return cdPipeline, nil
 }
 
-func (s *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPipeline models.CDPipelineCreateCommand) ([]k8s.Stage, error) {
+func (s *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPipeline models.CDPipelineCommand) ([]k8s.Stage, error) {
 	log.Printf("Start creating CR stages: %+v\n", cdPipeline.Stages)
 
 	err := checkStagesInK8s(edpRestClient, cdPipeline.Name, cdPipeline.Stages)
@@ -186,7 +180,7 @@ func (s *CDPipelineService) GetAllPipelines(criteria query.CDPipelineCriteria) (
 	return cdPipelines, nil
 }
 
-func (s *CDPipelineService) UpdatePipeline(pipeline models.CDPipelineUpdateCommand) error {
+func (s *CDPipelineService) UpdatePipeline(pipeline models.CDPipelineCommand) error {
 	log.Printf("Start updating CD Pipeline: %v", pipeline.Name)
 
 	if pipeline.Applications != nil {
@@ -217,10 +211,29 @@ func (s *CDPipelineService) UpdatePipeline(pipeline models.CDPipelineUpdateComma
 	}
 
 	if pipeline.Applications != nil {
-		err := s.updateApplications(pipelineCR, pipeline.Applications)
-		if err != nil {
-			return err
+		log.Printf("Start updating Autotest for CD Pipeline: %v. New Applications: %v", pipelineCR.Spec.Name, pipeline.Applications)
+
+		var codebaseBranches []string
+		for _, v := range pipeline.Applications {
+			codebaseBranches = append(codebaseBranches, fmt.Sprintf("%s-%s", v.ApplicationName, v.BranchName))
 		}
+
+		pipelineCR.Spec.CodebaseBranch = codebaseBranches
+	}
+
+	edpRestClient := s.Clients.EDPRestClient
+
+	err = edpRestClient.Put().
+		Namespace(context.Namespace).
+		Resource("cdpipelines").
+		Name(pipelineCR.Spec.Name).
+		Body(pipelineCR).
+		Do().
+		Into(pipelineCR)
+
+	if err != nil {
+		log.Printf("An error has occurred while updating CD Pipeline object in k8s: %s", err)
+		return err
 	}
 
 	log.Printf("CD Pipeline %v has been updated with new data; %v", pipeline.Name, pipeline)
@@ -228,31 +241,17 @@ func (s *CDPipelineService) UpdatePipeline(pipeline models.CDPipelineUpdateComma
 	return nil
 }
 
-func (s *CDPipelineService) updateApplications(crToUpdate *k8s.CDPipeline, applications []models.ApplicationWithBranch) error {
-	log.Printf("Start updating Autotest for CD Pipeline: %v. New Applications: %v", crToUpdate.Spec.Name, applications)
-
-	edpRestClient := s.Clients.EDPRestClient
-	var codebaseBranches []string
-	for _, v := range applications {
-		codebaseBranches = append(codebaseBranches, fmt.Sprintf("%s-%s", v.ApplicationName, v.BranchName))
+func (s *CDPipelineService) getStageAutotests(cdPipeline *query.CDPipeline) error {
+	for _, stage := range cdPipeline.Stage {
+		if stage.QualityGate == "autotests" {
+			autotests, err := s.getStagesAutotests(cdPipeline.Name, stage.Name)
+			if err != nil {
+				return err
+			}
+			stage.Autotests = autotests
+			log.Printf("Fetched Autotests %v for Stage %v", autotests, stage.Name)
+		}
 	}
-
-	crToUpdate.Spec.CodebaseBranch = codebaseBranches
-
-	err := edpRestClient.Put().
-		Namespace(context.Namespace).
-		Resource("cdpipelines").
-		Name(crToUpdate.Spec.Name).
-		Body(crToUpdate).
-		Do().
-		Into(crToUpdate)
-
-	if err != nil {
-		log.Printf("An error has occurred while updating CD Pipeline object in k8s: %s", err)
-		return err
-	}
-	log.Printf("Applications for CD Pipeline %v has been updated", crToUpdate.Spec.Name)
-
 	return nil
 }
 
@@ -329,7 +328,7 @@ func fillCodebaseStageMatrix(ocClient *appsV1Client.AppsV1Client, cdPipeline *qu
 	return matrix, nil
 }
 
-func convertPipelineData(cdPipeline models.CDPipelineCreateCommand) k8s.CDPipelineSpec {
+func convertPipelineData(cdPipeline models.CDPipelineCommand) k8s.CDPipelineSpec {
 	var codebaseBranches []string
 	for _, v := range cdPipeline.Applications {
 		codebaseBranches = append(codebaseBranches, fmt.Sprintf("%s-%s", v.ApplicationName, v.BranchName))

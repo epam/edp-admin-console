@@ -31,7 +31,6 @@ func init() {
 		"GET /admin/edp/cd-pipeline/([^/]*)/update":   {administrator, developer},
 		"POST /admin/edp/cd-pipeline/([^/]*)/update":  {administrator},
 
-
 		"GET /api/v1/edp/vcs$":                               {administrator, developer},
 		"GET /api/v1/edp/codebase":                           {administrator, developer},
 		"GET /api/v1/edp/codebase/([^/]*)$":                  {administrator, developer},
@@ -39,6 +38,7 @@ func init() {
 		"GET /api/v1/edp/cd-pipeline/([^/]*)/stage/([^/]*)$": {administrator, developer},
 		"POST /api/v1/edp/codebase$":                         {administrator},
 		"POST /api/v1/edp/cd-pipeline$":                      {administrator},
+		"PUT /api/v1/edp/cd-pipeline/([^/]*)$":               {administrator},
 	}
 }
 

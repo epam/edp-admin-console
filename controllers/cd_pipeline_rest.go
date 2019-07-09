@@ -32,80 +32,119 @@ type CDPipelineRestController struct {
 	CDPipelineService service.CDPipelineService
 }
 
-func (this *CDPipelineRestController) GetCDPipelineByName() {
-	pipelineName := this.GetString(":name")
-	cdPipeline, err := this.CDPipelineService.GetCDPipelineByName(pipelineName)
+func (c *CDPipelineRestController) GetCDPipelineByName() {
+	pipelineName := c.GetString(":name")
+	cdPipeline, err := c.CDPipelineService.GetCDPipelineByName(pipelineName)
 	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if cdPipeline == nil {
 		nonAppMsg := fmt.Sprintf("Please check CD Pipeline name. It seems there's not %s pipeline.", pipelineName)
-		http.Error(this.Ctx.ResponseWriter, nonAppMsg, http.StatusNotFound)
+		http.Error(c.Ctx.ResponseWriter, nonAppMsg, http.StatusNotFound)
 		return
 	}
 
-	this.Data["json"] = cdPipeline
-	this.ServeJSON()
+	c.Data["json"] = cdPipeline
+	c.ServeJSON()
 }
 
-func (this *CDPipelineRestController) GetStage() {
-	pipelineName := this.GetString(":pipelineName")
-	stageName := this.GetString(":stageName")
+func (c *CDPipelineRestController) GetStage() {
+	pipelineName := c.GetString(":pipelineName")
+	stageName := c.GetString(":stageName")
 
-	stage, err := this.CDPipelineService.GetStage(pipelineName, stageName)
+	stage, err := c.CDPipelineService.GetStage(pipelineName, stageName)
 	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if stage == nil {
-		http.Error(this.Ctx.ResponseWriter, "Please check request data.", http.StatusNotFound)
+		http.Error(c.Ctx.ResponseWriter, "Please check request data.", http.StatusNotFound)
 		return
 	}
 
-	this.Data["json"] = stage
-	this.ServeJSON()
+	c.Data["json"] = stage
+	c.ServeJSON()
 }
 
-func (this *CDPipelineRestController) CreateCDPipeline() {
-	var cdPipelineCreateCommand models.CDPipelineCreateCommand
-	err := json.NewDecoder(this.Ctx.Request.Body).Decode(&cdPipelineCreateCommand)
+func (c *CDPipelineRestController) CreateCDPipeline() {
+	var cdPipelineCreateCommand models.CDPipelineCommand
+	err := json.NewDecoder(c.Ctx.Request.Body).Decode(&cdPipelineCreateCommand)
 	if err != nil {
-		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	errMsg := validateCDPipelineRequestData(cdPipelineCreateCommand)
 	if errMsg != nil {
 		log.Printf("Failed to validate request data: %s", errMsg.Message)
-		http.Error(this.Ctx.ResponseWriter, errMsg.Message, http.StatusBadRequest)
+		http.Error(c.Ctx.ResponseWriter, errMsg.Message, http.StatusBadRequest)
 		return
 	}
 	log.Printf("Request data is receieved to create CD pipeline: %s. Applications: %v. Stages: %v. Services: %v",
 		cdPipelineCreateCommand.Name, cdPipelineCreateCommand.Applications, cdPipelineCreateCommand.Stages, cdPipelineCreateCommand.ThirdPartyServices)
 
-	_, pipelineErr := this.CDPipelineService.CreatePipeline(cdPipelineCreateCommand)
+	_, pipelineErr := c.CDPipelineService.CreatePipeline(cdPipelineCreateCommand)
 	if pipelineErr != nil {
 
 		switch pipelineErr.(type) {
 		case *models.CDPipelineExistsError:
-			http.Error(this.Ctx.ResponseWriter, fmt.Sprintf("cd pipeline %v is already exists", cdPipelineCreateCommand.Name), http.StatusFound)
+			http.Error(c.Ctx.ResponseWriter, fmt.Sprintf("cd pipeline %v is already exists", cdPipelineCreateCommand.Name), http.StatusFound)
 			return
 		case *models.NonValidRelatedBranchError:
-			http.Error(this.Ctx.ResponseWriter, fmt.Sprintf("one or more applications have non valid branches: %v", cdPipelineCreateCommand.Applications), http.StatusBadRequest)
+			http.Error(c.Ctx.ResponseWriter, fmt.Sprintf("one or more applications have non valid branches: %v", cdPipelineCreateCommand.Applications), http.StatusBadRequest)
 			return
 		default:
-			http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+			http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 	}
 
-	this.Ctx.ResponseWriter.WriteHeader(http.StatusCreated)
+	c.Ctx.ResponseWriter.WriteHeader(http.StatusCreated)
 }
 
-func validateCDPipelineRequestData(cdPipeline models.CDPipelineCreateCommand) *ErrMsg {
+func (c *CDPipelineRestController) UpdateCDPipeline() {
+	var pipelineUpdateCommand models.CDPipelineCommand
+	err := json.NewDecoder(c.Ctx.Request.Body).Decode(&pipelineUpdateCommand)
+	if err != nil {
+		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	pipelineUpdateCommand.Name = c.GetString(":name")
+
+	errMsg := validateCDPipelineUpdateRequestData(pipelineUpdateCommand)
+	if errMsg != nil {
+		log.Printf("Request data is not valid: %s", errMsg.Message)
+		http.Error(c.Ctx.ResponseWriter, errMsg.Message, http.StatusBadRequest)
+		return
+	}
+	log.Printf("Request data is receieved to update CD pipeline %s. Applications: %v.",
+		pipelineUpdateCommand.Name, pipelineUpdateCommand.Applications)
+
+	err = c.CDPipelineService.UpdatePipeline(pipelineUpdateCommand)
+	if err != nil {
+
+		switch err.(type) {
+		case *models.CDPipelineDoesNotExistError:
+			http.Error(c.Ctx.ResponseWriter, fmt.Sprintf("cd pipeline %v doesn't exist", pipelineUpdateCommand.Name), http.StatusNotFound)
+			return
+		case *models.NonValidRelatedBranchError:
+			http.Error(c.Ctx.ResponseWriter, fmt.Sprintf("one or more applications have non valid branches: %v", pipelineUpdateCommand.Name), http.StatusNotFound)
+			return
+		default:
+			http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+	}
+
+	c.Ctx.ResponseWriter.WriteHeader(http.StatusNoContent)
+}
+
+func validateCDPipelineRequestData(cdPipeline models.CDPipelineCommand) *ErrMsg {
 	var isCDPipelineValid, isApplicationsValid, isStagesValid bool
 	errMsg := &ErrMsg{"An internal error has occurred on server while validating CD Pipeline's request body.", http.StatusInternalServerError}
 	valid := validation.Validation{}
@@ -137,6 +176,10 @@ func validateCDPipelineRequestData(cdPipeline models.CDPipelineCreateCommand) *E
 				return errMsg
 			}
 		}
+	} else {
+		err := &validation.Error{Key: "stages", Message: "can not be null"}
+		valid.Errors = append(valid.Errors, err)
+		isStagesValid = false
 	}
 
 	if isCDPipelineValid && isApplicationsValid && isStagesValid {
