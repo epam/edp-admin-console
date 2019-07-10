@@ -46,7 +46,7 @@ type ErrMsg struct {
 	StatusCode int
 }
 
-const OpenshiftProjectLink = "https://master.%s/console/project/"
+const OpenshiftProjectLink = "%s/console/project/"
 
 func (s *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCommand) (*k8s.CDPipeline, error) {
 	log.Printf("Start creating CD Pipeline: %v", cdPipeline)
@@ -289,7 +289,7 @@ func (s *CDPipelineService) GetStage(cdPipelineName, stageName string) (*models.
 func createOpenshiftProjectLinks(stages []*query.Stage, cdPipelineName string) {
 	for index, stage := range stages {
 		stage.OpenshiftProjectName = fmt.Sprintf("%s-%s-%s", context.Tenant, cdPipelineName, stage.Name)
-		stage.OpenshiftProjectLink = fmt.Sprintf(OpenshiftProjectLink+stage.OpenshiftProjectName, beego.AppConfig.String("dnsWildcard"))
+		stage.OpenshiftProjectLink = fmt.Sprintf(OpenshiftProjectLink+stage.OpenshiftProjectName, beego.AppConfig.String("openshiftClusterURL"))
 		stages[index] = stage
 	}
 }

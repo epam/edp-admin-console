@@ -33,18 +33,19 @@ type EDPTenantService struct {
 }
 
 var (
-	edpComponentNames = []string{"OpenShift", "Jenkins", "Gerrit", "Sonar", "Nexus"}
-	wildcard          = beego.AppConfig.String("dnsWildcard")
+	edpComponentNames   = []string{"OpenShift", "Jenkins", "Gerrit", "Sonar", "Nexus"}
+	wildcard            = beego.AppConfig.String("dnsWildcard")
+	openshiftClusterURL = beego.AppConfig.String("openshiftClusterURL")
 )
 
 func (edpService EDPTenantService) GetEDPComponents() [][]string {
 	var compWithLinks = make([][]string, len(edpComponentNames))
 	for i := 0; i < len(edpComponentNames); i++ {
 		compWithLinks[i] = make([]string, 2)
-		val := edpComponentNames[i];
-		if (val == "OpenShift") {
+		val := edpComponentNames[i]
+		if val == "OpenShift" {
 			compWithLinks[i][0] = val
-			compWithLinks[i][1] = fmt.Sprintf("https://master.%s/console/project/%s-edp-cicd/overview", wildcard, context.Tenant)
+			compWithLinks[i][1] = fmt.Sprintf("%s/console/project/%s-edp-cicd/overview", openshiftClusterURL, context.Tenant)
 		} else {
 			compWithLinks[i][0] = val
 			compWithLinks[i][1] = fmt.Sprintf("https://%s-%s-edp-cicd.%s", strings.ToLower(val), context.Tenant, wildcard)
