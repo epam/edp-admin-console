@@ -95,17 +95,6 @@ $(function () {
         $el.find('.invalid-feedback').hide();
     }
 
-    function disableSelectElems() {
-        $.each($('.autotests-checkbox'), function () {
-            let $selectEl = $('select[name="' + $(this).attr('value') + '-autotestBranch"]');
-            if (!$(this).is(':checked')) {
-                $selectEl.attr('disabled', 'disabled');
-            } else {
-                $selectEl.removeAttr('disabled');
-            }
-        });
-    }
-
     $('.application-checkbox :checkbox').change(function () {
         let $selectEl = $('.select-' + $(this).attr('id'));
         if ($(this).is(':checked')) {
@@ -157,3 +146,14 @@ $(function () {
     });
 
 });
+
+function disableSelectElems() {
+    $.each($('.autotests-checkbox'), function () {
+        let $selectEl = $('select[name="' + $(this).attr('value') + '-autotestBranch"]');
+        if (!$(this).is(':checked')) {
+            $selectEl.attr('disabled', 'disabled');
+        } else {
+            $selectEl.removeAttr('disabled');
+        }
+    });
+}
