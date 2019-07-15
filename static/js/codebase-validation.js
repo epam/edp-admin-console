@@ -16,6 +16,9 @@ $(function () {
 
     !function () {
         $('.form-group .js-form-subsection select').attr('disabled', true);
+
+        $('.multi-module').addClass('hide-element');
+        $('#multiModule').attr("disabled", true);
     }();
 
     !function () {
@@ -49,6 +52,11 @@ $(function () {
         langDivEl.find('select').attr('disabled', false);
         langDivEl.show();
         $('.js-form-subsection input[name="framework"]').prop('checked', false);
+
+        $('.multi-module').addClass('hide-element');
+        $('#multiModule').attr("disabled", true);
+
+        $('.java-build-tools').val('Gradle');
     });
 
     $('#isRepoPrivate').change(function () {
@@ -151,6 +159,16 @@ $(function () {
         if (canCreateApplication) {
             createConfirmTable('#createAppForm');
             $('#confirmationPopup').modal('show');
+        }
+    });
+
+    $('.java-build-tools').change(function () {
+        if (this.value === 'Maven') {
+            $('#multiModule').attr("disabled", false);
+            $('.multi-module').removeClass('hide-element');
+        } else {
+            $('.multi-module').addClass('hide-element');
+            $('#multiModule').attr("disabled", true);
         }
     });
 

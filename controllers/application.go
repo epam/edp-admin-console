@@ -147,6 +147,8 @@ func extractApplicationRequestData(this *ApplicationController) command.CreateCo
 	codebase.Framework = &framework
 
 	isMultiModule, _ := this.GetBool("isMultiModule", false)
+	codebase.MultiModule = isMultiModule
+
 	if isMultiModule {
 		multimoduleApp := fmt.Sprintf("%s-multimodule", *codebase.Framework)
 		codebase.Framework = &multimoduleApp
