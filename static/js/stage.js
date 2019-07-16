@@ -32,27 +32,22 @@ $(function () {
             stageToEdit.addClass(stageData.stageName);
             stageToEdit.find('#stageNameForm').val(stageData.stageName);
             stageToEdit.find('#stageDescForm').val(stageData.stageDesc).attr('name', stageData.stageName + '-stageDesc');
-            stageToEdit.find('#nameOfStepForm').val(stageData.nameOfStep).attr('name', stageData.stageName + '-nameOfStep');
-            stageToEdit.find('#qualityGateTypeForm').val(stageData.qualityGateType).attr('name', stageData.stageName + '-qualityGateType');
             stageToEdit.find('#triggerTypeForm').val(stageData.triggerType).attr('name', stageData.stageName + '-triggerType');
 
+            let $stageBlockEl = $('.stage-info.' + stageData.stageName);
+            $stageBlockEl.find('.qualityGateType, .stepName, .autotestsName, .branchName').remove();
 
-            let $editEl = $('.stage-info.' + stageData.stageName);
-            $editEl.find('input[data-type="autotestName"]').remove();
-            $editEl.find('input[data-type="autotestBranch"]').remove();
+            $.each(stageData.qualityGates, function () {
+                let qualityGateTypeInputName = stageData.stageName + '-' + this.stepName + '-stageQualityGateType',
+                    stepNameInputName = stageData.stageName + '-stageStepName',
+                    autotestsInputName = stageData.stageName + '-' + this.stepName + '-stageAutotests',
+                    branchInputName = stageData.stageName + '-' + this.stepName + '-stageBranch';
 
-            if (stageData.autotests && stageData.qualityGateType === 'autotests') {
-
-                $('.autotests-checkbox-info input:checked').each(function () {
-                    let $stageBlockEl = $('.stage-info.' + stageData.stageName);
-                    let branch = stageData.autotests[$(this).attr('value')];
-
-                    $('<input data-target-select="' + branch + '" data-target="#' + $(this).attr('value') + '-checkbox' + '" id="' + $(this).attr('value') + '" name="' + stageData.stageName + '-autotests' + '" type="hidden" value="' + $(this).attr('value') + '" data-type="autotestName">').appendTo($stageBlockEl);
-
-                    let autotest = $(this).attr('value');
-                    $('<input id="' + autotest + '-' + branch + '" name="' + autotest + '-' + stageData.stageName + '-autotestBranch" type="hidden" value="' + branch + '" data-type="autotestBranch">').appendTo($stageBlockEl);
-                });
-            }
+                $('<input class="qualityGateType" type="hidden" name="' + qualityGateTypeInputName + '" value="' + this.qualityGateType + '">').appendTo($stageBlockEl);
+                $('<input class="stepName" type="hidden" name="' + stepNameInputName + '" value="' + this.stepName + '">').appendTo($stageBlockEl);
+                $('<input class="autotestsName" type="hidden" name="' + autotestsInputName + '" value="' + this.autotestName + '">').appendTo($stageBlockEl);
+                $('<input class="branchName" type="hidden" name="' + branchInputName + '" value="' + this.branchName + '">').appendTo($stageBlockEl)
+            });
         }
 
         let $stageAddedMsgEl = $('.invalid-feedback.stage-added-msg');
@@ -78,36 +73,14 @@ $(function () {
         toggleAdding();
     });
 
-    $('#stageName').focusout(function () {
-        let isValid = handleStageNameValidation();
-        let $stageAddedMsgEl = $('.invalid-feedback.stage-added-msg');
-        if (isValid) {
-            if (isStageAdded()) {
-                $stageAddedMsgEl.show();
-                return;
-            }
-            $stageAddedMsgEl.hide();
-        }
-    });
-
-    $('#stageDesc').focusout(function () {
-        handleStageDescriptionValidation();
-    });
-
-    $('#nameOfStep').focusout(function () {
-        handleStepNameValidation();
-    });
-
     $('.tooltip-icon').tooltip();
 
     $('#qualityGateType').change(function () {
-        let $autotestsEl = $('.autotests');
+        let $autotestsEl = $(this).parents('.quality-gate-row').find('.autotest-block-el');
         if (this.value === 'autotests') {
-            $autotestsEl.show();
+            $autotestsEl.removeClass('hide-element');
         } else {
-            $autotestsEl.hide();
-            $('#qualityGateType').removeClass('non-valid-input');
-            $('.autotests-validation-msg').hide();
+            $autotestsEl.addClass('hide-element');
         }
     });
 
@@ -118,10 +91,43 @@ $(function () {
         }
         disableSelectElems();
     });
+
+    $('.add-quality-gate-row').click(function () {
+        let $qualityGateTypeEl = $('.quality-gate-row:first').clone(true);
+        $qualityGateTypeEl.find('.qualityGateTypeLabel, .nameOfStepLabel, .autotestLabel, .branchLabel').remove();
+        $qualityGateTypeEl.find('#qualityGateType').val('manual');
+        $qualityGateTypeEl.find('.remove-quality-gate-type').removeClass('hide-element');
+        $qualityGateTypeEl.find('input.non-valid-input').removeClass('non-valid-input');
+        $qualityGateTypeEl.find('.invalid-feedback.step-name-validation-msg').hide();
+        $qualityGateTypeEl.find('.qualityGateType').val('manual');
+        $qualityGateTypeEl.find('.autotest-block-el').addClass('hide-element');
+        $qualityGateTypeEl.find('.nameOfStep').val('');
+        $qualityGateTypeEl.insertBefore($('.step-name-validation-msg'));
+    });
+
+    $('.remove-quality-gate-type').click(function () {
+        $(this).parents('.quality-gate-row').remove();
+    });
+
+    $('.autotest-projects').change(function () {
+        let selectedAutotest = $(this).val();
+        $.each($(this).parents('.quality-gate-row').find('.autotest-branches'), function () {
+            $(this).data('selected-autotest') === selectedAutotest ? $(this).show() : $(this).hide();
+        })
+    });
+
+    !function () {
+        $('.quality-gate-row .autotest-branches').hide();
+
+        $.each($('.quality-gate-row .autotest-projects'), function () {
+            $('select[data-selected-autotest="' + $(this).val() + '"]').show();
+        });
+
+    }();
 });
 
 function validateFields() {
-    return handleStageNameValidation() & handleStageDescriptionValidation() & handleStepNameValidation() & handleQualityGateTypeValidation();
+    return handleStageNameValidation() & handleStageDescriptionValidation() & handleStepNameValidation();
 }
 
 function appendStage(stageData) {
@@ -136,29 +142,35 @@ function appendStage(stageData) {
         '        </div>\n' +
         '<input data-mode="add" id="stageNameForm" name="stageName" type="hidden" value="' + stageData.stageName + '">' +
         '<input id="stageDescForm" name="' + stageData.stageName + '-stageDesc" type="hidden" value="' + stageData.stageDesc + '">' +
-        '<input id="nameOfStepForm" name="' + stageData.stageName + '-nameOfStep" type="hidden" value="' + stageData.nameOfStep + '">' +
-        '<input id="qualityGateTypeForm" name="' + stageData.stageName + '-qualityGateType" type="hidden" value="' + stageData.qualityGateType + '">' +
         '<input id="triggerTypeForm" name="' + stageData.stageName + '-triggerType" type="hidden" value="' + stageData.triggerType + '">' +
         '    </div>').appendTo($('.stages-list'));
 
-    if (stageData.autotests && stageData.qualityGateType === 'autotests') {
-        $.map(stageData.autotests, function (v, i) {
-            let $stageBlockEl = $('.stage-info.' + stageData.stageName);
-            $('<input data-target-select="' + v + '" data-target="#' + i + '-checkbox' + '" id="' + i + '" name="' + stageData.stageName + '-autotests' + '" type="hidden" value="' + i + '" data-type="autotestName">').appendTo($stageBlockEl);
-            $('<input id="' + i + '-' + v + '" name="' + i + '-' + stageData.stageName + '-autotestBranch' + '" type="hidden" value="' + v + '" data-type="autotestBranch">').appendTo($stageBlockEl);
-        });
-    }
+    let $stageBlockEl = $('.stage-info.' + stageData.stageName);
+    $.each(stageData.qualityGates, function () {
+        let qualityGateTypeInputName = stageData.stageName + '-' + this.stepName + '-stageQualityGateType',
+            stepNameInputName = stageData.stageName + '-stageStepName',
+            autotestsInputName = stageData.stageName + '-' + this.stepName + '-stageAutotests',
+            branchInputName = stageData.stageName + '-' + this.stepName + '-stageBranch';
+
+        $('<input class="qualityGateType" type="hidden" name="' + qualityGateTypeInputName + '" value="' + this.qualityGateType + '">').appendTo($stageBlockEl);
+        $('<input class="stepName" type="hidden" name="' + stepNameInputName + '" value="' + this.stepName + '">').appendTo($stageBlockEl);
+        $('<input class="autotestsName" type="hidden" name="' + autotestsInputName + '" value="' + this.autotestName + '">').appendTo($stageBlockEl);
+        $('<input class="branchName" type="hidden" name="' + branchInputName + '" value="' + this.branchName + '">').appendTo($stageBlockEl)
+    });
 }
 
 function resetFields() {
     $('#qualityGateType option:first').prop('selected', true);
     $('#triggerType option:first').prop('selected', true);
     $('#stage-creation input[type="text"]').val("");
-    $('.autotests').hide();
-    $('.autotests-checkbox').prop('checked', false);
 
     $('input.non-valid-input, select.non-valid-input').removeClass('non-valid-input');
     $('div.invalid-feedback').hide();
+
+    let $qualityGateTypeElems = $('.quality-gate-row');
+    $qualityGateTypeElems.not(':first').remove();
+    $qualityGateTypeElems.find('.qualityGateType').val('manual');
+    $qualityGateTypeElems.find('.autotest-block-el').addClass('hide-element');
 }
 
 function removeStage(stageName) {
@@ -177,24 +189,57 @@ function editStage(stageName) {
 
 function fillFields(stageName) {
     let $stageEl = $('.stage-info.' + stageName);
-    let qualityGateTypeVal = $stageEl.find('#qualityGateTypeForm').val();
     $('#stageName').val($stageEl.find('#stageNameForm').val());
     $('#stageDesc').val($stageEl.find('#stageDescForm').val());
-    $('#nameOfStep').val($stageEl.find('#nameOfStepForm').val());
-    $("#qualityGateType").val(qualityGateTypeVal);
     $("#triggerType").val($stageEl.find('#triggerTypeForm').val());
 
-    if (qualityGateTypeVal === 'autotests') {
-        $('.autotests').show();
+    let qualityGateData = collectOldQualityGatesData($stageEl);
+    createQualityGateRows(qualityGateData);
+}
 
-        $('input[name="' + stageName + '-autotests"]').each(function () {
-            $($(this).attr('data-target')).prop('checked', true);
+function collectOldQualityGatesData($stageEl) {
+    let $qualityGateTypeEl = $stageEl.find('.qualityGateType'),
+        $stepNameEl = $stageEl.find('.stepName'),
+        $autotestsNameEl = $stageEl.find('.autotestsName'),
+        $branchNameEl = $stageEl.find('.branchName');
 
-            let autotest = $(this).attr('value');
-            let branch = $(this).attr('data-target-select');
-            $('.' + autotest + '-branch').val(branch);
+    let result = [];
+    $.each($qualityGateTypeEl, function (i) {
+        result.push({
+            qualityGateType: $(this).val(),
+            stepName: $($stepNameEl[i]).val(),
+            autotestName: $(this).val() === 'autotests' ? $($autotestsNameEl[i]).val() : null,
+            branchName: $(this).val() === 'autotests' ? $($branchNameEl[i]).val() : null
         });
+    });
+
+    return result;
+}
+
+function createQualityGateRows(qualityGateData) {
+    for (let i = 0; i < qualityGateData.length - 1; i++) {
+        let $firstQualityGateRowEl = $('.quality-gate-row:first').clone(true);
+        $firstQualityGateRowEl.insertBefore($('.step-name-validation-msg'));
     }
+
+    let $readyToFillRowElems = $('.quality-gate-row');
+    $.each($readyToFillRowElems, function (i) {
+        if (i !== 0) {
+            $(this).find('.qualityGateTypeLabel, .nameOfStepLabel, .autotestLabel, .branchLabel').remove();
+            $(this).find('.remove-quality-gate-type').show();
+        }
+
+        $(this).find('.qualityGateType').val(qualityGateData[i].qualityGateType);
+        $(this).find('.nameOfStep').val(qualityGateData[i].stepName);
+
+        if (qualityGateData[i].qualityGateType === 'autotests') {
+            $(this).find('.autotest-block-el').removeClass('hide-element');
+            $(this).find('.autotest-projects').val(qualityGateData[i].autotestName);
+            $(this).find('.autotest-branches').hide();
+            $(this).find('[data-selected-autotest="' + qualityGateData[i].autotestName + '"]').show();
+            $(this).find('[data-selected-autotest="' + qualityGateData[i].autotestName + '"]').val(qualityGateData[i].branchName);
+        }
+    });
 }
 
 function toggleAdding() {
@@ -213,25 +258,26 @@ function toggleEditing() {
 }
 
 function collectStageData() {
-    let stageData = {
+    return {
         stageName: $('#stageName').val(),
         stageDesc: $('#stageDesc').val(),
-        nameOfStep: $('#nameOfStep').val(),
-        qualityGateType: $('#qualityGateType').val(),
-        autotests: undefined,
         triggerType: $('#triggerType').val(),
+        qualityGates: collectQualityGates(),
     };
+}
 
-    if (stageData.qualityGateType === 'autotests') {
-        let autotests = {};
-        $('.autotests-checkbox-info input:checked').each(function () {
-            let autName = $(this).attr('value');
-            autotests[autName] = $('.' + autName + '-branch').val();
+function collectQualityGates() {
+    let result = [];
+    $.each($('.quality-gate-row'), function () {
+        let qualityGateType = $(this).find('.qualityGateType').val();
+        result.push({
+            qualityGateType: qualityGateType,
+            stepName: $(this).find('.nameOfStep').val(),
+            autotestName: qualityGateType === 'autotests' ? $(this).find('.autotest-projects').val() : null,
+            branchName: qualityGateType === 'autotests' ? $(this).find('[data-selected-autotest="' + $(this).find('.autotest-projects').val() + '"]').val() : null
         });
-        stageData.autotests = autotests;
-    }
-
-    return stageData;
+    });
+    return result;
 }
 
 function handleStageNameValidation() {
@@ -261,37 +307,57 @@ function handleStageDescriptionValidation() {
 }
 
 function handleStepNameValidation() {
-    let $nameOfStep = $('#nameOfStep');
-    let $validationMsgEl = $('.step-name-validation-msg');
-    let valid = isStepNameValid();
-    if (!valid) {
-        $nameOfStep.addClass('non-valid-input');
-        $validationMsgEl.show();
+    let $nameOfStepElems = $('.nameOfStep'),
+        $validationMsgEl = $('.step-name-validation-msg'),
+        $duplicateValidationMsgEl = $('.duplicate-step-name-validation-msg'),
+        isValid = false;
+
+    $.each($nameOfStepElems, function () {
+        isValid = isFieldValid($(this), /^[a-z0-9]([-a-z0-9]*[a-z0-9])$/);
+        if (!isValid) {
+            $(this).addClass('non-valid-input');
+            $validationMsgEl.show();
+        } else {
+            $(this).removeClass('non-valid-input');
+        }
+    });
+
+    let nameOfStepArr = getValues($nameOfStepElems),
+        duplicateErr = doesArrayContainDuplicates(nameOfStepArr);
+    if (duplicateErr) {
+        $nameOfStepElems.addClass('non-valid-input');
+        $duplicateValidationMsgEl.show();
     } else {
-        $nameOfStep.removeClass('non-valid-input');
+        $nameOfStepElems.removeClass('non-valid-input');
+        $duplicateValidationMsgEl.hide();
+    }
+
+    if (isValid) {
         $validationMsgEl.hide();
     }
-    return valid;
+
+    return isValid && !duplicateErr;
 }
 
-function handleQualityGateTypeValidation() {
-    let $qualityGateTypeEl = $('#qualityGateType');
-    let $autotestsValidationMsgEl = $('.autotests-validation-msg');
-    let qualityTypeVal = $('#qualityGateType').children("option:selected").val();
-    if (qualityTypeVal === 'autotests') {
-        let isChecked = $('.autotests-checkbox').is(':checked');
-        if (!isChecked) {
-            $qualityGateTypeEl.addClass('non-valid-input');
-            $autotestsValidationMsgEl.show();
-        } else {
-            $qualityGateTypeEl.removeClass('non-valid-input');
-            $autotestsValidationMsgEl.hide();
+function getValues($elemsArray) {
+    let result = [];
+    $.each($elemsArray, function () {
+        result.push($(this).val());
+    });
+    return result
+}
+
+function doesArrayContainDuplicates(arr) {
+    let sortedArr = arr.sort();
+
+    let duplicates = [];
+    for (let i = 0; i < sortedArr.length - 1; i++) {
+        if (sortedArr[i + 1] === sortedArr[i]) {
+            duplicates.push(sortedArr[i]);
         }
-        return isChecked;
     }
-    $qualityGateTypeEl.removeClass('non-valid-input');
-    $autotestsValidationMsgEl.hide();
-    return true;
+
+    return duplicates.length > 0;
 }
 
 function isStageNameValid() {
@@ -306,13 +372,4 @@ function isStageNameValid() {
 function isStageDescriptionValid() {
     let $stageDescriptionEl = $('#stageDesc');
     return $stageDescriptionEl.val().length !== 0;
-}
-
-function isStepNameValid() {
-    let checkStepName = function (stepName) {
-        return /^[a-z0-9]([-a-z0-9]*[a-z0-9])$/.test(stepName);
-    };
-
-    let $stepNameEl = $('#nameOfStep');
-    return !(!$stepNameEl.val() || !checkStepName($stepNameEl.val()));
 }

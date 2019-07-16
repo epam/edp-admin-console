@@ -259,43 +259,34 @@ func (c *CDPipelineController) GetCDPipelineOverviewPage() {
 
 func retrieveStagesFromRequest(this *CDPipelineController) []models.StageCreate {
 	var stages []models.StageCreate
+
 	for index, stageName := range this.GetStrings("stageName") {
-		stage := models.StageCreate{
-			Name:            stageName,
-			Description:     this.GetString(stageName + "-stageDesc"),
-			StepName:        this.GetString(stageName + "-nameOfStep"),
-			QualityGateType: this.GetString(stageName + "-qualityGateType"),
-			TriggerType:     this.GetString(stageName + "-triggerType"),
-			Order:           index,
+		stageRequest := models.StageCreate{
+			Name:        stageName,
+			Description: this.GetString(stageName + "-stageDesc"),
+			TriggerType: this.GetString(stageName + "-triggerType"),
+			Order:       index,
 		}
 
-		if stage.QualityGateType == "autotests" {
-			autotestsFromRequest := this.GetStrings(stageName + "-autotests")
-			for _, autotest := range autotestsFromRequest {
-
-				autBranch := this.GetString(autotest + "-" + stage.Name + "-autotestBranch")
-
-				if stage.Autotests == nil {
-					stage.Autotests = []models.Autotest{
-						{
-							Name:       autotest,
-							BranchName: autBranch,
-						},
-					}
-					continue
-				}
-
-				stage.Autotests = append(stage.Autotests, models.Autotest{
-					Name:       autotest,
-					BranchName: autBranch,
-				})
-
+		for _, stepName := range this.GetStrings(stageName + "-stageStepName") {
+			qualityGateRequest := models.QualityGate{
+				QualityGateType: this.GetString(stageName + "-" + stepName + "-stageQualityGateType"),
+				StepName:        stepName,
 			}
 
+			if qualityGateRequest.QualityGateType == "autotests" {
+				autotestName := this.GetString(stageName + "-" + stepName + "-stageAutotests")
+				qualityGateRequest.AutotestName = &autotestName
+				stageName := this.GetString(stageName + "-" + stepName + "-stageBranch")
+				qualityGateRequest.BranchName = &stageName
+			}
+
+			stageRequest.QualityGates = append(stageRequest.QualityGates, qualityGateRequest)
 		}
 
-		stages = append(stages, stage)
+		stages = append(stages, stageRequest)
 	}
+
 	log.Printf("Stages are fetched from request: %v", stages)
 	return stages
 }
@@ -333,6 +324,7 @@ func validateCDPipelineUpdateRequestData(cdPipeline models.CDPipelineCommand) *E
 	isApplicationsValid := true
 	isCDPipelineValid := true
 	isStagesValid := true
+	isQualityGatesValid := true
 	errMsg := &ErrMsg{"An internal error has occurred on server while validating CD Pipeline's request body.", http.StatusInternalServerError}
 	valid := validation.Validation{}
 	isCDPipelineValid, err := valid.Valid(cdPipeline)
@@ -353,10 +345,11 @@ func validateCDPipelineUpdateRequestData(cdPipeline models.CDPipelineCommand) *E
 	if cdPipeline.Stages != nil {
 		for _, stage := range cdPipeline.Stages {
 
-			if (stage.QualityGateType == "autotests" && stage.Autotests == nil) ||
-				(stage.QualityGateType == "manual" && stage.Autotests != nil) {
-				isStagesValid = false
+			isValid, err := validateQualityGates(valid, stage.QualityGates)
+			if err != nil {
+				return errMsg
 			}
+			isQualityGatesValid = isValid
 
 			isStagesValid, err = valid.Valid(stage)
 			if err != nil {
@@ -365,9 +358,33 @@ func validateCDPipelineUpdateRequestData(cdPipeline models.CDPipelineCommand) *E
 		}
 	}
 
-	if isCDPipelineValid && isApplicationsValid && isStagesValid {
+	if isCDPipelineValid && isApplicationsValid && isStagesValid && isQualityGatesValid {
 		return nil
 	}
 
 	return &ErrMsg{string(createErrorResponseBody(valid)), http.StatusBadRequest}
+}
+
+func validateQualityGates(valid validation.Validation, qualityGates []models.QualityGate) (bool, error) {
+	isQualityGatesValid := true
+
+	if qualityGates != nil {
+		for _, qualityGate := range qualityGates {
+			isValid, err := valid.Valid(qualityGate)
+			if err != nil {
+				return false, err
+			}
+			isQualityGatesValid = isValid
+
+			if (qualityGate.QualityGateType == "autotests" && (qualityGate.AutotestName == nil || qualityGate.BranchName == nil)) ||
+				(qualityGate.QualityGateType == "manual" && (qualityGate.AutotestName != nil || qualityGate.BranchName != nil)) {
+				isQualityGatesValid = false
+			}
+		}
+	} else {
+		valid.Errors = append(valid.Errors, &validation.Error{Key: "qualityGates", Message: "can not be empty"})
+		isQualityGatesValid = false
+	}
+
+	return isQualityGatesValid, nil
 }

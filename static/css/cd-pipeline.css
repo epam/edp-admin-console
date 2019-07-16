@@ -4,7 +4,7 @@
 }
 
 .modal-size-adding-stages {
-    width: 600px !important;
+    width: 800px !important;
     height: 550px;
 }
 
@@ -89,4 +89,8 @@
     margin: auto 3px;
     height: 2px;
     box-shadow: none;
+}
+
+.element-width {
+    width: 150px;
 }

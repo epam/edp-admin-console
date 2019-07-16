@@ -145,7 +145,7 @@ func (c *CDPipelineRestController) UpdateCDPipeline() {
 }
 
 func validateCDPipelineRequestData(cdPipeline models.CDPipelineCommand) *ErrMsg {
-	var isCDPipelineValid, isApplicationsValid, isStagesValid bool
+	var isCDPipelineValid, isApplicationsValid, isStagesValid, isQualityGatesValid bool
 	errMsg := &ErrMsg{"An internal error has occurred on server while validating CD Pipeline's request body.", http.StatusInternalServerError}
 	valid := validation.Validation{}
 	isCDPipelineValid, err := valid.Valid(cdPipeline)
@@ -166,10 +166,11 @@ func validateCDPipelineRequestData(cdPipeline models.CDPipelineCommand) *ErrMsg 
 	if cdPipeline.Stages != nil {
 		for _, stage := range cdPipeline.Stages {
 
-			if (stage.QualityGateType == "autotests" && stage.Autotests == nil) ||
-				(stage.QualityGateType == "manual" && stage.Autotests != nil) {
-				isStagesValid = false
+			isValid, err := validateQualityGates(valid, stage.QualityGates)
+			if err != nil {
+				return errMsg
 			}
+			isQualityGatesValid = isValid
 
 			isStagesValid, err = valid.Valid(stage)
 			if err != nil {
@@ -182,7 +183,7 @@ func validateCDPipelineRequestData(cdPipeline models.CDPipelineCommand) *ErrMsg 
 		isStagesValid = false
 	}
 
-	if isCDPipelineValid && isApplicationsValid && isStagesValid {
+	if isCDPipelineValid && isApplicationsValid && isStagesValid && isQualityGatesValid {
 		return nil
 	}
 
