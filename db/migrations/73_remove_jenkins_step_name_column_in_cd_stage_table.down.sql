@@ -1,0 +1,1 @@
+alter table cd_stage add jenkins_step_name text;

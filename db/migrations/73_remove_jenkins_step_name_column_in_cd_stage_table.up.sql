@@ -1,0 +1,1 @@
+alter table cd_stage drop column jenkins_step_name;
