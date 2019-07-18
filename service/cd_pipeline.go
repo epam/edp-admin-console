@@ -136,11 +136,6 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 			cdPipeline.CodebaseStageMatrix = matrix
 		}
 
-		err = s.getStageAutotests(cdPipeline)
-		if err != nil {
-			return nil, err
-		}
-
 		log.Printf("Fetched CD Pipeline from DB: %v", cdPipeline)
 	}
 
@@ -241,20 +236,6 @@ func (s *CDPipelineService) UpdatePipeline(pipeline models.CDPipelineCommand) er
 	return nil
 }
 
-func (s *CDPipelineService) getStageAutotests(cdPipeline *query.CDPipeline) error {
-	for _, stage := range cdPipeline.Stage {
-		if stage.QualityGate == "autotests" {
-			autotests, err := s.getStagesAutotests(cdPipeline.Name, stage.Name)
-			if err != nil {
-				return err
-			}
-			stage.Autotests = autotests
-			log.Printf("Fetched Autotests %v for Stage %v", autotests, stage.Name)
-		}
-	}
-	return nil
-}
-
 func sortStagesByOrder(stages []*query.Stage) {
 	sort.Slice(stages, func(i, j int) bool {
 		return stages[i].Order < stages[j].Order
@@ -274,14 +255,14 @@ func (s *CDPipelineService) GetStage(cdPipelineName, stageName string) (*models.
 		return nil, nil
 	}
 
-	autotests, err := s.getStagesAutotests(cdPipelineName, stageName)
+	gates, err := s.ICDPipelineRepository.GetQualityGates(stage.Id)
 	if err != nil {
-		log.Printf("An error has occurred while fetching Autotests from database: %s", err)
+		log.Printf("An error has occurred while fetching Quality Gates from database: %v", err)
 		return nil, err
 	}
-	stage.Autotests = autotests
+	stage.QualityGates = gates
 
-	log.Printf("Fetched Stage: {%v}, Autotests: {%v}", stage, autotests)
+	log.Printf("Fetched Stage: {%v}, Quality Gates: {%v}", stage, stage.QualityGates)
 
 	return stage, nil
 }
@@ -447,29 +428,4 @@ func checkStagesInK8s(edpRestClient *rest.RESTClient, cdPipelineName string, sta
 		}
 	}
 	return nil
-}
-
-func (s *CDPipelineService) getStagesAutotests(cdPipelineName, stageName string) ([]models.Autotests, error) {
-	log.Printf("Start fetching Autotests by CD Pipeline %s and Stage %s names...", cdPipelineName, stageName)
-	autotests, err := s.ICDPipelineRepository.GetStagesAutotests(cdPipelineName, stageName)
-	if err != nil {
-		log.Printf("An error has occurred while getting Autotests from database: %s", err)
-		return nil, err
-	}
-
-	createLinks(autotests)
-
-	log.Printf("Fetched Autotests: {%v}", autotests)
-	return autotests, nil
-}
-
-func createLinks(autotests []models.Autotests) {
-	wildcard := beego.AppConfig.String("dnsWildcard")
-
-	if autotests != nil {
-		for i := range autotests {
-			autotests[i].VCSLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb?p=%s.git;a=shortlog;h=refs/heads/%s", "gerrit", context.Tenant, wildcard, autotests[i].Name, autotests[i].BranchName)
-			autotests[i].CICDLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s/view/%s", "jenkins", context.Tenant, wildcard, autotests[i].Name, strings.ToUpper(autotests[i].BranchName))
-		}
-	}
 }

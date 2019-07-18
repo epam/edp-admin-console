@@ -1,15 +1,16 @@
 package models
 
+import "edp-admin-console/models/query"
+
 type StageView struct {
-	Name            string             `json:"name"`
-	CDPipeline      string             `json:"cdPipeline"`
-	Description     string             `json:"description"`
-	QualityGate     string             `json:"qualityGate"`
-	TriggerType     string             `json:"triggerType"`
-	Order           string             `json:"order"`
-	JenkinsStepName string             `json:"jenkinsStepName"`
-	Applications    []ApplicationStage `json:"applications"`
-	Autotests       []Autotests        `json:"autotests"`
+	Id           int64               `json:"-"`
+	Name         string              `json:"name"`
+	CDPipeline   string              `json:"cdPipeline"`
+	Description  string              `json:"description"`
+	TriggerType  string              `json:"triggerType"`
+	Order        string              `json:"order"`
+	Applications []ApplicationStage  `json:"applications"`
+	QualityGates []query.QualityGate `json:"qualityGates"`
 }
 
 type ApplicationStage struct {
@@ -27,13 +28,4 @@ type CDPipelineStageView struct {
 	JenkinsStepName      string `json:"jenkinsStepName"`
 	Order                int    `json:"order"`
 	OpenshiftProjectLink string `json:"openshiftProjectLink"`
-}
-
-type Autotests struct {
-	Name                string `json:"name"`
-	TestReportFramework string `json:"testReportFramework" orm:"column(test_report_framework)"`
-	BuildTool           string `json:"buildTool" orm:"column(build_tool)"`
-	BranchName          string `json:"branchName" orm:"column(branch_name)"`
-	VCSLink             string `json:"-"`
-	CICDLink            string `json:"-"`
 }
