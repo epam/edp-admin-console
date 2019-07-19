@@ -17,8 +17,8 @@ type QualityGate struct {
 	QualityGateType  string          `json:"qualityGateType" orm:"column(quality_gate)"`
 	StepName         string          `json:"stepName" orm:"column(step_name)"`
 	CdStageId        *int            `json:"cdStageId" orm:"column(cd_stage_id)"`
-	CodebaseId       *int            `json:"codebaseId" orm:"column(codebase_id)"`
-	CodebaseBranchId *int            `json:"codebaseBranchId" orm:"column(codebase_branch_id)"`
+	CodebaseId       *int            `json:"-" orm:"column(codebase_id)"`
+	CodebaseBranchId *int            `json:"-" orm:"column(codebase_branch_id)"`
 	Autotest         *Codebase       `json:"autotest" orm:"-"`
 	Branch           *CodebaseBranch `json:"codebaseBranch" orm:"-"`
 }
