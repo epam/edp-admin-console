@@ -1,0 +1,1 @@
+drop table if exists applications_to_promote;
