@@ -11245,6 +11245,16 @@ li.nav-item.active {
     border-right: solid white 5px;
 }
 
+.promoted:before {
+    content: url('assets/icons/ok-icon.png');
+    border-right: solid white 5px;
+}
+
+.cancel:before {
+    content: url('assets/icons/cancel-icon.png');
+    border-right: solid white 5px;
+}
+
 .edp-back-link:before {
     content: url('assets/icons/arrow-back-active-20px.png');
 }
@@ -11300,4 +11310,9 @@ li.nav-item.active {
 
 .cd-pipeline-overview-table {
     max-width: 900px;
+}
+
+.promote-checkbox-overview,
+.non-promoted-applications {
+    display: none;
 }

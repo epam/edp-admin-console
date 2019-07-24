@@ -95,7 +95,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group col-sm-8">
+                                    <div class="form-group col-sm-4">
                                         <select title="Release Branches"
                                                 class="release-branch selectpicker select-{{.Name}} form-control"
                                                 name="{{.Name}}" disabled>
@@ -103,6 +103,16 @@
                                             <option value="{{.Name}}">{{.Name}}</option>
                                             {{end}}
                                         </select>
+                                    </div>
+
+                                    <div class="form-group col-sm-4">
+                                        <div class="custom-control custom-checkbox application-checkbox">
+                                            <input type="checkbox" class="custom-control-input app-checkbox checkbox-{{.Name}}"
+                                                   id="{{.Name}}-promote"
+                                                   name="{{.Name}}-promote" value="true" checked disabled>
+                                            <label class="custom-control-label"
+                                                   for="{{.Name}}-promote">Promote in pipeline</label>
+                                        </div>
                                     </div>
                                 </div>
                                 {{end}}

@@ -26,6 +26,7 @@ import (
 	"github.com/astaxie/beego/validation"
 	"log"
 	"net/http"
+	"sort"
 )
 
 type CDPipelineController struct {
@@ -139,6 +140,7 @@ func (c *CDPipelineController) GetEditCDPipelinePage() {
 	if flash.Data["error"] != "" {
 		c.Data["Error"] = flash.Data["error"]
 	}
+
 	c.Data["CDPipeline"] = cdPipeline
 	c.Data["Apps"] = applications
 	c.Data["Type"] = "delivery"
@@ -151,8 +153,9 @@ func (c *CDPipelineController) UpdateCDPipeline() {
 	pipelineName := c.GetString(":name")
 
 	pipelineUpdateCommand := models.CDPipelineCommand{
-		Name:         pipelineName,
-		Applications: convertApplicationWithBranchesData(c, appNameCheckboxes),
+		Name:                 pipelineName,
+		Applications:         convertApplicationWithBranchesData(c, appNameCheckboxes),
+		ApplicationToApprove: c.getApplicationsToPromoteFromRequest(appNameCheckboxes),
 	}
 
 	errMsg := validateCDPipelineUpdateRequestData(pipelineUpdateCommand)
@@ -199,10 +202,11 @@ func (c *CDPipelineController) CreateCDPipeline() {
 	stages := retrieveStagesFromRequest(c)
 
 	cdPipelineCreateCommand := models.CDPipelineCommand{
-		Name:               pipelineName,
-		Applications:       convertApplicationWithBranchesData(c, appNameCheckboxes),
-		ThirdPartyServices: serviceCheckboxes,
-		Stages:             stages,
+		Name:                 pipelineName,
+		Applications:         convertApplicationWithBranchesData(c, appNameCheckboxes),
+		ThirdPartyServices:   serviceCheckboxes,
+		Stages:               stages,
+		ApplicationToApprove: c.getApplicationsToPromoteFromRequest(appNameCheckboxes),
 	}
 	errMsg := validateCDPipelineRequestData(cdPipelineCreateCommand)
 	if errMsg != nil {
@@ -286,6 +290,10 @@ func retrieveStagesFromRequest(this *CDPipelineController) []models.StageCreate 
 
 		stages = append(stages, stageRequest)
 	}
+
+	sort.SliceStable(stages, func(i, j int) bool {
+		return stages[i].Order < stages[j].Order
+	})
 
 	log.Printf("Stages are fetched from request: %v", stages)
 	return stages
@@ -387,4 +395,15 @@ func validateQualityGates(valid validation.Validation, qualityGates []models.Qua
 	}
 
 	return isQualityGatesValid, nil
+}
+
+func (c *CDPipelineController) getApplicationsToPromoteFromRequest(appNameCheckboxes []string) []string {
+	var applicationsToPromote []string
+	for _, appName := range appNameCheckboxes {
+		promote, _ := c.GetBool(appName+"-promote", false)
+		if promote {
+			applicationsToPromote = append(applicationsToPromote, appName)
+		}
+	}
+	return applicationsToPromote
 }

@@ -96,13 +96,16 @@ $(function () {
     }
 
     $('.application-checkbox :checkbox').change(function () {
-        let $selectEl = $('.select-' + $(this).attr('id'));
+        let $selectEl = $('.select-' + $(this).attr('id')),
+            $checkboxEl = $('.checkbox-' + $(this).attr('id'));
         if ($(this).is(':checked')) {
             $selectEl.prop('disabled', false);
+            $checkboxEl.prop('disabled', false);
             $('.app-checkbox-error').hide();
             blockIsValid($('.application-block'));
         } else {
             $selectEl.prop('disabled', true);
+            $checkboxEl.prop('disabled', true);
         }
     });
 

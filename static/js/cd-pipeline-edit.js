@@ -1,6 +1,8 @@
 $(function () {
 
     !function () {
+        $('input.promote-checkbox').prop('checked', false);
+
         $.each($('.cd-pipeline-applications input'), function () {
             let $appBodyEl = $('.applications .card-body'),
                 $inputAppEl = $appBodyEl.find('input[value="' + $(this).data('app-name') + '"]');
@@ -17,15 +19,28 @@ $(function () {
             }
 
         });
+
+        $.each($('.applications-to-promote input'), function () {
+            let appToPromote = $(this).data('app-name');
+            $.each($('.applications .card-body').find('input.promote-checkbox'), function () {
+                if ($(this).attr('id') === appToPromote + '-promote') {
+                    $(this).prop('checked', true);
+                    $(this).prop('disabled', false);
+                }
+            });
+        });
     }();
 
     $('.application-checkbox :checkbox').change(function () {
-        let $selectEl = $('.select-' + $(this).attr('id'));
+        let $selectEl = $('.select-' + $(this).attr('id')),
+            $checkboxEl = $('.checkbox-' + $(this).attr('id'));
         if ($(this).is(':checked')) {
             $selectEl.prop('disabled', false);
+            $checkboxEl.prop('disabled', false);
             $('.app-checkbox-error').hide();
         } else {
             $selectEl.prop('disabled', true);
+            $checkboxEl.prop('disabled', true);
         }
     });
 

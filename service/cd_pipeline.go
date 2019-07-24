@@ -136,6 +136,14 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 			cdPipeline.CodebaseStageMatrix = matrix
 		}
 
+		applicationsToPromote, err := s.CodebaseService.GetApplicationsToPromote(cdPipeline.Id)
+		if err != nil {
+			log.Printf("An error has occurred while getting Applications To Promote for CD Pipeline %v: %v", cdPipeline.Id, err)
+			return nil, err
+		}
+
+		cdPipeline.ApplicationsToPromote = applicationsToPromote
+
 		log.Printf("Fetched CD Pipeline from DB: %v", cdPipeline)
 	}
 
@@ -215,6 +223,9 @@ func (s *CDPipelineService) UpdatePipeline(pipeline models.CDPipelineCommand) er
 
 		pipelineCR.Spec.CodebaseBranch = codebaseBranches
 	}
+
+	pipelineCR.Spec.ApplicationsToPromote = pipeline.ApplicationToApprove
+	pipelineCR.Status.LastTimeUpdated = time.Now()
 
 	edpRestClient := s.Clients.EDPRestClient
 
@@ -315,9 +326,10 @@ func convertPipelineData(cdPipeline models.CDPipelineCommand) k8s.CDPipelineSpec
 		codebaseBranches = append(codebaseBranches, fmt.Sprintf("%s-%s", v.ApplicationName, v.BranchName))
 	}
 	return k8s.CDPipelineSpec{
-		Name:               cdPipeline.Name,
-		CodebaseBranch:     codebaseBranches,
-		ThirdPartyServices: cdPipeline.ThirdPartyServices,
+		Name:                  cdPipeline.Name,
+		CodebaseBranch:        codebaseBranches,
+		ThirdPartyServices:    cdPipeline.ThirdPartyServices,
+		ApplicationsToPromote: cdPipeline.ApplicationToApprove,
 	}
 }
 

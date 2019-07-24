@@ -42,6 +42,10 @@
     display: none;
 }
 
+.applications-to-promote {
+    display: none;
+}
+
 .circle {
     border: 1px solid #aaa;
     box-shadow: inset 1px 1px 3px #fff;

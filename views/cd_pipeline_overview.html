@@ -51,12 +51,13 @@
                                                 <th scope="col">Application</th>
                                                 <th scope="col">Branch</th>
                                                 <th scope="col">Jenkins</th>
+                                                <th scope="col">Promote in CD Pipeline</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             {{range .CDPipeline.CodebaseBranch}}
                                                 <tr>
-                                                    <td>
+                                                    <td class="codebaseName">
                                                         {{.Codebase.Name}}
                                                     </td>
                                                     <td>
@@ -66,6 +67,9 @@
                                                     <td>
                                                         <a href="{{.CICDLink}}" target="_blank" class="edp-link"
                                                            rel="noopener noreferrer">Link</a>
+                                                    </td>
+                                                    <td class="promoteCDPipeline">
+                                                        <div class="promote-checkbox-overview"/>
                                                     </td>
                                                 </tr>
                                             {{end}}
@@ -247,6 +251,12 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="applications-to-promote">
+            {{range $app := .CDPipeline.ApplicationsToPromote}}
+                <input type="hidden" data-app-name="{{$app}}">
+            {{end}}
         </div>
     </section>
     {{template "template/footer_template.html" .}}

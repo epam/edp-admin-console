@@ -45,3 +45,13 @@ var CodebaseTypes = map[string]CodebaseType{
 	"autotests":   Autotests,
 	"library":     Library,
 }
+
+type ApplicationsToPromote struct {
+	Id           int `orm:"column(id)"`
+	CdPipelineId int `orm:"column(cd_pipeline_id)"`
+	CodebaseId   int `orm:"column(codebase_id)"`
+}
+
+func (c *ApplicationsToPromote) TableName() string {
+	return "applications_to_promote"
+}

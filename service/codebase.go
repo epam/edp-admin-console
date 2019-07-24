@@ -276,3 +276,26 @@ func (s CodebaseService) checkAppAndBranch(apps []models.ApplicationWithBranch) 
 	}
 	return true
 }
+
+func (s CodebaseService) GetApplicationsToPromote(cdPipelineId int) ([]string, error) {
+	appsToPromote, err := s.ICodebaseRepository.SelectApplicationToPromote(cdPipelineId)
+	if err != nil {
+		return nil, fmt.Errorf("an error has occurred while fetching Ids of applications which shoould be promoted: %v", err)
+	}
+	return s.selectApplicationNames(appsToPromote)
+}
+
+func (s CodebaseService) selectApplicationNames(applicationsToPromote []*query.ApplicationsToPromote) ([]string, error) {
+	var result []string
+	for _, app := range applicationsToPromote {
+		codebase, err := s.ICodebaseRepository.GetCodebaseById(app.CodebaseId)
+		if err != nil {
+			return nil, fmt.Errorf("an error has occurred while fetching Codebase by Id %v: %v", app.CodebaseId, err)
+		}
+		result = append(result, codebase.Name)
+	}
+
+	log.Printf("Fetched Application to promote: %v", result)
+
+	return result, nil
+}

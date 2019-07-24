@@ -24,8 +24,10 @@ import (
 type ICodebaseRepository interface {
 	GetCodebasesByCriteria(criteria query.CodebaseCriteria) ([]*query.Codebase, error)
 	GetCodebaseByName(name string) (*query.Codebase, error)
+	GetCodebaseById(id int) (*query.Codebase, error)
 	ExistActiveCodebaseAndBranch(codebaseName, branchName string) bool
 	ExistCodebaseAndBranch(cbName, brName string) bool
+	SelectApplicationToPromote(cdPipelineId int) ([]*query.ApplicationsToPromote, error)
 }
 
 type CodebaseRepository struct {
@@ -68,6 +70,35 @@ func (CodebaseRepository) GetCodebaseByName(name string) (*query.Codebase, error
 	codebase := query.Codebase{Name: name}
 
 	err := o.Read(&codebase, "Name")
+
+	if err == orm.ErrNoRows {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = loadRelatedActionLog(&codebase)
+
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = o.LoadRelated(&codebase, "CodebaseBranch", false, 100, 0, "Name")
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &codebase, nil
+}
+
+func (CodebaseRepository) GetCodebaseById(id int) (*query.Codebase, error) {
+	o := orm.NewOrm()
+	codebase := query.Codebase{Id: id}
+
+	err := o.Read(&codebase, "Id")
 
 	if err == orm.ErrNoRows {
 		return nil, nil
@@ -135,4 +166,14 @@ func (CodebaseRepository) ExistCodebaseAndBranch(cbName, brName string) bool {
 		Filter("name", cbName).
 		Filter("CodebaseBranch__name", brName).
 		Exist()
+}
+
+func (CodebaseRepository) SelectApplicationToPromote(cdPipelineId int) ([]*query.ApplicationsToPromote, error) {
+	o := orm.NewOrm()
+	var applicationsToPromote []*query.ApplicationsToPromote
+
+	_, err := o.QueryTable(new(query.ApplicationsToPromote)).
+		Filter("cd_pipeline_id", cdPipelineId).All(&applicationsToPromote)
+
+	return applicationsToPromote, err
 }
