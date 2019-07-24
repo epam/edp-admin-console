@@ -270,5 +270,15 @@ func (CDPipelineRepository) GetQualityGates(stageId int64) ([]query.QualityGate,
 		return nil, err
 	}
 
+	err = loadRelatedAutotest(gates)
+	if err != nil {
+		return nil, err
+	}
+
+	err = loadRelatedBranch(gates)
+	if err != nil {
+		return nil, err
+	}
+
 	return gates, nil
 }
