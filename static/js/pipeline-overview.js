@@ -7,9 +7,7 @@ $(function () {
             $.each($('.applications-info .edp-table tbody tr'), function () {
                 let $promoteEl = $(this).find('.promoteCDPipeline');
                 if ($(this).find('.codebaseName').text().trim() === appToPromote) {
-                    $promoteEl.find('.promote-checkbox-overview').addClass('promoted').show();
-                } else {
-                    $promoteEl.find('.promote-checkbox-overview').addClass('cancel').show();
+                    $promoteEl.find('.promote-checkbox-overview').removeClass('cancel').addClass('promoted');
                 }
             });
 
