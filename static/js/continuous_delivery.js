@@ -5,7 +5,9 @@ $(function () {
         let anchor = $(location).attr('hash');
         if (anchor) {
             if (anchor === '#cdPipelineSuccessModal') {
-                showNotification(true);
+                showNotification(true, null, 'Provisioning has been started.', 'Provisioning has been failed.');
+            } else {
+                showNotification(true, null, 'The pipeline has been edited successfully.', 'Editing has been failed.');
             }
             location.hash = '';
         }
@@ -41,10 +43,10 @@ function getCDPipelineStatus(pipelineName) {
     return status;
 }
 
-function showNotification(ok, delay) {
+function showNotification(ok, delay, successMsg, failMsg) {
     $.notify({
             icon: ok ? 'glyphicon glyphicon-ok-circle alert-icon' : 'glyphicon gglyphicon-warning-sign alert-icon',
-            message: ok ? 'Provisioning has been started.' : 'Provisioning has been failed.'
+            message: ok ? successMsg : failMsg
         },
         {
             type: ok ? 'success' : 'error',

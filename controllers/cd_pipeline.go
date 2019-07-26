@@ -196,7 +196,7 @@ func (c *CDPipelineController) UpdateCDPipeline() {
 
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
-	c.Redirect("/admin/edp/cd-pipeline/overview#cdPipelineSuccessModal", 302)
+	c.Redirect("/admin/edp/cd-pipeline/overview#cdPipelineEditSuccessModal", 302)
 }
 
 func (c *CDPipelineController) CreateCDPipeline() {
