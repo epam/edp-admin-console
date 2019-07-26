@@ -24,6 +24,12 @@
                         <a href="{{.CDPipeline.JenkinsLink}}" target="_blank" class="edp-link" rel="noopener noreferrer">
                             {{.CDPipeline.Name}}
                         </a>
+
+                        <a href="/admin/edp/cd-pipeline/{{.CDPipeline.Name}}/update">
+                            <button class="delete">
+                                <i class="icon-pencil"></i>
+                            </button>
+                        </a>
                     </h1>
                 <p>
                     Find below the Pipeline details.
