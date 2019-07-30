@@ -64,5 +64,5 @@ type CDPipelineCommand struct {
 type ApplicationWithInputDockerStream struct {
 	ApplicationName   string `json:"appName" valid:"Required;Match(/^[a-z][a-z0-9-]*[a-z0-9]$/)"`
 	BranchName        string `json:"branchName" valid:"Required;Match(/^[a-z0-9][a-z0-9-._]*[a-z0-9]$/)"`
-	InputDockerStream string `json:"inputDockerStream" valid:"Required"`
+	InputDockerStream string `json:"inputDockerStream"`
 }
