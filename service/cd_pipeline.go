@@ -217,11 +217,14 @@ func (s *CDPipelineService) UpdatePipeline(pipeline models.CDPipelineCommand) er
 		log.Printf("Start updating Autotest for CD Pipeline: %v. New Applications: %v", pipelineCR.Spec.Name, pipeline.Applications)
 
 		var codebaseBranches []string
+		var dockerStreams []string
 		for _, v := range pipeline.Applications {
 			codebaseBranches = append(codebaseBranches, fmt.Sprintf("%s-%s", v.ApplicationName, v.BranchName))
+			dockerStreams = append(dockerStreams, v.InputDockerStream)
 		}
 
 		pipelineCR.Spec.CodebaseBranch = codebaseBranches
+		pipelineCR.Spec.InputDockerStreams = dockerStreams
 	}
 
 	pipelineCR.Spec.ApplicationsToPromote = pipeline.ApplicationToApprove
@@ -322,12 +325,15 @@ func fillCodebaseStageMatrix(ocClient *appsV1Client.AppsV1Client, cdPipeline *qu
 
 func convertPipelineData(cdPipeline models.CDPipelineCommand) k8s.CDPipelineSpec {
 	var codebaseBranches []string
-	for _, v := range cdPipeline.Applications {
-		codebaseBranches = append(codebaseBranches, fmt.Sprintf("%s-%s", v.ApplicationName, v.BranchName))
+	var dockerStreams []string
+	for _, app := range cdPipeline.Applications {
+		codebaseBranches = append(codebaseBranches, fmt.Sprintf("%s-%s", app.ApplicationName, app.BranchName))
+		dockerStreams = append(dockerStreams, app.InputDockerStream)
 	}
 	return k8s.CDPipelineSpec{
 		Name:                  cdPipeline.Name,
 		CodebaseBranch:        codebaseBranches,
+		InputDockerStreams:    dockerStreams,
 		ThirdPartyServices:    cdPipeline.ThirdPartyServices,
 		ApplicationsToPromote: cdPipeline.ApplicationToApprove,
 	}

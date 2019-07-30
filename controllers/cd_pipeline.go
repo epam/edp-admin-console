@@ -154,8 +154,13 @@ func (c *CDPipelineController) UpdateCDPipeline() {
 
 	pipelineUpdateCommand := models.CDPipelineCommand{
 		Name:                 pipelineName,
-		Applications:         convertApplicationWithBranchesData(c, appNameCheckboxes),
+		Applications:         c.convertApplicationWithBranchesData(appNameCheckboxes),
 		ApplicationToApprove: c.getApplicationsToPromoteFromRequest(appNameCheckboxes),
+	}
+
+	for i := range pipelineUpdateCommand.Applications {
+		pipelineUpdateCommand.Applications[i].InputDockerStream =
+			fmt.Sprintf("%s-%s", pipelineUpdateCommand.Applications[i].ApplicationName, pipelineUpdateCommand.Applications[i].BranchName)
 	}
 
 	errMsg := validateCDPipelineUpdateRequestData(pipelineUpdateCommand)
@@ -203,11 +208,17 @@ func (c *CDPipelineController) CreateCDPipeline() {
 
 	cdPipelineCreateCommand := models.CDPipelineCommand{
 		Name:                 pipelineName,
-		Applications:         convertApplicationWithBranchesData(c, appNameCheckboxes),
+		Applications:         c.convertApplicationWithBranchesData(appNameCheckboxes),
 		ThirdPartyServices:   serviceCheckboxes,
 		Stages:               stages,
 		ApplicationToApprove: c.getApplicationsToPromoteFromRequest(appNameCheckboxes),
 	}
+
+	for i := range cdPipelineCreateCommand.Applications {
+		cdPipelineCreateCommand.Applications[i].InputDockerStream =
+			fmt.Sprintf("%s-%s", cdPipelineCreateCommand.Applications[i].ApplicationName, cdPipelineCreateCommand.Applications[i].BranchName)
+	}
+
 	errMsg := validateCDPipelineRequestData(cdPipelineCreateCommand)
 	if errMsg != nil {
 		log.Printf("Request data is not valid: %s", errMsg.Message)
@@ -299,13 +310,15 @@ func retrieveStagesFromRequest(this *CDPipelineController) []models.StageCreate 
 	return stages
 }
 
-func convertApplicationWithBranchesData(this *CDPipelineController, appNameCheckboxes []string) []models.ApplicationWithBranch {
-	var applicationWithBranches []models.ApplicationWithBranch
+func (c *CDPipelineController) convertApplicationWithBranchesData(appNameCheckboxes []string) []models.ApplicationWithInputDockerStream {
+	var applicationWithBranches []models.ApplicationWithInputDockerStream
 	for _, appName := range appNameCheckboxes {
-		applicationWithBranches = append(applicationWithBranches, models.ApplicationWithBranch{
+		app := models.ApplicationWithInputDockerStream{
 			ApplicationName: appName,
-			BranchName:      this.GetString(appName),
-		})
+			BranchName:      c.GetString(appName),
+		}
+
+		applicationWithBranches = append(applicationWithBranches, app)
 	}
 	return applicationWithBranches
 }

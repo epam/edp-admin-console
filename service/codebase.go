@@ -266,7 +266,7 @@ func convertData(codebase command.CreateCodebase) k8s.CodebaseSpec {
 	return spec
 }
 
-func (s CodebaseService) checkAppAndBranch(apps []models.ApplicationWithBranch) bool {
+func (s CodebaseService) checkAppAndBranch(apps []models.ApplicationWithInputDockerStream) bool {
 	for _, app := range apps {
 		exist := s.ICodebaseRepository.ExistActiveCodebaseAndBranch(app.ApplicationName, app.BranchName)
 
