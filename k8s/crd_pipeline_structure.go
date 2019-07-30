@@ -25,6 +25,7 @@ import (
 type CDPipelineSpec struct {
 	Name                  string   `json:"name"`
 	CodebaseBranch        []string `json:"codebase_branch"`
+	InputDockerStreams    []string `json:"input_docker_streams"`
 	ThirdPartyServices    []string `json:"services"`
 	ApplicationsToPromote []string `json:"applicationsToPromote"`
 }
