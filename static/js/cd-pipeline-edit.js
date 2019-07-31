@@ -10,11 +10,11 @@ $(function () {
             if ($inputAppEl.length !== 0) {
                 $inputAppEl.prop('checked', true);
 
-                let $selectBranchEl = $appBodyEl.find('select[name="' + $(this).data('app-name') + '"]');
+                let $selectDockerStreamEl = $appBodyEl.find('select[name="' + $(this).data('app-name') + '"]');
 
-                if ($selectBranchEl) {
-                    $selectBranchEl.val($(this).data('branch-name'))
-                    $selectBranchEl.prop('disabled', false);
+                if ($selectDockerStreamEl) {
+                    $selectDockerStreamEl.val($(this).data('docker-stream-name'));
+                    $selectDockerStreamEl.prop('disabled', false);
                 }
             }
 

@@ -51,7 +51,11 @@ const OpenshiftProjectLink = "%s/console/project/"
 func (s *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCommand) (*k8s.CDPipeline, error) {
 	log.Printf("Start creating CD Pipeline: %v", cdPipeline)
 
-	exist := s.CodebaseService.checkAppAndBranch(cdPipeline.Applications)
+	exist, err := s.CodebaseService.checkBranch(cdPipeline.Applications)
+	if err != nil {
+		return nil, err
+	}
+
 	if !exist {
 		return nil, models.NewNonValidRelatedBranchError()
 	}
@@ -144,7 +148,7 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 
 		cdPipeline.ApplicationsToPromote = applicationsToPromote
 
-		log.Printf("Fetched CD Pipeline from DB: %v", cdPipeline)
+		log.Printf("Fetched CD Pipeline from DB: %+v", cdPipeline)
 	}
 
 	return cdPipeline, nil
@@ -187,7 +191,11 @@ func (s *CDPipelineService) UpdatePipeline(pipeline models.CDPipelineCommand) er
 	log.Printf("Start updating CD Pipeline: %v", pipeline.Name)
 
 	if pipeline.Applications != nil {
-		exist := s.CodebaseService.checkAppAndBranch(pipeline.Applications)
+		exist, err := s.CodebaseService.checkBranch(pipeline.Applications)
+		if err != nil {
+			return err
+		}
+
 		if !exist {
 			return models.NewNonValidRelatedBranchError()
 		}
@@ -216,14 +224,11 @@ func (s *CDPipelineService) UpdatePipeline(pipeline models.CDPipelineCommand) er
 	if pipeline.Applications != nil {
 		log.Printf("Start updating Autotest for CD Pipeline: %v. New Applications: %v", pipelineCR.Spec.Name, pipeline.Applications)
 
-		var codebaseBranches []string
 		var dockerStreams []string
 		for _, v := range pipeline.Applications {
-			codebaseBranches = append(codebaseBranches, fmt.Sprintf("%s-%s", v.ApplicationName, v.BranchName))
 			dockerStreams = append(dockerStreams, v.InputDockerStream)
 		}
 
-		pipelineCR.Spec.CodebaseBranch = codebaseBranches
 		pipelineCR.Spec.InputDockerStreams = dockerStreams
 	}
 
@@ -324,15 +329,15 @@ func fillCodebaseStageMatrix(ocClient *appsV1Client.AppsV1Client, cdPipeline *qu
 }
 
 func convertPipelineData(cdPipeline models.CDPipelineCommand) k8s.CDPipelineSpec {
-	var codebaseBranches []string
+	//var codebaseBranches []string
 	var dockerStreams []string
 	for _, app := range cdPipeline.Applications {
-		codebaseBranches = append(codebaseBranches, fmt.Sprintf("%s-%s", app.ApplicationName, app.BranchName))
+		//codebaseBranches = append(codebaseBranches, fmt.Sprintf("%s-%s", app.ApplicationName, app.BranchName))
 		dockerStreams = append(dockerStreams, app.InputDockerStream)
 	}
 	return k8s.CDPipelineSpec{
 		Name:                  cdPipeline.Name,
-		CodebaseBranch:        codebaseBranches,
+		CodebaseBranch:        nil,
 		InputDockerStreams:    dockerStreams,
 		ThirdPartyServices:    cdPipeline.ThirdPartyServices,
 		ApplicationsToPromote: cdPipeline.ApplicationToApprove,

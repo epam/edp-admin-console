@@ -62,7 +62,9 @@
                                                 class="release-branch selectpicker select-{{.Name}} form-control"
                                                 name="{{.Name}}" disabled>
                                             {{range $i, $rb := .CodebaseBranch}}
-                                            <option value="{{.Name}}">{{.Name}}</option>
+                                                {{range $rb.CodebaseDockerStream}}
+                                                    <option value="{{.OcImageStreamName}}">{{.OcImageStreamName}}</option>
+                                                {{end}}
                                             {{end}}
                                         </select>
                                     </div>
@@ -84,7 +86,8 @@
 
                                 <div class="cd-pipeline-applications">
                                     {{range .CDPipeline.CodebaseBranch}}
-                                        <input type="hidden" data-app-name="{{.AppName}}" data-branch-name="{{.Name}}">
+                                        {{$dockerStream := index .CodebaseDockerStream 0}}
+                                        <input type="hidden" data-app-name="{{.AppName}}" data-docker-stream-name="{{$dockerStream.OcImageStreamName}}">
                                     {{end}}
                                 </div>
 

@@ -266,15 +266,19 @@ func convertData(codebase command.CreateCodebase) k8s.CodebaseSpec {
 	return spec
 }
 
-func (s CodebaseService) checkAppAndBranch(apps []models.ApplicationWithInputDockerStream) bool {
+func (s CodebaseService) checkBranch(apps []models.CDPipelineApplicationCommand) (bool, error) {
 	for _, app := range apps {
-		exist := s.ICodebaseRepository.ExistActiveCodebaseAndBranch(app.ApplicationName, app.BranchName)
+		exist, err := s.ICodebaseRepository.ExistActiveBranch(app.InputDockerStream)
+		if err != nil {
+			log.Printf("An error has occurred while checking status of branch %v", err)
+			return false, err
+		}
 
 		if !exist {
-			return false
+			return false, nil
 		}
 	}
-	return true
+	return true, nil
 }
 
 func (s CodebaseService) GetApplicationsToPromote(cdPipelineId int) ([]string, error) {

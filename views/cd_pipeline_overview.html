@@ -55,7 +55,7 @@
                                             <thead>
                                             <tr>
                                                 <th scope="col">Application</th>
-                                                <th scope="col">Branch</th>
+                                                <th scope="col">Docker Stream</th>
                                                 <th scope="col">Jenkins</th>
                                                 <th scope="col">Promote in CD Pipeline</th>
                                             </tr>
@@ -67,8 +67,9 @@
                                                         {{.Codebase.Name}}
                                                     </td>
                                                     <td>
+                                                        {{$dockerStream := index .CodebaseDockerStream 0}}
                                                         <a href="{{.VCSLink}}" target="_blank" class="edp-link"
-                                                           rel="noopener noreferrer">{{.Name}}</a>
+                                                           rel="noopener noreferrer">{{$dockerStream.OcImageStreamName}}</a>
                                                     </td>
                                                     <td>
                                                         <a href="{{.CICDLink}}" target="_blank" class="edp-link"

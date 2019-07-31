@@ -96,11 +96,13 @@
                                     </div>
 
                                     <div class="form-group col-sm-4">
-                                        <select title="Release Branches"
+                                        <select title="Input Docker Streams"
                                                 class="release-branch selectpicker select-{{.Name}} form-control"
                                                 name="{{.Name}}" disabled>
                                             {{range $i, $rb := .CodebaseBranch}}
-                                            <option value="{{.Name}}">{{.Name}}</option>
+                                                {{range $rb.CodebaseDockerStream}}
+                                                    <option value="{{.OcImageStreamName}}">{{.OcImageStreamName}}</option>
+                                                {{end}}
                                             {{end}}
                                         </select>
                                     </div>

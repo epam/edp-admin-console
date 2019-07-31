@@ -39,17 +39,18 @@ const (
 		"	cs.trigger_type, " +
 		"	c.name app_name, " +
 		"	cb.name branch_name, " +
-		"	in_cds.oc_image_stream_name input_image_stream, " +
+		"	in_cds.oc_image_stream_name  input_image_stream, " +
 		"	out_cds.oc_image_stream_name output_image_stream, " +
 		"	cs.\"order\", " +
-		"   cs.id " +
+		"	cs.id " +
 		"from cd_stage cs " +
 		"	left join stage_codebase_docker_stream scds on cs.id = scds.cd_stage_id " +
 		"	left join codebase_docker_stream in_cds on scds.input_codebase_docker_stream_id = in_cds.id " +
 		"	left join codebase_docker_stream out_cds on scds.output_codebase_docker_stream_id = out_cds.id " +
 		"	left join codebase c on in_cds.codebase_id = c.id " +
-		"	left join cd_pipeline_codebase_branch cpcb on cs.cd_pipeline_id = cpcb.cd_pipeline_id " +
-		"	left join codebase_branch cb on cb.id = cpcb.codebase_branch_id " +
+		"	left join cd_pipeline_docker_stream cpds on cs.cd_pipeline_id = cpds.cd_pipeline_id " +
+		"	left join codebase_docker_stream cds on cpds.codebase_docker_stream_id = cds.id " +
+		"	left join codebase_branch cb on cb.id = cds.codebase_branch_id " +
 		"	left join cd_pipeline cp on cs.cd_pipeline_id = cp.id " +
 		"where cp.name = ? " +
 		"  and cs.name = ? " +
@@ -60,6 +61,11 @@ const (
 		"where c.type = 'autotests' " +
 		"  and c.id = ? " +
 		"and cb.id = ? ;"
+	SelectDockerStreamName = "select cds.id, cds.oc_image_stream_name " +
+		"	from cd_pipeline cp " +
+		"left join cd_pipeline_docker_stream cpds on cp.id = cpds.cd_pipeline_id " +
+		"left join codebase_docker_stream cds on cpds.codebase_docker_stream_id = cds.id " +
+		"where cp.name = ? and cds.codebase_branch_id = ? ;"
 )
 
 type CDPipelineRepository struct {
@@ -80,16 +86,25 @@ func (this CDPipelineRepository) GetCDPipelineByName(pipelineName string) (*quer
 		return nil, err
 	}
 
-	_, err = o.LoadRelated(&cdPipeline, "CodebaseBranch", false, 100, 0, "Name")
+	_, err = o.LoadRelated(&cdPipeline, "CodebaseDockerStream", false, 100, 0, "Id")
 	if err != nil {
 		return nil, err
 	}
 
-	for _, c := range cdPipeline.CodebaseBranch {
-		_, err = o.LoadRelated(c, "Codebase", false, 100, 0, "Name")
-		if err != nil {
-			return nil, err
-		}
+	branches, err := loadRelatedCodebaseDockerStreams(cdPipeline.CodebaseDockerStream)
+	if err != nil {
+		return nil, err
+	}
+	cdPipeline.CodebaseBranch = branches
+
+	err = loadRelatedCodebases(cdPipeline.CodebaseBranch)
+	if err != nil {
+		return nil, err
+	}
+
+	err = loadRelatedDockerStreams(pipelineName, cdPipeline.CodebaseBranch)
+	if err != nil {
+		return nil, err
 	}
 
 	_, err = o.LoadRelated(&cdPipeline, "Stage", false, 100, 0, "Name")
@@ -120,6 +135,49 @@ func (this CDPipelineRepository) GetCDPipelineByName(pipelineName string) (*quer
 	}
 
 	return &cdPipeline, nil
+}
+
+func loadRelatedCodebaseDockerStreams(dockerStreams []*query.CodebaseDockerStream) ([]*query.CodebaseBranch, error) {
+	var branches []*query.CodebaseBranch
+	o := orm.NewOrm()
+
+	for _, dockerStream := range dockerStreams {
+		_, err := o.LoadRelated(dockerStream, "CodebaseBranch", false, 100, 0, "Id")
+		if err != nil {
+			return nil, err
+		}
+		branches = append(branches, dockerStream.CodebaseBranch)
+	}
+
+	return branches, nil
+}
+
+func loadRelatedCodebases(branches []*query.CodebaseBranch) error {
+	o := orm.NewOrm()
+
+	for _, branch := range branches {
+		_, err := o.LoadRelated(branch, "Codebase", false, 100, 0, "Name")
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func loadRelatedDockerStreams(pipelineName string, branches []*query.CodebaseBranch) error {
+	o := orm.NewOrm()
+	for _, branch := range branches {
+		var dockerStream query.CodebaseDockerStream
+		err := o.Raw(SelectDockerStreamName, pipelineName, branch.Id).QueryRow(&dockerStream)
+		if err != nil {
+			return err
+		}
+
+		branch.CodebaseDockerStream = []*query.CodebaseDockerStream{&dockerStream}
+	}
+
+	return nil
 }
 
 func loadRelatedQualityGates(stages []*query.Stage) error {

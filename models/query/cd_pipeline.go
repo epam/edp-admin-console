@@ -10,6 +10,7 @@ type CDPipeline struct {
 	ThirdPartyService     []*ThirdPartyService                                    `json:"services" orm:"rel(m2m);rel_table(cd_pipeline_third_party_service)"`
 	CodebaseStageMatrix   map[CDCodebaseStageMatrixKey]CDCodebaseStageMatrixValue `json:"-" orm:"-"`
 	ApplicationsToPromote []string                                                `json:"applicationsToPromote" orm:"-"`
+	CodebaseDockerStream  []*CodebaseDockerStream                                 `json:"-" orm:"rel(m2m);rel_table(cd_pipeline_docker_stream)"`
 }
 
 type CDCodebaseStageMatrixKey struct {

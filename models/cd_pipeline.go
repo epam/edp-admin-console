@@ -54,15 +54,14 @@ type Autotest struct {
 }
 
 type CDPipelineCommand struct {
-	Name                 string                             `json:"name" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
-	Applications         []ApplicationWithInputDockerStream `json:"applications" valid:"Required"`
-	ThirdPartyServices   []string                           `json:"services"`
-	Stages               []StageCreate                      `json:"stages"`
-	ApplicationToApprove []string                           `json:"-"`
+	Name                 string                         `json:"name" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
+	Applications         []CDPipelineApplicationCommand `json:"applications" valid:"Required"`
+	ThirdPartyServices   []string                       `json:"services"`
+	Stages               []StageCreate                  `json:"stages"`
+	ApplicationToApprove []string                       `json:"-"`
 }
 
-type ApplicationWithInputDockerStream struct {
+type CDPipelineApplicationCommand struct {
 	ApplicationName   string `json:"appName" valid:"Required;Match(/^[a-z][a-z0-9-]*[a-z0-9]$/)"`
-	BranchName        string `json:"branchName" valid:"Required;Match(/^[a-z0-9][a-z0-9-._]*[a-z0-9]$/)"`
 	InputDockerStream string `json:"inputDockerStream"`
 }

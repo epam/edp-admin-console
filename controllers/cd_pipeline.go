@@ -158,11 +158,6 @@ func (c *CDPipelineController) UpdateCDPipeline() {
 		ApplicationToApprove: c.getApplicationsToPromoteFromRequest(appNameCheckboxes),
 	}
 
-	for i := range pipelineUpdateCommand.Applications {
-		pipelineUpdateCommand.Applications[i].InputDockerStream =
-			fmt.Sprintf("%s-%s", pipelineUpdateCommand.Applications[i].ApplicationName, pipelineUpdateCommand.Applications[i].BranchName)
-	}
-
 	errMsg := validateCDPipelineUpdateRequestData(pipelineUpdateCommand)
 	if errMsg != nil {
 		log.Printf("Request data is not valid: %s", errMsg.Message)
@@ -212,11 +207,6 @@ func (c *CDPipelineController) CreateCDPipeline() {
 		ThirdPartyServices:   serviceCheckboxes,
 		Stages:               stages,
 		ApplicationToApprove: c.getApplicationsToPromoteFromRequest(appNameCheckboxes),
-	}
-
-	for i := range cdPipelineCreateCommand.Applications {
-		cdPipelineCreateCommand.Applications[i].InputDockerStream =
-			fmt.Sprintf("%s-%s", cdPipelineCreateCommand.Applications[i].ApplicationName, cdPipelineCreateCommand.Applications[i].BranchName)
 	}
 
 	errMsg := validateCDPipelineRequestData(cdPipelineCreateCommand)
@@ -310,15 +300,13 @@ func retrieveStagesFromRequest(this *CDPipelineController) []models.StageCreate 
 	return stages
 }
 
-func (c *CDPipelineController) convertApplicationWithBranchesData(appNameCheckboxes []string) []models.ApplicationWithInputDockerStream {
-	var applicationWithBranches []models.ApplicationWithInputDockerStream
+func (c *CDPipelineController) convertApplicationWithBranchesData(appNameCheckboxes []string) []models.CDPipelineApplicationCommand {
+	var applicationWithBranches []models.CDPipelineApplicationCommand
 	for _, appName := range appNameCheckboxes {
-		app := models.ApplicationWithInputDockerStream{
-			ApplicationName: appName,
-			BranchName:      c.GetString(appName),
-		}
-
-		applicationWithBranches = append(applicationWithBranches, app)
+		applicationWithBranches = append(applicationWithBranches, models.CDPipelineApplicationCommand{
+			ApplicationName:   appName,
+			InputDockerStream: c.GetString(appName),
+		})
 	}
 	return applicationWithBranches
 }

@@ -25,7 +25,7 @@ type ICodebaseRepository interface {
 	GetCodebasesByCriteria(criteria query.CodebaseCriteria) ([]*query.Codebase, error)
 	GetCodebaseByName(name string) (*query.Codebase, error)
 	GetCodebaseById(id int) (*query.Codebase, error)
-	ExistActiveCodebaseAndBranch(codebaseName, branchName string) bool
+	ExistActiveBranch(dockerStreamName string) (bool, error)
 	ExistCodebaseAndBranch(cbName, brName string) bool
 	SelectApplicationToPromote(cdPipelineId int) ([]*query.ApplicationsToPromote, error)
 }
@@ -59,6 +59,18 @@ func (CodebaseRepository) GetCodebasesByCriteria(criteria query.CodebaseCriteria
 		err = loadRelatedCodebaseBranch(c, criteria.BranchStatus)
 		if err != nil {
 			return nil, err
+		}
+
+		err = loadRelatedCodebaseDockerStream(c.CodebaseBranch)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, branch := range c.CodebaseBranch {
+			err := loadRelatedBranches(branch)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 	}
@@ -152,13 +164,49 @@ func loadRelatedCodebaseBranch(codebase *query.Codebase, status query.Status) er
 	return err
 }
 
-func (CodebaseRepository) ExistActiveCodebaseAndBranch(cbName, brName string) bool {
-	return orm.NewOrm().QueryTable(new(query.Codebase)).
-		Filter("name", cbName).
-		Filter("status", "active").
-		Filter("CodebaseBranch__name", brName).
-		Filter("CodebaseBranch__status", "active").
-		Exist()
+func loadRelatedCodebaseDockerStream(branches []*query.CodebaseBranch) error {
+	o := orm.NewOrm()
+
+	for _, branch := range branches {
+		qs := o.QueryTable(new(query.CodebaseDockerStream))
+
+		_, err := qs.Filter("codebase_branch_id", branch.Id).
+			All(&branch.CodebaseDockerStream, "Id", "OcImageStreamName")
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func loadRelatedBranches(branch *query.CodebaseBranch) error {
+	o := orm.NewOrm()
+
+	for _, dockerStream := range branch.CodebaseDockerStream {
+		_, err := o.LoadRelated(dockerStream, "CodebaseBranch", false, 100, 0, "Name")
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (CodebaseRepository) ExistActiveBranch(dockerStreamName string) (bool, error) {
+	o := orm.NewOrm()
+
+	var dockerStream query.CodebaseDockerStream
+
+	err := o.QueryTable(new(query.CodebaseDockerStream)).Filter("ocImageStreamName", dockerStreamName).One(&dockerStream)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = o.LoadRelated(&dockerStream, "CodebaseBranch", false, 100, 0, "Name")
+	if err != nil {
+		return false, err
+	}
+
+	return dockerStream.CodebaseBranch.Status == "active", nil
 }
 
 func (CodebaseRepository) ExistCodebaseAndBranch(cbName, brName string) bool {
