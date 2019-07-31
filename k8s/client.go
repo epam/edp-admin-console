@@ -30,7 +30,7 @@ import (
 )
 
 var k8sConfig clientcmd.ClientConfig
-var SchemeGroupVersion = schema.GroupVersion{Group: "edp.epam.com", Version: "v1alpha1"}
+var SchemeGroupVersion = schema.GroupVersion{Group: "v2.edp.epam.com", Version: "v1alpha1"}
 
 type ClientSet struct {
 	CoreClient    *coreV1Client.CoreV1Client

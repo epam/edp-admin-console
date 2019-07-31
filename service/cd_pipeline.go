@@ -79,7 +79,7 @@ func (s *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCommand) 
 
 	crd := &k8s.CDPipeline{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: "edp.epam.com/v1alpha1",
+			APIVersion: "v2.edp.epam.com/v1alpha1",
 			Kind:       "CDPipeline",
 		},
 		ObjectMeta: metav1.ObjectMeta{
@@ -386,7 +386,7 @@ func createLinksForBranchEntities(branchEntities []*query.CodebaseBranch) {
 func createCrd(cdPipelineName string, stage models.StageCreate) k8s.Stage {
 	return k8s.Stage{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: "edp.epam.com/v1alpha1",
+			APIVersion: "v2.edp.epam.com/v1alpha1",
 			Kind:       "Stage",
 		},
 		ObjectMeta: metav1.ObjectMeta{

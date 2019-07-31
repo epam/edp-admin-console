@@ -74,7 +74,7 @@ func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*k8s.C
 
 	crd := &k8s.Codebase{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: "edp.epam.com/v1alpha1",
+			APIVersion: "v2.edp.epam.com/v1alpha1",
 			Kind:       CodebaseKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{

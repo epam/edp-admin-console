@@ -56,7 +56,7 @@ func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCo
 	spec := convertBranchInfoData(branchInfo, appName)
 	branch := &k8s.CodebaseBranch{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: "edp.epam.com/v1alpha1",
+			APIVersion: "v2.edp.epam.com/v1alpha1",
 			Kind:       "CodebaseBranch",
 		},
 		ObjectMeta: metav1.ObjectMeta{
