@@ -47,7 +47,7 @@
                             <div class="card-body">
                                 {{range .Apps}}
                                 <div class="row">
-                                    <div class="form-group col-sm-4">
+                                    <div class="form-group col-sm-4 app-block">
                                         <div class="custom-control custom-checkbox application-checkbox">
                                             <input type="checkbox" class="custom-control-input app-checkbox"
                                                    id="{{.Name}}"
@@ -69,7 +69,7 @@
                                         </select>
                                     </div>
 
-                                    <div class="form-group col-sm-4">
+                                    <div class="form-group col-sm-4 promote-block">
                                         <div class="custom-control custom-checkbox application-checkbox">
                                             <input type="checkbox" class="custom-control-input app-checkbox promote-checkbox checkbox-{{.Name}}"
                                                    id="{{.Name}}-promote"

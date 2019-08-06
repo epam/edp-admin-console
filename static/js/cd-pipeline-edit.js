@@ -29,6 +29,12 @@ $(function () {
                 }
             });
         });
+
+        $.each($('#collapseTwo .card-body .row'), function () {
+            if ($(this).find('.app-block input').is(':checked')) {
+                $(this).find('.promote-block input').prop('disabled', false);
+            }
+        });
     }();
 
     $('.application-checkbox :checkbox').change(function () {
