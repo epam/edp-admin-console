@@ -329,15 +329,12 @@ func fillCodebaseStageMatrix(ocClient *appsV1Client.AppsV1Client, cdPipeline *qu
 }
 
 func convertPipelineData(cdPipeline models.CDPipelineCommand) k8s.CDPipelineSpec {
-	//var codebaseBranches []string
 	var dockerStreams []string
 	for _, app := range cdPipeline.Applications {
-		//codebaseBranches = append(codebaseBranches, fmt.Sprintf("%s-%s", app.ApplicationName, app.BranchName))
 		dockerStreams = append(dockerStreams, app.InputDockerStream)
 	}
 	return k8s.CDPipelineSpec{
 		Name:                  cdPipeline.Name,
-		CodebaseBranch:        nil,
 		InputDockerStreams:    dockerStreams,
 		ThirdPartyServices:    cdPipeline.ThirdPartyServices,
 		ApplicationsToPromote: cdPipeline.ApplicationToApprove,

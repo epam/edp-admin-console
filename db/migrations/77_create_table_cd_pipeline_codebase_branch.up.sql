@@ -1,0 +1,1 @@
+drop table if exists cd_pipeline_codebase_branch;

@@ -77,11 +77,6 @@ func (in *CDPipelineList) DeepCopyObject() runtime.Object {
 
 func (in *CDPipelineSpec) DeepCopyInto(out *CDPipelineSpec) {
 	*out = *in
-	if in.CodebaseBranch != nil {
-		in, out := &in.CodebaseBranch, &out.CodebaseBranch
-		*out = make([]string, len(*in))
-		copy(*out, *in)
-	}
 	if in.InputDockerStreams != nil {
 		in, out := &in.InputDockerStreams, &out.InputDockerStreams
 		*out = make([]string, len(*in))
