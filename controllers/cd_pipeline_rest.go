@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"edp-admin-console/models"
+	"edp-admin-console/models/command"
 	"edp-admin-console/service"
 	"encoding/json"
 	"fmt"
@@ -70,7 +71,7 @@ func (c *CDPipelineRestController) GetStage() {
 }
 
 func (c *CDPipelineRestController) CreateCDPipeline() {
-	var cdPipelineCreateCommand models.CDPipelineCommand
+	var cdPipelineCreateCommand command.CDPipelineCommand
 	err := json.NewDecoder(c.Ctx.Request.Body).Decode(&cdPipelineCreateCommand)
 	if err != nil {
 		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
@@ -106,7 +107,7 @@ func (c *CDPipelineRestController) CreateCDPipeline() {
 }
 
 func (c *CDPipelineRestController) UpdateCDPipeline() {
-	var pipelineUpdateCommand models.CDPipelineCommand
+	var pipelineUpdateCommand command.CDPipelineCommand
 	err := json.NewDecoder(c.Ctx.Request.Body).Decode(&pipelineUpdateCommand)
 	if err != nil {
 		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
@@ -144,7 +145,7 @@ func (c *CDPipelineRestController) UpdateCDPipeline() {
 	c.Ctx.ResponseWriter.WriteHeader(http.StatusNoContent)
 }
 
-func validateCDPipelineRequestData(cdPipeline models.CDPipelineCommand) *ErrMsg {
+func validateCDPipelineRequestData(cdPipeline command.CDPipelineCommand) *ErrMsg {
 	var isCDPipelineValid, isApplicationsValid, isStagesValid, isQualityGatesValid bool
 	errMsg := &ErrMsg{"An internal error has occurred on server while validating CD Pipeline's request body.", http.StatusInternalServerError}
 	valid := validation.Validation{}

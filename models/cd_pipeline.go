@@ -33,14 +33,6 @@ type CDPipelineView struct {
 	JenkinsLink string `json:"jenkinsLink"`
 }
 
-type StageCreate struct {
-	Name         string        `json:"name" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
-	Description  string        `json:"description" valid:"Required"`
-	TriggerType  string        `json:"triggerType" valid:"Required"`
-	Order        int           `json:"order" valid:"Match(/^[0-9]$/)"`
-	QualityGates []QualityGate `json:"qualityGates" valid:"Required"`
-}
-
 type QualityGate struct {
 	QualityGateType string  `json:"qualityGateType" valid:"Required"`
 	StepName        string  `json:"stepName" valid:"Required;Match(/^[A-z0-9-._]/)"`
@@ -51,14 +43,6 @@ type QualityGate struct {
 type Autotest struct {
 	Name       string `json:"autotestName"`
 	BranchName string `json:"branchName"`
-}
-
-type CDPipelineCommand struct {
-	Name                 string                         `json:"name" valid:"Required;Match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])$/)"`
-	Applications         []CDPipelineApplicationCommand `json:"applications" valid:"Required"`
-	ThirdPartyServices   []string                       `json:"services"`
-	Stages               []StageCreate                  `json:"stages"`
-	ApplicationToApprove []string                       `json:"-"`
 }
 
 type CDPipelineApplicationCommand struct {

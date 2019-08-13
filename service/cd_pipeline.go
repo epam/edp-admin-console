@@ -20,6 +20,7 @@ import (
 	"edp-admin-console/context"
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
+	"edp-admin-console/models/command"
 	"edp-admin-console/models/query"
 	"edp-admin-console/repository"
 	"fmt"
@@ -48,7 +49,7 @@ type ErrMsg struct {
 
 const OpenshiftProjectLink = "%s/console/project/"
 
-func (s *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCommand) (*k8s.CDPipeline, error) {
+func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand) (*k8s.CDPipeline, error) {
 	log.Printf("Start creating CD Pipeline: %v", cdPipeline)
 
 	exist, err := s.CodebaseService.checkBranch(cdPipeline.Applications)
@@ -92,8 +93,13 @@ func (s *CDPipelineService) CreatePipeline(cdPipeline models.CDPipelineCommand) 
 		},
 		Spec: convertPipelineData(cdPipeline),
 		Status: k8s.CDPipelineStatus{
+			Available:       false,
 			LastTimeUpdated: time.Now(),
 			Status:          "initialized",
+			Username:        cdPipeline.Username,
+			Action:          "cd_pipeline_registration",
+			Result:          "success",
+			Value:           "inactive",
 		},
 	}
 
@@ -154,7 +160,7 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 	return cdPipeline, nil
 }
 
-func (s *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPipeline models.CDPipelineCommand) ([]k8s.Stage, error) {
+func (s *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPipeline command.CDPipelineCommand) ([]k8s.Stage, error) {
 	log.Printf("Start creating CR stages: %+v\n", cdPipeline.Stages)
 
 	err := checkStagesInK8s(edpRestClient, cdPipeline.Name, cdPipeline.Stages)
@@ -163,7 +169,7 @@ func (s *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPipel
 		return nil, err
 	}
 
-	stagesCr, err := saveStagesIntoK8s(edpRestClient, cdPipeline.Name, cdPipeline.Stages)
+	stagesCr, err := saveStagesIntoK8s(edpRestClient, cdPipeline.Name, cdPipeline.Stages, cdPipeline.Username)
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +193,7 @@ func (s *CDPipelineService) GetAllPipelines(criteria query.CDPipelineCriteria) (
 	return cdPipelines, nil
 }
 
-func (s *CDPipelineService) UpdatePipeline(pipeline models.CDPipelineCommand) error {
+func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) error {
 	log.Printf("Start updating CD Pipeline: %v", pipeline.Name)
 
 	if pipeline.Applications != nil {
@@ -328,7 +334,7 @@ func fillCodebaseStageMatrix(ocClient *appsV1Client.AppsV1Client, cdPipeline *qu
 	return matrix, nil
 }
 
-func convertPipelineData(cdPipeline models.CDPipelineCommand) k8s.CDPipelineSpec {
+func convertPipelineData(cdPipeline command.CDPipelineCommand) k8s.CDPipelineSpec {
 	var dockerStreams []string
 	for _, app := range cdPipeline.Applications {
 		dockerStreams = append(dockerStreams, app.InputDockerStream)
@@ -385,7 +391,7 @@ func createLinksForBranchEntities(branchEntities []*query.CodebaseBranch) {
 	}
 }
 
-func createCrd(cdPipelineName string, stage models.StageCreate) k8s.Stage {
+func createCrd(cdPipelineName string, stage command.CDStageCommand) k8s.Stage {
 	return k8s.Stage{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v2.edp.epam.com/v1alpha1",
@@ -404,15 +410,21 @@ func createCrd(cdPipelineName string, stage models.StageCreate) k8s.Stage {
 			QualityGates: stage.QualityGates,
 		},
 		Status: k8s.StageStatus{
+			Available:       false,
 			LastTimeUpdated: time.Now(),
 			Status:          "initialized",
+			Username:        stage.Username,
+			Action:          "cd_stage_registration",
+			Result:          "success",
+			Value:           "inactive",
 		},
 	}
 }
 
-func saveStagesIntoK8s(edpRestClient *rest.RESTClient, cdPipelineName string, stages []models.StageCreate) ([]k8s.Stage, error) {
+func saveStagesIntoK8s(edpRestClient *rest.RESTClient, cdPipelineName string, stages []command.CDStageCommand, username string) ([]k8s.Stage, error) {
 	var stagesCr []k8s.Stage
 	for _, stage := range stages {
+		stage.Username = username
 		crd := createCrd(cdPipelineName, stage)
 		stageCr := k8s.Stage{}
 		err := edpRestClient.Post().Namespace(context.Namespace).Resource("stages").Body(&crd).Do().Into(&stageCr)
@@ -426,7 +438,7 @@ func saveStagesIntoK8s(edpRestClient *rest.RESTClient, cdPipelineName string, st
 	return stagesCr, nil
 }
 
-func checkStagesInK8s(edpRestClient *rest.RESTClient, cdPipelineName string, stages []models.StageCreate) error {
+func checkStagesInK8s(edpRestClient *rest.RESTClient, cdPipelineName string, stages []command.CDStageCommand) error {
 	for _, stage := range stages {
 		stagesCr := &k8s.Stage{}
 		stageName := fmt.Sprintf("%s-%s", cdPipelineName, stage.Name)

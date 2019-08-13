@@ -19,6 +19,7 @@ package controllers
 import (
 	"edp-admin-console/context"
 	"edp-admin-console/models"
+	"edp-admin-console/models/command"
 	"edp-admin-console/models/query"
 	"edp-admin-console/service"
 	"fmt"
@@ -152,7 +153,7 @@ func (c *CDPipelineController) UpdateCDPipeline() {
 	appNameCheckboxes := c.GetStrings("app")
 	pipelineName := c.GetString(":name")
 
-	pipelineUpdateCommand := models.CDPipelineCommand{
+	pipelineUpdateCommand := command.CDPipelineCommand{
 		Name:                 pipelineName,
 		Applications:         c.convertApplicationWithBranchesData(appNameCheckboxes),
 		ApplicationToApprove: c.getApplicationsToPromoteFromRequest(appNameCheckboxes),
@@ -201,12 +202,13 @@ func (c *CDPipelineController) CreateCDPipeline() {
 	serviceCheckboxes := c.GetStrings("service")
 	stages := retrieveStagesFromRequest(c)
 
-	cdPipelineCreateCommand := models.CDPipelineCommand{
+	cdPipelineCreateCommand := command.CDPipelineCommand{
 		Name:                 pipelineName,
 		Applications:         c.convertApplicationWithBranchesData(appNameCheckboxes),
 		ThirdPartyServices:   serviceCheckboxes,
 		Stages:               stages,
 		ApplicationToApprove: c.getApplicationsToPromoteFromRequest(appNameCheckboxes),
+		Username:             c.Ctx.Input.Session("username").(string),
 	}
 
 	errMsg := validateCDPipelineRequestData(cdPipelineCreateCommand)
@@ -262,11 +264,11 @@ func (c *CDPipelineController) GetCDPipelineOverviewPage() {
 	c.TplName = "cd_pipeline_overview.html"
 }
 
-func retrieveStagesFromRequest(this *CDPipelineController) []models.StageCreate {
-	var stages []models.StageCreate
+func retrieveStagesFromRequest(this *CDPipelineController) []command.CDStageCommand {
+	var stages []command.CDStageCommand
 
 	for index, stageName := range this.GetStrings("stageName") {
-		stageRequest := models.StageCreate{
+		stageRequest := command.CDStageCommand{
 			Name:        stageName,
 			Description: this.GetString(stageName + "-stageDesc"),
 			TriggerType: this.GetString(stageName + "-triggerType"),
@@ -329,7 +331,7 @@ func addCdPipelineInProgressIfAny(cdPipelines []*query.CDPipeline, pipelineInPro
 	return cdPipelines
 }
 
-func validateCDPipelineUpdateRequestData(cdPipeline models.CDPipelineCommand) *ErrMsg {
+func validateCDPipelineUpdateRequestData(cdPipeline command.CDPipelineCommand) *ErrMsg {
 	isApplicationsValid := true
 	isCDPipelineValid := true
 	isStagesValid := true

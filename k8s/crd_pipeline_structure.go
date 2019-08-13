@@ -31,8 +31,13 @@ type CDPipelineSpec struct {
 
 // +k8s:openapi-gen=true
 type CDPipelineStatus struct {
+	Available       bool      `json:"available"`
 	LastTimeUpdated time.Time `json:"last_time_updated"`
 	Status          string    `json:"status"`
+	Username        string    `json:"username"`
+	Action          string    `json:"action"`
+	Result          string    `json:"result"`
+	Value           string    `json:"value"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
