@@ -1,4 +1,4 @@
-create table quality_gate_stage
+create table if not exists quality_gate_stage
 (
   id                 integer default nextval('quality_gate_id_seq'::regclass) not null
     constraint quality_gate_pk
