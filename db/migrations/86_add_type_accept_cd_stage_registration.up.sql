@@ -1,0 +1,1 @@
+alter type "action" add value 'accept_cd_stage_registration';

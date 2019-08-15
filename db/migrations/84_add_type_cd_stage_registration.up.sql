@@ -1,0 +1,1 @@
+alter type "action" add value 'cd_stage_registration';

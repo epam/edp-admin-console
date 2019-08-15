@@ -1,0 +1,1 @@
+alter type "action" add value 'fetching_user_settings_config_map';
