@@ -19,7 +19,7 @@ type Codebase struct {
 	TestReportFramework string            `json:"testReportFramework" orm:"column(test_report_framework)"`
 	Description         string            `json:"description" orm:"column(description)"`
 	CodebaseBranch      []*CodebaseBranch `json:"codebase_branch" orm:"reverse(many)"`
-	ActionLog           []*ActionLog      `json:"action_log" orm:"rel(m2m);rel_table(codebase_action_log)"`
+	ActionLog           []*ActionLog      `json:"-" orm:"rel(m2m);rel_table(codebase_action_log)"`
 }
 
 func (c *Codebase) TableName() string {
