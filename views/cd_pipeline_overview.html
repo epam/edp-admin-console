@@ -255,6 +255,45 @@
                                 </div>
                             </div>
                         {{end}}
+
+                        {{if .CDPipeline.ActionLog}}
+                            <div class="card status-info">
+                                <div class="card-header collapsed" id="headingFour" data-toggle="collapse"
+                                     data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" type="button">
+                                            Status Info
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Status Info."></span>
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseFour" class="collapse status" aria-labelledby="headingFour">
+                                    <div class="card-body">
+                                        <table class="action-log-table edp-card-table">
+                                            <tbody>
+                                            <tr>
+                                                <th scope="col" style="width: 20%">Date</th>
+                                                <th scope="col" style="width: 25%">User</th>
+                                                <th scope="col" style="width: 22.5%">Action</th>
+                                                <th scope="col" style="width: 10%">Result</th>
+                                                <th scope="col" style="width: 22.5%">Message</th>
+                                            </tr>
+                                            {{range .CDPipeline.ActionLog}}
+                                                <tr>
+                                                    <td>{{.LastTimeUpdate.Format "02.01.2006 15:04:05 (UTC-07)" }}</td>
+                                                    <td>{{.UserName}}</td>
+                                                    <td>{{.Action}}</td>
+                                                    <td>{{.Result}}</td>
+                                                    <td>{{.Message}}</td>
+                                                </tr>
+                                            {{end}}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        {{end}}
                     </div>
                 </div>
             </div>

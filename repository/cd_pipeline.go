@@ -134,6 +134,11 @@ func (this CDPipelineRepository) GetCDPipelineByName(pipelineName string) (*quer
 		return nil, err
 	}
 
+	err = loadRelatedActionLogForCDPipeline(&cdPipeline)
+	if err != nil {
+		return nil, err
+	}
+
 	return &cdPipeline, nil
 }
 
@@ -255,6 +260,19 @@ func (this CDPipelineRepository) GetCDPipelines(criteria query.CDPipelineCriteri
 		return nil, err
 	}
 	return pipelines, nil
+}
+
+func loadRelatedActionLogForCDPipeline(cdPipeline *query.CDPipeline) error {
+	o := orm.NewOrm()
+
+	_, err := o.QueryTable(new(query.ActionLog)).
+		Filter("cdPipeline__cd_pipeline_id", cdPipeline.Id).
+		OrderBy("LastTimeUpdate").
+		Distinct().
+		All(&cdPipeline.ActionLog, "LastTimeUpdate", "UserName",
+			"Message", "Action", "Result")
+
+	return err
 }
 
 func (this CDPipelineRepository) GetStage(cdPipelineName, stageName string) (*models.StageView, error) {
