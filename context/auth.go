@@ -46,11 +46,11 @@ func InitAuth() {
 	parameters := getParameters()
 	log.Println(fmt.Sprintf("Keycloak has been retrieved: %s. \n"+
 		"ClientId has been retrieved: %s. \n"+
-		"ClientSecret has been retrieved: %s. \n"+
+		"ClientSecret has been retrieved. \n"+
 		"Host has been retrieved: %s. \n"+
 		"CallBackEndpoint has been retrieved: %s. \n"+
 		"StateAuthKey has been retrieved: %s.",
-		parameters.KeycloakURL, parameters.ClientId, parameters.ClientSecret,
+		parameters.KeycloakURL, parameters.ClientId,
 		parameters.Host, parameters.CallBackEndpoint, parameters.StateAuthKey))
 
 	provider, err := oidc.NewProvider(context.Background(), parameters.KeycloakURL)
