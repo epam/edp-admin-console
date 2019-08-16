@@ -109,6 +109,8 @@ func (c *CDPipelineController) GetCreateCDPipelinePage() {
 		return
 	}
 
+	autotests = filterAutotestsWithActiveBranches(autotests)
+
 	c.Data["Services"] = services
 	c.Data["Apps"] = apps
 	c.Data["EDPVersion"] = context.EDPVersion
@@ -116,6 +118,20 @@ func (c *CDPipelineController) GetCreateCDPipelinePage() {
 	c.Data["Type"] = "delivery"
 	c.Data["Autotests"] = autotests
 	c.TplName = "create_cd_pipeline.html"
+}
+
+func filterAutotestsWithActiveBranches(autotests []*query.Codebase) []*query.Codebase {
+	if autotests == nil {
+		return autotests
+	}
+
+	for i, autotest := range autotests {
+		if len(autotest.CodebaseBranch) == 0 {
+			autotests = append(autotests[:i], autotests[i+1:]...)
+		}
+	}
+
+	return autotests
 }
 
 func (c *CDPipelineController) GetEditCDPipelinePage() {
