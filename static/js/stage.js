@@ -310,17 +310,22 @@ function handleStepNameValidation() {
     let $nameOfStepElems = $('.nameOfStep'),
         $validationMsgEl = $('.step-name-validation-msg'),
         $duplicateValidationMsgEl = $('.duplicate-step-name-validation-msg'),
-        isValid = false;
+        isValid = true;
 
     $.each($nameOfStepElems, function () {
-        isValid = isFieldValid($(this), /^[a-z0-9]([-a-z0-9]*[a-z0-9])$/);
-        if (!isValid) {
+        let isStepNameValid = isFieldValid($(this), /^[a-z0-9]([-a-z0-9]*[a-z0-9])$/);
+        if (!isStepNameValid) {
+            isValid = false;
             $(this).addClass('non-valid-input');
             $validationMsgEl.show();
         } else {
             $(this).removeClass('non-valid-input');
         }
     });
+
+    if (!isValid) {
+        return false
+    }
 
     let nameOfStepArr = getValues($nameOfStepElems),
         duplicateErr = doesArrayContainDuplicates(nameOfStepArr);

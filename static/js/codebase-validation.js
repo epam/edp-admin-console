@@ -56,7 +56,14 @@ $(function () {
         $('.multi-module').addClass('hide-element');
         $('#multiModule').attr("disabled", true);
 
-        $('.java-build-tools').val('Gradle');
+        let codebaseVal = $('.card.main-block').data('codebase-type');
+        if (codebaseVal === 'application' || codebaseVal === 'library') {
+            $('.java-build-tools').val('Gradle');
+        } else {
+            $('.java-build-tools').val('Maven');
+        }
+
+        $('.test-report-framework').val('allure');
     });
 
     $('#isRepoPrivate').change(function () {

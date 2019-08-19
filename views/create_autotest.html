@@ -35,7 +35,7 @@
                 <div class="accordion" id="accordionCreateCodebase">
                     {{template "template/accordion_codebase_template.html" .}}
 
-                    <div class="card main-block">
+                    <div class="card main-block" data-codebase-type="autotest">
                         <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
                              data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                             <h5 class="mb-0">
@@ -121,7 +121,7 @@
                                             <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                                                   title="Autotest Report Framework"></span>
                                         </label>
-                                        <select class="form-control java-build-tools" name="testReportFramework">
+                                        <select class="form-control test-report-framework" name="testReportFramework">
                                             <option value="allure">Allure</option>
                                         </select>
                                     </div>
