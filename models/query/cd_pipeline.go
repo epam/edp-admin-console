@@ -11,7 +11,7 @@ type CDPipeline struct {
 	CodebaseStageMatrix   map[CDCodebaseStageMatrixKey]CDCodebaseStageMatrixValue `json:"-" orm:"-"`
 	ApplicationsToPromote []string                                                `json:"applicationsToPromote" orm:"-"`
 	CodebaseDockerStream  []*CodebaseDockerStream                                 `json:"-" orm:"rel(m2m);rel_table(cd_pipeline_docker_stream)"`
-	ActionLog             []*ActionLog                                            `json:"action_log" orm:"rel(m2m);rel_table(cd_pipeline_action_log)"`
+	ActionLog             []*ActionLog                                            `json:"-" orm:"rel(m2m);rel_table(cd_pipeline_action_log)"`
 }
 
 type CDCodebaseStageMatrixKey struct {
