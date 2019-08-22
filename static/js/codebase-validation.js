@@ -49,12 +49,20 @@ $(function () {
     $('#languageSelection').on('change', function (e) {
         $('.js-form-subsection, .appLangError').hide();
         let langDivEl = $($(e.target).data('target'));
-        langDivEl.find('select').attr('disabled', false);
         langDivEl.show();
         $('.js-form-subsection input[name="framework"]').prop('checked', false);
 
         $('.multi-module').addClass('hide-element');
         $('#multiModule').attr("disabled", true);
+
+        $.each($('.build-tool .js-form-subsection'), function () {
+            if ($(this).hasClass($(e.target).data('target').substring(1))) {
+                $(this).show();
+                $(this).find('select').attr('disabled', false);
+            } else {
+                $(this).find('select').attr('disabled', true);
+            }
+        });
 
         let codebaseVal = $('.card.main-block').data('codebase-type');
         if (codebaseVal === 'application' || codebaseVal === 'library') {
