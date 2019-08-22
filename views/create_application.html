@@ -309,7 +309,7 @@
                                               title="Specify size of database."></span>
                                     </label>
                                     <div class="d-flex">
-                                        <input name="dbCapacity" type="number" class="form-control storage-capacity"
+                                        <input name="dbCapacity" type="number" min="0" oninput="this.value = Math.abs(this.value)" class="form-control storage-capacity"
                                                id="dbCapacity" placeholder="Enter database size">
                                         <select class="capacity-ext form-control storage-capacity-ext" name="capacityExt">
                                             <option value="Mi" >Mi</option>
