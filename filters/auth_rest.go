@@ -45,7 +45,7 @@ func AuthRestFilter(context *bgCtx.Context) {
 	idToken, err := appCtx.GetAuthConfig().Verifier.Verify(ctx.Background(), token)
 	if err != nil {
 		log.Printf("Token presented in the session is not valid")
-		http.Error(context.ResponseWriter, "Token presented in the session is not valid", http.StatusInternalServerError)
+		http.Error(context.ResponseWriter, "Token presented in the session is not valid", http.StatusUnauthorized)
 		return
 	}
 
