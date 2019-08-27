@@ -62,7 +62,7 @@ func (c *LibraryController) GetCreatePage() {
 	c.Data["IsVcsEnabled"] = isVcsEnabled
 	c.Data["Type"] = query.Library
 	c.Data["CodeBaseIntegrationStrategy"] = true
-
+	c.Data["IntegrationStrategies"] = []string{"Create", "Clone"}
 	c.TplName = "create_library.html"
 }
 
@@ -103,7 +103,7 @@ func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
 		Name:      c.GetString("nameOfApp"),
 		Lang:      c.GetString("appLang"),
 		BuildTool: c.GetString("buildTool"),
-		Strategy:  c.GetString("strategy"),
+		Strategy:  strings.ToLower(c.GetString("strategy")),
 		Type:      "library",
 	}
 

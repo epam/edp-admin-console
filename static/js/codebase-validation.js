@@ -9,7 +9,8 @@ $(function () {
         CODEBASE_NAME: /^[a-z][a-z0-9-]*[a-z0-9]$/,
         REPO_LOGIN: /\w/,
         REPO_PASSWORD: /\w/,
-        REPO_URL: /(?:^git|^ssh|^https?|^git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/
+        REPO_URL: /(?:^git|^ssh|^https?|^git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/,
+        RELATIVE_PATH: /^\/.*$/
     };
 
     $('.tooltip-icon').add('[data-toggle="tooltip"]').tooltip();
@@ -90,11 +91,13 @@ $(function () {
         let $login = $('.repoLogin'), $pass = $('.repoPassword'),
             $url = $('.repo-url'), $privateRep = $('.private-repo');
 
-        if (this.value === 'clone') {
+        if (this.value.toLowerCase() === 'clone') {
             $url.add($privateRep).removeClass('hide-element');
             if ($('#isRepoPrivate').is(':checked')) {
                 $login.add($pass).removeClass('hide-element');
             }
+        } else if (this.value.toLowerCase() === 'import') {
+
         } else {
             $url.add($privateRep).addClass('hide-element');
             $login.add($pass).addClass('hide-element');
@@ -344,7 +347,17 @@ $(function () {
                 $repoMsg.show();
                 $repoUrl.addClass('is-invalid');
             }
+        } else if ($strategyEl.val().toLowerCase() === 'import') {
+            let $gitRelativePath = $('#gitRelativePath'),
+                isGitRelativePathValid = isFieldValid($gitRelativePath, REGEX.RELATIVE_PATH),
+                $errMsg = $gitRelativePath.next('.invalid-feedback');
+            if (!isGitRelativePathValid) {
+                isValid = false;
+                $errMsg.show();
+                $gitRelativePath.addClass('is-invalid');
+            }
         }
+
         return isValid;
     }
 
@@ -445,4 +458,5 @@ $(function () {
 
         return true;
     }
-});
+})
+;

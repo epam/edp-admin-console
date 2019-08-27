@@ -18,9 +18,36 @@
                               title="Select the existing codebase for reproduction or create new codebase."></span>
                     </label>
                     <select class="form-control" id="strategy" name="strategy">
-                        <option value="create">Create</option>
-                        <option value="clone">Clone</option>
+                        {{range $value := .IntegrationStrategies}}
+                            <option value="{{$value}}">{{$value}}</option>
+                        {{end}}
                     </select>
+                </div>
+            {{end}}
+
+            {{if .GitServers}}
+                <div class="form-group gitServerEl">
+                    <label for="gitServer">Git Server
+                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                              title="Select the existing Git Server."></span>
+                    </label>
+                    <select class="form-control" id="gitServer" name="gitServer">
+                        {{range .GitServers}}
+                            <option value="{{.Name}}">{{.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+
+                <div class="form-group gitRelativePathEl">
+                    <label for="gitRelativePath">Relative path
+                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                              title="Specify relative path to repository."></span>
+                    </label>
+                    <input name="gitRelativePath" type="text" class="form-control" id="gitRelativePath"
+                           placeholder="Enter repository path ">
+                    <div class="invalid-feedback repo-path-validation">
+                        Please specify path to repository.
+                    </div>
                 </div>
             {{end}}
 

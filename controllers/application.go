@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"log"
+	"strings"
 )
 
 type ApplicationController struct {
@@ -32,6 +33,7 @@ type ApplicationController struct {
 	CodebaseService  service.CodebaseService
 	EDPTenantService service.EDPTenantService
 	BranchService    service.CodebaseBranchService
+	GitServerService service.GitServerService
 }
 
 const (
@@ -90,8 +92,28 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 		return
 	}
 
+	integrationStrategies := getStrategiesFromEnvVariable()
+	if integrationStrategies == nil {
+		c.Abort("500")
+		return
+	}
+
 	if flash.Data["error"] != "" {
 		c.Data["Error"] = flash.Data["error"]
+	}
+
+	isImportStrategy := isImportStrategy(integrationStrategies)
+	if isImportStrategy {
+		log.Println("Import strategy is used.")
+
+		gitServers, err := c.GitServerService.GetServers(query.GitServerCriteria{Status: query.Active})
+		if err != nil {
+			c.Abort("500")
+			return
+		}
+		log.Printf("Fetched Git Servers: %v", gitServers)
+
+		c.Data["GitServers"] = gitServers
 	}
 
 	c.Data["EDPVersion"] = context.EDPVersion
@@ -99,7 +121,33 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 	c.Data["IsVcsEnabled"] = isVcsEnabled
 	c.Data["Type"] = query.App
 	c.Data["CodeBaseIntegrationStrategy"] = true
+	c.Data["IntegrationStrategies"] = integrationStrategies
 	c.TplName = "create_application.html"
+}
+
+func isImportStrategy(integrationStrategies []string) bool {
+	return contains(integrationStrategies, "import")
+}
+
+func contains(a []string, x string) bool {
+	for _, n := range a {
+		if x == strings.ToLower(n) {
+			return true
+		}
+	}
+	return false
+}
+
+func getStrategiesFromEnvVariable() []string {
+	integrationStrategies := beego.AppConfig.String("integrationStrategies")
+	if integrationStrategies == "" {
+		log.Printf("'INTEGRATION_STRATEGIES' variable is empty.")
+		return nil
+	}
+
+	s := strings.Split(integrationStrategies, ",")
+	log.Printf("Fetched Integrationg Strategies: %v", s)
+	return s
 }
 
 func (c *ApplicationController) CreateApplication() {
@@ -139,8 +187,15 @@ func extractApplicationRequestData(this *ApplicationController) command.CreateCo
 		Lang:      this.GetString("appLang"),
 		BuildTool: this.GetString("buildTool"),
 		Name:      this.GetString("nameOfApp"),
-		Strategy:  this.GetString("strategy"),
+		Strategy:  strings.ToLower(this.GetString("strategy")),
 		Type:      "application",
+	}
+
+	if codebase.Strategy == "import" {
+		gitServer := this.GetString("gitServer")
+		codebase.GitServer = &gitServer
+		gitRepoPath := this.GetString("gitRelativePath")
+		codebase.GitUrlPath = &gitRepoPath
 	}
 
 	framework := this.GetString("framework")

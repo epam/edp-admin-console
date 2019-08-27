@@ -15,6 +15,8 @@ type CreateCodebase struct {
 	Vcs                 *Vcs        `json:"vcs,omitempty"`
 	Description         *string     `json:"description,omitempty"`
 	Username            string      `json:"username"`
+	GitServer           *string     `json:"gitServer"`
+	GitUrlPath          *string     `json:"gitUrlPath"`
 }
 
 type Repository struct {
