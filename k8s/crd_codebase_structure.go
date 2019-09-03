@@ -33,6 +33,8 @@ type CodebaseSpec struct {
 	TestReportFramework *string     `json:"testReportFramework"`
 	Type                string      `json:"type"`
 	Description         *string     `json:"description"`
+	GitServer           *string     `json:"gitServer"`
+	GitUrlPath          *string     `json:"gitUrlPath"`
 }
 
 type Repository struct {

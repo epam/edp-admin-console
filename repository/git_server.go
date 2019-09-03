@@ -2,27 +2,28 @@ package repository
 
 import (
 	"edp-admin-console/models/query"
+	"github.com/astaxie/beego/orm"
 )
 
 type IGitServerRepository interface {
-	GetGitServersByCriteria(criteria query.GitServerCriteria) ([]query.GitServer, error)
+	GetGitServersByCriteria(criteria query.GitServerCriteria) ([]*query.GitServer, error)
 }
 
 type GitServerRepository struct {
 	IGitServerRepository
 }
 
-func (GitServerRepository) GetGitServersByCriteria(criteria query.GitServerCriteria) ([]query.GitServer, error) {
-	return []query.GitServer{
-		{
-			Id:     1,
-			Name:   "https://git.epam.com",
-			Status: "active",
-		},
-		{
-			Id:     2,
-			Name:   "https://gerrit-edp-cicd-delivery.delivery.aws.main.edp.projects.epam.com",
-			Status: "active",
-		},
-	}, nil
+func (GitServerRepository) GetGitServersByCriteria(criteria query.GitServerCriteria) ([]*query.GitServer, error) {
+	o := orm.NewOrm()
+	var gitServers []*query.GitServer
+
+	_, err := o.QueryTable(new(query.GitServer)).
+		Filter("available", criteria.Available).
+		OrderBy("name").
+		All(&gitServers)
+	if err != nil {
+		return nil, err
+	}
+
+	return gitServers, nil
 }

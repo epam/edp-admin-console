@@ -1,8 +1,8 @@
 hash: 7c900e5536151a6c9792677fe43fbb8e6c355a10526ac5ca76f1169cb0ccda7d
-updated: 2019-06-19T12:14:53.6262423+03:00
+updated: 2019-09-03T11:44:27.6740072+03:00
 imports:
 - name: github.com/astaxie/beego
-  version: 1b6edafc96ad27b6515fafeccd7339dda3e997b1
+  version: 32ee728078c84c28f2642c70745afc8f6830044d
   subpackages:
   - config
   - context
@@ -126,6 +126,8 @@ imports:
   version: da645544ed44df016359bd4c0e3dc60ee3a0da43
   subpackages:
   - diffmatchpatch
+- name: github.com/shiena/ansicolor
+  version: a422bbe96644373c5753384a59d678f7d261ff10
 - name: github.com/spf13/pflag
   version: 9ff6c6923cfffbcd502984b8e0c80539a94968b7
 - name: github.com/src-d/gcfg

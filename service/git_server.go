@@ -10,7 +10,7 @@ type GitServerService struct {
 	IGitServerRepository repository.IGitServerRepository
 }
 
-func (s GitServerService) GetServers(criteria query.GitServerCriteria) ([]query.GitServer, error) {
+func (s GitServerService) GetServers(criteria query.GitServerCriteria) ([]*query.GitServer, error) {
 	log.Println("Start fetching Git Servers...")
 
 	gitServers, err := s.IGitServerRepository.GetGitServersByCriteria(criteria)

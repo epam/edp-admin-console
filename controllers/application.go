@@ -106,7 +106,7 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 	if isImportStrategy {
 		log.Println("Import strategy is used.")
 
-		gitServers, err := c.GitServerService.GetServers(query.GitServerCriteria{Status: query.Active})
+		gitServers, err := c.GitServerService.GetServers(query.GitServerCriteria{Available: true})
 		if err != nil {
 			c.Abort("500")
 			return
