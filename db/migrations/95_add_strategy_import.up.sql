@@ -1,0 +1,1 @@
+alter type "strategy" add value 'import';
