@@ -1,0 +1,1 @@
+alter table codebase drop column git_project_path;
