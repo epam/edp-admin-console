@@ -225,10 +225,10 @@ func convertData(codebase command.CreateCodebase) k8s.CodebaseSpec {
 		Strategy:  codebase.Strategy,
 		Name:      codebase.Name,
 		Type:      codebase.Type,
+		GitServer: codebase.GitServer,
 	}
 
 	if spec.Strategy == "import" {
-		spec.GitServer = codebase.GitServer
 		spec.GitUrlPath = codebase.GitUrlPath
 	}
 

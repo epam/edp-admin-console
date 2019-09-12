@@ -105,6 +105,10 @@ func (c *CodebaseRestController) CreateCodebase() {
 		return
 	}
 
+	if codebase.Strategy != "import" {
+		codebase.GitServer = "gerrit"
+	}
+
 	errMsg := validRequestData(codebase)
 	if errMsg != nil {
 		log.Printf("Failed to validate request data: %s", errMsg.Message)

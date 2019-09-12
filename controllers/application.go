@@ -192,10 +192,11 @@ func extractApplicationRequestData(this *ApplicationController) command.CreateCo
 	}
 
 	if codebase.Strategy == "import" {
-		gitServer := this.GetString("gitServer")
-		codebase.GitServer = &gitServer
+		codebase.GitServer = this.GetString("gitServer")
 		gitRepoPath := this.GetString("gitRelativePath")
 		codebase.GitUrlPath = &gitRepoPath
+	} else {
+		codebase.GitServer = "gerrit"
 	}
 
 	framework := this.GetString("framework")
