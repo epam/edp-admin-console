@@ -20,6 +20,9 @@ type Codebase struct {
 	Description         string            `json:"description" orm:"column(description)"`
 	CodebaseBranch      []*CodebaseBranch `json:"codebase_branch" orm:"reverse(many)"`
 	ActionLog           []*ActionLog      `json:"-" orm:"rel(m2m);rel_table(codebase_action_log)"`
+	GitServerId         *int              `json:"-" orm:"column(git_server_id)"`
+	GitProjectPath      *string           `json:"gitProjectPath" orm:"column(git_project_path)"`
+	GitServer           *string           `json:"gitServer" orm:"-"`
 }
 
 func (c *Codebase) TableName() string {

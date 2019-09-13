@@ -34,6 +34,10 @@ type CodebaseRepository struct {
 	ICodebaseRepository
 }
 
+const (
+	ApplicationType = "application"
+)
+
 func (CodebaseRepository) GetCodebasesByCriteria(criteria query.CodebaseCriteria) ([]*query.Codebase, error) {
 	o := orm.NewOrm()
 	var codebases []*query.Codebase
@@ -73,6 +77,13 @@ func (CodebaseRepository) GetCodebasesByCriteria(criteria query.CodebaseCriteria
 			}
 		}
 
+		if c.Type == ApplicationType {
+			err = loadRelatedGitServerName(c)
+			if err != nil {
+				return nil, err
+			}
+		}
+
 	}
 	return codebases, err
 }
@@ -98,9 +109,15 @@ func (CodebaseRepository) GetCodebaseByName(name string) (*query.Codebase, error
 	}
 
 	_, err = o.LoadRelated(&codebase, "CodebaseBranch", false, 100, 0, "Name")
-
 	if err != nil {
 		return nil, err
+	}
+
+	if codebase.Type == ApplicationType {
+		err = loadRelatedGitServerName(&codebase)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &codebase, nil
@@ -121,15 +138,20 @@ func (CodebaseRepository) GetCodebaseById(id int) (*query.Codebase, error) {
 	}
 
 	err = loadRelatedActionLog(&codebase)
-
 	if err != nil {
 		return nil, err
 	}
 
 	_, err = o.LoadRelated(&codebase, "CodebaseBranch", false, 100, 0, "Name")
-
 	if err != nil {
 		return nil, err
+	}
+
+	if codebase.Type == ApplicationType {
+		err = loadRelatedGitServerName(&codebase)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &codebase, nil
@@ -188,6 +210,22 @@ func loadRelatedBranches(branch *query.CodebaseBranch) error {
 			return err
 		}
 	}
+	return nil
+}
+
+func loadRelatedGitServerName(codebase *query.Codebase) error {
+	o := orm.NewOrm()
+
+	server := query.GitServer{}
+	err := o.QueryTable(new(query.GitServer)).
+		Filter("id", codebase.GitServerId).
+		One(&server)
+	if err != nil {
+		return err
+	}
+
+	codebase.GitServer = &server.Name
+
 	return nil
 }
 
