@@ -285,7 +285,7 @@ $(function () {
         let $codebaseBlockEl = $('.codebase-block'),
             $strategyEl = $codebaseBlockEl.find('#strategy');
 
-        if ($strategyEl.length === 0 || $strategyEl.val() === 'clone') {
+        if ($strategyEl.length === 0 || $strategyEl.val().toLowerCase() === 'clone') {
             let $repoUrl = $('#gitRepoUrl'),
                 isRepoUrlValid = isFieldValid($repoUrl, REGEX.REPO_URL),
                 $repoMsg = $repoUrl.next('.invalid-feedback');
