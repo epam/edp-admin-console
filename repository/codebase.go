@@ -77,7 +77,7 @@ func (CodebaseRepository) GetCodebasesByCriteria(criteria query.CodebaseCriteria
 			}
 		}
 
-		if c.Type == ApplicationType {
+		if c.Type == ApplicationType && c.GitServerId != nil {
 			err = loadRelatedGitServerName(c)
 			if err != nil {
 				return nil, err
@@ -113,7 +113,7 @@ func (CodebaseRepository) GetCodebaseByName(name string) (*query.Codebase, error
 		return nil, err
 	}
 
-	if codebase.Type == ApplicationType {
+	if codebase.Type == ApplicationType && codebase.GitServerId != nil {
 		err = loadRelatedGitServerName(&codebase)
 		if err != nil {
 			return nil, err
@@ -147,7 +147,7 @@ func (CodebaseRepository) GetCodebaseById(id int) (*query.Codebase, error) {
 		return nil, err
 	}
 
-	if codebase.Type == ApplicationType {
+	if codebase.Type == ApplicationType && codebase.GitServerId != nil {
 		err = loadRelatedGitServerName(&codebase)
 		if err != nil {
 			return nil, err
