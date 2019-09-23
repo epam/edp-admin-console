@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"log"
+	"path"
 	"strings"
 )
 
@@ -116,6 +117,7 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 		c.Data["GitServers"] = gitServers
 	}
 
+	c.Data["ImportStrategy"] = isImportStrategy
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["IsVcsEnabled"] = isVcsEnabled
@@ -152,7 +154,7 @@ func getStrategiesFromEnvVariable() []string {
 
 func (c *ApplicationController) CreateApplication() {
 	flash := beego.NewFlash()
-	codebase := extractApplicationRequestData(c)
+	codebase := c.extractApplicationRequestData()
 	errMsg := validRequestData(codebase)
 	if errMsg != nil {
 		log.Printf("Failed to validate request data: %s", errMsg.Message)
@@ -182,11 +184,10 @@ func (c *ApplicationController) CreateApplication() {
 	c.Redirect(fmt.Sprintf("/admin/edp/application/overview?%s=%s#codebaseSuccessModal", paramWaitingForCodebase, codebase.Name), 302)
 }
 
-func extractApplicationRequestData(this *ApplicationController) command.CreateCodebase {
+func (this *ApplicationController) extractApplicationRequestData() command.CreateCodebase {
 	codebase := command.CreateCodebase{
 		Lang:      this.GetString("appLang"),
 		BuildTool: this.GetString("buildTool"),
-		Name:      this.GetString("nameOfApp"),
 		Strategy:  strings.ToLower(this.GetString("strategy")),
 		Type:      "application",
 	}
@@ -195,7 +196,9 @@ func extractApplicationRequestData(this *ApplicationController) command.CreateCo
 		codebase.GitServer = this.GetString("gitServer")
 		gitRepoPath := this.GetString("gitRelativePath")
 		codebase.GitUrlPath = &gitRepoPath
+		codebase.Name = path.Base(*codebase.GitUrlPath)
 	} else {
+		codebase.Name = this.GetString("nameOfApp")
 		codebase.GitServer = "gerrit"
 	}
 

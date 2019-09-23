@@ -35,7 +35,8 @@
                 <div class="accordion" id="accordionCreateCodebase">
                     {{template "template/accordion_codebase_template.html" .}}
 
-                    <div class="card main-block" data-codebase-type="application">
+                    <div class="card main-block" data-codebase-type="application"
+                         data-import-strategy="{{.ImportStrategy}}">
                         <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
                              data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                             <h5 class="mb-0">
@@ -48,22 +49,26 @@
                         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
                              data-parent="#accordionCreateCodebase">
                             <div class="card-body">
-                                <div class="form-group app-name">
-                                    <label for="nameOfApp">Application Name
-                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Application name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters."></span>
-                                    </label>
-                                    <input name="nameOfApp" type="text" class="codebase-name form-control" id="nameOfApp"
-                                           placeholder="Type your application name">
-                                    <div class="codebase-name-validation invalid-feedback regex-error">
-                                        Application name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters.
-                                    </div>
-                                    <div class="app-name-duplicate-validation">
-                                        <div class="invalid-feedback duplicate-msg">
-                                            Current application is already exists.
+
+                                {{if not .ImportStrategy}}
+                                    <div class="form-group app-name">
+                                        <label for="nameOfApp">Application Name
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Application name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters."></span>
+                                        </label>
+                                        <input name="nameOfApp" type="text" class="codebase-name form-control" id="nameOfApp"
+                                               placeholder="Type your application name">
+                                        <div class="codebase-name-validation invalid-feedback regex-error">
+                                            Application name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters.
+                                        </div>
+                                        <div class="app-name-duplicate-validation">
+                                            <div class="invalid-feedback duplicate-msg">
+                                                Current application is already exists.
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                {{end}}
+
                                 <p class="form-group">Application Code Language/framework
                                     <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                                           title="Select application language/framework and build tool."></span>

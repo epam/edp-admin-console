@@ -29,6 +29,7 @@ import (
 	"github.com/satori/go.uuid"
 	"log"
 	"net/http"
+	"path"
 	"regexp"
 	"strings"
 )
@@ -107,6 +108,8 @@ func (c *CodebaseRestController) CreateCodebase() {
 
 	if codebase.Strategy != "import" {
 		codebase.GitServer = "gerrit"
+	} else {
+		codebase.Name = path.Base(*codebase.GitUrlPath)
 	}
 
 	errMsg := validRequestData(codebase)

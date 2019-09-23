@@ -47,6 +47,24 @@ $(function () {
         }
     }();
 
+    !function () {
+        if ($('.main-block').data('codebase-type') !== 'autotest') {
+            let $login = $('.repoLogin'), $pass = $('.repoPassword'),
+                $url = $('.repo-url'), $privateRep = $('.private-repo');
+            let strategy = $('#strategy').val().toLowerCase();
+
+            if (strategy === 'clone') {
+                $url.add($privateRep).removeClass('hide-element');
+                if ($('#isRepoPrivate').is(':checked')) {
+                    $login.add($pass).removeClass('hide-element');
+                }
+            } else {
+                $url.add($privateRep).addClass('hide-element');
+                $login.add($pass).addClass('hide-element');
+            }
+        }
+    }();
+
     $('#languageSelection').on('change', function (e) {
         $('.js-form-subsection, .appLangError').hide();
         let langDivEl = $($(e.target).data('target'));
@@ -96,8 +114,6 @@ $(function () {
             if ($('#isRepoPrivate').is(':checked')) {
                 $login.add($pass).removeClass('hide-element');
             }
-        } else if (this.value.toLowerCase() === 'import') {
-
         } else {
             $url.add($privateRep).addClass('hide-element');
             $login.add($pass).addClass('hide-element');
@@ -364,11 +380,15 @@ $(function () {
     function isMainInfoValid() {
         let $codebaseEl = $('.main-block'),
             $codebaseInputEl = $('.codebase-name'),
-            isCodebaseNameValid = isFieldValid($codebaseInputEl, REGEX.CODEBASE_NAME);
+            isCodebaseNameValid = true,
+            importStrategy = !!$codebaseEl.data('import-strategy');
 
-        if (!isCodebaseNameValid) {
-            $('.codebase-name-validation.regex-error').show();
-            $codebaseInputEl.addClass('is-invalid');
+        if (!importStrategy) {
+            isCodebaseNameValid = isFieldValid($codebaseInputEl, REGEX.CODEBASE_NAME);
+            if (!isCodebaseNameValid) {
+                $('.codebase-name-validation.regex-error').show();
+                $codebaseInputEl.addClass('is-invalid');
+            }
         }
 
         let $descriptionInputEl = $('#description'),
