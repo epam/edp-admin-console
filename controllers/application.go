@@ -103,8 +103,8 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 		c.Data["Error"] = flash.Data["error"]
 	}
 
-	isImportStrategy := isImportStrategy(integrationStrategies)
-	if isImportStrategy {
+	contains := doesIntegrationStrategiesContainImportStrategy(integrationStrategies)
+	if contains {
 		log.Println("Import strategy is used.")
 
 		gitServers, err := c.GitServerService.GetServers(query.GitServerCriteria{Available: true})
@@ -117,7 +117,6 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 		c.Data["GitServers"] = gitServers
 	}
 
-	c.Data["ImportStrategy"] = isImportStrategy
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["IsVcsEnabled"] = isVcsEnabled
@@ -127,7 +126,7 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 	c.TplName = "create_application.html"
 }
 
-func isImportStrategy(integrationStrategies []string) bool {
+func doesIntegrationStrategiesContainImportStrategy(integrationStrategies []string) bool {
 	return contains(integrationStrategies, "import")
 }
 

@@ -47,18 +47,47 @@ $(function () {
         }
     }();
 
+    function activateCloneBlock() {
+        $('.main-block').data('import-strategy', false);
+        $('.app-name').removeClass('hide-element');
+
+        $('.gitServerEl').addClass('hide-element');
+        $('.gitRelativePathEl').addClass('hide-element');
+    }
+
+    function activateCreateBlock() {
+        $('.main-block').data('import-strategy', false);
+        $('.app-name').removeClass('hide-element');
+
+        $('.gitServerEl').addClass('hide-element');
+        $('.gitRelativePathEl').addClass('hide-element');
+    }
+
+    function activateImportBlock() {
+        $('.main-block').data('import-strategy', true);
+        $('.app-name').addClass('hide-element');
+        $('.gitServerEl').removeClass('hide-element');
+        $('.gitRelativePathEl').removeClass('hide-element');
+    }
+
     !function () {
         if ($('.main-block').data('codebase-type') !== 'autotest') {
             let $login = $('.repoLogin'), $pass = $('.repoPassword'),
-                $url = $('.repo-url'), $privateRep = $('.private-repo');
-            let strategy = $('#strategy').val().toLowerCase();
+                $url = $('.repo-url'), $privateRep = $('.private-repo'),
+                strategy = $('#strategy').val().toLowerCase();
 
             if (strategy === 'clone') {
+                activateCloneBlock();
                 $url.add($privateRep).removeClass('hide-element');
                 if ($('#isRepoPrivate').is(':checked')) {
                     $login.add($pass).removeClass('hide-element');
                 }
+            } else if (strategy === 'create') {
+                activateCreateBlock();
+                $url.add($privateRep).addClass('hide-element');
+                $login.add($pass).addClass('hide-element');
             } else {
+                activateImportBlock();
                 $url.add($privateRep).addClass('hide-element');
                 $login.add($pass).addClass('hide-element');
             }
@@ -110,11 +139,17 @@ $(function () {
             $url = $('.repo-url'), $privateRep = $('.private-repo');
 
         if (this.value.toLowerCase() === 'clone') {
+            activateCloneBlock();
             $url.add($privateRep).removeClass('hide-element');
             if ($('#isRepoPrivate').is(':checked')) {
                 $login.add($pass).removeClass('hide-element');
             }
+        } else if (this.value.toLowerCase() === 'create') {
+            activateCreateBlock();
+            $url.add($privateRep).addClass('hide-element');
+            $login.add($pass).addClass('hide-element');
         } else {
+            activateImportBlock();
             $url.add($privateRep).addClass('hide-element');
             $login.add($pass).addClass('hide-element');
         }
