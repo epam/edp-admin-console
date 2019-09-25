@@ -25,23 +25,27 @@ import (
 	"edp-admin-console/repository"
 	"errors"
 	"fmt"
+	"github.com/astaxie/beego"
 	"k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	coreV1Client "k8s.io/client-go/kubernetes/typed/core/v1"
 	"log"
+	"strings"
 	"time"
 )
 
 type CodebaseService struct {
-	Clients             k8s.ClientSet
-	ICodebaseRepository repository.ICodebaseRepository
-	BranchService       CodebaseBranchService
+	Clients              k8s.ClientSet
+	ICodebaseRepository  repository.ICodebaseRepository
+	BranchService        CodebaseBranchService
+	IGitServerRepository repository.GitServerRepository
 }
 
 const (
 	CodebaseKind   = "Codebase"
 	CodebasePlural = "codebases"
+	ImportStrategy = "import"
 )
 
 func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*k8s.Codebase, error) {
@@ -158,10 +162,54 @@ func (s CodebaseService) GetCodebaseByName(name string) (*query.Codebase, error)
 	log.Printf("Fetched codebase info: %+v", codebase)
 
 	if codebase != nil {
-		createBranchLinks(codebase.CodebaseBranch, codebase.Name, context.Tenant)
+		err := s.createBranchLinks(*codebase, context.Tenant)
+		if err != nil {
+			log.Printf("An error has occurred while creating link to Git Server: %v", err)
+			return nil, err
+		}
 	}
 
 	return codebase, nil
+}
+
+func (s CodebaseService) createBranchLinks(codebase query.Codebase, tenant string) error {
+	if codebase.Strategy == ImportStrategy {
+		err := s.createLinksForGitProvider(codebase, tenant)
+		if err != nil {
+			return err
+		}
+	} else {
+		createLinksForGerritProvider(codebase, tenant)
+	}
+	return nil
+}
+
+func (s CodebaseService) createLinksForGitProvider(codebase query.Codebase, tenant string) error {
+	gitServer, err := s.IGitServerRepository.GetGitServer(*codebase.GitServer)
+	if err != nil {
+		return err
+	}
+
+	if gitServer == nil {
+		return errors.New(fmt.Sprintf("unexpected behaviour. couldn't find %v GitServer in DB", *codebase.GitServer))
+	}
+
+	for index, branch := range codebase.CodebaseBranch {
+		branch.VCSLink = fmt.Sprintf("https://%s%s/commits/%s", gitServer.Hostname, *codebase.GitProjectPath, branch.Name)
+		branch.CICDLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s/view/%s", "jenkins", tenant, wildcard, codebase.Name, strings.ToUpper(branch.Name))
+		codebase.CodebaseBranch[index] = branch
+	}
+
+	return nil
+}
+
+func createLinksForGerritProvider(codebase query.Codebase, tenant string) {
+	wildcard := beego.AppConfig.String("dnsWildcard")
+	for index, branch := range codebase.CodebaseBranch {
+		branch.VCSLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb?p=%s.git;a=shortlog;h=refs/heads/%s", "gerrit", tenant, wildcard, codebase.Name, branch.Name)
+		branch.CICDLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s/view/%s", "jenkins", tenant, wildcard, codebase.Name, strings.ToUpper(branch.Name))
+		codebase.CodebaseBranch[index] = branch
+	}
 }
 
 func (s CodebaseService) ExistCodebaseAndBranch(cbName, brName string) bool {

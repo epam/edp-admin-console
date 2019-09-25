@@ -24,12 +24,10 @@ import (
 	"edp-admin-console/repository"
 	"errors"
 	"fmt"
-	"github.com/astaxie/beego"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
 	"log"
-	"strings"
 	"time"
 )
 
@@ -97,15 +95,6 @@ func convertBranchInfoData(branchInfo command.CreateCodebaseBranch, appName stri
 		Name:         branchInfo.Name,
 		Commit:       branchInfo.Commit,
 		CodebaseName: appName,
-	}
-}
-
-func createBranchLinks(branches []*query.CodebaseBranch, cbName string, tenant string) {
-	wildcard := beego.AppConfig.String("dnsWildcard")
-	for index, branch := range branches {
-		branch.VCSLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb?p=%s.git;a=shortlog;h=refs/heads/%s", "gerrit", tenant, wildcard, cbName, branch.Name)
-		branch.CICDLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s/view/%s", "jenkins", tenant, wildcard, cbName, strings.ToUpper(branch.Name))
-		branches[index] = branch
 	}
 }
 

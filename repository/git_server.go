@@ -27,3 +27,20 @@ func (GitServerRepository) GetGitServersByCriteria(criteria query.GitServerCrite
 
 	return gitServers, nil
 }
+
+func (GitServerRepository) GetGitServer(name string) (*query.GitServer, error) {
+	o := orm.NewOrm()
+	gitServer := query.GitServer{Name: name}
+
+	err := o.Read(&gitServer, "Name")
+
+	if err == orm.ErrNoRows {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &gitServer, nil
+}
