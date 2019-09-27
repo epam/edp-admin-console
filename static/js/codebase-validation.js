@@ -71,26 +71,24 @@ $(function () {
     }
 
     !function () {
-        if ($('.main-block').data('codebase-type') !== 'autotest') {
-            let $login = $('.repoLogin'), $pass = $('.repoPassword'),
-                $url = $('.repo-url'), $privateRep = $('.private-repo'),
-                strategy = $('#strategy').val().toLowerCase();
+        let $login = $('.repoLogin'), $pass = $('.repoPassword'),
+            $url = $('.repo-url'), $privateRep = $('.private-repo'),
+            strategy = $('#strategy').val().toLowerCase();
 
-            if (strategy === 'clone') {
-                activateCloneBlock();
-                $url.add($privateRep).removeClass('hide-element');
-                if ($('#isRepoPrivate').is(':checked')) {
-                    $login.add($pass).removeClass('hide-element');
-                }
-            } else if (strategy === 'create') {
-                activateCreateBlock();
-                $url.add($privateRep).addClass('hide-element');
-                $login.add($pass).addClass('hide-element');
-            } else {
-                activateImportBlock();
-                $url.add($privateRep).addClass('hide-element');
-                $login.add($pass).addClass('hide-element');
+        if (strategy === 'clone') {
+            activateCloneBlock();
+            $url.add($privateRep).removeClass('hide-element');
+            if ($('#isRepoPrivate').is(':checked')) {
+                $login.add($pass).removeClass('hide-element');
             }
+        } else if (strategy === 'create') {
+            activateCreateBlock();
+            $url.add($privateRep).addClass('hide-element');
+            $login.add($pass).addClass('hide-element');
+        } else {
+            activateImportBlock();
+            $url.add($privateRep).addClass('hide-element');
+            $login.add($pass).addClass('hide-element');
         }
     }();
 

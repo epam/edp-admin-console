@@ -356,5 +356,14 @@ func (CDPipelineRepository) GetQualityGates(stageId int64) ([]query.QualityGate,
 		return nil, err
 	}
 
+	for _, gate := range gates {
+		if gate.QualityGateType == "autotests" && gate.Autotest.GitServerId != nil {
+			err := loadRelatedGitServerName(gate.Autotest)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	return gates, nil
 }

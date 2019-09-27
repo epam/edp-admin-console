@@ -11,6 +11,8 @@ import (
 	"github.com/astaxie/beego/validation"
 	"log"
 	"net/http"
+	"path"
+	"regexp"
 	"strings"
 )
 
@@ -19,6 +21,7 @@ type LibraryController struct {
 	EDPTenantService service.EDPTenantService
 	CodebaseService  service.CodebaseService
 	BranchService    service.CodebaseBranchService
+	GitServerService service.GitServerService
 }
 
 func (c *LibraryController) GetLibraryListPage() {
@@ -56,13 +59,33 @@ func (c *LibraryController) GetCreatePage() {
 		return
 	}
 
+	integrationStrategies := getStrategiesFromEnvVariable()
+	if integrationStrategies == nil {
+		c.Abort("500")
+		return
+	}
+
+	contains := doesIntegrationStrategiesContainImportStrategy(integrationStrategies)
+	if contains {
+		log.Println("Import strategy is used.")
+
+		gitServers, err := c.GitServerService.GetServers(query.GitServerCriteria{Available: true})
+		if err != nil {
+			c.Abort("500")
+			return
+		}
+		log.Printf("Fetched Git Servers: %v", gitServers)
+
+		c.Data["GitServers"] = gitServers
+	}
+
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["HasRights"] = isAdmin(c.GetSession("realm_roles").([]string))
 	c.Data["IsVcsEnabled"] = isVcsEnabled
 	c.Data["Type"] = query.Library
 	c.Data["CodeBaseIntegrationStrategy"] = true
-	c.Data["IntegrationStrategies"] = []string{"Create", "Clone"}
+	c.Data["IntegrationStrategies"] = integrationStrategies
 	c.TplName = "create_library.html"
 }
 
@@ -100,11 +123,20 @@ func (c *LibraryController) Create() {
 
 func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
 	library := command.CreateCodebase{
-		Name:      c.GetString("nameOfApp"),
 		Lang:      c.GetString("appLang"),
 		BuildTool: c.GetString("buildTool"),
 		Strategy:  strings.ToLower(c.GetString("strategy")),
 		Type:      "library",
+	}
+
+	if library.Strategy == strings.ToLower(ImportStrategy) {
+		library.GitServer = c.GetString("gitServer")
+		gitRepoPath := c.GetString("gitRelativePath")
+		library.GitUrlPath = &gitRepoPath
+		library.Name = path.Base(*library.GitUrlPath)
+	} else {
+		library.Name = c.GetString("nameOfApp")
+		library.GitServer = "gerrit"
 	}
 
 	repoUrl := c.GetString("gitRepoUrl")
@@ -136,6 +168,10 @@ func validateLibraryRequestData(library command.CreateCodebase) *ErrMsg {
 	valid := validation.Validation{}
 
 	_, err := valid.Valid(library)
+
+	if library.Strategy == strings.ToLower(ImportStrategy) {
+		valid.Match(library.GitUrlPath, regexp.MustCompile("^\\/.*$"), "Spec.GitUrlPath")
+	}
 
 	if library.Strategy == "clone" && library.Repository != nil {
 		_, err = valid.Valid(library.Repository)

@@ -148,7 +148,7 @@ func validRequestData(codebase command.CreateCodebase) *ErrMsg {
 	resErr = err
 
 	if codebase.Strategy == "import" {
-		valid.Match(codebase.GitUrlPath, regexp.MustCompile("^\\/.*$"), "Route.Site.Match")
+		valid.Match(codebase.GitUrlPath, regexp.MustCompile("^\\/.*$"), "Spec.GitUrlPath")
 	}
 
 	if codebase.Repository != nil {

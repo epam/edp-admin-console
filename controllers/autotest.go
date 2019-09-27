@@ -11,6 +11,8 @@ import (
 	"github.com/astaxie/beego/validation"
 	"log"
 	"net/http"
+	"path"
+	"regexp"
 	"strings"
 )
 
@@ -19,7 +21,13 @@ type AutotestsController struct {
 	CodebaseService  service.CodebaseService
 	EDPTenantService service.EDPTenantService
 	BranchService    service.CodebaseBranchService
+	GitServerService service.GitServerService
 }
+
+const (
+	CreateStrategy = "Create"
+	ImportStrategy = "Import"
+)
 
 func (c *AutotestsController) CreateAutotests() {
 	flash := beego.NewFlash()
@@ -72,11 +80,20 @@ func logAutotestsRequestData(autotests command.CreateCodebase) {
 
 func (c *AutotestsController) extractAutotestsRequestData() command.CreateCodebase {
 	codebase := command.CreateCodebase{
-		Name:      c.GetString("nameOfApp"),
 		Lang:      c.GetString("appLang"),
 		BuildTool: c.GetString("buildTool"),
-		Strategy:  "clone",
+		Strategy:  strings.ToLower(c.GetString("strategy")),
 		Type:      "autotests",
+	}
+
+	if codebase.Strategy == strings.ToLower(ImportStrategy) {
+		codebase.GitServer = c.GetString("gitServer")
+		gitRepoPath := c.GetString("gitRelativePath")
+		codebase.GitUrlPath = &gitRepoPath
+		codebase.Name = path.Base(*codebase.GitUrlPath)
+	} else {
+		codebase.Name = c.GetString("nameOfApp")
+		codebase.GitServer = "gerrit"
 	}
 
 	testReportFramework := c.GetString("testReportFramework")
@@ -118,6 +135,10 @@ func validateAutotestsRequestData(autotests command.CreateCodebase) *ErrMsg {
 	valid := validation.Validation{}
 
 	_, err := valid.Valid(autotests)
+
+	if autotests.Strategy == strings.ToLower(ImportStrategy) {
+		valid.Match(autotests.GitUrlPath, regexp.MustCompile("^\\/.*$"), "Spec.GitUrlPath")
+	}
 
 	if autotests.Repository != nil {
 		_, err = valid.Valid(autotests.Repository)
@@ -162,11 +183,36 @@ func (c *AutotestsController) GetCreateAutotestsPage() {
 		return
 	}
 
+	integrationStrategies := getStrategiesFromEnvVariable()
+	if integrationStrategies == nil {
+		c.Abort("500")
+		return
+	}
+
+	contains := doesIntegrationStrategiesContainImportStrategy(integrationStrategies)
+	if contains {
+		log.Println("Import strategy is used.")
+
+		gitServers, err := c.GitServerService.GetServers(query.GitServerCriteria{Available: true})
+		if err != nil {
+			c.Abort("500")
+			return
+		}
+		log.Printf("Fetched Git Servers: %v", gitServers)
+
+		c.Data["GitServers"] = gitServers
+	}
+
+	integrationStrategies = util.RemoveElByValue(integrationStrategies, CreateStrategy)
+	log.Println("Create strategy is removed from list due to Autotest")
+
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["HasRights"] = isAdmin(c.GetSession("realm_roles").([]string))
 	c.Data["IsVcsEnabled"] = isVcsEnabled
 	c.Data["Type"] = query.Autotests
+	c.Data["IntegrationStrategies"] = integrationStrategies
+	c.Data["CodeBaseIntegrationStrategy"] = true
 	c.TplName = "create_autotest.html"
 }
 

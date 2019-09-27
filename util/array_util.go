@@ -16,6 +16,8 @@
 
 package util
 
+import "strings"
+
 func Contains(array []string, e string) bool {
 	for _, element := range array {
 		if element == e {
@@ -23,4 +25,13 @@ func Contains(array []string, e string) bool {
 		}
 	}
 	return false
+}
+
+func RemoveElByValue(array []string, val string) []string {
+	for i, v := range array {
+		if strings.ToLower(v) == strings.ToLower(val) {
+			return append(array[:i], array[i+1:]...)
+		}
+	}
+	return array
 }
