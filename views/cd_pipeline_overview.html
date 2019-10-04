@@ -61,15 +61,15 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            {{range .CDPipeline.CodebaseBranch}}
+
+                                            {{range .CDPipeline.CodebaseDockerStream}}
                                                 <tr>
                                                     <td class="codebaseName">
-                                                        {{.Codebase.Name}}
+                                                        {{.CodebaseBranch.Codebase.Name}}
                                                     </td>
                                                     <td>
-                                                        {{$dockerStream := index .CodebaseDockerStream 0}}
-                                                        <a href="{{.VCSLink}}" target="_blank" class="edp-link"
-                                                           rel="noopener noreferrer">{{$dockerStream.OcImageStreamName}}</a>
+                                                        <a href="{{.ImageLink}}" target="_blank" class="edp-link"
+                                                           rel="noopener noreferrer">{{.OcImageStreamName}}</a>
                                                     </td>
                                                     <td>
                                                         <a href="{{.CICDLink}}" target="_blank" class="edp-link"
@@ -80,6 +80,7 @@
                                                     </td>
                                                 </tr>
                                             {{end}}
+
                                             </tbody>
                                         </table>
                                     </div>

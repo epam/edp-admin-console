@@ -47,7 +47,10 @@ type ErrMsg struct {
 	StatusCode int
 }
 
-const OpenshiftProjectLink = "%s/console/project/"
+const (
+	OpenshiftProjectLink = "%s/console/project/"
+	EdpCICDPostfix       = "-edp-cicd"
+)
 
 func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand) (*k8s.CDPipeline, error) {
 	log.Printf("Start creating CD Pipeline: %v", cdPipeline)
@@ -131,6 +134,8 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 	}
 	if cdPipeline != nil {
 		createJenkinsLink(cdPipeline)
+		createDockerImageLinks(cdPipeline.CodebaseDockerStream)
+
 		if len(cdPipeline.Stage) != 0 {
 			sortStagesByOrder(cdPipeline.Stage)
 			createOpenshiftProjectLinks(cdPipeline.Stage, cdPipeline.Name)
@@ -369,7 +374,8 @@ func (s *CDPipelineService) getCDPipelineCR(pipelineName string) (*k8s.CDPipelin
 func createJenkinsLinks(cdPipelines []*query.CDPipeline) {
 	wildcard := beego.AppConfig.String("dnsWildcard")
 	for index, pipeline := range cdPipelines {
-		pipeline.JenkinsLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s", "jenkins", context.Tenant, wildcard, fmt.Sprintf("%s-%s", pipeline.Name, "cd-pipeline"))
+		pipeline.JenkinsLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s", "jenkins", context.Tenant,
+			wildcard, fmt.Sprintf("%s-%s", pipeline.Name, "cd-pipeline"))
 		cdPipelines[index] = pipeline
 		log.Printf("Created Jenkins link %v", pipeline.JenkinsLink)
 	}
@@ -377,17 +383,19 @@ func createJenkinsLinks(cdPipelines []*query.CDPipeline) {
 
 func createJenkinsLink(cdPipeline *query.CDPipeline) {
 	wildcard := beego.AppConfig.String("dnsWildcard")
-	cdPipeline.JenkinsLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s", "jenkins", context.Tenant, wildcard, fmt.Sprintf("%s-%s", cdPipeline.Name, "cd-pipeline"))
+	cdPipeline.JenkinsLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s", "jenkins", context.Tenant,
+		wildcard, fmt.Sprintf("%s-%s", cdPipeline.Name, "cd-pipeline"))
 	log.Printf("Created CD Pipeline Jenkins link %v", cdPipeline.JenkinsLink)
-	createLinksForBranchEntities(cdPipeline.CodebaseBranch)
 }
 
-func createLinksForBranchEntities(branchEntities []*query.CodebaseBranch) {
-	wildcard := beego.AppConfig.String("dnsWildcard")
-	for index, branch := range branchEntities {
-		branch.VCSLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/gitweb?p=%s.git;a=shortlog;h=refs/heads/%s", "gerrit", context.Tenant, wildcard, branch.Codebase.Name, branch.Name)
-		branch.CICDLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s/view/%s", "jenkins", context.Tenant, wildcard, branch.Codebase.Name, strings.ToUpper(branch.Name))
-		branchEntities[index] = branch
+func createDockerImageLinks(stream []*query.CodebaseDockerStream) {
+	openshiftClusterURL = beego.AppConfig.String("openshiftClusterURL")
+
+	for i, val := range stream {
+		stream[i].ImageLink = fmt.Sprintf(openshiftClusterURL+"/console/project/%v%v/browse/images/%v", context.Tenant,
+			EdpCICDPostfix, val.OcImageStreamName)
+		stream[i].CICDLink = fmt.Sprintf("https://%s-%s-edp-cicd.%s/job/%s/view/%s", "jenkins", context.Tenant,
+			wildcard, val.CodebaseBranch.Codebase.Name, strings.ToUpper(val.CodebaseBranch.Name))
 	}
 }
 
