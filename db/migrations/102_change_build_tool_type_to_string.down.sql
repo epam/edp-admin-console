@@ -1,0 +1,1 @@
+alter table codebase alter column build_tool type build_tool using build_tool::build_tool;
