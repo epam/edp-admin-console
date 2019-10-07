@@ -80,10 +80,11 @@ func logAutotestsRequestData(autotests command.CreateCodebase) {
 
 func (c *AutotestsController) extractAutotestsRequestData() command.CreateCodebase {
 	codebase := command.CreateCodebase{
-		Lang:      c.GetString("appLang"),
-		BuildTool: c.GetString("buildTool"),
-		Strategy:  strings.ToLower(c.GetString("strategy")),
-		Type:      "autotests",
+		Lang:         c.GetString("appLang"),
+		BuildTool:    c.GetString("buildTool"),
+		Strategy:     strings.ToLower(c.GetString("strategy")),
+		Type:         "autotests",
+		JenkinsSlave: c.GetString("jenkinsSlave"),
 	}
 
 	if codebase.Strategy == strings.ToLower(ImportStrategy) {

@@ -62,6 +62,7 @@ func init() {
 	pipelineRepository := repository.CDPipelineRepository{}
 	serviceRepository := repository.ServiceCatalogRepository{}
 	gitServerRepository := repository.GitServerRepository{}
+	sr := repository.SlaveRepository{}
 
 	edpService := service.EDPTenantService{Clients: clients}
 	clusterService := service.ClusterService{Clients: clients}
@@ -70,15 +71,16 @@ func init() {
 	pipelineService := service.CDPipelineService{Clients: clients, ICDPipelineRepository: pipelineRepository, CodebaseService: codebaseService, BranchService: branchService}
 	thirdPartyService := service.ThirdPartyService{IServiceCatalogRepository: serviceRepository}
 	gitServerService := service.GitServerService{IGitServerRepository: gitServerRepository}
+	ss := service.SlaveService{ISlaveRepository: sr}
 
 	beego.ErrorController(&controllers.ErrorController{})
 	beego.Router("/", &controllers.MainController{EDPTenantService: edpService}, "get:Index")
 
 	adminEdpNamespace := beego.NewNamespace("/admin/edp",
 		beego.NSRouter("/overview", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPComponents"),
-		beego.NSRouter("/application/overview", &controllers.ApplicationController{CodebaseService: codebaseService, EDPTenantService: edpService, BranchService: branchService, GitServerService: gitServerService}, "get:GetApplicationsOverviewPage"),
-		beego.NSRouter("/application/create", &controllers.ApplicationController{CodebaseService: codebaseService, EDPTenantService: edpService, BranchService: branchService, GitServerService: gitServerService}, "get:GetCreateApplicationPage"),
-		beego.NSRouter("/application", &controllers.ApplicationController{CodebaseService: codebaseService, EDPTenantService: edpService, BranchService: branchService, GitServerService: gitServerService}, "post:CreateApplication"),
+		beego.NSRouter("/application/overview", &controllers.ApplicationController{CodebaseService: codebaseService, EDPTenantService: edpService, BranchService: branchService, GitServerService: gitServerService, SlaveService: ss}, "get:GetApplicationsOverviewPage"),
+		beego.NSRouter("/application/create", &controllers.ApplicationController{CodebaseService: codebaseService, EDPTenantService: edpService, BranchService: branchService, GitServerService: gitServerService, SlaveService: ss}, "get:GetCreateApplicationPage"),
+		beego.NSRouter("/application", &controllers.ApplicationController{CodebaseService: codebaseService, EDPTenantService: edpService, BranchService: branchService, GitServerService: gitServerService, SlaveService: ss}, "post:CreateApplication"),
 
 		beego.NSRouter("/cd-pipeline/overview", &controllers.CDPipelineController{CodebaseService: codebaseService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService, ThirdPartyService: thirdPartyService}, "get:GetContinuousDeliveryPage"),
 		beego.NSRouter("/cd-pipeline/create", &controllers.CDPipelineController{CodebaseService: codebaseService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService, ThirdPartyService: thirdPartyService}, "get:GetCreateCDPipelinePage"),

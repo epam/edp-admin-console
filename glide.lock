@@ -1,5 +1,5 @@
-hash: 7c900e5536151a6c9792677fe43fbb8e6c355a10526ac5ca76f1169cb0ccda7d
-updated: 2019-09-03T11:44:27.6740072+03:00
+hash: 35073a0adc9bf37366c02bbbae7131a04e835a228362a3e4954b87e013538b04
+updated: 2019-10-07T16:41:16.915257+03:00
 imports:
 - name: github.com/astaxie/beego
   version: 32ee728078c84c28f2642c70745afc8f6830044d
@@ -112,6 +112,8 @@ imports:
   version: 25c428535bd3f55a16f149a9daebd3fa4c5a562b
 - name: github.com/peterbourgon/diskv
   version: 5f041e8faa004a95c88a202771f4cc3e991971e6
+- name: github.com/pkg/errors
+  version: ba968bfe8b2f7e042a574c888954fccecfa385b4
 - name: github.com/pquerna/cachecontrol
   version: 1555304b9b35fdd2b425bccf1a5613677705e7d0
   subpackages:

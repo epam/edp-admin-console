@@ -35,6 +35,7 @@ type ApplicationController struct {
 	EDPTenantService service.EDPTenantService
 	BranchService    service.CodebaseBranchService
 	GitServerService service.GitServerService
+	SlaveService     service.SlaveService
 }
 
 const (
@@ -117,12 +118,19 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 		c.Data["GitServers"] = gitServers
 	}
 
+	s, err := c.SlaveService.GetAllSlaves()
+	if err != nil {
+		c.Abort("500")
+		return
+	}
+
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["IsVcsEnabled"] = isVcsEnabled
 	c.Data["Type"] = query.App
 	c.Data["CodeBaseIntegrationStrategy"] = true
 	c.Data["IntegrationStrategies"] = integrationStrategies
+	c.Data["JenkinsSlaves"] = s
 	c.TplName = "create_application.html"
 }
 
@@ -183,28 +191,29 @@ func (c *ApplicationController) CreateApplication() {
 	c.Redirect(fmt.Sprintf("/admin/edp/application/overview?%s=%s#codebaseSuccessModal", paramWaitingForCodebase, codebase.Name), 302)
 }
 
-func (this *ApplicationController) extractApplicationRequestData() command.CreateCodebase {
+func (c *ApplicationController) extractApplicationRequestData() command.CreateCodebase {
 	codebase := command.CreateCodebase{
-		Lang:      this.GetString("appLang"),
-		BuildTool: this.GetString("buildTool"),
-		Strategy:  strings.ToLower(this.GetString("strategy")),
-		Type:      "application",
+		Lang:         c.GetString("appLang"),
+		BuildTool:    c.GetString("buildTool"),
+		Strategy:     strings.ToLower(c.GetString("strategy")),
+		Type:         "application",
+		JenkinsSlave: c.GetString("jenkinsSlave"),
 	}
 
 	if codebase.Strategy == "import" {
-		codebase.GitServer = this.GetString("gitServer")
-		gitRepoPath := this.GetString("gitRelativePath")
+		codebase.GitServer = c.GetString("gitServer")
+		gitRepoPath := c.GetString("gitRelativePath")
 		codebase.GitUrlPath = &gitRepoPath
 		codebase.Name = path.Base(*codebase.GitUrlPath)
 	} else {
-		codebase.Name = this.GetString("nameOfApp")
+		codebase.Name = c.GetString("nameOfApp")
 		codebase.GitServer = "gerrit"
 	}
 
-	framework := this.GetString("framework")
+	framework := c.GetString("framework")
 	codebase.Framework = &framework
 
-	isMultiModule, _ := this.GetBool("isMultiModule", false)
+	isMultiModule, _ := c.GetBool("isMultiModule", false)
 	codebase.MultiModule = isMultiModule
 
 	if isMultiModule {
@@ -212,21 +221,21 @@ func (this *ApplicationController) extractApplicationRequestData() command.Creat
 		codebase.Framework = &multimoduleApp
 	}
 
-	repoUrl := this.GetString("gitRepoUrl")
+	repoUrl := c.GetString("gitRepoUrl")
 	if repoUrl != "" {
 		codebase.Repository = &command.Repository{
 			Url: repoUrl,
 		}
 
-		isRepoPrivate, _ := this.GetBool("isRepoPrivate", false)
+		isRepoPrivate, _ := c.GetBool("isRepoPrivate", false)
 		if isRepoPrivate {
-			codebase.Repository.Login = this.GetString("repoLogin")
-			codebase.Repository.Password = this.GetString("repoPassword")
+			codebase.Repository.Login = c.GetString("repoLogin")
+			codebase.Repository.Password = c.GetString("repoPassword")
 		}
 	}
 
-	vcsLogin := this.GetString("vcsLogin")
-	vcsPassword := this.GetString("vcsPassword")
+	vcsLogin := c.GetString("vcsLogin")
+	vcsPassword := c.GetString("vcsPassword")
 	if vcsLogin != "" && vcsPassword != "" {
 		codebase.Vcs = &command.Vcs{
 			Login:    vcsLogin,
@@ -234,26 +243,26 @@ func (this *ApplicationController) extractApplicationRequestData() command.Creat
 		}
 	}
 
-	needRoute, _ := this.GetBool("needRoute", false)
+	needRoute, _ := c.GetBool("needRoute", false)
 	if needRoute {
 		codebase.Route = &command.Route{
-			Site: this.GetString("routeSite"),
+			Site: c.GetString("routeSite"),
 		}
-		if len(this.GetString("routePath")) > 0 {
-			codebase.Route.Path = this.GetString("routePath")
+		if len(c.GetString("routePath")) > 0 {
+			codebase.Route.Path = c.GetString("routePath")
 		}
 	}
 
-	needDb, _ := this.GetBool("needDb", false)
+	needDb, _ := c.GetBool("needDb", false)
 	if needDb {
 		codebase.Database = &command.Database{
-			Kind:     this.GetString("database"),
-			Version:  this.GetString("dbVersion"),
-			Capacity: this.GetString("dbCapacity") + this.GetString("capacityExt"),
-			Storage:  this.GetString("dbPersistentStorage"),
+			Kind:     c.GetString("database"),
+			Version:  c.GetString("dbVersion"),
+			Capacity: c.GetString("dbCapacity") + c.GetString("capacityExt"),
+			Storage:  c.GetString("dbPersistentStorage"),
 		}
 	}
-	codebase.Username = this.Ctx.Input.Session("username").(string)
+	codebase.Username = c.Ctx.Input.Session("username").(string)
 	return codebase
 }
 

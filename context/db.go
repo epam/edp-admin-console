@@ -66,7 +66,7 @@ func InitDb() {
 	orm.Debug = debug
 	orm.RegisterModel(new(query.Codebase), new(query.ActionLog), new(query.CodebaseBranch), new(query.ThirdPartyService),
 		new(query.CDPipeline), new(query.Stage), new(query.QualityGate), new(query.ApplicationsToPromote), new(query.CodebaseDockerStream),
-		new(query.GitServer))
+		new(query.GitServer), new(query.JenkinsSlave))
 }
 
 func checkErr(err error) {

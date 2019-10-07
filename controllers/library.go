@@ -123,10 +123,11 @@ func (c *LibraryController) Create() {
 
 func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
 	library := command.CreateCodebase{
-		Lang:      c.GetString("appLang"),
-		BuildTool: c.GetString("buildTool"),
-		Strategy:  strings.ToLower(c.GetString("strategy")),
-		Type:      "library",
+		Lang:         c.GetString("appLang"),
+		BuildTool:    c.GetString("buildTool"),
+		Strategy:     strings.ToLower(c.GetString("strategy")),
+		Type:         "library",
+		JenkinsSlave: c.GetString("jenkinsSlave"),
 	}
 
 	if library.Strategy == strings.ToLower(ImportStrategy) {

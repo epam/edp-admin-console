@@ -23,7 +23,8 @@
                     Create Application
                 </h1>
                 <p>
-                    To create an application, pass all the steps below and receive the following: Gerrit Project, Code Review, Jenkins Pipelines.
+                    To create an application, pass all the steps below and receive the following: Gerrit Project, Code
+                    Review, Jenkins Pipelines.
                 </p>
 
                 {{ if .Error }}
@@ -54,10 +55,12 @@
                                         <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                                               title="Application name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters."></span>
                                     </label>
-                                    <input name="nameOfApp" type="text" class="codebase-name form-control" id="nameOfApp"
+                                    <input name="nameOfApp" type="text" class="codebase-name form-control"
+                                           id="nameOfApp"
                                            placeholder="Type your application name">
                                     <div class="codebase-name-validation invalid-feedback regex-error">
-                                        Application name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters.
+                                        Application name may contain only: lower-case letters, numbers and dashes and
+                                        cannot start and end with dash. Minimum 2 characters.
                                     </div>
                                     <div class="app-name-duplicate-validation">
                                         <div class="invalid-feedback duplicate-msg">
@@ -202,6 +205,40 @@
                                               title="The application has multi-module structure, in which there is API and a main application that implements the API."></span>
                                     </label>
                                 </div>
+
+                                <div class="form-group jenkinsSlave">
+                                    <div class="js-form-subsection form-subsection formSubsection1">
+                                        <label for="jenkinsSlave">Select Jenkins Slave
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Select Jenkins Slave which will be used to handle application."></span>
+                                        </label>
+                                        <select class="form-control jenkinsSlave" name="jenkinsSlave">
+                                            <option>maven</option>
+                                            <option>gradle</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="js-form-subsection form-subsection formSubsection2">
+                                        <label for="jenkinsSlave">Select Jenkins Slave
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Select Jenkins Slave which will be used to handle application."></span>
+                                        </label>
+                                        <select class="form-control jenkinsSlave" name="jenkinsSlave">
+                                            <option>npm</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="js-form-subsection form-subsection formSubsection3">
+                                        <label for="jenkinsSlave">Select Jenkins Slave
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Select Jenkins Slave which will be used to handle application."></span>
+                                        </label>
+                                        <select class="form-control jenkinsSlave" name="jenkinsSlave">
+                                            <option>dotnet</option>
+                                        </select>
+                                    </div>
+                                </div>
+
                                 <button type="button" class="application-submit edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
                                         data-target="{{if .IsVcsEnabled}}#collapseVCS{{else}}#collapseFour{{end}}"
@@ -213,7 +250,7 @@
                         </div>
                     </div>
                     {{if .IsVcsEnabled}}
-                    {{template "template/accordion_vcs_template.html" .}}
+                        {{template "template/accordion_vcs_template.html" .}}
                     {{end}}
                     <div class="card route-block">
                         <div class="card-header collapsed" id="headingFour" data-toggle="collapse"
@@ -229,7 +266,7 @@
                         </div>
                         <div id="collapseFour" class="collapse route" aria-labelledby="headingFour"
                              data-parent="#accordionCreateCodebase">
-                            <div class="card-body" >
+                            <div class="card-body">
                                 <div class="form-check form-group">
                                     <input class="form-check-input" type="checkbox" value="true" id="needRoute"
                                            name="needRoute">
@@ -245,7 +282,8 @@
                                     <input name="routeSite" type="text" class="form-control" id="routeSite"
                                            placeholder="Enter exposing service name">
                                     <div class="route-site invalid-feedback">
-                                        Site names may only contain lower-case letters, numbers, and dashes. They may not start or end with a dash. Min 2 characters.
+                                        Site names may only contain lower-case letters, numbers, and dashes. They may
+                                        not start or end with a dash. Min 2 characters.
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -263,7 +301,7 @@
                                         data-toggle="collapse"
                                         data-target="#collapseFive" aria-expanded="false"
                                         aria-controls="collapseFour">
-                                Proceed
+                                    Proceed
                                 </button>
                             </div>
                         </div>
@@ -311,10 +349,13 @@
                                               title="Specify size of database."></span>
                                     </label>
                                     <div class="d-flex">
-                                        <input name="dbCapacity" type="number" min="1" oninput="validity.valid||(value='');" class="form-control storage-capacity"
+                                        <input name="dbCapacity" type="number" min="1"
+                                               oninput="validity.valid||(value='');"
+                                               class="form-control storage-capacity"
                                                id="dbCapacity" placeholder="Enter database size">
-                                        <select class="capacity-ext form-control storage-capacity-ext" name="capacityExt">
-                                            <option value="Mi" >Mi</option>
+                                        <select class="capacity-ext form-control storage-capacity-ext"
+                                                name="capacityExt">
+                                            <option value="Mi">Mi</option>
                                             <option value="Gi">Gi</option>
                                             <option value="Ti">Ti</option>
                                         </select>

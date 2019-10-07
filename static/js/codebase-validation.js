@@ -16,7 +16,7 @@ $(function () {
     $('.tooltip-icon').add('[data-toggle="tooltip"]').tooltip();
 
     !function () {
-        $('.form-group .js-form-subsection select').attr('disabled', true);
+        $('.form-group .js-form-subsection select:not(.jenkinsSlave)').attr('disabled', true);
 
         $('.multi-module').addClass('hide-element');
         $('#multiModule').attr("disabled", true);
@@ -101,7 +101,7 @@ $(function () {
         $('.multi-module').addClass('hide-element');
         $('#multiModule').attr("disabled", true);
 
-        $.each($('.build-tool .js-form-subsection'), function () {
+        $.each($('.build-tool .js-form-subsection, .jenkinsSlave .js-form-subsection'), function () {
             if ($(this).hasClass($(e.target).data('target').substring(1))) {
                 $(this).show();
                 $(this).find('select').attr('disabled', false);

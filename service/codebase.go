@@ -267,13 +267,14 @@ func getSecret(name string, username string, password string) *v1.Secret {
 
 func convertData(codebase command.CreateCodebase) k8s.CodebaseSpec {
 	spec := k8s.CodebaseSpec{
-		Lang:      codebase.Lang,
-		Framework: codebase.Framework,
-		BuildTool: codebase.BuildTool,
-		Strategy:  codebase.Strategy,
-		Name:      codebase.Name,
-		Type:      codebase.Type,
-		GitServer: codebase.GitServer,
+		Lang:         codebase.Lang,
+		Framework:    codebase.Framework,
+		BuildTool:    codebase.BuildTool,
+		Strategy:     codebase.Strategy,
+		Name:         codebase.Name,
+		Type:         codebase.Type,
+		GitServer:    codebase.GitServer,
+		JenkinsSlave: codebase.JenkinsSlave,
 	}
 
 	if spec.Strategy == "import" {

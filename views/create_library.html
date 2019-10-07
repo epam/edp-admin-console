@@ -115,8 +115,8 @@
                                                   title="Select library build tool."></span>
                                         </label>
                                         <select class="form-control java-build-tools" name="buildTool">
-                                            <option>Gradle</option>
                                             <option>Maven</option>
+                                            <option>Gradle</option>
                                         </select>
                                     </div>
                                     <div class="js-form-subsection form-subsection formSubsection-js">
@@ -134,6 +134,39 @@
                                                   title="Select library build tool."></span>
                                         </label>
                                         <select class="form-control" name="buildTool">
+                                            <option>dotnet</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group jenkinsSlave">
+                                    <div class="js-form-subsection form-subsection formSubsection-java">
+                                        <label for="jenkinsSlave">Select Jenkins Slave
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Select Jenkins Slave which will be used to handle application."></span>
+                                        </label>
+                                        <select class="form-control jenkinsSlave" name="jenkinsSlave">
+                                            <option>maven</option>
+                                            <option>gradle</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="js-form-subsection form-subsection formSubsection-js">
+                                        <label for="jenkinsSlave">Select Jenkins Slave
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Select Jenkins Slave which will be used to handle application."></span>
+                                        </label>
+                                        <select class="form-control jenkinsSlave" name="jenkinsSlave">
+                                            <option>npm</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="js-form-subsection form-subsection formSubsection-dotnet">
+                                        <label for="jenkinsSlave">Select Jenkins Slave
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Select Jenkins Slave which will be used to handle application."></span>
+                                        </label>
+                                        <select class="form-control jenkinsSlave" name="jenkinsSlave">
                                             <option>dotnet</option>
                                         </select>
                                     </div>

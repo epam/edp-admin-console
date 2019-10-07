@@ -35,6 +35,7 @@ type CodebaseSpec struct {
 	Description         *string     `json:"description"`
 	GitServer           string      `json:"gitServer"`
 	GitUrlPath          *string     `json:"gitUrlPath"`
+	JenkinsSlave        string      `json:"jenkinsSlave"`
 }
 
 type Repository struct {
