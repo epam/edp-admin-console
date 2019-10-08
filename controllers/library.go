@@ -22,6 +22,10 @@ type LibraryController struct {
 	CodebaseService  service.CodebaseService
 	BranchService    service.CodebaseBranchService
 	GitServerService service.GitServerService
+	SlaveService     service.SlaveService
+
+	IntegrationStrategies []string
+	BuildTools            []string
 }
 
 func (c *LibraryController) GetLibraryListPage() {
@@ -59,13 +63,7 @@ func (c *LibraryController) GetCreatePage() {
 		return
 	}
 
-	integrationStrategies := getStrategiesFromEnvVariable()
-	if integrationStrategies == nil {
-		c.Abort("500")
-		return
-	}
-
-	contains := doesIntegrationStrategiesContainImportStrategy(integrationStrategies)
+	contains := doesIntegrationStrategiesContainImportStrategy(c.IntegrationStrategies)
 	if contains {
 		log.Println("Import strategy is used.")
 
@@ -79,13 +77,21 @@ func (c *LibraryController) GetCreatePage() {
 		c.Data["GitServers"] = gitServers
 	}
 
+	s, err := c.SlaveService.GetAllSlaves()
+	if err != nil {
+		c.Abort("500")
+		return
+	}
+
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["HasRights"] = isAdmin(c.GetSession("realm_roles").([]string))
 	c.Data["IsVcsEnabled"] = isVcsEnabled
 	c.Data["Type"] = query.Library
 	c.Data["CodeBaseIntegrationStrategy"] = true
-	c.Data["IntegrationStrategies"] = integrationStrategies
+	c.Data["IntegrationStrategies"] = c.IntegrationStrategies
+	c.Data["JenkinsSlaves"] = s
+	c.Data["BuildTools"] = c.BuildTools
 	c.TplName = "create_library.html"
 }
 

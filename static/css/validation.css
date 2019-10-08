@@ -22,3 +22,8 @@
 .form-error {
     color: red;
 }
+
+.button-disable {
+    pointer-events: none;
+    opacity: 0.4;
+}

@@ -36,6 +36,9 @@ type ApplicationController struct {
 	BranchService    service.CodebaseBranchService
 	GitServerService service.GitServerService
 	SlaveService     service.SlaveService
+
+	IntegrationStrategies []string
+	BuildTools            []string
 }
 
 const (
@@ -94,17 +97,11 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 		return
 	}
 
-	integrationStrategies := getStrategiesFromEnvVariable()
-	if integrationStrategies == nil {
-		c.Abort("500")
-		return
-	}
-
 	if flash.Data["error"] != "" {
 		c.Data["Error"] = flash.Data["error"]
 	}
 
-	contains := doesIntegrationStrategiesContainImportStrategy(integrationStrategies)
+	contains := doesIntegrationStrategiesContainImportStrategy(c.IntegrationStrategies)
 	if contains {
 		log.Println("Import strategy is used.")
 
@@ -129,8 +126,9 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 	c.Data["IsVcsEnabled"] = isVcsEnabled
 	c.Data["Type"] = query.App
 	c.Data["CodeBaseIntegrationStrategy"] = true
-	c.Data["IntegrationStrategies"] = integrationStrategies
+	c.Data["IntegrationStrategies"] = c.IntegrationStrategies
 	c.Data["JenkinsSlaves"] = s
+	c.Data["BuildTools"] = c.BuildTools
 	c.TplName = "create_application.html"
 }
 
@@ -145,18 +143,6 @@ func contains(a []string, x string) bool {
 		}
 	}
 	return false
-}
-
-func getStrategiesFromEnvVariable() []string {
-	integrationStrategies := beego.AppConfig.String("integrationStrategies")
-	if integrationStrategies == "" {
-		log.Printf("'INTEGRATION_STRATEGIES' variable is empty.")
-		return nil
-	}
-
-	s := strings.Split(integrationStrategies, ",")
-	log.Printf("Fetched Integrationg Strategies: %v", s)
-	return s
 }
 
 func (c *ApplicationController) CreateApplication() {

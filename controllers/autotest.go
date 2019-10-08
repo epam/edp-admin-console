@@ -22,10 +22,13 @@ type AutotestsController struct {
 	EDPTenantService service.EDPTenantService
 	BranchService    service.CodebaseBranchService
 	GitServerService service.GitServerService
+	SlaveService     service.SlaveService
+
+	IntegrationStrategies []string
+	BuildTools            []string
 }
 
 const (
-	CreateStrategy = "Create"
 	ImportStrategy = "Import"
 )
 
@@ -184,13 +187,7 @@ func (c *AutotestsController) GetCreateAutotestsPage() {
 		return
 	}
 
-	integrationStrategies := getStrategiesFromEnvVariable()
-	if integrationStrategies == nil {
-		c.Abort("500")
-		return
-	}
-
-	contains := doesIntegrationStrategiesContainImportStrategy(integrationStrategies)
+	contains := doesIntegrationStrategiesContainImportStrategy(c.IntegrationStrategies)
 	if contains {
 		log.Println("Import strategy is used.")
 
@@ -204,7 +201,12 @@ func (c *AutotestsController) GetCreateAutotestsPage() {
 		c.Data["GitServers"] = gitServers
 	}
 
-	integrationStrategies = util.RemoveElByValue(integrationStrategies, CreateStrategy)
+	s, err := c.SlaveService.GetAllSlaves()
+	if err != nil {
+		c.Abort("500")
+		return
+	}
+
 	log.Println("Create strategy is removed from list due to Autotest")
 
 	c.Data["EDPVersion"] = context.EDPVersion
@@ -212,8 +214,10 @@ func (c *AutotestsController) GetCreateAutotestsPage() {
 	c.Data["HasRights"] = isAdmin(c.GetSession("realm_roles").([]string))
 	c.Data["IsVcsEnabled"] = isVcsEnabled
 	c.Data["Type"] = query.Autotests
-	c.Data["IntegrationStrategies"] = integrationStrategies
+	c.Data["IntegrationStrategies"] = c.IntegrationStrategies
 	c.Data["CodeBaseIntegrationStrategy"] = true
+	c.Data["JenkinsSlaves"] = s
+	c.Data["BuildTools"] = c.BuildTools
 	c.TplName = "create_autotest.html"
 }
 

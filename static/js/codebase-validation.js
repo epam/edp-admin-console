@@ -48,48 +48,64 @@ $(function () {
     }();
 
     function activateCloneBlock() {
+        $('.formSubsection-other').hide();
+
+        $('.other-language').removeClass('button-disable');
+
         $('.main-block').data('import-strategy', false);
         $('.app-name').removeClass('hide-element');
 
         $('.gitServerEl').addClass('hide-element');
         $('.gitRelativePathEl').addClass('hide-element');
+
+        $('.repo-url').add($('.private-repo')).removeClass('hide-element');
+
+        if ($('#isRepoPrivate').is(':checked')) {
+            $('.repoLogin').add($('.repoPassword')).removeClass('hide-element');
+        }
     }
 
     function activateCreateBlock() {
+        $('.formSubsection-other').hide();
+
+        $('.other-language').addClass('button-disable');
+
         $('.main-block').data('import-strategy', false);
         $('.app-name').removeClass('hide-element');
 
         $('.gitServerEl').addClass('hide-element');
         $('.gitRelativePathEl').addClass('hide-element');
+
+        $('.repo-url').add($('.private-repo')).addClass('hide-element');
+        $('.repoLogin').add($('.repoPassword')).addClass('hide-element');
     }
 
     function activateImportBlock() {
+        $('.formSubsection-other').hide();
+
+        $('.other-language').removeClass('button-disable');
+
         $('.main-block').data('import-strategy', true);
         $('.app-name').addClass('hide-element');
         $('.gitServerEl').removeClass('hide-element');
         $('.gitRelativePathEl').removeClass('hide-element');
+
+        $('.repo-url').add($('.private-repo')).addClass('hide-element');
+        $('.repoLogin').add($('.repoPassword')).addClass('hide-element');
+    }
+
+    function toggleStrategy(strategy) {
+        if (strategy === 'clone') {
+            activateCloneBlock();
+        } else if (strategy === 'create') {
+            activateCreateBlock();
+        } else {
+            activateImportBlock();
+        }
     }
 
     !function () {
-        let $login = $('.repoLogin'), $pass = $('.repoPassword'),
-            $url = $('.repo-url'), $privateRep = $('.private-repo'),
-            strategy = $('#strategy').val().toLowerCase();
-
-        if (strategy === 'clone') {
-            activateCloneBlock();
-            $url.add($privateRep).removeClass('hide-element');
-            if ($('#isRepoPrivate').is(':checked')) {
-                $login.add($pass).removeClass('hide-element');
-            }
-        } else if (strategy === 'create') {
-            activateCreateBlock();
-            $url.add($privateRep).addClass('hide-element');
-            $login.add($pass).addClass('hide-element');
-        } else {
-            activateImportBlock();
-            $url.add($privateRep).addClass('hide-element');
-            $login.add($pass).addClass('hide-element');
-        }
+        toggleStrategy($('#strategy').val().toLowerCase());
     }();
 
     $('#languageSelection').on('change', function (e) {
@@ -100,6 +116,8 @@ $(function () {
 
         $('.multi-module').addClass('hide-element');
         $('#multiModule').attr("disabled", true);
+
+        $('.main-block').data('code-language', $(e.target).data('target').replace('.formSubsection-', ''));
 
         $.each($('.build-tool .js-form-subsection, .jenkinsSlave .js-form-subsection'), function () {
             if ($(this).hasClass($(e.target).data('target').substring(1))) {
@@ -133,24 +151,7 @@ $(function () {
     });
 
     $('#strategy').change(function () {
-        let $login = $('.repoLogin'), $pass = $('.repoPassword'),
-            $url = $('.repo-url'), $privateRep = $('.private-repo');
-
-        if (this.value.toLowerCase() === 'clone') {
-            activateCloneBlock();
-            $url.add($privateRep).removeClass('hide-element');
-            if ($('#isRepoPrivate').is(':checked')) {
-                $login.add($pass).removeClass('hide-element');
-            }
-        } else if (this.value.toLowerCase() === 'create') {
-            activateCreateBlock();
-            $url.add($privateRep).addClass('hide-element');
-            $login.add($pass).addClass('hide-element');
-        } else {
-            activateImportBlock();
-            $url.add($privateRep).addClass('hide-element');
-            $login.add($pass).addClass('hide-element');
-        }
+        toggleStrategy(this.value.toLowerCase());
     });
 
     $('#btn-modal-continue').click(function () {
@@ -434,12 +435,14 @@ $(function () {
         }
 
         let isLanguageChosen = $codebaseEl.find('.language input').is(':checked'),
-            isFrameworkChosen;
+            isFrameworkChosen = true;
         if (isLanguageChosen) {
-            let $frameworksEl = $codebaseEl.find('.form__input-wrapper .form-subsection input');
-            isFrameworkChosen = $frameworksEl.length === 0 ? true : $frameworksEl.is(":checked");
-            if (!isFrameworkChosen) {
-                $('.frameworkError').show();
+            if ($('.main-block').data('code-language') !== "other") {
+                let $frameworksEl = $codebaseEl.find('.form__input-wrapper .form-subsection input');
+                isFrameworkChosen = $frameworksEl.length === 0 ? true : $frameworksEl.is(":checked");
+                if (!isFrameworkChosen) {
+                    $('.frameworkError').show();
+                }
             }
         } else {
             $('.appLangError').show();

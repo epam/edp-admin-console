@@ -36,7 +36,7 @@
                 <div class="accordion" id="accordionCreateCodebase">
                     {{template "template/accordion_codebase_template.html" .}}
 
-                    <div class="card main-block" data-codebase-type="application" data-import-strategy>
+                    <div class="card main-block" data-codebase-type="application" data-import-strategy data-code-language>
                         <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
                              data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                             <h5 class="mb-0">
@@ -74,41 +74,10 @@
                                           title="Select application language/framework and build tool."></span>
                                 </p>
                                 <div class="form__input-wrapper">
-                                    <fieldset id="languageSelection" class="language">
-                                        <div class="d-flex">
-                                            <div class="form__radio-btn-wrapper">
-                                                <input name="appLang" type="radio" class="form__radio-btn"
-                                                       id="appLang-Java"
-                                                       value="Java" data-target=".formSubsection1">
-                                                <label class="form__radio-label" for="appLang-Java">
-                                                    <img class="form__radio-label-icon" src="/static/img/java-logo.png"
-                                                         alt="logo">
-                                                    <span class="form__radio-label-text">Java</span>
-                                                </label>
-                                            </div>
-                                            <div class="form__radio-btn-wrapper">
-                                                <input name="appLang" type="radio" class="form__radio-btn"
-                                                       id="appLang-JavaScript" value="JavaScript"
-                                                       data-target=".formSubsection2">
-                                                <label class="form__radio-label" for="appLang-JavaScript">
-                                                    <img class="form__radio-label-icon"
-                                                         src="/static/img/unofficial-java-script-logo-2.png" alt="logo">
-                                                    <span class="form__radio-label-text">JavaScript</span>
-                                                </label>
-                                            </div>
-                                            <div class="form__radio-btn-wrapper">
-                                                <input name="appLang" type="radio" class="form__radio-btn"
-                                                       id="appLang-DotNet" value="DotNet"
-                                                       data-target=".formSubsection3">
-                                                <label class="form__radio-label" for="appLang-DotNet">
-                                                    <img class="form__radio-label-icon"
-                                                         src="/static/img/dotNet.png" alt="logo">
-                                                    <span class="form__radio-label-text">DotNet</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </fieldset>
-                                    <div class="js-form-subsection form-subsection formSubsection1">
+
+                                    {{template "template/language_template.html" .}}
+
+                                    <div class="js-form-subsection form-subsection formSubsection-java">
                                         <div class="form__input-wrapper  with-circle"><span
                                                     class="form__input-heading"></span>
                                             <div class="form__radio-btn-wrapper">
@@ -125,7 +94,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="js-form-subsection form-subsection formSubsection2">
+                                    <div class="js-form-subsection form-subsection formSubsection-js">
                                         <div class="form__input-wrapper with-circle"><span
                                                     class="form__input-heading"></span>
                                             <div class="form__radio-btn-wrapper">
@@ -142,7 +111,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="js-form-subsection form-subsection formSubsection3">
+                                    <div class="js-form-subsection form-subsection formSubsection-dotnet">
                                         <div class="form__input-wrapper with-circle"><span
                                                     class="form__input-heading"></span>
                                             <div class="form__radio-btn-wrapper">
@@ -166,36 +135,9 @@
                                 <div class="invalid-feedback frameworkError">
                                     Please select framework.
                                 </div>
-                                <div class="form-group build-tool">
-                                    <div class="js-form-subsection form-subsection formSubsection1">
-                                        <label for="buildTool">Select Build Tool
-                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Select application build tool."></span>
-                                        </label>
-                                        <select class="form-control java-build-tools" name="buildTool">
-                                            <option>Gradle</option>
-                                            <option>Maven</option>
-                                        </select>
-                                    </div>
-                                    <div class="js-form-subsection form-subsection formSubsection2">
-                                        <label for="buildTool">Select Build Tool
-                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Select application build tool."></span>
-                                        </label>
-                                        <select class="form-control" name="buildTool">
-                                            <option>NPM</option>
-                                        </select>
-                                    </div>
-                                    <div class="js-form-subsection form-subsection formSubsection3">
-                                        <label for="buildTool">Select Build Tool
-                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Select application build tool."></span>
-                                        </label>
-                                        <select class="form-control" name="buildTool">
-                                            <option>dotnet</option>
-                                        </select>
-                                    </div>
-                                </div>
+
+                                {{template "template/build_tool_template.html" .}}
+
                                 <div class="form-check multi-module hide-element">
                                     <input class="form-check-input" type="checkbox" value="true" id="multiModule"
                                            name="isMultiModule">
@@ -206,38 +148,7 @@
                                     </label>
                                 </div>
 
-                                <div class="form-group jenkinsSlave">
-                                    <div class="js-form-subsection form-subsection formSubsection1">
-                                        <label for="jenkinsSlave">Select Jenkins Slave
-                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Select Jenkins Slave which will be used to handle application."></span>
-                                        </label>
-                                        <select class="form-control jenkinsSlave" name="jenkinsSlave">
-                                            <option>maven</option>
-                                            <option>gradle</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="js-form-subsection form-subsection formSubsection2">
-                                        <label for="jenkinsSlave">Select Jenkins Slave
-                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Select Jenkins Slave which will be used to handle application."></span>
-                                        </label>
-                                        <select class="form-control jenkinsSlave" name="jenkinsSlave">
-                                            <option>npm</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="js-form-subsection form-subsection formSubsection3">
-                                        <label for="jenkinsSlave">Select Jenkins Slave
-                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Select Jenkins Slave which will be used to handle application."></span>
-                                        </label>
-                                        <select class="form-control jenkinsSlave" name="jenkinsSlave">
-                                            <option>dotnet</option>
-                                        </select>
-                                    </div>
-                                </div>
+                                {{template "template/jenkins_slave_template.html" .}}
 
                                 <button type="button" class="application-submit edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"

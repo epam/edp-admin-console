@@ -1,0 +1,50 @@
+<div class="form-group build-tool">
+
+    <div class="js-form-subsection form-subsection formSubsection-java">
+        <label for="buildTool">Select Build Tool
+            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                  title="Select application build tool."></span>
+        </label>
+        <select class="form-control java-build-tools" name="buildTool">
+            {{if ne .Type "autotests" }}
+                <option>Gradle</option>
+            {{end}}
+            <option>Maven</option>
+        </select>
+    </div>
+
+    {{if ne .Type "autotests" }}
+        <div class="js-form-subsection form-subsection formSubsection-js">
+            <label for="buildTool">Select Build Tool
+                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                      title="Select application build tool."></span>
+            </label>
+            <select class="form-control" name="buildTool">
+                <option>NPM</option>
+            </select>
+        </div>
+
+        <div class="js-form-subsection form-subsection formSubsection-dotnet">
+            <label for="buildTool">Select Build Tool
+                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                      title="Select application build tool."></span>
+            </label>
+            <select class="form-control" name="buildTool">
+                <option>dotnet</option>
+            </select>
+        </div>
+    {{end}}
+
+    <div class="js-form-subsection form-subsection formSubsection-other">
+        <label for="buildTool">Select Build Tool
+            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                  title="Select application build tool."></span>
+        </label>
+        <select class="form-control" name="buildTool">
+            {{range $tool := .BuildTools}}
+                <option>{{$tool}}</option>
+            {{end}}
+        </select>
+    </div>
+
+</div>

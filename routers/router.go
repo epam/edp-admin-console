@@ -23,8 +23,16 @@ import (
 	"edp-admin-console/k8s"
 	"edp-admin-console/repository"
 	"edp-admin-console/service"
+	"edp-admin-console/util"
 	"github.com/astaxie/beego"
 	"log"
+)
+
+const (
+	integrationStrategies = "integrationStrategies"
+	buildTools            = "buildTools"
+
+	CreateStrategy = "Create"
 )
 
 func init() {
@@ -76,11 +84,59 @@ func init() {
 	beego.ErrorController(&controllers.ErrorController{})
 	beego.Router("/", &controllers.MainController{EDPTenantService: edpService}, "get:Index")
 
+	integrationStrategies := util.GetValuesFromConfig(integrationStrategies)
+	if integrationStrategies == nil {
+		log.Fatalf("integrationStrategies config variable is empty.")
+	}
+
+	buildTools := util.GetValuesFromConfig(buildTools)
+	if buildTools == nil {
+		log.Fatalf("buildTools config variable is empty.")
+	}
+
+	is := make([]string, len(integrationStrategies))
+	copy(is, integrationStrategies)
+
+	appc := controllers.ApplicationController{
+		CodebaseService:  codebaseService,
+		EDPTenantService: edpService,
+		BranchService:    branchService,
+		GitServerService: gitServerService,
+		SlaveService:     ss,
+
+		IntegrationStrategies: is,
+		BuildTools:            buildTools,
+	}
+
+	autis := make([]string, len(integrationStrategies))
+	copy(autis, integrationStrategies)
+
+	autc := controllers.AutotestsController{
+		EDPTenantService: edpService,
+		CodebaseService:  codebaseService,
+		BranchService:    branchService,
+		GitServerService: gitServerService,
+		SlaveService:     ss,
+
+		IntegrationStrategies: util.RemoveElByValue(autis, CreateStrategy),
+		BuildTools:            buildTools,
+	}
+
+	lc := controllers.LibraryController{
+		EDPTenantService: edpService,
+		CodebaseService:  codebaseService,
+		GitServerService: gitServerService,
+		SlaveService:     ss,
+
+		IntegrationStrategies: is,
+		BuildTools:            buildTools,
+	}
+
 	adminEdpNamespace := beego.NewNamespace("/admin/edp",
 		beego.NSRouter("/overview", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPComponents"),
-		beego.NSRouter("/application/overview", &controllers.ApplicationController{CodebaseService: codebaseService, EDPTenantService: edpService, BranchService: branchService, GitServerService: gitServerService, SlaveService: ss}, "get:GetApplicationsOverviewPage"),
-		beego.NSRouter("/application/create", &controllers.ApplicationController{CodebaseService: codebaseService, EDPTenantService: edpService, BranchService: branchService, GitServerService: gitServerService, SlaveService: ss}, "get:GetCreateApplicationPage"),
-		beego.NSRouter("/application", &controllers.ApplicationController{CodebaseService: codebaseService, EDPTenantService: edpService, BranchService: branchService, GitServerService: gitServerService, SlaveService: ss}, "post:CreateApplication"),
+		beego.NSRouter("/application/overview", &appc, "get:GetApplicationsOverviewPage"),
+		beego.NSRouter("/application/create", &appc, "get:GetCreateApplicationPage"),
+		beego.NSRouter("/application", &appc, "post:CreateApplication"),
 
 		beego.NSRouter("/cd-pipeline/overview", &controllers.CDPipelineController{CodebaseService: codebaseService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService, ThirdPartyService: thirdPartyService}, "get:GetContinuousDeliveryPage"),
 		beego.NSRouter("/cd-pipeline/create", &controllers.CDPipelineController{CodebaseService: codebaseService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService, ThirdPartyService: thirdPartyService}, "get:GetCreateCDPipelinePage"),
@@ -88,16 +144,16 @@ func init() {
 		beego.NSRouter("/cd-pipeline", &controllers.CDPipelineController{CodebaseService: codebaseService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService, ThirdPartyService: thirdPartyService}, "post:CreateCDPipeline"),
 		beego.NSRouter("/cd-pipeline/:name/update", &controllers.CDPipelineController{CodebaseService: codebaseService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService, ThirdPartyService: thirdPartyService}, "post:UpdateCDPipeline"),
 		beego.NSRouter("/cd-pipeline/:pipelineName/overview", &controllers.CDPipelineController{EDPTenantService: edpService, BranchService: branchService, PipelineService: pipelineService, ThirdPartyService: thirdPartyService}, "get:GetCDPipelineOverviewPage"),
-		beego.NSRouter("/autotest/overview", &controllers.AutotestsController{EDPTenantService: edpService, CodebaseService: codebaseService, BranchService: branchService, GitServerService: gitServerService}, "get:GetAutotestsOverviewPage"),
-		beego.NSRouter("/autotest/create", &controllers.AutotestsController{EDPTenantService: edpService, CodebaseService: codebaseService, BranchService: branchService, GitServerService: gitServerService}, "get:GetCreateAutotestsPage"),
-		beego.NSRouter("/autotest", &controllers.AutotestsController{EDPTenantService: edpService, CodebaseService: codebaseService, BranchService: branchService, GitServerService: gitServerService}, "post:CreateAutotests"),
+		beego.NSRouter("/autotest/overview", &autc, "get:GetAutotestsOverviewPage"),
+		beego.NSRouter("/autotest/create", &autc, "get:GetCreateAutotestsPage"),
+		beego.NSRouter("/autotest", &autc, "post:CreateAutotests"),
 
 		beego.NSRouter("/codebase/:codebaseName/overview", &controllers.CodebaseController{CodebaseService: codebaseService, EDPTenantService: edpService, BranchService: branchService}, "get:GetCodebaseOverviewPage"),
 		beego.NSRouter("/codebase/:codebaseName/branch", &controllers.BranchController{BranchService: branchService, CodebaseService: codebaseService}, "post:CreateCodebaseBranch"),
 
-		beego.NSRouter("/library/overview", &controllers.LibraryController{EDPTenantService: edpService, CodebaseService: codebaseService, GitServerService: gitServerService}, "get:GetLibraryListPage"),
-		beego.NSRouter("/library/create", &controllers.LibraryController{EDPTenantService: edpService, CodebaseService: codebaseService, GitServerService: gitServerService}, "get:GetCreatePage"),
-		beego.NSRouter("/library", &controllers.LibraryController{EDPTenantService: edpService, CodebaseService: codebaseService, GitServerService: gitServerService}, "post:Create"),
+		beego.NSRouter("/library/overview", &lc, "get:GetLibraryListPage"),
+		beego.NSRouter("/library/create", &lc, "get:GetCreatePage"),
+		beego.NSRouter("/library", &lc, "post:Create"),
 		beego.NSRouter("/service/overview", &controllers.ThirdPartyServiceController{ThirdPartyService: thirdPartyService}, "get:GetServicePage"),
 	)
 	beego.AddNamespace(adminEdpNamespace)
