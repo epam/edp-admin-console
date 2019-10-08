@@ -84,6 +84,13 @@ func (CodebaseRepository) GetCodebasesByCriteria(criteria query.CodebaseCriteria
 			}
 		}
 
+		if c.JenkinsSlaveId != nil {
+			err := loadRelatedJenkinsSlaveName(c)
+			if err != nil {
+				return nil, err
+			}
+		}
+
 	}
 	return codebases, err
 }
@@ -120,6 +127,13 @@ func (CodebaseRepository) GetCodebaseByName(name string) (*query.Codebase, error
 		}
 	}
 
+	if codebase.JenkinsSlaveId != nil {
+		err = loadRelatedJenkinsSlaveName(&codebase)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &codebase, nil
 }
 
@@ -149,6 +163,13 @@ func (CodebaseRepository) GetCodebaseById(id int) (*query.Codebase, error) {
 
 	if codebase.GitServerId != nil {
 		err = loadRelatedGitServerName(&codebase)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if codebase.JenkinsSlaveId != nil {
+		err = loadRelatedJenkinsSlaveName(&codebase)
 		if err != nil {
 			return nil, err
 		}
@@ -225,6 +246,22 @@ func loadRelatedGitServerName(codebase *query.Codebase) error {
 	}
 
 	codebase.GitServer = &server.Name
+
+	return nil
+}
+
+func loadRelatedJenkinsSlaveName(c *query.Codebase) error {
+	o := orm.NewOrm()
+
+	s := query.JenkinsSlave{}
+	err := o.QueryTable(new(query.JenkinsSlave)).
+		Filter("id", c.JenkinsSlaveId).
+		One(&s)
+	if err != nil {
+		return err
+	}
+
+	c.JenkinsSlave = s.Name
 
 	return nil
 }
