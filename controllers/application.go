@@ -44,6 +44,8 @@ type ApplicationController struct {
 const (
 	paramWaitingForBranch   = "waitingforbranch"
 	paramWaitingForCodebase = "waitingforcodebase"
+
+	OtherLanguage = "other"
 )
 
 func (c *ApplicationController) GetApplicationsOverviewPage() {
@@ -196,8 +198,12 @@ func (c *ApplicationController) extractApplicationRequestData() command.CreateCo
 		codebase.GitServer = "gerrit"
 	}
 
-	framework := c.GetString("framework")
-	codebase.Framework = &framework
+	if o := OtherLanguage; codebase.Lang == OtherLanguage {
+		codebase.Framework = &o
+	} else {
+		framework := c.GetString("framework")
+		codebase.Framework = &framework
+	}
 
 	isMultiModule, _ := c.GetBool("isMultiModule", false)
 	codebase.MultiModule = isMultiModule

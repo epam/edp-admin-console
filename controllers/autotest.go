@@ -90,6 +90,10 @@ func (c *AutotestsController) extractAutotestsRequestData() command.CreateCodeba
 		JenkinsSlave: c.GetString("jenkinsSlave"),
 	}
 
+	if o := OtherLanguage; codebase.Lang == OtherLanguage {
+		codebase.Framework = &o
+	}
+
 	if codebase.Strategy == strings.ToLower(ImportStrategy) {
 		codebase.GitServer = c.GetString("gitServer")
 		gitRepoPath := c.GetString("gitRelativePath")

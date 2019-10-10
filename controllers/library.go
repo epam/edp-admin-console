@@ -136,6 +136,10 @@ func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
 		JenkinsSlave: c.GetString("jenkinsSlave"),
 	}
 
+	if o := OtherLanguage; library.Lang == OtherLanguage {
+		library.Framework = &o
+	}
+
 	if library.Strategy == strings.ToLower(ImportStrategy) {
 		library.GitServer = c.GetString("gitServer")
 		gitRepoPath := c.GetString("gitRelativePath")
