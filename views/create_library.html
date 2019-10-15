@@ -80,27 +80,20 @@
 
                                 {{template "template/build_tool_template.html" .}}
 
-                                {{template "template/jenkins_slave_template.html" .}}
-
-                                {{if .IsVcsEnabled}}
-                                    <button type="button" class="library-submit edp-submit-form-btn btn btn-primary"
-                                            data-toggle="collapse"
-                                            data-target="#collapseVCS"
-                                            aria-expanded="false"
-                                            aria-controls="collapseTwo">
-                                        Proceed
-                                    </button>
-                                {{else}}
-                                    <div class="form-buttons-footer-left">
-                                        <button type="submit" class="create-library edp-submit-form-btn btn btn-primary">
-                                            Create
-                                        </button>
-                                    </div>
-                                {{end}}
+                                <button type="button" class="library-submit edp-submit-form-btn btn btn-primary"
+                                        data-toggle="collapse"
+                                        data-target="#collapseThree"
+                                        aria-expanded="false"
+                                        aria-controls="collapseTwo">
+                                    Proceed
+                                </button>
 
                             </div>
                         </div>
                     </div>
+
+                    {{template "template/advanced_settings_block_template.html" .}}
+
                     {{if .IsVcsEnabled}}
                          {{template "template/accordion_vcs_template.html" .}}
                     {{end}}

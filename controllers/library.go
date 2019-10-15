@@ -23,6 +23,7 @@ type LibraryController struct {
 	BranchService    service.CodebaseBranchService
 	GitServerService service.GitServerService
 	SlaveService     service.SlaveService
+	JobProvisioning  service.JobProvisioning
 
 	IntegrationStrategies []string
 	BuildTools            []string
@@ -83,6 +84,12 @@ func (c *LibraryController) GetCreatePage() {
 		return
 	}
 
+	p, err := c.JobProvisioning.GetAllJobProvisioners()
+	if err != nil {
+		c.Abort("500")
+		return
+	}
+
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["HasRights"] = isAdmin(c.GetSession("realm_roles").([]string))
@@ -92,6 +99,7 @@ func (c *LibraryController) GetCreatePage() {
 	c.Data["IntegrationStrategies"] = c.IntegrationStrategies
 	c.Data["JenkinsSlaves"] = s
 	c.Data["BuildTools"] = c.BuildTools
+	c.Data["JobProvisioners"] = p
 	c.TplName = "create_library.html"
 }
 
@@ -129,11 +137,12 @@ func (c *LibraryController) Create() {
 
 func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
 	library := command.CreateCodebase{
-		Lang:         c.GetString("appLang"),
-		BuildTool:    c.GetString("buildTool"),
-		Strategy:     strings.ToLower(c.GetString("strategy")),
-		Type:         "library",
-		JenkinsSlave: c.GetString("jenkinsSlave"),
+		Lang:            c.GetString("appLang"),
+		BuildTool:       c.GetString("buildTool"),
+		Strategy:        strings.ToLower(c.GetString("strategy")),
+		Type:            "library",
+		JenkinsSlave:    c.GetString("jenkinsSlave"),
+		JobProvisioning: c.GetString("jobProvisioning"),
 	}
 
 	if o := OtherLanguage; library.Lang == OtherLanguage {

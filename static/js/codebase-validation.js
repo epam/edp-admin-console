@@ -48,8 +48,6 @@ $(function () {
     }();
 
     function activateCloneBlock() {
-        $('.formSubsection-other').hide();
-
         $('.other-language').removeClass('button-disable');
 
         $('.main-block').data('import-strategy', false);
@@ -66,8 +64,6 @@ $(function () {
     }
 
     function activateCreateBlock() {
-        $('.formSubsection-other').hide();
-
         $('.other-language').addClass('button-disable');
 
         $('.main-block').data('import-strategy', false);
@@ -81,8 +77,6 @@ $(function () {
     }
 
     function activateImportBlock() {
-        $('.formSubsection-other').hide();
-
         $('.other-language').removeClass('button-disable');
 
         $('.main-block').data('import-strategy', true);

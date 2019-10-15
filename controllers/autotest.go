@@ -23,6 +23,7 @@ type AutotestsController struct {
 	BranchService    service.CodebaseBranchService
 	GitServerService service.GitServerService
 	SlaveService     service.SlaveService
+	JobProvisioning  service.JobProvisioning
 
 	IntegrationStrategies []string
 	BuildTools            []string
@@ -83,11 +84,12 @@ func logAutotestsRequestData(autotests command.CreateCodebase) {
 
 func (c *AutotestsController) extractAutotestsRequestData() command.CreateCodebase {
 	codebase := command.CreateCodebase{
-		Lang:         c.GetString("appLang"),
-		BuildTool:    c.GetString("buildTool"),
-		Strategy:     strings.ToLower(c.GetString("strategy")),
-		Type:         "autotests",
-		JenkinsSlave: c.GetString("jenkinsSlave"),
+		Lang:            c.GetString("appLang"),
+		BuildTool:       c.GetString("buildTool"),
+		Strategy:        strings.ToLower(c.GetString("strategy")),
+		Type:            "autotests",
+		JenkinsSlave:    c.GetString("jenkinsSlave"),
+		JobProvisioning: c.GetString("jobProvisioning"),
 	}
 
 	if o := OtherLanguage; codebase.Lang == OtherLanguage {
@@ -211,6 +213,12 @@ func (c *AutotestsController) GetCreateAutotestsPage() {
 		return
 	}
 
+	p, err := c.JobProvisioning.GetAllJobProvisioners()
+	if err != nil {
+		c.Abort("500")
+		return
+	}
+
 	log.Println("Create strategy is removed from list due to Autotest")
 
 	c.Data["EDPVersion"] = context.EDPVersion
@@ -222,6 +230,7 @@ func (c *AutotestsController) GetCreateAutotestsPage() {
 	c.Data["CodeBaseIntegrationStrategy"] = true
 	c.Data["JenkinsSlaves"] = s
 	c.Data["BuildTools"] = c.BuildTools
+	c.Data["JobProvisioners"] = p
 	c.TplName = "create_autotest.html"
 }
 

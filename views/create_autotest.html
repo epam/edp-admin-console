@@ -93,8 +93,6 @@
 
                                 {{template "template/build_tool_template.html" .}}
 
-                                {{template "template/jenkins_slave_template.html" .}}
-
                                 <div class="form-group">
                                     <div class="js-form-subsection-autotest-framework">
                                         <label for="testReportFramework">Autotest Report Framework
@@ -107,24 +105,18 @@
                                     </div>
                                 </div>
 
-
-                                {{if .IsVcsEnabled}}
                                 <button type="button" class="autotest-submit edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
-                                        data-target="#collapseVCS"
+                                        data-target="#collapseThree"
                                         aria-expanded="false"
                                         aria-controls="collapseTwo">
                                     Proceed
                                 </button>
-                                {{else}}
-                                <button type="submit"
-                                        class="create-autotest edp-submit-form-btn btn btn-primary">
-                                    Create
-                                </button>
-                                {{end}}
                             </div>
                         </div>
                     </div>
+
+                    {{template "template/advanced_settings_block_template.html" .}}
 
                     {{if .IsVcsEnabled}}
                         {{template "template/accordion_vcs_template.html" .}}

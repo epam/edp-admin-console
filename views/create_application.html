@@ -148,11 +148,9 @@
                                     </label>
                                 </div>
 
-                                {{template "template/jenkins_slave_template.html" .}}
-
                                 <button type="button" class="application-submit edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
-                                        data-target="{{if .IsVcsEnabled}}#collapseVCS{{else}}#collapseFour{{end}}"
+                                        data-target="#collapseThree"
                                         aria-expanded="false"
                                         aria-controls="collapseTwo">
                                     Proceed
@@ -160,6 +158,9 @@
                             </div>
                         </div>
                     </div>
+
+                    {{template "template/advanced_settings_block_template.html" .}}
+
                     {{if .IsVcsEnabled}}
                         {{template "template/accordion_vcs_template.html" .}}
                     {{end}}

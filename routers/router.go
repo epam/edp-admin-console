@@ -71,6 +71,7 @@ func init() {
 	serviceRepository := repository.ServiceCatalogRepository{}
 	gitServerRepository := repository.GitServerRepository{}
 	sr := repository.SlaveRepository{}
+	pr := repository.JobProvisioning{}
 
 	edpService := service.EDPTenantService{Clients: clients}
 	clusterService := service.ClusterService{Clients: clients}
@@ -80,6 +81,7 @@ func init() {
 	thirdPartyService := service.ThirdPartyService{IServiceCatalogRepository: serviceRepository}
 	gitServerService := service.GitServerService{IGitServerRepository: gitServerRepository}
 	ss := service.SlaveService{ISlaveRepository: sr}
+	ps := service.JobProvisioning{IJobProvisioningRepository: pr}
 
 	beego.ErrorController(&controllers.ErrorController{})
 	beego.Router("/", &controllers.MainController{EDPTenantService: edpService}, "get:Index")
@@ -103,6 +105,7 @@ func init() {
 		BranchService:    branchService,
 		GitServerService: gitServerService,
 		SlaveService:     ss,
+		JobProvisioning:  ps,
 
 		IntegrationStrategies: is,
 		BuildTools:            buildTools,
@@ -117,6 +120,7 @@ func init() {
 		BranchService:    branchService,
 		GitServerService: gitServerService,
 		SlaveService:     ss,
+		JobProvisioning:  ps,
 
 		IntegrationStrategies: util.RemoveElByValue(autis, CreateStrategy),
 		BuildTools:            buildTools,
@@ -127,6 +131,7 @@ func init() {
 		CodebaseService:  codebaseService,
 		GitServerService: gitServerService,
 		SlaveService:     ss,
+		JobProvisioning:  ps,
 
 		IntegrationStrategies: is,
 		BuildTools:            buildTools,

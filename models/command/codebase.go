@@ -18,6 +18,7 @@ type CreateCodebase struct {
 	GitServer           string      `json:"gitServer"`
 	GitUrlPath          *string     `json:"gitUrlPath"`
 	JenkinsSlave        string      `json:"jenkinsSlave"`
+	JobProvisioning     string      `json:"jobProvisioning"`
 }
 
 type Repository struct {

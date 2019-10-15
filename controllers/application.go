@@ -36,6 +36,7 @@ type ApplicationController struct {
 	BranchService    service.CodebaseBranchService
 	GitServerService service.GitServerService
 	SlaveService     service.SlaveService
+	JobProvisioning  service.JobProvisioning
 
 	IntegrationStrategies []string
 	BuildTools            []string
@@ -123,6 +124,12 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 		return
 	}
 
+	p, err := c.JobProvisioning.GetAllJobProvisioners()
+	if err != nil {
+		c.Abort("500")
+		return
+	}
+
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["IsVcsEnabled"] = isVcsEnabled
@@ -131,6 +138,7 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 	c.Data["IntegrationStrategies"] = c.IntegrationStrategies
 	c.Data["JenkinsSlaves"] = s
 	c.Data["BuildTools"] = c.BuildTools
+	c.Data["JobProvisioners"] = p
 	c.TplName = "create_application.html"
 }
 
@@ -181,11 +189,12 @@ func (c *ApplicationController) CreateApplication() {
 
 func (c *ApplicationController) extractApplicationRequestData() command.CreateCodebase {
 	codebase := command.CreateCodebase{
-		Lang:         c.GetString("appLang"),
-		BuildTool:    c.GetString("buildTool"),
-		Strategy:     strings.ToLower(c.GetString("strategy")),
-		Type:         "application",
-		JenkinsSlave: c.GetString("jenkinsSlave"),
+		Lang:            c.GetString("appLang"),
+		BuildTool:       c.GetString("buildTool"),
+		Strategy:        strings.ToLower(c.GetString("strategy")),
+		Type:            "application",
+		JenkinsSlave:    c.GetString("jenkinsSlave"),
+		JobProvisioning: c.GetString("jobProvisioning"),
 	}
 
 	if codebase.Strategy == "import" {
