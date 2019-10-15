@@ -115,6 +115,32 @@
                         </div>
                     </div>
 
+                    <div class="card">
+                        <div class="card-header" id="head-advanced-settings"
+                             aria-expanded="true" aria-controls="collapse-advanced-settings">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" type="button">
+                                    Advanced Settings
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapse-advanced-settings" class="show route" aria-labelledby="head-advanced-settings">
+                            <div class="card-body">
+                                <table class="edp-card-table">
+                                    <tbody>
+                                    <tr >
+                                        <th>Job Provisioner</th>
+                                        <td>{{.Codebase.JobProvisioning}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Jenkins Slave</th>
+                                        <td>{{.Codebase.JenkinsSlave}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
 
                     {{if and (eq .Codebase.Status "active") (ne (len .Codebase.CodebaseBranch) 0) }}
                         <div class="card">

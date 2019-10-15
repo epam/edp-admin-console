@@ -134,6 +134,13 @@ func (CodebaseRepository) GetCodebaseByName(name string) (*query.Codebase, error
 		}
 	}
 
+	if codebase.JobProvisioningId != nil {
+		err = loadRelatedJobProvisioner(&codebase)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &codebase, nil
 }
 
@@ -262,6 +269,22 @@ func loadRelatedJenkinsSlaveName(c *query.Codebase) error {
 	}
 
 	c.JenkinsSlave = s.Name
+
+	return nil
+}
+
+func loadRelatedJobProvisioner(c *query.Codebase) error {
+	o := orm.NewOrm()
+
+	s := query.JobProvisioning{}
+	err := o.QueryTable(new(query.JobProvisioning)).
+		Filter("id", c.JobProvisioningId).
+		One(&s)
+	if err != nil {
+		return err
+	}
+
+	c.JobProvisioning = s.Name
 
 	return nil
 }

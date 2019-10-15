@@ -25,6 +25,8 @@ type Codebase struct {
 	GitProjectPath      *string           `json:"gitProjectPath" orm:"column(git_project_path)"`
 	JenkinsSlaveId      *int              `json:"-" orm:"column(jenkins_slave_id)"`
 	JenkinsSlave        string            `json:"jenkinsSlave" orm:"-"`
+	JobProvisioningId   *int              `json:"-" orm:"column(job_provisioning_id)"`
+	JobProvisioning     string            `json:"jobProvisioning" orm:"-"`
 }
 
 func (c *Codebase) TableName() string {
