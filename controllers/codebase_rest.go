@@ -44,6 +44,10 @@ type ErrMsg struct {
 	StatusCode int
 }
 
+func (c *CodebaseRestController) Prepare() {
+	c.EnableXSRF = false
+}
+
 func (c *CodebaseRestController) GetCodebases() {
 	criteria, err := getFilterCriteria(c)
 	if err != nil {

@@ -24,6 +24,7 @@ import (
 	"edp-admin-console/util"
 	"fmt"
 	"github.com/astaxie/beego"
+	"html/template"
 	"log"
 	"path"
 	"strings"
@@ -139,6 +140,7 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 	c.Data["JenkinsSlaves"] = s
 	c.Data["BuildTools"] = c.BuildTools
 	c.Data["JobProvisioners"] = p
+	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.TplName = "create_application.html"
 }
 

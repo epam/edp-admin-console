@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
+	"html/template"
 	"log"
 	"net/http"
 	"path"
@@ -100,6 +101,7 @@ func (c *LibraryController) GetCreatePage() {
 	c.Data["JenkinsSlaves"] = s
 	c.Data["BuildTools"] = c.BuildTools
 	c.Data["JobProvisioners"] = p
+	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.TplName = "create_library.html"
 }
 

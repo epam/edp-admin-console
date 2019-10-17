@@ -21,6 +21,7 @@ import (
 	"edp-admin-console/models/query"
 	"edp-admin-console/service"
 	"github.com/astaxie/beego"
+	"html/template"
 	"log"
 )
 
@@ -45,29 +46,29 @@ func (c *CodebaseController) GetCodebaseOverviewPage() {
 	}
 
 	codebase.CodebaseBranch = addCodebaseBranchInProgressIfAny(codebase.CodebaseBranch, c.GetString(paramWaitingForBranch))
-	if err != nil {
-		c.Abort("500")
-		return
-	}
 
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["Codebase"] = codebase
 	c.Data["Type"] = codebase.Type
 	switch codebase.Type {
-		case "application": {
+	case "application":
+		{
 			c.Data["TypeCaption"] = "Application"
 			c.Data["TypeSingular"] = "application"
 		}
-		case "autotests": {
+	case "autotests":
+		{
 			c.Data["TypeCaption"] = "Autotests codebase"
 			c.Data["TypeSingular"] = "autotests codebase"
 		}
-		case "library": {
+	case "library":
+		{
 			c.Data["TypeCaption"] = "Library"
 			c.Data["TypeSingular"] = "library"
 		}
 	}
+	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.TplName = "codebase_overview.html"
 }
 

@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
+	"html/template"
 	"log"
 	"net/http"
 	"sort"
@@ -117,6 +118,7 @@ func (c *CDPipelineController) GetCreateCDPipelinePage() {
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["Type"] = "delivery"
 	c.Data["Autotests"] = autotests
+	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.TplName = "create_cd_pipeline.html"
 }
 
@@ -161,6 +163,7 @@ func (c *CDPipelineController) GetEditCDPipelinePage() {
 	c.Data["CDPipeline"] = cdPipeline
 	c.Data["Apps"] = applications
 	c.Data["Type"] = "delivery"
+	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.TplName = "edit_cd_pipeline.html"
 }
 

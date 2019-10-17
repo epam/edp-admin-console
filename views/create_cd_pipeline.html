@@ -45,26 +45,24 @@
                         <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
                              data-parent="#accordionCreatePipeline">
                             <div class="card-body">
-                                <form id="createCDCR" method="post" action="/admin/edp/cd-pipeline">
-                                    <div class="form-group pipeline-name">
-                                        <label for="pipelineName">Pipeline Name:</label>
-                                        <input name="pipelineName" type="text" class="form-control"
-                                               id="pipelineName"
-                                               placeholder="Enter pipeline name ">
-                                        <div class="invalid-feedback pipeline-name-validation">
-                                            Pipeline name may contain only: lower-case letters, numbers and dashes
-                                            and
-                                            cannot start
-                                            and end with dash and dot. Can not be empty.
-                                        </div>
+                                <div class="form-group pipeline-name">
+                                    <label for="pipelineName">Pipeline Name:</label>
+                                    <input name="pipelineName" type="text" class="form-control"
+                                           id="pipelineName"
+                                           placeholder="Enter pipeline name ">
+                                    <div class="invalid-feedback pipeline-name-validation">
+                                        Pipeline name may contain only: lower-case letters, numbers and dashes
+                                        and
+                                        cannot start
+                                        and end with dash and dot. Can not be empty.
                                     </div>
-                                    <button type="button" class="pipeline-info-button edp-submit-form-btn btn btn-primary"
-                                            data-toggle="collapse"
-                                            data-target="#collapseTwo" aria-expanded="false"
-                                            aria-controls="collapseOne">
-                                        Proceed
-                                    </button>
-                                </form>
+                                </div>
+                                <button type="button" class="pipeline-info-button edp-submit-form-btn btn btn-primary"
+                                        data-toggle="collapse"
+                                        data-target="#collapseTwo" aria-expanded="false"
+                                        aria-controls="collapseOne">
+                                    Proceed
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -216,6 +214,7 @@
                         </div>
                     </div>
                 </div>
+                {{ .xsrfdata }}
             </form>
         </div>
     </section>

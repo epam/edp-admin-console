@@ -33,6 +33,10 @@ type CDPipelineRestController struct {
 	CDPipelineService service.CDPipelineService
 }
 
+func (c *CDPipelineRestController) Prepare() {
+	c.EnableXSRF = false
+}
+
 func (c *CDPipelineRestController) GetCDPipelineByName() {
 	pipelineName := c.GetString(":name")
 	cdPipeline, err := c.CDPipelineService.GetCDPipelineByName(pipelineName)
