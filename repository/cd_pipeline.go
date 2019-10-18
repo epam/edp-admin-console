@@ -47,14 +47,13 @@ const (
 		"	left join stage_codebase_docker_stream scds on cs.id = scds.cd_stage_id " +
 		"	left join codebase_docker_stream in_cds on scds.input_codebase_docker_stream_id = in_cds.id " +
 		"	left join codebase_docker_stream out_cds on scds.output_codebase_docker_stream_id = out_cds.id " +
-		"	left join codebase c on in_cds.codebase_id = c.id " +
 		"	left join cd_pipeline_docker_stream cpds on cs.cd_pipeline_id = cpds.cd_pipeline_id " +
 		"	left join codebase_docker_stream cds on cpds.codebase_docker_stream_id = cds.id " +
 		"	left join codebase_branch cb on cb.id = cds.codebase_branch_id " +
+		"	left join codebase c on cb.codebase_id = c.id " +
 		"	left join cd_pipeline cp on cs.cd_pipeline_id = cp.id " +
 		"where cp.name = ? " +
-		"  and cs.name = ? " +
-		"  and cb.codebase_id = in_cds.codebase_id;"
+		"  and cs.name = ? ;"
 	SelectCodebaseAndBranchName = "select c.name codebase_name, cb.name codebase_branch_name " +
 		"	from codebase c " +
 		"left join codebase_branch cb on c.id = cb.codebase_id " +
