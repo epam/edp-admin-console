@@ -1,0 +1,1 @@
+alter table codebase_docker_stream alter column codebase_id drop not null;
