@@ -101,6 +101,12 @@ function createConfirmTable(formName) {
             'Integration method': 'strategy'
         });
 
+    addBlock(null, "ADVANCED CI SETTINGS",
+        {
+            'Job Provisioner': 'jobProvisioning',
+            'Jenkins Slave': 'jenkinsSlave'
+        });
+
     if ( !isFound('strategy') || getValue('strategy') === "clone" ) {
         addBlock(
             null, null,
