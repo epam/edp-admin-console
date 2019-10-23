@@ -41,6 +41,7 @@ type ApplicationController struct {
 
 	IntegrationStrategies []string
 	BuildTools            []string
+	DeploymentScript      []string
 }
 
 const (
@@ -140,6 +141,7 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 	c.Data["JenkinsSlaves"] = s
 	c.Data["BuildTools"] = c.BuildTools
 	c.Data["JobProvisioners"] = p
+	c.Data["DeploymentScripts"] = c.DeploymentScript
 	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.TplName = "create_application.html"
 }
@@ -191,12 +193,13 @@ func (c *ApplicationController) CreateApplication() {
 
 func (c *ApplicationController) extractApplicationRequestData() command.CreateCodebase {
 	codebase := command.CreateCodebase{
-		Lang:            c.GetString("appLang"),
-		BuildTool:       c.GetString("buildTool"),
-		Strategy:        strings.ToLower(c.GetString("strategy")),
-		Type:            "application",
-		JenkinsSlave:    c.GetString("jenkinsSlave"),
-		JobProvisioning: c.GetString("jobProvisioning"),
+		Lang:             c.GetString("appLang"),
+		BuildTool:        c.GetString("buildTool"),
+		Strategy:         strings.ToLower(c.GetString("strategy")),
+		Type:             "application",
+		JenkinsSlave:     c.GetString("jenkinsSlave"),
+		JobProvisioning:  c.GetString("jobProvisioning"),
+		DeploymentScript: c.GetString("deploymentScript"),
 	}
 
 	if codebase.Strategy == "import" {

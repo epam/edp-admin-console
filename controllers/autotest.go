@@ -28,6 +28,7 @@ type AutotestsController struct {
 
 	IntegrationStrategies []string
 	BuildTools            []string
+	DeploymentScript      []string
 }
 
 const (
@@ -85,12 +86,13 @@ func logAutotestsRequestData(autotests command.CreateCodebase) {
 
 func (c *AutotestsController) extractAutotestsRequestData() command.CreateCodebase {
 	codebase := command.CreateCodebase{
-		Lang:            c.GetString("appLang"),
-		BuildTool:       c.GetString("buildTool"),
-		Strategy:        strings.ToLower(c.GetString("strategy")),
-		Type:            "autotests",
-		JenkinsSlave:    c.GetString("jenkinsSlave"),
-		JobProvisioning: c.GetString("jobProvisioning"),
+		Lang:             c.GetString("appLang"),
+		BuildTool:        c.GetString("buildTool"),
+		Strategy:         strings.ToLower(c.GetString("strategy")),
+		Type:             "autotests",
+		JenkinsSlave:     c.GetString("jenkinsSlave"),
+		JobProvisioning:  c.GetString("jobProvisioning"),
+		DeploymentScript: c.GetString("deploymentScript"),
 	}
 
 	if o := OtherLanguage; codebase.Lang == OtherLanguage {

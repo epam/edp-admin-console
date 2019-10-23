@@ -28,6 +28,7 @@ type LibraryController struct {
 
 	IntegrationStrategies []string
 	BuildTools            []string
+	DeploymentScript      []string
 }
 
 func (c *LibraryController) GetLibraryListPage() {
@@ -139,12 +140,13 @@ func (c *LibraryController) Create() {
 
 func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
 	library := command.CreateCodebase{
-		Lang:            c.GetString("appLang"),
-		BuildTool:       c.GetString("buildTool"),
-		Strategy:        strings.ToLower(c.GetString("strategy")),
-		Type:            "library",
-		JenkinsSlave:    c.GetString("jenkinsSlave"),
-		JobProvisioning: c.GetString("jobProvisioning"),
+		Lang:             c.GetString("appLang"),
+		BuildTool:        c.GetString("buildTool"),
+		Strategy:         strings.ToLower(c.GetString("strategy")),
+		Type:             "library",
+		JenkinsSlave:     c.GetString("jenkinsSlave"),
+		JobProvisioning:  c.GetString("jobProvisioning"),
+		DeploymentScript: c.GetString("deploymentScript"),
 	}
 
 	if o := OtherLanguage; library.Lang == OtherLanguage {

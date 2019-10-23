@@ -266,43 +266,44 @@ func getSecret(name string, username string, password string) *v1.Secret {
 }
 
 func convertData(codebase command.CreateCodebase) k8s.CodebaseSpec {
-	spec := k8s.CodebaseSpec{
-		Lang:            codebase.Lang,
-		Framework:       codebase.Framework,
-		BuildTool:       codebase.BuildTool,
-		Strategy:        codebase.Strategy,
-		Name:            codebase.Name,
-		Type:            codebase.Type,
-		GitServer:       codebase.GitServer,
-		JenkinsSlave:    codebase.JenkinsSlave,
-		JobProvisioning: codebase.JobProvisioning,
+	s := k8s.CodebaseSpec{
+		Lang:             codebase.Lang,
+		Framework:        codebase.Framework,
+		BuildTool:        codebase.BuildTool,
+		Strategy:         codebase.Strategy,
+		Name:             codebase.Name,
+		Type:             codebase.Type,
+		GitServer:        codebase.GitServer,
+		JenkinsSlave:     codebase.JenkinsSlave,
+		JobProvisioning:  codebase.JobProvisioning,
+		DeploymentScript: codebase.DeploymentScript,
 	}
 
-	if spec.Strategy == "import" {
-		spec.GitUrlPath = codebase.GitUrlPath
+	if s.Strategy == "import" {
+		s.GitUrlPath = codebase.GitUrlPath
 	}
 
 	if codebase.Framework != nil {
-		spec.Framework = codebase.Framework
+		s.Framework = codebase.Framework
 	}
 
 	if codebase.Repository != nil {
-		spec.Repository = &k8s.Repository{
+		s.Repository = &k8s.Repository{
 			Url: codebase.Repository.Url,
 		}
 	}
 
 	if codebase.Route != nil {
-		spec.Route = &k8s.Route{
+		s.Route = &k8s.Route{
 			Site: codebase.Route.Site,
 		}
 		if len(codebase.Route.Path) > 0 {
-			spec.Route.Path = codebase.Route.Path
+			s.Route.Path = codebase.Route.Path
 		}
 	}
 
 	if codebase.Database != nil {
-		spec.Database = &k8s.Database{
+		s.Database = &k8s.Database{
 			Kind:     codebase.Database.Kind,
 			Version:  codebase.Database.Version,
 			Capacity: codebase.Database.Capacity,
@@ -311,14 +312,14 @@ func convertData(codebase command.CreateCodebase) k8s.CodebaseSpec {
 	}
 
 	if codebase.TestReportFramework != nil {
-		spec.TestReportFramework = codebase.TestReportFramework
+		s.TestReportFramework = codebase.TestReportFramework
 	}
 
 	if codebase.Description != nil {
-		spec.Description = codebase.Description
+		s.Description = codebase.Description
 	}
 
-	return spec
+	return s
 }
 
 func (s CodebaseService) checkBranch(apps []models.CDPipelineApplicationCommand) (bool, error) {

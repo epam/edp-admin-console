@@ -31,6 +31,7 @@ import (
 const (
 	integrationStrategies = "integrationStrategies"
 	buildTools            = "buildTools"
+	deploymentScript      = "deploymentScript"
 
 	CreateStrategy = "Create"
 )
@@ -96,6 +97,11 @@ func init() {
 		log.Fatalf("buildTools config variable is empty.")
 	}
 
+	ds := util.GetValuesFromConfig(deploymentScript)
+	if ds == nil {
+		log.Fatalf("deploymentScript config variable is empty.")
+	}
+
 	is := make([]string, len(integrationStrategies))
 	copy(is, integrationStrategies)
 
@@ -109,6 +115,7 @@ func init() {
 
 		IntegrationStrategies: is,
 		BuildTools:            buildTools,
+		DeploymentScript:      ds,
 	}
 
 	autis := make([]string, len(integrationStrategies))
@@ -124,6 +131,7 @@ func init() {
 
 		IntegrationStrategies: util.RemoveElByValue(autis, CreateStrategy),
 		BuildTools:            buildTools,
+		DeploymentScript:      ds,
 	}
 
 	lc := controllers.LibraryController{
@@ -135,6 +143,7 @@ func init() {
 
 		IntegrationStrategies: is,
 		BuildTools:            buildTools,
+		DeploymentScript:      ds,
 	}
 
 	adminEdpNamespace := beego.NewNamespace("/admin/edp",
