@@ -27,6 +27,7 @@ type Codebase struct {
 	JenkinsSlave        string            `json:"jenkinsSlave" orm:"-"`
 	JobProvisioningId   *int              `json:"-" orm:"column(job_provisioning_id)"`
 	JobProvisioning     string            `json:"jobProvisioning" orm:"-"`
+	DeploymentScript    string            `json:"deploymentScript" orm:"deployment_script"`
 }
 
 func (c *Codebase) TableName() string {
