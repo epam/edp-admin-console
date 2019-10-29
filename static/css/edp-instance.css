@@ -91,3 +91,7 @@
     padding-right: 25px;
     padding-left: 11px;
 }
+
+a.component-name {
+    text-transform: capitalize;
+}

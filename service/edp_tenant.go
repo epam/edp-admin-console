@@ -20,39 +20,13 @@ import (
 	"edp-admin-console/context"
 	"edp-admin-console/k8s"
 	"errors"
-	"fmt"
-	"github.com/astaxie/beego"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"log"
 	"strconv"
-	"strings"
 )
 
 type EDPTenantService struct {
 	Clients k8s.ClientSet
-}
-
-var (
-	edpComponentNames   = []string{"OpenShift", "Jenkins", "Gerrit", "Sonar", "Nexus"}
-	wildcard            = beego.AppConfig.String("dnsWildcard")
-	openshiftClusterURL = beego.AppConfig.String("openshiftClusterURL")
-)
-
-func (edpService EDPTenantService) GetEDPComponents() [][]string {
-	var compWithLinks = make([][]string, len(edpComponentNames))
-	for i := 0; i < len(edpComponentNames); i++ {
-		compWithLinks[i] = make([]string, 2)
-		val := edpComponentNames[i]
-		if val == "OpenShift" {
-			compWithLinks[i][0] = val
-			compWithLinks[i][1] = fmt.Sprintf("%s/console/project/%s-edp-cicd/overview", openshiftClusterURL, context.Tenant)
-		} else {
-			compWithLinks[i][0] = val
-			compWithLinks[i][1] = fmt.Sprintf("https://%s-%s-edp-cicd.%s", strings.ToLower(val), context.Tenant, wildcard)
-
-		}
-	}
-	return compWithLinks
 }
 
 func (this EDPTenantService) GetVcsIntegrationValue() (bool, error) {

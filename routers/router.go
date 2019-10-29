@@ -22,7 +22,9 @@ import (
 	"edp-admin-console/filters"
 	"edp-admin-console/k8s"
 	"edp-admin-console/repository"
+	edpComponentRepo "edp-admin-console/repository/edp-component"
 	"edp-admin-console/service"
+	edpComponentService "edp-admin-console/service/edp-component"
 	"edp-admin-console/util"
 	"github.com/astaxie/beego"
 	"log"
@@ -73,6 +75,7 @@ func init() {
 	gitServerRepository := repository.GitServerRepository{}
 	sr := repository.SlaveRepository{}
 	pr := repository.JobProvisioning{}
+	ecr := edpComponentRepo.EDPComponent{}
 
 	edpService := service.EDPTenantService{Clients: clients}
 	clusterService := service.ClusterService{Clients: clients}
@@ -83,6 +86,7 @@ func init() {
 	gitServerService := service.GitServerService{IGitServerRepository: gitServerRepository}
 	ss := service.SlaveService{ISlaveRepository: sr}
 	ps := service.JobProvisioning{IJobProvisioningRepository: pr}
+	ecs := edpComponentService.EDPComponentService{IEDPComponent: ecr}
 
 	beego.ErrorController(&controllers.ErrorController{})
 	beego.Router("/", &controllers.MainController{EDPTenantService: edpService}, "get:Index")
@@ -146,8 +150,13 @@ func init() {
 		DeploymentScript:      ds,
 	}
 
+	ec := controllers.EDPTenantController{
+		EDPTenantService: edpService,
+		EDPComponent:     ecs,
+	}
+
 	adminEdpNamespace := beego.NewNamespace("/admin/edp",
-		beego.NSRouter("/overview", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetEDPComponents"),
+		beego.NSRouter("/overview", &ec, "get:GetEDPComponents"),
 		beego.NSRouter("/application/overview", &appc, "get:GetApplicationsOverviewPage"),
 		beego.NSRouter("/application/create", &appc, "get:GetCreateApplicationPage"),
 		beego.NSRouter("/application", &appc, "post:CreateApplication"),
@@ -176,7 +185,7 @@ func init() {
 		beego.NSRouter("/codebase", &controllers.CodebaseRestController{CodebaseService: codebaseService}, "post:CreateCodebase"),
 		beego.NSRouter("/codebase", &controllers.CodebaseRestController{CodebaseService: codebaseService}, "get:GetCodebases"),
 		beego.NSRouter("/codebase/:codebaseName", &controllers.CodebaseRestController{CodebaseService: codebaseService}, "get:GetCodebase"),
-		beego.NSRouter("/vcs", &controllers.EDPTenantController{EDPTenantService: edpService}, "get:GetVcsIntegrationValue"),
+		beego.NSRouter("/vcs", &ec, "get:GetVcsIntegrationValue"),
 		beego.NSRouter("/cd-pipeline/:name", &controllers.CDPipelineRestController{CDPipelineService: pipelineService}, "get:GetCDPipelineByName"),
 		beego.NSRouter("/cd-pipeline/:pipelineName/stage/:stageName", &controllers.CDPipelineRestController{CDPipelineService: pipelineService}, "get:GetStage"),
 		beego.NSRouter("/cd-pipeline", &controllers.CDPipelineRestController{CDPipelineService: pipelineService}, "post:CreateCDPipeline"),

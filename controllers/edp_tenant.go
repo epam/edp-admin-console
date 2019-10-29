@@ -19,6 +19,7 @@ package controllers
 import (
 	"edp-admin-console/context"
 	"edp-admin-console/service"
+	ec "edp-admin-console/service/edp-component"
 	"github.com/astaxie/beego"
 	"net/http"
 	"strings"
@@ -27,18 +28,23 @@ import (
 type EDPTenantController struct {
 	beego.Controller
 	EDPTenantService service.EDPTenantService
+	EDPComponent     ec.EDPComponentService
 }
 
-func (this *EDPTenantController) GetEDPComponents() {
-	components := this.EDPTenantService.GetEDPComponents()
+func (c *EDPTenantController) GetEDPComponents() {
+	comp, err := c.EDPComponent.GetEDPComponents()
+	if err != nil {
+		c.Abort("500")
+		return
+	}
 
-	this.Data["Username"] = this.Ctx.Input.Session("username")
-	this.Data["InputURL"] = strings.TrimSuffix(this.Ctx.Input.URL(), "/"+context.Tenant)
-	this.Data["EDPTenantName"] = context.Tenant
-	this.Data["EDPVersion"] = context.EDPVersion
-	this.Data["EDPComponents"] = components
-	this.Data["Type"] = "overview"
-	this.TplName = "edp_components.html"
+	c.Data["Username"] = c.Ctx.Input.Session("username")
+	c.Data["InputURL"] = strings.TrimSuffix(c.Ctx.Input.URL(), "/"+context.Tenant)
+	c.Data["EDPTenantName"] = context.Tenant
+	c.Data["EDPVersion"] = context.EDPVersion
+	c.Data["EDPComponents"] = comp
+	c.Data["Type"] = "overview"
+	c.TplName = "edp_components.html"
 }
 
 func (this *EDPTenantController) GetVcsIntegrationValue() {

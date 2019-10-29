@@ -389,7 +389,8 @@ func createJenkinsLink(cdPipeline *query.CDPipeline) {
 }
 
 func createDockerImageLinks(stream []*query.CodebaseDockerStream) {
-	openshiftClusterURL = beego.AppConfig.String("openshiftClusterURL")
+	openshiftClusterURL := beego.AppConfig.String("openshiftClusterURL")
+	wildcard := beego.AppConfig.String("dnsWildcard")
 
 	for i, val := range stream {
 		stream[i].ImageLink = fmt.Sprintf(openshiftClusterURL+"/console/project/%v%v/browse/images/%v", context.Tenant,

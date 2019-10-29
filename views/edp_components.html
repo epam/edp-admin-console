@@ -23,12 +23,12 @@
                         {{ range $i, $val := .EDPComponents }}
                             <tr>
                                 <td width="25px">
-                                    <a href="{{ index $val 1 }}" target="_blank" rel="noopener noreferrer">
-                                        <img src="/static/img/{{ index $val 0 }}.svg" alt="{{ index $val 0 }}" height="45" width="42">
+                                    <a href="{{ $val.Url }}" target="_blank" rel="noopener noreferrer">
+                                        <img src="data:image/svg+xml;base64,{{ $val.Icon }}" alt="{{ $val.Type }}" height="45" width="42"/>
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="{{ index $val 1 }}" target="_blank" rel="noopener noreferrer">{{ index $val 0 }}</a>
+                                    <a href="{{ $val.Url }}" target="_blank" rel="noopener noreferrer" class="component-name">{{ $val.Type }}</a>
                                 </td>
                             </tr>
                         {{end}}

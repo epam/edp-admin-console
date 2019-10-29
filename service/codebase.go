@@ -185,6 +185,7 @@ func (s CodebaseService) createBranchLinks(codebase query.Codebase, tenant strin
 }
 
 func (s CodebaseService) createLinksForGitProvider(codebase query.Codebase, tenant string) error {
+	wildcard := beego.AppConfig.String("dnsWildcard")
 	gitServer, err := s.IGitServerRepository.GetGitServer(*codebase.GitServer)
 	if err != nil {
 		return err
