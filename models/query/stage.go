@@ -1,15 +1,15 @@
 package query
 
 type Stage struct {
-	Id                   int           `json:"id" orm:"column(id)"`
-	Name                 string        `json:"name" orm:"column(name)"`
-	Description          string        `json:"description" orm:"column(description)"`
-	TriggerType          string        `json:"triggerType" orm:"column(trigger_type)"`
-	Order                int           `json:"order" orm:"column(order)"`
-	OpenshiftProjectLink string        `json:"openshiftProjectLink" orm:"-"`
-	OpenshiftProjectName string        `json:"openshiftProjectName" orm:"-"`
-	CDPipeline           *CDPipeline   `json:"-" orm:"rel(fk);column(cd_pipeline_id)"`
-	QualityGates         []QualityGate `json:"qualityGates" orm:"-"`
+	Id                  int           `json:"id" orm:"column(id)"`
+	Name                string        `json:"name" orm:"column(name)"`
+	Description         string        `json:"description" orm:"column(description)"`
+	TriggerType         string        `json:"triggerType" orm:"column(trigger_type)"`
+	Order               int           `json:"order" orm:"column(order)"`
+	PlatformProjectLink string        `json:"platformProjectLink" orm:"-"`
+	PlatformProjectName string        `json:"platformProjectName" orm:"-"`
+	CDPipeline          *CDPipeline   `json:"-" orm:"rel(fk);column(cd_pipeline_id)"`
+	QualityGates        []QualityGate `json:"qualityGates" orm:"-"`
 }
 
 type QualityGate struct {

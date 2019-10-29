@@ -22,6 +22,7 @@ import (
 	"edp-admin-console/models/command"
 	"edp-admin-console/models/query"
 	"edp-admin-console/service"
+	"edp-admin-console/service/platform"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
@@ -280,6 +281,7 @@ func (c *CDPipelineController) GetCDPipelineOverviewPage() {
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["Type"] = "delivery"
+	c.Data["IsOpenshift"] = platform.IsOpenshift()
 	c.TplName = "cd_pipeline_overview.html"
 }
 

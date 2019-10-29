@@ -108,7 +108,13 @@
                                                 <tr>
                                                     <th scope="col">Name</th>
                                                     <th scope="col">Trigger Type</th>
-                                                    <th scope="col">OpenShift Project</th>
+                                                    <th scope="col">
+                                                        {{if .IsOpenshift}}
+                                                            OpenShift Project
+                                                        {{else}}
+                                                            Kubernetes Namespace
+                                                        {{end}}
+                                                    </th>
                                                     <th scope="col">Quality Gates</th>
                                                 </tr>
                                                 </thead>
@@ -124,7 +130,7 @@
                                                         </td>
                                                         <td>{{.TriggerType}}</td>
                                                         <td>
-                                                            <a href="{{.OpenshiftProjectLink}}" target="_blank" class="edp-link"
+                                                            <a href="{{.PlatformProjectLink}}" target="_blank" class="edp-link"
                                                                rel="noopener noreferrer">Link</a>
                                                         </td>
                                                         <td>

@@ -77,16 +77,27 @@ func init() {
 	pr := repository.JobProvisioning{}
 	ecr := edpComponentRepo.EDPComponent{}
 
+	ecs := edpComponentService.EDPComponentService{IEDPComponent: ecr}
 	edpService := service.EDPTenantService{Clients: clients}
 	clusterService := service.ClusterService{Clients: clients}
 	branchService := service.CodebaseBranchService{Clients: clients, IReleaseBranchRepository: branchRepository}
-	codebaseService := service.CodebaseService{Clients: clients, ICodebaseRepository: codebaseRepository, BranchService: branchService, IGitServerRepository: gitServerRepository}
-	pipelineService := service.CDPipelineService{Clients: clients, ICDPipelineRepository: pipelineRepository, CodebaseService: codebaseService, BranchService: branchService}
+	codebaseService := service.CodebaseService{
+		Clients:              clients,
+		ICodebaseRepository:  codebaseRepository,
+		BranchService:        branchService,
+		IGitServerRepository: gitServerRepository,
+	}
+	pipelineService := service.CDPipelineService{
+		Clients:               clients,
+		ICDPipelineRepository: pipelineRepository,
+		CodebaseService:       codebaseService,
+		BranchService:         branchService,
+		EDPComponent:          ecs,
+	}
 	thirdPartyService := service.ThirdPartyService{IServiceCatalogRepository: serviceRepository}
 	gitServerService := service.GitServerService{IGitServerRepository: gitServerRepository}
 	ss := service.SlaveService{ISlaveRepository: sr}
 	ps := service.JobProvisioning{IJobProvisioningRepository: pr}
-	ecs := edpComponentService.EDPComponentService{IEDPComponent: ecr}
 
 	beego.ErrorController(&controllers.ErrorController{})
 	beego.Router("/", &controllers.MainController{EDPTenantService: edpService}, "get:Index")
