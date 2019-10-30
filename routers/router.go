@@ -86,6 +86,7 @@ func init() {
 		ICodebaseRepository:  codebaseRepository,
 		BranchService:        branchService,
 		IGitServerRepository: gitServerRepository,
+		EDPComponent:         ecs,
 	}
 	pipelineService := service.CDPipelineService{
 		Clients:               clients,

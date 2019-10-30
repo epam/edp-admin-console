@@ -28,3 +28,11 @@ func CreateCICDApplicationLink(domain, codebase, branch string) string {
 func CreateCICDPipelineLink(domain, pipelineName string) string {
 	return fmt.Sprintf("%v/job/%v-%v", domain, pipelineName, "cd-pipeline")
 }
+
+func CreateGerritLink(domain, codebaseName, branchName string) string {
+	return fmt.Sprintf("%v/gitweb?p=%s.git;a=shortlog;h=refs/heads/%s", domain, codebaseName, branchName)
+}
+
+func CreateGitLink(hostname, path, branch string) string {
+	return fmt.Sprintf("https://%s%s/commits/%s", hostname, path, branch)
+}

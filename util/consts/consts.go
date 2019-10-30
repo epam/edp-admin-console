@@ -6,4 +6,5 @@ const (
 	Openshift      = "openshift"
 	Kubernetes     = "kubernetes"
 	DockerRegistry = "docker-registry"
+	Gerrit         = "gerrit"
 )

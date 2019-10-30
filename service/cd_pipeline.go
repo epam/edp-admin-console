@@ -439,13 +439,11 @@ func (s *CDPipelineService) createJenkinsLinks(cdPipelines []*query.CDPipeline) 
 }
 
 func (s *CDPipelineService) createJenkinsLink(cdPipeline *query.CDPipeline) error {
-	c, err := s.EDPComponent.GetEDPComponent(consts.Jenkins)
+	c, err := s.getEDPComponent(consts.Jenkins)
 	if err != nil {
 		return err
 	}
-	if c == nil {
-		return errors.New(fmt.Sprintf("couldn't find %v EDP component in DB", consts.Jenkins))
-	}
+
 	cdPipeline.JenkinsLink = util.CreateCICDPipelineLink(c.Url, cdPipeline.Name)
 
 	log.Printf("Created CD Pipeline Jenkins link %v", cdPipeline.JenkinsLink)
