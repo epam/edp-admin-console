@@ -53,7 +53,8 @@ const (
 		"	left join codebase c on cb.codebase_id = c.id " +
 		"	left join cd_pipeline cp on cs.cd_pipeline_id = cp.id " +
 		"where cp.name = ? " +
-		"  and cs.name = ? ;"
+		"  and cs.name = ? " +
+		"  and cb.id = in_cds.codebase_branch_id;"
 	SelectCodebaseAndBranchName = "select c.name codebase_name, cb.name codebase_branch_name " +
 		"	from codebase c " +
 		"left join codebase_branch cb on c.id = cb.codebase_id " +
