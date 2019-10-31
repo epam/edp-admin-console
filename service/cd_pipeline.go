@@ -29,7 +29,6 @@ import (
 	"edp-admin-console/util/consts"
 	"errors"
 	"fmt"
-	appsV1Client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
@@ -55,6 +54,7 @@ type ErrMsg struct {
 const (
 	OpenshiftProjectLink = "%s/console/project/"
 	EdpCICDPostfix       = "-edp-cicd"
+	platformType         = "platformType"
 )
 
 func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand) (*k8s.CDPipeline, error) {
@@ -161,7 +161,7 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 			cdPipeline.CodebaseBranch[i] = branch
 		}
 
-		matrix, err := fillCodebaseStageMatrix(s.Clients.AppsV1Client, cdPipeline)
+		matrix, err := fillCodebaseStageMatrix(&s.Clients, cdPipeline)
 		if err == nil {
 			cdPipeline.CodebaseStageMatrix = matrix
 		}
@@ -358,14 +358,56 @@ func (s CDPipelineService) getEDPComponent(component string) (*query.EDPComponen
 	return c, nil
 }
 
-func fillCodebaseStageMatrix(ocClient *appsV1Client.AppsV1Client, cdPipeline *query.CDPipeline) (map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, error) {
+func fillCodebaseStageMatrix(ocClient *k8s.ClientSet, cdPipeline *query.CDPipeline) (map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, error) {
+	if !platform.IsOpenshift() {
+		return fillCodebaseStageMatrixK8s(ocClient, cdPipeline)
+	}
 	var matrix = make(map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, len(cdPipeline.CodebaseBranch)*len(cdPipeline.Stage))
+
 	for _, stage := range cdPipeline.Stage {
-		dcs, err := ocClient.DeploymentConfigs(stage.PlatformProjectName).List(metav1.ListOptions{})
+
+		dcs, err := ocClient.AppsV1Client.DeploymentConfigs(stage.PlatformProjectName).List(metav1.ListOptions{})
 		if err != nil {
 			log.Printf("An error has occurred while getting project from OpenShift: %s", err)
 			return nil, err
 		}
+
+		for _, codebase := range cdPipeline.CodebaseBranch {
+			var key = query.CDCodebaseStageMatrixKey{
+				CodebaseBranch: codebase,
+				Stage:          stage,
+			}
+			var value = query.CDCodebaseStageMatrixValue{
+				DockerVersion: "no deploy",
+			}
+			for _, dc := range dcs.Items {
+				for _, container := range dc.Spec.Template.Spec.Containers {
+					if container.Name == codebase.AppName {
+						var containerImage = container.Image
+						var delimeter = strings.LastIndex(containerImage, ":")
+						if delimeter > 0 {
+							value.DockerVersion = string(containerImage[(delimeter + 1):len(containerImage)])
+						}
+					}
+				}
+			}
+			matrix[key] = value
+		}
+
+	}
+	return matrix, nil
+}
+
+func fillCodebaseStageMatrixK8s(ocClient *k8s.ClientSet, cdPipeline *query.CDPipeline) (map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, error) {
+	var matrix = make(map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, len(cdPipeline.CodebaseBranch)*len(cdPipeline.Stage))
+	for _, stage := range cdPipeline.Stage {
+
+		dcs, err := ocClient.ExtensionClient.Deployments(stage.PlatformProjectName).List(metav1.ListOptions{})
+		if err != nil {
+			log.Printf("An error has occurred while getting project from K8s: %s", err)
+			return nil, err
+		}
+
 		for _, codebase := range cdPipeline.CodebaseBranch {
 			var key = query.CDCodebaseStageMatrixKey{
 				CodebaseBranch: codebase,

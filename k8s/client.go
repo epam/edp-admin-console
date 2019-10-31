@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	coreV1Client "k8s.io/client-go/kubernetes/typed/core/v1"
+	extensionsV1Client "k8s.io/client-go/kubernetes/typed/extensions/v1beta1"
 	storageV1Client "k8s.io/client-go/kubernetes/typed/storage/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -33,10 +34,11 @@ var k8sConfig clientcmd.ClientConfig
 var SchemeGroupVersion = schema.GroupVersion{Group: "v2.edp.epam.com", Version: "v1alpha1"}
 
 type ClientSet struct {
-	CoreClient    *coreV1Client.CoreV1Client
-	StorageClient *storageV1Client.StorageV1Client
-	EDPRestClient *rest.RESTClient
-	AppsV1Client  *appsV1Client.AppsV1Client
+	CoreClient      *coreV1Client.CoreV1Client
+	StorageClient   *storageV1Client.StorageV1Client
+	EDPRestClient   *rest.RESTClient
+	AppsV1Client    *appsV1Client.AppsV1Client
+	ExtensionClient *extensionsV1Client.ExtensionsV1beta1Client
 }
 
 func init() {
@@ -71,11 +73,18 @@ func CreateOpenShiftClients() ClientSet {
 		panic(err)
 	}
 
+	extClient, err := getExtensionClient()
+	if err != nil {
+		log.Printf("An error has occurred while getting k8s extension client: %s", err)
+		panic(err)
+	}
+
 	return ClientSet{
-		CoreClient:    coreClient,
-		StorageClient: storageClient,
-		EDPRestClient: crClient,
-		AppsV1Client:  openshiftAppClient,
+		CoreClient:      coreClient,
+		StorageClient:   storageClient,
+		EDPRestClient:   crClient,
+		AppsV1Client:    openshiftAppClient,
+		ExtensionClient: extClient,
 	}
 }
 
@@ -89,6 +98,18 @@ func getCoreClient() (*coreV1Client.CoreV1Client, error) {
 		return nil, err
 	}
 	return coreClient, nil
+}
+
+func getExtensionClient() (*extensionsV1Client.ExtensionsV1beta1Client, error) {
+	restConfig, err := k8sConfig.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+	extClient, err := extensionsV1Client.NewForConfig(restConfig)
+	if err != nil {
+		return nil, err
+	}
+	return extClient, nil
 }
 
 func getStorageClient() (*storageV1Client.StorageV1Client, error) {
