@@ -36,17 +36,19 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label for="deploymentScript">Select Deployment Scripts
-                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                          title="Select Deployment Script which will be used for deploy"></span>
-                </label>
-                <select class="form-control deploymentScript" name="deploymentScript">
-                    {{range $ds := .DeploymentScripts}}
-                        <option>{{$ds}}</option>
-                    {{end}}
-                </select>
-            </div>
+            {{if eq .Type "application" }}
+                <div class="form-group">
+                    <label for="deploymentScript">Select Deployment Scripts
+                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                              title="Select Deployment Script which will be used for deploy"></span>
+                    </label>
+                    <select class="form-control deploymentScript" name="deploymentScript">
+                        {{range $ds := .DeploymentScripts}}
+                            <option>{{$ds}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            {{end}}
 
             {{if eq .Type "application" }}
                 <button type="button" class="advanced-settings-submit edp-submit-form-btn btn btn-primary"
