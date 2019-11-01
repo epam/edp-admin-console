@@ -177,10 +177,7 @@ func (s CodebaseService) GetCodebaseByName(name string) (*query.Codebase, error)
 
 func (s CodebaseService) createBranchLinks(codebase query.Codebase, tenant string) error {
 	if codebase.Strategy == ImportStrategy {
-		err := s.createLinksForGitProvider(codebase, tenant)
-		if err != nil {
-			return err
-		}
+		return s.createLinksForGitProvider(codebase, tenant)
 	}
 	return s.createLinksForGerritProvider(codebase, tenant)
 }
