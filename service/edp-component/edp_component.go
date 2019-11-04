@@ -4,6 +4,7 @@ import (
 	"edp-admin-console/context"
 	"edp-admin-console/models/query"
 	ec "edp-admin-console/repository/edp-component"
+	"edp-admin-console/util/consts"
 	"fmt"
 	"github.com/pkg/errors"
 	"log"
@@ -39,10 +40,16 @@ func (s EDPComponentService) GetEDPComponents() ([]*query.EDPComponent, error) {
 	log.Printf("Fetched EDP Components: %+v", c)
 
 	for i, v := range c {
-		if v.Type == "openshift" {
-			c[i].Url = fmt.Sprintf("%s/console/project/%s-edp-cicd/overview", v.Url, context.Tenant)
-		}
+		modifyPlatformLinks(v.Url, v.Type, c[i])
 	}
 
 	return c, nil
+}
+
+func modifyPlatformLinks(url, componentType string, c *query.EDPComponent) {
+	if componentType == consts.Openshift {
+		c.Url = fmt.Sprintf("%v/console/project/%v-edp-cicd/overview", url, context.Tenant)
+	} else if componentType == consts.Kubernetes {
+		c.Url = fmt.Sprintf("%v/#/overview?namespace=%v-edp-cicd", url, context.Tenant)
+	}
 }
