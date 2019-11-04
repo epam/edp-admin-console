@@ -26,13 +26,12 @@ import (
 	_ "github.com/golang-migrate/migrate/database/postgres"
 	_ "github.com/golang-migrate/migrate/source/file"
 	_ "github.com/lib/pq"
-	"github.com/pkg/errors"
 	"log"
 )
 
 func InitDb() {
 	err := orm.RegisterDriver("postgres", orm.DRPostgres)
-	checkErr(err, fmt.Sprintf("couldn't register %v driver", "postgres"))
+	checkErr(err)
 
 	pgUser := beego.AppConfig.String("pgUser")
 	pgPassword := beego.AppConfig.String("pgPassword")
@@ -45,18 +44,18 @@ func InitDb() {
 		pgUser, pgPassword, pgHost, pgPort, pgDatabase, pgSchema)
 
 	err = orm.RegisterDataBase("default", "postgres", params)
-	checkErr(err, "couldn't register database")
+	checkErr(err)
 	log.Printf("Connection to %s:%s database is established.", pgHost, pgPort)
 
 	db, err := orm.GetDB("default")
-	checkErr(err, "couldnt' get db")
+	checkErr(err)
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	m, err := migrate.NewWithDatabaseInstance(
 		"file://db/migrations",
 		pgDatabase, driver)
-	checkErr(err, "couldn't initialize migration instance")
+	checkErr(err)
 	err = m.Up()
-	checkErr(err, "db migration is failed")
+	checkErr(err)
 	debug, err := beego.AppConfig.Bool("ormDebug")
 	if err != nil {
 		log.Printf("Cannot read orm debug config. Set to false %v", err)
@@ -69,8 +68,16 @@ func InitDb() {
 		new(query.EDPComponent))
 }
 
-func checkErr(err error, msg string) {
+func checkErr(err error) {
 	if err != nil {
-		panic(errors.Wrap(err, msg))
+		handleErr(err)
+	}
+}
+
+func handleErr(err error) {
+	if err.Error() == "no change" {
+		log.Printf("Warning from db migration: %v", err)
+	} else {
+		log.Fatal(err)
 	}
 }
