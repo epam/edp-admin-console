@@ -21,6 +21,7 @@ import (
 	"edp-admin-console/models/command"
 	"edp-admin-console/models/query"
 	"edp-admin-console/service"
+	"edp-admin-console/service/platform"
 	"edp-admin-console/util"
 	"fmt"
 	"github.com/astaxie/beego"
@@ -142,6 +143,7 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 	c.Data["BuildTools"] = c.BuildTools
 	c.Data["JobProvisioners"] = p
 	c.Data["DeploymentScripts"] = c.DeploymentScript
+	c.Data["IsOpenshift"] = platform.IsOpenshift()
 	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.TplName = "create_application.html"
 }

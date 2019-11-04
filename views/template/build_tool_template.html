@@ -5,11 +5,11 @@
             <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                   title="Select application build tool."></span>
         </label>
-        <select class="form-control java-build-tools" name="buildTool">
+        <select class="form-control buildTool java-build-tools" name="buildTool">
             {{if ne .Type "autotests" }}
-                <option>Gradle</option>
+                <option data-build-tool="gradle">Gradle</option>
             {{end}}
-            <option>Maven</option>
+            <option data-build-tool="maven">Maven</option>
         </select>
     </div>
 
@@ -19,8 +19,8 @@
                 <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                       title="Select application build tool."></span>
             </label>
-            <select class="form-control" name="buildTool">
-                <option>NPM</option>
+            <select class="form-control buildTool js-build-tools" name="buildTool">
+                <option data-build-tool="npm">NPM</option>
             </select>
         </div>
 
@@ -29,8 +29,8 @@
                 <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                       title="Select application build tool."></span>
             </label>
-            <select class="form-control" name="buildTool">
-                <option>dotnet</option>
+            <select class="form-control buildTool dotnet-build-tools" name="buildTool">
+                <option data-build-tool="dotnet">dotnet</option>
             </select>
         </div>
     {{end}}
@@ -40,9 +40,9 @@
             <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                   title="Select application build tool."></span>
         </label>
-        <select class="form-control" name="buildTool">
+        <select class="form-control buildTool other-build-tools" name="buildTool">
             {{range $tool := .BuildTools}}
-                <option>{{$tool}}</option>
+                <option data-build-tool="{{$tool}}">{{$tool}}</option>
             {{end}}
         </select>
     </div>

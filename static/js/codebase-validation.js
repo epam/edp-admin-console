@@ -13,7 +13,21 @@ $(function () {
         RELATIVE_PATH: /^\/.*$/
     };
 
+    let DEPLOYMENT_SCRIPT = {
+        OPENSHIFT_TEMPLATE: "openshift-template",
+        HELM_CHART: "helm-chart"
+    };
+
     $('.tooltip-icon').add('[data-toggle="tooltip"]').tooltip();
+
+    !function () {
+        let $deployScriptEl = $('.deploymentScript');
+        if ($('.advanced-settings-block').data('openshift')) {
+            $deployScriptEl.val(DEPLOYMENT_SCRIPT.OPENSHIFT_TEMPLATE);
+            return;
+        }
+        $deployScriptEl.val(DEPLOYMENT_SCRIPT.HELM_CHART);
+    }();
 
     !function () {
         $('.form-group .js-form-subsection select:not(.jenkinsSlave)').attr('disabled', true);
@@ -130,6 +144,8 @@ $(function () {
         }
 
         $('.test-report-framework').val('allure');
+
+        setJenkinsSlave($('.buildTool:enabled'));
     });
 
     $('#isRepoPrivate').change(function () {
@@ -224,7 +240,7 @@ $(function () {
         }
     });
 
-    $('.java-build-tools').change(function () {
+    $('.java-build-tools,.js-build-tools,.dotnet-build-tools,.other-build-tools').change(function () {
         if (this.value === 'Maven') {
             $('#multiModule').attr("disabled", false);
             $('.multi-module').removeClass('hide-element');
@@ -232,7 +248,18 @@ $(function () {
             $('.multi-module').addClass('hide-element');
             $('#multiModule').attr("disabled", true);
         }
+
+        setJenkinsSlave($(this));
     });
+
+    function setJenkinsSlave(el) {
+        let $slave = $('.jenkinsSlave option:contains(' + el.find(':selected').data('build-tool') + ')');
+        if ($slave.length) {
+            $slave.prop({selected: true});
+            return;
+        }
+        $('.jenkinsSlave').val($('.jenkinsSlave option:first').val());
+    }
 
     function validateCodebaseInfo(event) {
         let $codebaseBlockEl = $('.codebase-block');

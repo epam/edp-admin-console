@@ -1,4 +1,4 @@
-<div class="card advanced-settings-block">
+<div class="card advanced-settings-block" data-openshift="{{.IsOpenshift}}">
 
     <div class="card-header collapsed" id="headingThree" data-toggle="collapse"
          data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
@@ -31,7 +31,7 @@
                 </label>
                 <select class="form-control jenkinsSlave" name="jenkinsSlave">
                     {{range .JenkinsSlaves}}
-                        <option>{{.Name}}</option>
+                        <option value="{{.Name}}">{{.Name}}</option>
                     {{end}}
                 </select>
             </div>
