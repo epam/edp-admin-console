@@ -23,12 +23,8 @@ import (
 	"edp-admin-console/models/command"
 	"edp-admin-console/models/query"
 	"edp-admin-console/repository"
-	ec "edp-admin-console/service/edp-component"
-	"edp-admin-console/util"
-	"edp-admin-console/util/consts"
 	"errors"
 	"fmt"
-	"github.com/astaxie/beego"
 	"k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -38,17 +34,14 @@ import (
 )
 
 type CodebaseService struct {
-	Clients              k8s.ClientSet
-	ICodebaseRepository  repository.ICodebaseRepository
-	BranchService        CodebaseBranchService
-	IGitServerRepository repository.GitServerRepository
-	EDPComponent         ec.EDPComponentService
+	Clients             k8s.ClientSet
+	ICodebaseRepository repository.ICodebaseRepository
+	BranchService       CodebaseBranchService
 }
 
 const (
 	CodebaseKind   = "Codebase"
 	CodebasePlural = "codebases"
-	ImportStrategy = "import"
 )
 
 func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*k8s.Codebase, error) {
@@ -164,61 +157,7 @@ func (s CodebaseService) GetCodebaseByName(name string) (*query.Codebase, error)
 	}
 	log.Printf("Fetched codebase info: %+v", codebase)
 
-	if codebase != nil {
-		err := s.createBranchLinks(*codebase, context.Tenant)
-		if err != nil {
-			log.Printf("An error has occurred while creating link to Git Server: %v", err)
-			return nil, err
-		}
-	}
-
 	return codebase, nil
-}
-
-func (s CodebaseService) createBranchLinks(codebase query.Codebase, tenant string) error {
-	if codebase.Strategy == ImportStrategy {
-		return s.createLinksForGitProvider(codebase, tenant)
-	}
-	return s.createLinksForGerritProvider(codebase, tenant)
-}
-
-func (s CodebaseService) createLinksForGitProvider(codebase query.Codebase, tenant string) error {
-	w := beego.AppConfig.String("dnsWildcard")
-	g, err := s.IGitServerRepository.GetGitServer(*codebase.GitServer)
-	if err != nil {
-		return err
-	}
-
-	if g == nil {
-		return errors.New(fmt.Sprintf("unexpected behaviour. couldn't find %v GitServer in DB", *codebase.GitServer))
-	}
-
-	for i, b := range codebase.CodebaseBranch {
-		codebase.CodebaseBranch[i].VCSLink = util.CreateGitLink(g.Hostname, *codebase.GitProjectPath, b.Name)
-		j := fmt.Sprintf("https://%s-%s-edp-cicd.%s", consts.Jenkins, tenant, w)
-		codebase.CodebaseBranch[i].CICDLink = util.CreateCICDApplicationLink(j, codebase.Name, b.Name)
-	}
-
-	return nil
-}
-
-func (s CodebaseService) createLinksForGerritProvider(codebase query.Codebase, tenant string) error {
-	cj, err := s.getEDPComponent(consts.Jenkins)
-	if err != nil {
-		return err
-	}
-
-	cg, err := s.getEDPComponent(consts.Gerrit)
-	if err != nil {
-		return err
-	}
-
-	for i, b := range codebase.CodebaseBranch {
-		codebase.CodebaseBranch[i].VCSLink = util.CreateGerritLink(cg.Url, codebase.Name, b.Name)
-		codebase.CodebaseBranch[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, codebase.Name, b.Name)
-	}
-
-	return nil
 }
 
 func (s CodebaseService) ExistCodebaseAndBranch(cbName, brName string) bool {
@@ -367,15 +306,4 @@ func (s CodebaseService) selectApplicationNames(applicationsToPromote []*query.A
 	log.Printf("Fetched Application to promote: %v", result)
 
 	return result, nil
-}
-
-func (s CodebaseService) getEDPComponent(component string) (*query.EDPComponent, error) {
-	c, err := s.EDPComponent.GetEDPComponent(component)
-	if err != nil {
-		return nil, err
-	}
-	if c == nil {
-		return nil, errors.New(fmt.Sprintf("couldn't find %v EDP component in DB", component))
-	}
-	return c, nil
 }

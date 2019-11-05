@@ -7,4 +7,6 @@ const (
 	Kubernetes     = "kubernetes"
 	DockerRegistry = "docker-registry"
 	Gerrit         = "gerrit"
+
+	EdpCICDPostfix = "-edp-cicd"
 )

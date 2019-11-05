@@ -20,9 +20,15 @@ import (
 	"edp-admin-console/context"
 	"edp-admin-console/models/query"
 	"edp-admin-console/service"
+	ec "edp-admin-console/service/edp-component"
+	"edp-admin-console/util"
+	"edp-admin-console/util/consts"
+	"errors"
+	"fmt"
 	"github.com/astaxie/beego"
 	"html/template"
 	"log"
+	"strings"
 )
 
 type CodebaseController struct {
@@ -30,6 +36,8 @@ type CodebaseController struct {
 	CodebaseService  service.CodebaseService
 	EDPTenantService service.EDPTenantService
 	BranchService    service.CodebaseBranchService
+	GitServerService service.GitServerService
+	EDPComponent     ec.EDPComponentService
 }
 
 func (c *CodebaseController) GetCodebaseOverviewPage() {
@@ -42,6 +50,13 @@ func (c *CodebaseController) GetCodebaseOverviewPage() {
 
 	if codebase == nil {
 		c.Abort("404")
+		return
+	}
+
+	err = c.createBranchLinks(*codebase, context.Tenant)
+	if err != nil {
+		log.Printf("An error has occurred while creating link to Git Server: %v", err)
+		c.Abort("500")
 		return
 	}
 
@@ -88,4 +103,50 @@ func addCodebaseBranchInProgressIfAny(branches []*query.CodebaseBranch, branchIn
 		branches = append(branches, &branch)
 	}
 	return branches
+}
+
+func (c CodebaseController) createBranchLinks(codebase query.Codebase, tenant string) error {
+	if codebase.Strategy == strings.ToLower(ImportStrategy) {
+		return c.createLinksForGitProvider(codebase, tenant)
+	}
+	return c.createLinksForGerritProvider(codebase, tenant)
+}
+
+func (c CodebaseController) createLinksForGitProvider(codebase query.Codebase, tenant string) error {
+	w := beego.AppConfig.String("dnsWildcard")
+	g, err := c.GitServerService.GetGitServer(*codebase.GitServer)
+	if err != nil {
+		return err
+	}
+
+	if g == nil {
+		return errors.New(fmt.Sprintf("unexpected behaviour. couldn't find %v GitServer in DB", *codebase.GitServer))
+	}
+
+	for i, b := range codebase.CodebaseBranch {
+		codebase.CodebaseBranch[i].VCSLink = util.CreateGitLink(g.Hostname, *codebase.GitProjectPath, b.Name)
+		j := fmt.Sprintf("https://%s-%s-edp-cicd.%s", consts.Jenkins, tenant, w)
+		codebase.CodebaseBranch[i].CICDLink = util.CreateCICDApplicationLink(j, codebase.Name, b.Name)
+	}
+
+	return nil
+}
+
+func (c CodebaseController) createLinksForGerritProvider(codebase query.Codebase, tenant string) error {
+	cj, err := c.EDPComponent.GetEDPComponent(consts.Jenkins)
+	if err != nil {
+		return err
+	}
+
+	cg, err := c.EDPComponent.GetEDPComponent(consts.Gerrit)
+	if err != nil {
+		return err
+	}
+
+	for i, b := range codebase.CodebaseBranch {
+		codebase.CodebaseBranch[i].VCSLink = util.CreateGerritLink(cg.Url, codebase.Name, b.Name)
+		codebase.CodebaseBranch[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, codebase.Name, b.Name)
+	}
+
+	return nil
 }

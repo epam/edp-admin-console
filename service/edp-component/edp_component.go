@@ -24,6 +24,10 @@ func (s EDPComponentService) GetEDPComponent(componentType string) (*query.EDPCo
 			componentType)
 	}
 
+	if c == nil {
+		return nil, errors.New(fmt.Sprintf("couldn't find %v EDP component in DB", componentType))
+	}
+
 	log.Printf("Fetched EDP Component: %+v", c)
 
 	return c, nil

@@ -82,11 +82,9 @@ func init() {
 	clusterService := service.ClusterService{Clients: clients}
 	branchService := service.CodebaseBranchService{Clients: clients, IReleaseBranchRepository: branchRepository}
 	codebaseService := service.CodebaseService{
-		Clients:              clients,
-		ICodebaseRepository:  codebaseRepository,
-		BranchService:        branchService,
-		IGitServerRepository: gitServerRepository,
-		EDPComponent:         ecs,
+		Clients:             clients,
+		ICodebaseRepository: codebaseRepository,
+		BranchService:       branchService,
 	}
 	pipelineService := service.CDPipelineService{
 		Clients:               clients,
@@ -167,23 +165,40 @@ func init() {
 		EDPComponent:     ecs,
 	}
 
+	cc := controllers.CodebaseController{
+		CodebaseService:  codebaseService,
+		EDPTenantService: edpService,
+		BranchService:    branchService,
+		GitServerService: gitServerService,
+		EDPComponent:     ecs,
+	}
+
+	cpc := controllers.CDPipelineController{
+		CodebaseService:   codebaseService,
+		PipelineService:   pipelineService,
+		EDPTenantService:  edpService,
+		BranchService:     branchService,
+		ThirdPartyService: thirdPartyService,
+		EDPComponent:      ecs,
+	}
+
 	adminEdpNamespace := beego.NewNamespace("/admin/edp",
 		beego.NSRouter("/overview", &ec, "get:GetEDPComponents"),
 		beego.NSRouter("/application/overview", &appc, "get:GetApplicationsOverviewPage"),
 		beego.NSRouter("/application/create", &appc, "get:GetCreateApplicationPage"),
 		beego.NSRouter("/application", &appc, "post:CreateApplication"),
 
-		beego.NSRouter("/cd-pipeline/overview", &controllers.CDPipelineController{CodebaseService: codebaseService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService, ThirdPartyService: thirdPartyService}, "get:GetContinuousDeliveryPage"),
-		beego.NSRouter("/cd-pipeline/create", &controllers.CDPipelineController{CodebaseService: codebaseService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService, ThirdPartyService: thirdPartyService}, "get:GetCreateCDPipelinePage"),
-		beego.NSRouter("/cd-pipeline/:name/update", &controllers.CDPipelineController{CodebaseService: codebaseService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService, ThirdPartyService: thirdPartyService}, "get:GetEditCDPipelinePage"),
-		beego.NSRouter("/cd-pipeline", &controllers.CDPipelineController{CodebaseService: codebaseService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService, ThirdPartyService: thirdPartyService}, "post:CreateCDPipeline"),
-		beego.NSRouter("/cd-pipeline/:name/update", &controllers.CDPipelineController{CodebaseService: codebaseService, PipelineService: pipelineService, EDPTenantService: edpService, BranchService: branchService, ThirdPartyService: thirdPartyService}, "post:UpdateCDPipeline"),
-		beego.NSRouter("/cd-pipeline/:pipelineName/overview", &controllers.CDPipelineController{EDPTenantService: edpService, BranchService: branchService, PipelineService: pipelineService, ThirdPartyService: thirdPartyService}, "get:GetCDPipelineOverviewPage"),
+		beego.NSRouter("/cd-pipeline/overview", &cpc, "get:GetContinuousDeliveryPage"),
+		beego.NSRouter("/cd-pipeline/create", &cpc, "get:GetCreateCDPipelinePage"),
+		beego.NSRouter("/cd-pipeline/:name/update", &cpc, "get:GetEditCDPipelinePage"),
+		beego.NSRouter("/cd-pipeline", &cpc, "post:CreateCDPipeline"),
+		beego.NSRouter("/cd-pipeline/:name/update", &cpc, "post:UpdateCDPipeline"),
+		beego.NSRouter("/cd-pipeline/:pipelineName/overview", &cpc, "get:GetCDPipelineOverviewPage"),
 		beego.NSRouter("/autotest/overview", &autc, "get:GetAutotestsOverviewPage"),
 		beego.NSRouter("/autotest/create", &autc, "get:GetCreateAutotestsPage"),
 		beego.NSRouter("/autotest", &autc, "post:CreateAutotests"),
 
-		beego.NSRouter("/codebase/:codebaseName/overview", &controllers.CodebaseController{CodebaseService: codebaseService, EDPTenantService: edpService, BranchService: branchService}, "get:GetCodebaseOverviewPage"),
+		beego.NSRouter("/codebase/:codebaseName/overview", &cc, "get:GetCodebaseOverviewPage"),
 		beego.NSRouter("/codebase/:codebaseName/branch", &controllers.BranchController{BranchService: branchService, CodebaseService: codebaseService}, "post:CreateCodebaseBranch"),
 
 		beego.NSRouter("/library/overview", &lc, "get:GetLibraryListPage"),

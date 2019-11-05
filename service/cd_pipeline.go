@@ -25,9 +25,6 @@ import (
 	"edp-admin-console/repository"
 	ec "edp-admin-console/service/edp-component"
 	"edp-admin-console/service/platform"
-	"edp-admin-console/util"
-	"edp-admin-console/util/consts"
-	"errors"
 	"fmt"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -138,22 +135,12 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 		return nil, err
 	}
 	if cdPipeline != nil {
-		if err := s.createJenkinsLink(cdPipeline); err != nil {
-			return nil, err
-		}
-
-		if err := s.createDockerImageLinks(cdPipeline.CodebaseDockerStream); err != nil {
-			return nil, err
-		}
 
 		if len(cdPipeline.Stage) != 0 {
 			sortStagesByOrder(cdPipeline.Stage)
 
 			createPlatformNames(cdPipeline.Stage, cdPipeline.Name)
 
-			if err := s.createPlatformLinks(cdPipeline.Stage, cdPipeline.Name); err != nil {
-				return nil, err
-			}
 			log.Printf("Fetched Stages. Count: {%v}. Rows: {%v}", len(cdPipeline.Stage), cdPipeline.Stage)
 		}
 		for i, branch := range cdPipeline.CodebaseBranch {
@@ -203,13 +190,6 @@ func (s *CDPipelineService) GetAllPipelines(criteria query.CDPipelineCriteria) (
 	if err != nil {
 		log.Printf("An error has occurred while getting CD Pipelines from database: %s", err)
 		return nil, err
-	}
-
-	if len(cdPipelines) != 0 {
-		err := s.createJenkinsLinks(cdPipelines)
-		if err != nil {
-			return nil, err
-		}
 	}
 	log.Printf("Fetched CD Pipelines. Count: {%v}. Rows: {%v}", len(cdPipelines), cdPipelines)
 
@@ -315,47 +295,10 @@ func (s *CDPipelineService) GetStage(cdPipelineName, stageName string) (*models.
 	return stage, nil
 }
 
-func (s *CDPipelineService) createPlatformLinks(stages []*query.Stage, cdPipelineName string) error {
-	if platform.IsOpenshift() {
-		c, err := s.getEDPComponent(consts.Openshift)
-		if err != nil {
-			return err
-		}
-
-		for i, v := range stages {
-			stages[i].PlatformProjectLink = util.CreateNativeProjectLink(c.Url, v.PlatformProjectName)
-		}
-
-		return nil
-	}
-
-	c, err := s.getEDPComponent(consts.Kubernetes)
-	if err != nil {
-		return err
-	}
-
-	for i, v := range stages {
-		stages[i].PlatformProjectLink = util.CreateNonNativeProjectLink(c.Url, v.PlatformProjectName)
-	}
-
-	return nil
-}
-
 func createPlatformNames(stages []*query.Stage, cdPipelineName string) {
 	for i, v := range stages {
 		stages[i].PlatformProjectName = fmt.Sprintf("%s-%s-%s", context.Tenant, cdPipelineName, v.Name)
 	}
-}
-
-func (s CDPipelineService) getEDPComponent(component string) (*query.EDPComponent, error) {
-	c, err := s.EDPComponent.GetEDPComponent(component)
-	if err != nil {
-		return nil, err
-	}
-	if c == nil {
-		return nil, errors.New(fmt.Sprintf("couldn't find %v EDP component in DB", component))
-	}
-	return c, nil
 }
 
 func fillCodebaseStageMatrix(ocClient *k8s.ClientSet, cdPipeline *query.CDPipeline) (map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, error) {
@@ -464,71 +407,6 @@ func (s *CDPipelineService) getCDPipelineCR(pipelineName string) (*k8s.CDPipelin
 	}
 
 	return cdPipeline, nil
-}
-
-func (s *CDPipelineService) createJenkinsLinks(cdPipelines []*query.CDPipeline) error {
-	c, err := s.getEDPComponent(consts.Jenkins)
-	if err != nil {
-		return err
-	}
-
-	for index, pipeline := range cdPipelines {
-		cdPipelines[index].JenkinsLink = util.CreateCICDPipelineLink(c.Url, pipeline.Name)
-		log.Printf("Created Jenkins link %v", pipeline.JenkinsLink)
-	}
-
-	return nil
-}
-
-func (s *CDPipelineService) createJenkinsLink(cdPipeline *query.CDPipeline) error {
-	c, err := s.getEDPComponent(consts.Jenkins)
-	if err != nil {
-		return err
-	}
-
-	cdPipeline.JenkinsLink = util.CreateCICDPipelineLink(c.Url, cdPipeline.Name)
-
-	log.Printf("Created CD Pipeline Jenkins link %v", cdPipeline.JenkinsLink)
-
-	return nil
-}
-
-func (s *CDPipelineService) createDockerImageLinks(stream []*query.CodebaseDockerStream) error {
-	if platform.IsOpenshift() {
-		co, err := s.getEDPComponent(consts.Openshift)
-		if err != nil {
-			return err
-		}
-
-		cj, err := s.getEDPComponent(consts.Jenkins)
-		if err != nil {
-			return err
-		}
-
-		for i, v := range stream {
-			stream[i].ImageLink = util.CreateNativeDockerStreamLink(co.Url, context.Tenant+EdpCICDPostfix, v.OcImageStreamName)
-			stream[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, v.CodebaseBranch.Codebase.Name, v.CodebaseBranch.Name)
-		}
-
-		return nil
-	}
-
-	cd, err := s.getEDPComponent(consts.DockerRegistry)
-	if err != nil {
-		return err
-	}
-
-	cj, err := s.getEDPComponent(consts.Jenkins)
-	if err != nil {
-		return err
-	}
-
-	for i, v := range stream {
-		stream[i].ImageLink = util.CreateNonNativeDockerStreamLink(cd.Url, v.OcImageStreamName)
-		stream[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, v.CodebaseBranch.Codebase.Name, v.CodebaseBranch.Name)
-	}
-
-	return nil
 }
 
 func createCrd(cdPipelineName string, stage command.CDStageCommand) k8s.Stage {

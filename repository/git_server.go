@@ -7,6 +7,7 @@ import (
 
 type IGitServerRepository interface {
 	GetGitServersByCriteria(criteria query.GitServerCriteria) ([]*query.GitServer, error)
+	GetGitServerByName(name string) (*query.GitServer, error)
 }
 
 type GitServerRepository struct {
@@ -28,7 +29,7 @@ func (GitServerRepository) GetGitServersByCriteria(criteria query.GitServerCrite
 	return gitServers, nil
 }
 
-func (GitServerRepository) GetGitServer(name string) (*query.GitServer, error) {
+func (GitServerRepository) GetGitServerByName(name string) (*query.GitServer, error) {
 	o := orm.NewOrm()
 	gitServer := query.GitServer{Name: name}
 

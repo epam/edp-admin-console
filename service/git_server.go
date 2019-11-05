@@ -22,3 +22,16 @@ func (s GitServerService) GetServers(criteria query.GitServerCriteria) ([]*query
 
 	return gitServers, nil
 }
+
+func (s GitServerService) GetGitServer(name string) (*query.GitServer, error) {
+	log.Printf("Start fetching Git Server %v...", name)
+
+	g, err := s.IGitServerRepository.GetGitServerByName(name)
+	if err != nil {
+		log.Printf("An error has occurred while fetching Git Server %v from DB: %v", name, err)
+		return nil, err
+	}
+	log.Printf("Fetched Git Server: %v ", g)
+
+	return g, nil
+}

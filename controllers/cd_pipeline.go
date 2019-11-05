@@ -22,7 +22,11 @@ import (
 	"edp-admin-console/models/command"
 	"edp-admin-console/models/query"
 	"edp-admin-console/service"
+	ec "edp-admin-console/service/edp-component"
 	"edp-admin-console/service/platform"
+	"edp-admin-console/util"
+	"edp-admin-console/util/consts"
+	"errors"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
@@ -39,9 +43,12 @@ type CDPipelineController struct {
 	EDPTenantService  service.EDPTenantService
 	BranchService     service.CodebaseBranchService
 	ThirdPartyService service.ThirdPartyService
+	EDPComponent      ec.EDPComponentService
 }
 
-const paramWaitingForCdPipeline = "waitingforcdpipeline"
+const (
+	paramWaitingForCdPipeline = "waitingforcdpipeline"
+)
 
 func (c *CDPipelineController) GetContinuousDeliveryPage() {
 	applications, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
@@ -66,6 +73,13 @@ func (c *CDPipelineController) GetContinuousDeliveryPage() {
 		c.Abort("500")
 		return
 	}
+
+	err = c.createJenkinsLinks(cdPipelines)
+	if err != nil {
+		c.Abort("500")
+		return
+	}
+
 	cdPipelines = addCdPipelineInProgressIfAny(cdPipelines, c.GetString(paramWaitingForCdPipeline))
 
 	contextRoles := c.GetSession("realm_roles").([]string)
@@ -277,6 +291,26 @@ func (c *CDPipelineController) GetCDPipelineOverviewPage() {
 		return
 	}
 
+	if cdPipeline == nil {
+		c.Abort("404")
+		return
+	}
+
+	if err := c.createOneJenkinsLink(cdPipeline); err != nil {
+		c.Abort("500")
+		return
+	}
+
+	if err := c.createDockerImageLinks(cdPipeline.CodebaseDockerStream); err != nil {
+		c.Abort("500")
+		return
+	}
+
+	if err := c.createPlatformLinks(cdPipeline.Stage, cdPipeline.Name); err != nil {
+		c.Abort("500")
+		return
+	}
+
 	c.Data["CDPipeline"] = cdPipeline
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
@@ -430,4 +464,117 @@ func (c *CDPipelineController) getApplicationsToPromoteFromRequest(appNameCheckb
 		}
 	}
 	return applicationsToPromote
+}
+
+func (c *CDPipelineController) createOneJenkinsLink(cdPipeline *query.CDPipeline) error {
+	edc, err := c.EDPComponent.GetEDPComponent(consts.Jenkins)
+	if err != nil {
+		return err
+	}
+
+	cdPipeline.JenkinsLink = util.CreateCICDPipelineLink(edc.Url, cdPipeline.Name)
+
+	log.Printf("Created CD Pipeline Jenkins link %v", cdPipeline.JenkinsLink)
+
+	return nil
+}
+
+func (c *CDPipelineController) createDockerImageLinks(stream []*query.CodebaseDockerStream) error {
+	if platform.IsOpenshift() {
+		return c.createNativeDockerImageLinks(stream)
+	}
+	return c.createNonNativeDockerImageLinks(stream)
+}
+
+func (c *CDPipelineController) createNativeDockerImageLinks(s []*query.CodebaseDockerStream) error {
+	co, err := c.EDPComponent.GetEDPComponent(consts.Openshift)
+	if err != nil {
+		return err
+	}
+
+	cj, err := c.EDPComponent.GetEDPComponent(consts.Jenkins)
+	if err != nil {
+		return err
+	}
+
+	for i, v := range s {
+		s[i].ImageLink = util.CreateNativeDockerStreamLink(co.Url, context.Tenant+consts.EdpCICDPostfix, v.OcImageStreamName)
+		s[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, v.CodebaseBranch.Codebase.Name, v.CodebaseBranch.Name)
+	}
+
+	return nil
+}
+
+func (c *CDPipelineController) createNonNativeDockerImageLinks(s []*query.CodebaseDockerStream) error {
+	cd, err := c.EDPComponent.GetEDPComponent(consts.DockerRegistry)
+	if err != nil {
+		return err
+	}
+
+	cj, err := c.EDPComponent.GetEDPComponent(consts.Jenkins)
+	if err != nil {
+		return err
+	}
+
+	for i, v := range s {
+		s[i].ImageLink = util.CreateNonNativeDockerStreamLink(cd.Url, v.OcImageStreamName)
+		s[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, v.CodebaseBranch.Codebase.Name, v.CodebaseBranch.Name)
+	}
+
+	return nil
+}
+
+func (c *CDPipelineController) createPlatformLinks(stages []*query.Stage, cdPipelineName string) error {
+	if len(stages) == 0 {
+		return errors.New("stages can't be an empty or nil")
+	}
+
+	if platform.IsOpenshift() {
+		return c.createNativePlatformLinks(stages, cdPipelineName)
+	}
+	return c.createNonNativePlatformLinks(stages, cdPipelineName)
+}
+
+func (c *CDPipelineController) createNativePlatformLinks(stages []*query.Stage, cdPipelineName string) error {
+	edc, err := c.EDPComponent.GetEDPComponent(consts.Openshift)
+	if err != nil {
+		return err
+	}
+
+	for i, v := range stages {
+		stages[i].PlatformProjectLink = util.CreateNativeProjectLink(edc.Url, v.PlatformProjectName)
+	}
+
+	return nil
+}
+
+func (c *CDPipelineController) createNonNativePlatformLinks(stages []*query.Stage, cdPipelineName string) error {
+	edc, err := c.EDPComponent.GetEDPComponent(consts.Kubernetes)
+	if err != nil {
+		return err
+	}
+
+	for i, v := range stages {
+		stages[i].PlatformProjectLink = util.CreateNonNativeProjectLink(edc.Url, v.PlatformProjectName)
+	}
+
+	return nil
+}
+
+func (c *CDPipelineController) createJenkinsLinks(cdPipelines []*query.CDPipeline) error {
+	if len(cdPipelines) == 0 {
+		return errors.New("CD Pipelines can't be an empty or nil")
+	}
+
+	edc, err := c.EDPComponent.GetEDPComponent(consts.Jenkins)
+	if err != nil {
+		return err
+	}
+
+	for index, pipeline := range cdPipelines {
+		cdPipelines[index].JenkinsLink = util.CreateCICDPipelineLink(edc.Url, pipeline.Name)
+		log.Printf("Created Jenkins link %v", pipeline.JenkinsLink)
+	}
+
+	return nil
 }
