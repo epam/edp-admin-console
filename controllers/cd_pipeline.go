@@ -307,6 +307,7 @@ func (c *CDPipelineController) GetCDPipelineOverviewPage() {
 	}
 
 	if err := c.createPlatformLinks(cdPipeline.Stage, cdPipeline.Name); err != nil {
+		log.Println(err)
 		c.Abort("500")
 		return
 	}
@@ -563,7 +564,8 @@ func (c *CDPipelineController) createNonNativePlatformLinks(stages []*query.Stag
 
 func (c *CDPipelineController) createJenkinsLinks(cdPipelines []*query.CDPipeline) error {
 	if len(cdPipelines) == 0 {
-		return errors.New("CD Pipelines can't be an empty or nil")
+		log.Println("There're no CD Pipelines. Generating Jenkins links are skipped.")
+		return nil
 	}
 
 	edc, err := c.EDPComponent.GetEDPComponent(consts.Jenkins)
