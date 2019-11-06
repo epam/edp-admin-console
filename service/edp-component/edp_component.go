@@ -28,7 +28,7 @@ func (s EDPComponentService) GetEDPComponent(componentType string) (*query.EDPCo
 		return nil, errors.New(fmt.Sprintf("couldn't find %v EDP component in DB", componentType))
 	}
 
-	log.Printf("Fetched EDP Component: %+v", c)
+	log.Printf("Fetched EDP Component. type: %v, url: %v", c.Type, c.Url)
 
 	return c, nil
 }
@@ -41,7 +41,7 @@ func (s EDPComponentService) GetEDPComponents() ([]*query.EDPComponent, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "an error has occurred while fetching EDP Components from DB")
 	}
-	log.Printf("Fetched EDP Components: %+v", c)
+	log.Printf("Fetched EDP Components. length: %v", len(c))
 
 	for i, v := range c {
 		modifyPlatformLinks(v.Url, v.Type, c[i])
