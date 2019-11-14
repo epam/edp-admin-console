@@ -177,25 +177,23 @@ func createTempSecrets(namespace string, codebase command.CreateCodebase, coreCl
 	if codebase.Repository != nil && (codebase.Repository.Login != "" && codebase.Repository.Password != "") {
 		repoSecretName := fmt.Sprintf("repository-codebase-%s-temp", codebase.Name)
 		tempRepoSecret := getSecret(repoSecretName, codebase.Repository.Login, codebase.Repository.Password)
-		repositorySecret, err := createSecret(namespace, tempRepoSecret, coreClient)
 
-		if err != nil {
+		if _, err := createSecret(namespace, tempRepoSecret, coreClient); err != nil {
 			log.Printf("An error has occurred while creating repository secret: %s", err)
 			return err
 		}
-		log.Printf("Repository secret was created: %s", repositorySecret)
+		log.Printf("Repository secret for %v codebase was created", codebase.Name)
 	}
 
 	if codebase.Vcs != nil {
 		vcsSecretName := fmt.Sprintf("vcs-autouser-codebase-%s-temp", codebase.Name)
 		tempVcsSecret := getSecret(vcsSecretName, codebase.Vcs.Login, codebase.Vcs.Password)
-		vcsSecret, err := createSecret(namespace, tempVcsSecret, coreClient)
 
-		if err != nil {
+		if _, err := createSecret(namespace, tempVcsSecret, coreClient); err != nil {
 			log.Printf("An error has occurred while creating vcs secret: %s", err)
 			return err
 		}
-		log.Printf("Vcs secret was created: %s", vcsSecret)
+		log.Printf("VCS secret for %v codebase was created", codebase.Name)
 	}
 
 	return nil
