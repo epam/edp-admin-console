@@ -2,11 +2,10 @@ package context
 
 import (
 	"github.com/astaxie/beego"
-	"strings"
 )
 
 var (
 	Namespace  = beego.AppConfig.String("cicdNamespace")
-	Tenant     = strings.TrimSuffix(Namespace, "-edp-cicd")
 	EDPVersion = beego.AppConfig.String("edpVersion")
+	Tenant     = beego.AppConfig.String("edpName")
 )

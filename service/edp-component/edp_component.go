@@ -52,8 +52,8 @@ func (s EDPComponentService) GetEDPComponents() ([]*query.EDPComponent, error) {
 
 func modifyPlatformLinks(url, componentType string, c *query.EDPComponent) {
 	if componentType == consts.Openshift {
-		c.Url = fmt.Sprintf("%v/console/project/%v-edp-cicd/overview", url, context.Tenant)
+		c.Url = fmt.Sprintf("%v/console/project/%v/overview", url, context.Namespace)
 	} else if componentType == consts.Kubernetes {
-		c.Url = fmt.Sprintf("%v/#/overview?namespace=%v-edp-cicd", url, context.Tenant)
+		c.Url = fmt.Sprintf("%v/#/overview?namespace=%v", url, context.Namespace)
 	}
 }
