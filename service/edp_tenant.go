@@ -17,10 +17,8 @@
 package service
 
 import (
-	"edp-admin-console/context"
 	"edp-admin-console/k8s"
-	"errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/astaxie/beego"
 	"log"
 	"strconv"
 )
@@ -30,27 +28,11 @@ type EDPTenantService struct {
 }
 
 func (this EDPTenantService) GetVcsIntegrationValue() (bool, error) {
-	coreClient := this.Clients.CoreClient
-
-	res, err := coreClient.ConfigMaps(context.Namespace).Get("user-settings", metav1.GetOptions{})
-
+	res, err := strconv.ParseBool(beego.AppConfig.String("vcsIntegrationEnabled"))
 	if err != nil {
-		log.Printf("An error has occurred while getting user settings: %s", err)
+		log.Printf("failed to read VCS_INTEGRATION_ENABLED value: %s", err)
 		return false, err
 	}
 
-	var vcsEnabled = res.Data["vcs_integration_enabled"]
-
-	if len(vcsEnabled) == 0 {
-		log.Println("vcs_integration_enabled property doesn't exist")
-		return false, errors.New("NOT_FOUND")
-	}
-
-	result, err := strconv.ParseBool(vcsEnabled)
-
-	if err != nil {
-		log.Printf("An error has occurred while parsing 'vcs_integration_enabled=false': %s", err)
-		return false, err
-	}
-	return result, nil
+	return res, nil
 }
