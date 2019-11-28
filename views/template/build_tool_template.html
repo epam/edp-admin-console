@@ -33,6 +33,17 @@
                 <option data-build-tool="dotnet">dotnet</option>
             </select>
         </div>
+
+        <div class="js-form-subsection form-subsection formSubsection-groovy-pipeline">
+            <label for="buildTool">Select Build Tool
+                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                      title="Select application build tool."></span>
+            </label>
+            <select class="form-control buildTool groovy-pipeline-build-tools" name="buildTool">
+                <option data-build-tool="groovy-pipeline">none</option>
+            </select>
+        </div>
+
     {{end}}
 
     <div class="js-form-subsection form-subsection formSubsection-other">

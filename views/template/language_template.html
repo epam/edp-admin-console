@@ -34,6 +34,20 @@
                     <span class="form__radio-label-text">DotNet</span>
                 </label>
             </div>
+
+        {{end}}
+
+        {{if eq .Type "library" }}
+            <div class="form__radio-btn-wrapper">
+                <input name="appLang" type="radio" class="form__radio-btn"
+                       id="appLang-Groovy-pipeline" value="groovy-pipeline"
+                       data-target=".formSubsection-groovy-pipeline">
+                <label class="form__radio-label" for="appLang-Groovy-pipeline">
+                    <img class="form__radio-label-icon"
+                         src="/static/img/groovy.png" alt="logo">
+                    <span class="form__radio-label-text">Groovy-pipeline</span>
+                </label>
+            </div>
         {{end}}
 
         <div class="form__radio-btn-wrapper other-language">

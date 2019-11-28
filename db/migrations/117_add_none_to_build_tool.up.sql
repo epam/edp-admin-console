@@ -1,0 +1,1 @@
+alter type "build_tool" add value 'none';

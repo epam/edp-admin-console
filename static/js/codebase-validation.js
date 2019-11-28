@@ -240,7 +240,7 @@ $(function () {
         }
     });
 
-    $('.java-build-tools,.js-build-tools,.dotnet-build-tools,.other-build-tools').change(function () {
+    $('.java-build-tools,.js-build-tools,.dotnet-build-tools,.groovy-pipeline-build-tools,.other-build-tools').change(function () {
         if (this.value === 'Maven') {
             $('#multiModule').attr("disabled", false);
             $('.multi-module').removeClass('hide-element');
