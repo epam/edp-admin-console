@@ -105,6 +105,17 @@ func (c *CDPipelineController) GetCreateCDPipelinePage() {
 		return
 	}
 
+	groovyLibs, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
+		BranchStatus: query.Active,
+		Status:       query.Active,
+		Type:         query.Library,
+		Language:     "groovy-pipeline",
+	})
+	if err != nil {
+		c.Abort("500")
+		return
+	}
+
 	if flash.Data["error"] != "" {
 		c.Data["Error"] = flash.Data["error"]
 	}
@@ -129,6 +140,7 @@ func (c *CDPipelineController) GetCreateCDPipelinePage() {
 
 	c.Data["Services"] = services
 	c.Data["Apps"] = apps
+	c.Data["GroovyLibs"] = groovyLibs
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["Type"] = "delivery"

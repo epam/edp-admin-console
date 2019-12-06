@@ -116,11 +116,29 @@ $(function () {
         })
     });
 
+    $('.pipeline-library').change(function () {
+        let $branchEl = $(this).parents('.pipeline-library-row').find('.branch-block-el');
+        if (this.value === 'default') {
+            $branchEl.addClass('hide-element');
+        } else {
+            $branchEl.removeClass('hide-element');
+        }
+
+        let selectedPipelineLibrary = $(this).val();
+        $.each($(this).parents('.pipeline-library-row').find('.pipeline-library-branches'), function () {
+            $(this).data('selected-pipeline-library') === selectedPipelineLibrary ? $(this).show() : $(this).hide();
+        })
+    });
+
     !function () {
         $('.quality-gate-row .autotest-branches').hide();
 
         $.each($('.quality-gate-row .autotest-projects'), function () {
             $('select[data-selected-autotest="' + $(this).val() + '"]').show();
+        });
+
+        $.each($('.pipeline-library-row .pipeline-library-branches'), function () {
+            $('select[data-selected-pipeline-library="' + $(this).val() + '"]').show();
         });
 
     }();

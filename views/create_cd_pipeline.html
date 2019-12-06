@@ -26,9 +26,9 @@
                 <p>Select which applications within this pipeline user wants to deploy.</p>
 
                 {{if .Error}}
-                <div class="backend-validation-error">
-                    {{.Error}}
-                </div>
+                    <div class="backend-validation-error">
+                        {{.Error}}
+                    </div>
                 {{end}}
 
                 <div class="accordion" id="accordionCreatePipeline">
@@ -82,44 +82,46 @@
                              data-parent="#accordionCreatePipeline">
                             <div class="card-body">
                                 {{range .Apps}}
-                                <div class="row">
-                                    <div class="form-group col-sm-4">
-                                        <div class="custom-control custom-checkbox application-checkbox">
-                                            <input type="checkbox" class="custom-control-input app-checkbox"
-                                                   id="{{.Name}}"
-                                                   name="app" value="{{.Name}}">
-                                            <label class="custom-control-label"
-                                                   for="{{.Name}}">{{.Name}}</label>
+                                    <div class="row">
+                                        <div class="form-group col-sm-4">
+                                            <div class="custom-control custom-checkbox application-checkbox">
+                                                <input type="checkbox" class="custom-control-input app-checkbox"
+                                                       id="{{.Name}}"
+                                                       name="app" value="{{.Name}}">
+                                                <label class="custom-control-label"
+                                                       for="{{.Name}}">{{.Name}}</label>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="form-group col-sm-4">
-                                        <select title="Input Docker Streams"
-                                                class="release-branch selectpicker select-{{.Name}} form-control"
-                                                name="{{.Name}}" disabled>
-                                            {{range $i, $rb := .CodebaseBranch}}
-                                                {{range $rb.CodebaseDockerStream}}
-                                                    <option value="{{.OcImageStreamName}}">{{.OcImageStreamName}}</option>
+                                        <div class="form-group col-sm-4">
+                                            <select title="Input Docker Streams"
+                                                    class="release-branch selectpicker select-{{.Name}} form-control"
+                                                    name="{{.Name}}" disabled>
+                                                {{range $i, $rb := .CodebaseBranch}}
+                                                    {{range $rb.CodebaseDockerStream}}
+                                                        <option value="{{.OcImageStreamName}}">{{.OcImageStreamName}}</option>
+                                                    {{end}}
                                                 {{end}}
-                                            {{end}}
-                                        </select>
-                                    </div>
+                                            </select>
+                                        </div>
 
-                                    <div class="form-group col-sm-4">
-                                        <div class="custom-control custom-checkbox application-checkbox">
-                                            <input type="checkbox" class="custom-control-input app-checkbox checkbox-{{.Name}}"
-                                                   id="{{.Name}}-promote"
-                                                   name="{{.Name}}-promote" value="true" checked disabled>
-                                            <label class="custom-control-label"
-                                                   for="{{.Name}}-promote">Promote in pipeline</label>
+                                        <div class="form-group col-sm-4">
+                                            <div class="custom-control custom-checkbox application-checkbox">
+                                                <input type="checkbox"
+                                                       class="custom-control-input app-checkbox checkbox-{{.Name}}"
+                                                       id="{{.Name}}-promote"
+                                                       name="{{.Name}}-promote" value="true" checked disabled>
+                                                <label class="custom-control-label"
+                                                       for="{{.Name}}-promote">Promote in pipeline</label>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                                 {{end}}
                                 <div class="invalid-feedback app-checkbox-error">
                                     At least one checkbox must be checked.
                                 </div>
-                                <button type="button" class="application-info-button edp-submit-form-btn btn btn-primary"
+                                <button type="button"
+                                        class="application-info-button edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
                                         data-target="#collapseThree" aria-expanded="false"
                                         aria-controls="collapseTwo">
@@ -148,9 +150,9 @@
                                 </div>
 
                                 {{if .Error}}
-                                <div class="backend-validation-error">
-                                    {{.Error}}
-                                </div>
+                                    <div class="backend-validation-error">
+                                        {{.Error}}
+                                    </div>
                                 {{end}}
 
                                 <div class="form-group">
@@ -187,20 +189,20 @@
 
                                 <div class="left-padding form-group">
                                     {{if .Services}}
-                                    {{range .Services}}
-                                    <div class="row">
-                                        <div class="custom-control custom-checkbox service-checkbox">
-                                            <input type="checkbox"
-                                                   class="custom-control-input service-checkbox"
-                                                   id="{{.Name}}"
-                                                   name="service" value="{{.Name}}">
-                                            <label class="custom-control-label"
-                                                   for="{{.Name}}">{{.Name}}</label>
-                                        </div>
-                                    </div>
-                                    {{end}}
+                                        {{range .Services}}
+                                            <div class="row">
+                                                <div class="custom-control custom-checkbox service-checkbox">
+                                                    <input type="checkbox"
+                                                           class="custom-control-input service-checkbox"
+                                                           id="{{.Name}}"
+                                                           name="service" value="{{.Name}}">
+                                                    <label class="custom-control-label"
+                                                           for="{{.Name}}">{{.Name}}</label>
+                                                </div>
+                                            </div>
+                                        {{end}}
                                     {{else}}
-                                    There're no available services.
+                                        There're no available services.
                                     {{end}}
                                 </div>
 
@@ -276,12 +278,13 @@
                             </div>
                             <div class="form-group w-25 mr-4 mb-2">
                                 <label for="nameOfStep"
-                                        class="nameOfStepLabel">Step name
+                                       class="nameOfStepLabel">Step name
                                     <span class="tooltip-icon" data-toggle="tooltip"
                                           data-placement="top" title=""
                                           data-original-title="Define quality gate step name"></span>
                                 </label>
-                                <input type="text" class="form-control element-width nameOfStep" id="nameOfStep" placeholder="Enter step name">
+                                <input type="text" class="form-control element-width nameOfStep" id="nameOfStep"
+                                       placeholder="Enter step name">
                             </div>
 
                             {{if .Autotests}}
@@ -299,7 +302,7 @@
                                 </div>
 
                                 <div class="form-group w-25 mr-4 mb-2 autotest-block-el hide-element">
-                                    <label  class="branchLabel">Branch
+                                    <label class="branchLabel">Branch
                                         <span class="tooltip-icon" data-toggle="tooltip"
                                               data-placement="top" title=""
                                               data-original-title="Select autotest for stage"></span>
@@ -324,7 +327,8 @@
                     </div>
 
                     <div class="invalid-feedback step-name-validation-msg">
-                        One or more steps are invalid. Step name may contain only: lower-case letters, numbers and dashes and cannot start and end with
+                        One or more steps are invalid. Step name may contain only: lower-case letters, numbers and
+                        dashes and cannot start and end with
                         dash. Can not be empty.
                     </div>
 
@@ -339,8 +343,8 @@
                             <div class="form-group w-50 mb-2">
                                 <label for="triggerType">Trigger type
                                     <span class="tooltip-icon" data-toggle="tooltip"
-                                                                           data-placement="top" title=""
-                                                                           data-original-title="Stage provisioning trigger type"></span>
+                                          data-placement="top" title=""
+                                          data-original-title="Stage provisioning trigger type"></span>
                                 </label>
                                 <select class="form-control" id="triggerType">
                                     <option>Manual</option>
@@ -348,10 +352,50 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="pipeline-library-row">
+                        <div class="d-flex flex-column justify-content-start">
+                            <div class="d-flex">
+                                <div class="form-group w-25 mr-4 mb-2">
+                                    <label for="pipelineLibrary">Groovy-pipeline library
+                                        <span class="tooltip-icon" data-toggle="tooltip"
+                                              data-placement="top" title=""
+                                              data-original-title="Groovy pipeline library for Stage"></span>
+                                    </label>
+                                    <select class="form-control element-width pipeline-library">
+                                        <option value="default">EDP default</option>
+                                        {{if .GroovyLibs}}
+                                            {{range .GroovyLibs}}
+                                                <option value="{{.Name}}">{{.Name}}</option>
+                                            {{end}}
+                                        {{end}}
+                                    </select>
+                                </div>
+                                <div class="form-group w-25 mr-4 mb-2 branch-block-el hide-element">
+                                    <label class="branchLabel">Branch
+                                        <span class="tooltip-icon" data-toggle="tooltip"
+                                              data-placement="top" title=""
+                                              data-original-title="Groovy pipeline library for Stage"></span>
+                                    </label>
+                                    {{range $pipelineLib := .GroovyLibs}}
+                                        {{if .CodebaseBranch}}
+                                            <select data-selected-pipeline-library="{{$pipelineLib.Name}}"
+                                                    class="form-control element-width pipeline-library-branches">
+                                                {{range .CodebaseBranch}}
+                                                    <option value="{{.Name}}">{{.Name}}</option>
+                                                {{end}}
+                                            </select>
+                                        {{end}}
+                                    {{end}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="cancel-edit-stage btn btn-secondary btn-modal-close" data-dismiss="modal">
+                    <button type="button" class="cancel-edit-stage btn btn-secondary btn-modal-close"
+                            data-dismiss="modal">
                         Cancel
                     </button>
                     <button type="button" class="add-stage btn btn-primary">

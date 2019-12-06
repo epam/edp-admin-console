@@ -50,6 +50,11 @@ func (CodebaseRepository) GetCodebasesByCriteria(criteria query.CodebaseCriteria
 	if criteria.Status != "" {
 		qs = qs.Filter("status", criteria.Status)
 	}
+
+	if criteria.Language != "" {
+		qs = qs.Filter("language", criteria.Language)
+	}
+
 	_, err := qs.OrderBy("name").
 		All(&codebases)
 

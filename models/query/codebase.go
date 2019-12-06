@@ -38,9 +38,11 @@ type CodebaseCriteria struct {
 	BranchStatus Status
 	Status       Status
 	Type         CodebaseType
+	Language     CodebaseLanguage
 }
 
 type CodebaseType string
+type CodebaseLanguage string
 
 const (
 	App       CodebaseType = "application"
