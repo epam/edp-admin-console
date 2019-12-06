@@ -23,3 +23,7 @@ import:
   version: v3.9.0
 - package: github.com/pkg/errors
   version: v0.8.1
+- package: github.com/epmd-edp/codebase-operator
+  version: 2.2.0-83
+  subpackages:
+  - v2

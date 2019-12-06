@@ -25,6 +25,7 @@ import (
 	"edp-admin-console/repository"
 	"errors"
 	"fmt"
+	edpv1alpha1 "github.com/epmd-edp/codebase-operator/pkg/apis/edp/v1alpha1"
 	"k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -44,7 +45,7 @@ const (
 	CodebasePlural = "codebases"
 )
 
-func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*k8s.Codebase, error) {
+func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*edpv1alpha1.Codebase, error) {
 	log.Printf("Start creating Codebase resource: %v ...", codebase)
 
 	codebaseCr, err := s.GetCodebaseCR(codebase.Name)
@@ -72,7 +73,7 @@ func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*k8s.C
 	edpClient := s.Clients.EDPRestClient
 	coreClient := s.Clients.CoreClient
 
-	crd := &k8s.Codebase{
+	crd := &edpv1alpha1.Codebase{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v2.edp.epam.com/v1alpha1",
 			Kind:       CodebaseKind,
@@ -82,7 +83,7 @@ func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*k8s.C
 			Namespace: context.Namespace,
 		},
 		Spec: convertData(codebase),
-		Status: k8s.CodebaseStatus{
+		Status: edpv1alpha1.CodebaseStatus{
 			Available:       false,
 			LastTimeUpdated: time.Now(),
 			Status:          "initialized",
@@ -100,12 +101,12 @@ func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*k8s.C
 		return nil, err
 	}
 
-	result := &k8s.Codebase{}
+	result := &edpv1alpha1.Codebase{}
 	err = edpClient.Post().Namespace(context.Namespace).Resource(CodebasePlural).Body(crd).Do().Into(result)
 
 	if err != nil {
 		log.Printf("An error has occurred while creating codebase resource in k8s: %s", err)
-		return &k8s.Codebase{}, err
+		return &edpv1alpha1.Codebase{}, err
 	}
 
 	_, err = s.BranchService.CreateCodebaseBranch(command.CreateCodebaseBranch{
@@ -114,15 +115,15 @@ func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*k8s.C
 	}, codebase.Name)
 	if err != nil {
 		log.Printf("Error has been occurred during the master branch creation: %v", err)
-		return &k8s.Codebase{}, err
+		return &edpv1alpha1.Codebase{}, err
 	}
 	return result, nil
 }
 
-func (s CodebaseService) GetCodebaseCR(codebaseName string) (*k8s.Codebase, error) {
+func (s CodebaseService) GetCodebaseCR(codebaseName string) (*edpv1alpha1.Codebase, error) {
 	edpClient := s.Clients.EDPRestClient
 
-	result := &k8s.Codebase{}
+	result := &edpv1alpha1.Codebase{}
 	err := edpClient.Get().Namespace(context.Namespace).Resource(CodebasePlural).Name(codebaseName).Do().Into(result)
 
 	if k8serrors.IsNotFound(err) {
@@ -211,13 +212,12 @@ func getSecret(name string, username string, password string) *v1.Secret {
 	}
 }
 
-func convertData(codebase command.CreateCodebase) k8s.CodebaseSpec {
-	s := k8s.CodebaseSpec{
+func convertData(codebase command.CreateCodebase) edpv1alpha1.CodebaseSpec {
+	s := edpv1alpha1.CodebaseSpec{
 		Lang:             codebase.Lang,
 		Framework:        codebase.Framework,
 		BuildTool:        codebase.BuildTool,
-		Strategy:         codebase.Strategy,
-		Name:             codebase.Name,
+		Strategy:         edpv1alpha1.Strategy(codebase.Strategy),
 		Type:             codebase.Type,
 		GitServer:        codebase.GitServer,
 		JenkinsSlave:     codebase.JenkinsSlave,
@@ -234,13 +234,13 @@ func convertData(codebase command.CreateCodebase) k8s.CodebaseSpec {
 	}
 
 	if codebase.Repository != nil {
-		s.Repository = &k8s.Repository{
+		s.Repository = &edpv1alpha1.Repository{
 			Url: codebase.Repository.Url,
 		}
 	}
 
 	if codebase.Route != nil {
-		s.Route = &k8s.Route{
+		s.Route = &edpv1alpha1.Route{
 			Site: codebase.Route.Site,
 		}
 		if len(codebase.Route.Path) > 0 {
@@ -249,7 +249,7 @@ func convertData(codebase command.CreateCodebase) k8s.CodebaseSpec {
 	}
 
 	if codebase.Database != nil {
-		s.Database = &k8s.Database{
+		s.Database = &edpv1alpha1.Database{
 			Kind:     codebase.Database.Kind,
 			Version:  codebase.Database.Version,
 			Capacity: codebase.Database.Capacity,

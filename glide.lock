@@ -1,5 +1,5 @@
-hash: 35073a0adc9bf37366c02bbbae7131a04e835a228362a3e4954b87e013538b04
-updated: 2019-10-31T18:38:27.8850427+03:00
+hash: 5f39668fe1f68f4c07bfb4b03b04b494b6fe19d7202b0b3b9cc5272657b90965
+updated: 2019-12-06T15:03:22.8519212+02:00
 imports:
 - name: github.com/astaxie/beego
   version: 32ee728078c84c28f2642c70745afc8f6830044d
@@ -21,7 +21,7 @@ imports:
   subpackages:
   - log
 - name: github.com/emirpasic/gods
-  version: 4e23915b9a82f35f320a68a395a7a5045c826932
+  version: 729073a73ce2057955fafa2a8f0ac62b99e950c9
   subpackages:
   - containers
   - lists
@@ -29,6 +29,11 @@ imports:
   - trees
   - trees/binaryheap
   - utils
+- name: github.com/epmd-edp/codebase-operator
+  version: 444bef021f41a2b6d8ffaacd5d116b89449818aa
+  subpackages:
+  - pkg/apis/edp/v1alpha1
+  - v2
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/go-openapi/jsonpointer
@@ -86,12 +91,11 @@ imports:
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/kevinburke/ssh_config
-  version: 01f96b0aa0cdcaa93f9495f89bbc6cb5a992ce6e
+  version: 81db2a75821ed34e682567d48be488a1c3121088
 - name: github.com/lib/pq
-  version: f91d3411e481ed313eeab65ebfe9076466c39d01
+  version: d6156e141ac6c06345c7c73f450987a9ed4b751f
   subpackages:
   - oid
-  - scram
 - name: github.com/mailru/easyjson
   version: 2f5df55504ebc322e4d52d34df6a1f5b503bf26d
   subpackages:
@@ -109,6 +113,8 @@ imports:
   subpackages:
   - apps/clientset/versioned/scheme
   - apps/clientset/versioned/typed/apps/v1
+- name: github.com/pelletier/go-buffruneio
+  version: 25c428535bd3f55a16f149a9daebd3fa4c5a562b
 - name: github.com/peterbourgon/diskv
   version: 5f041e8faa004a95c88a202771f4cc3e991971e6
 - name: github.com/pkg/errors
@@ -163,16 +169,12 @@ imports:
   version: 1c05540f6879653db88113bc4a2b70aec4bd491f
   subpackages:
   - context
-  - context/ctxhttp
-  - html
-  - html/atom
   - http2
   - http2/hpack
   - idna
   - lex/httplex
-  - websocket
 - name: golang.org/x/oauth2
-  version: 0f29369cfe4552d0e4bcddc57cc75f4d7e672a33
+  version: a6bd8cefa1811bd24b86f8902872e4e8225f74c4
   subpackages:
   - internal
 - name: golang.org/x/sys
@@ -195,7 +197,7 @@ imports:
   - unicode/norm
   - width
 - name: google.golang.org/appengine
-  version: 16bce7d3dc4e458f2f6f56a1349cbbfcdc8a8fdf
+  version: 54a98f90d1c46b7731eb8fb305d2a321c30ef610
   subpackages:
   - internal
   - internal/base
@@ -207,12 +209,12 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/square/go-jose.v2
-  version: 8fd82ff1d52a5162ff23c0a48e2c64a1fa4a3f8f
+  version: 628223f44a71f715d2881ea69afc795a1e9c01be
   subpackages:
   - cipher
   - json
 - name: gopkg.in/src-d/go-billy.v4
-  version: 780403cfc1bc95ff4d07e7b26db40a6186c5326e
+  version: 982626487c60a5252e7d0b695ca23fb0fa2fd670
   subpackages:
   - helper/chroot
   - helper/polyfill
@@ -361,6 +363,11 @@ imports:
   subpackages:
   - pkg/common
   - pkg/util/proto
+- name: sigs.k8s.io/controller-runtime
+  version: e1159d6655b260c4812fd0792cd1344ecc96a57e
+  subpackages:
+  - pkg/runtime/scheme
+  - pkg/scheme
 testImports:
 - name: github.com/davecgh/go-spew
   version: 782f4967f2dc4564575ca782fe2d04090b5faca8

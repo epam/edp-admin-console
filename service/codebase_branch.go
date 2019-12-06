@@ -24,6 +24,7 @@ import (
 	"edp-admin-console/repository"
 	"errors"
 	"fmt"
+	edpv1alpha1 "github.com/epmd-edp/codebase-operator/pkg/apis/edp/v1alpha1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
@@ -36,7 +37,7 @@ type CodebaseBranchService struct {
 	IReleaseBranchRepository repository.ICodebaseBranchRepository
 }
 
-func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCodebaseBranch, appName string) (*k8s.CodebaseBranch, error) {
+func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCodebaseBranch, appName string) (*edpv1alpha1.CodebaseBranch, error) {
 	log.Println("Start creating CR for branch release...")
 	edpRestClient := s.Clients.EDPRestClient
 
@@ -52,7 +53,7 @@ func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCo
 	}
 
 	spec := convertBranchInfoData(branchInfo, appName)
-	branch := &k8s.CodebaseBranch{
+	branch := &edpv1alpha1.CodebaseBranch{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v2.edp.epam.com/v1alpha1",
 			Kind:       "CodebaseBranch",
@@ -62,7 +63,7 @@ func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCo
 			Namespace: context.Namespace,
 		},
 		Spec: spec,
-		Status: k8s.CodebaseBranchStatus{
+		Status: edpv1alpha1.CodebaseBranchStatus{
 			Status:          "initialized",
 			LastTimeUpdated: time.Now(),
 			Username:        branchInfo.Username,
@@ -72,11 +73,11 @@ func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCo
 		},
 	}
 
-	result := &k8s.CodebaseBranch{}
+	result := &edpv1alpha1.CodebaseBranch{}
 	err = edpRestClient.Post().Namespace(context.Namespace).Resource("codebasebranches").Body(branch).Do().Into(result)
 	if err != nil {
 		log.Printf("An error has occurred while creating release branch custom resource in k8s: %s", err)
-		return &k8s.CodebaseBranch{}, err
+		return &edpv1alpha1.CodebaseBranch{}, err
 	}
 	return result, nil
 }
@@ -90,16 +91,16 @@ func (s *CodebaseBranchService) GetCodebaseBranchesByCriteria(criteria query.Cod
 	return codebaseBranches, nil
 }
 
-func convertBranchInfoData(branchInfo command.CreateCodebaseBranch, appName string) k8s.CodebaseBranchSpec {
-	return k8s.CodebaseBranchSpec{
-		Name:         branchInfo.Name,
-		Commit:       branchInfo.Commit,
+func convertBranchInfoData(branchInfo command.CreateCodebaseBranch, appName string) edpv1alpha1.CodebaseBranchSpec {
+	return edpv1alpha1.CodebaseBranchSpec{
+		BranchName:   branchInfo.Name,
+		FromCommit:   branchInfo.Commit,
 		CodebaseName: appName,
 	}
 }
 
-func getReleaseBranchCR(edpRestClient *rest.RESTClient, branchName string, appName string, namespace string) (*k8s.CodebaseBranch, error) {
-	result := &k8s.CodebaseBranch{}
+func getReleaseBranchCR(edpRestClient *rest.RESTClient, branchName string, appName string, namespace string) (*edpv1alpha1.CodebaseBranch, error) {
+	result := &edpv1alpha1.CodebaseBranch{}
 	err := edpRestClient.Get().Namespace(namespace).Resource("codebasebranches").Name(fmt.Sprintf("%s-%s", appName, branchName)).Do().Into(result)
 
 	if k8serrors.IsNotFound(err) {

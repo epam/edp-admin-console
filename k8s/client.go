@@ -17,6 +17,7 @@
 package k8s
 
 import (
+	edpv1alpha1 "github.com/epmd-edp/codebase-operator/pkg/apis/edp/v1alpha1"
 	appsV1Client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -178,10 +179,10 @@ func createCrdClient(cfg *rest.Config) (*rest.RESTClient, error) {
 
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&Codebase{},
-		&CodebaseList{},
-		&CodebaseBranch{},
-		&CodebaseBranchList{},
+		&edpv1alpha1.Codebase{},
+		&edpv1alpha1.CodebaseList{},
+		&edpv1alpha1.CodebaseBranch{},
+		&edpv1alpha1.CodebaseBranchList{},
 		&CDPipeline{},
 		&CDPipelineList{},
 		&Stage{},
