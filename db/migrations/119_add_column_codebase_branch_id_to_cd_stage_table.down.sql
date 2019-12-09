@@ -1,0 +1,1 @@
+alter table cd_stage drop column codebase_branch_id;
