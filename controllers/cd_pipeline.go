@@ -30,6 +30,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
+	edppipelinesv1alpha1 "github.com/epmd-edp/cd-pipeline-operator/pkg/apis/edp/v1alpha1"
 	"html/template"
 	"log"
 	"net/http"
@@ -344,7 +345,7 @@ func retrieveStagesFromRequest(this *CDPipelineController) []command.CDStageComm
 		}
 
 		for _, stepName := range this.GetStrings(stageName + "-stageStepName") {
-			qualityGateRequest := models.QualityGate{
+			qualityGateRequest := edppipelinesv1alpha1.QualityGate{
 				QualityGateType: this.GetString(stageName + "-" + stepName + "-stageQualityGateType"),
 				StepName:        stepName,
 			}
@@ -444,7 +445,7 @@ func validateCDPipelineUpdateRequestData(cdPipeline command.CDPipelineCommand) *
 	return &ErrMsg{string(createErrorResponseBody(valid)), http.StatusBadRequest}
 }
 
-func validateQualityGates(valid validation.Validation, qualityGates []models.QualityGate) (bool, error) {
+func validateQualityGates(valid validation.Validation, qualityGates []edppipelinesv1alpha1.QualityGate) (bool, error) {
 	isQualityGatesValid := true
 
 	if qualityGates != nil {

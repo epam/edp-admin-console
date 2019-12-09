@@ -26,6 +26,7 @@ import (
 	ec "edp-admin-console/service/edp-component"
 	"edp-admin-console/service/platform"
 	"fmt"
+	edppipelinesv1alpha1 "github.com/epmd-edp/cd-pipeline-operator/pkg/apis/edp/v1alpha1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
@@ -54,7 +55,7 @@ const (
 	platformType         = "platformType"
 )
 
-func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand) (*k8s.CDPipeline, error) {
+func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand) (*edppipelinesv1alpha1.CDPipeline, error) {
 	log.Printf("Start creating CD Pipeline: %v", cdPipeline)
 
 	exist, err := s.CodebaseService.checkBranch(cdPipeline.Applications)
@@ -87,7 +88,7 @@ func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand)
 		return nil, models.NewCDPipelineExistsError()
 	}
 
-	crd := &k8s.CDPipeline{
+	crd := &edppipelinesv1alpha1.CDPipeline{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v2.edp.epam.com/v1alpha1",
 			Kind:       "CDPipeline",
@@ -97,7 +98,7 @@ func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand)
 			Namespace: context.Namespace,
 		},
 		Spec: convertPipelineData(cdPipeline),
-		Status: k8s.CDPipelineStatus{
+		Status: edppipelinesv1alpha1.CDPipelineStatus{
 			Available:       false,
 			LastTimeUpdated: time.Now(),
 			Status:          "initialized",
@@ -108,7 +109,7 @@ func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand)
 		},
 	}
 
-	cdPipelineCr := &k8s.CDPipeline{}
+	cdPipelineCr := &edppipelinesv1alpha1.CDPipeline{}
 	err = edpRestClient.Post().Namespace(context.Namespace).Resource("cdpipelines").Body(crd).Do().Into(cdPipelineCr)
 
 	if err != nil {
@@ -167,7 +168,7 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 	return cdPipeline, nil
 }
 
-func (s *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPipeline command.CDPipelineCommand) ([]k8s.Stage, error) {
+func (s *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPipeline command.CDPipelineCommand) ([]edppipelinesv1alpha1.Stage, error) {
 	log.Printf("Start creating CR stages: %+v\n", cdPipeline.Stages)
 
 	err := checkStagesInK8s(edpRestClient, cdPipeline.Name, cdPipeline.Stages)
@@ -377,12 +378,12 @@ func fillCodebaseStageMatrixK8s(ocClient *k8s.ClientSet, cdPipeline *query.CDPip
 	return matrix, nil
 }
 
-func convertPipelineData(cdPipeline command.CDPipelineCommand) k8s.CDPipelineSpec {
+func convertPipelineData(cdPipeline command.CDPipelineCommand) edppipelinesv1alpha1.CDPipelineSpec {
 	var dockerStreams []string
 	for _, app := range cdPipeline.Applications {
 		dockerStreams = append(dockerStreams, app.InputDockerStream)
 	}
-	return k8s.CDPipelineSpec{
+	return edppipelinesv1alpha1.CDPipelineSpec{
 		Name:                  cdPipeline.Name,
 		InputDockerStreams:    dockerStreams,
 		ThirdPartyServices:    cdPipeline.ThirdPartyServices,
@@ -390,9 +391,9 @@ func convertPipelineData(cdPipeline command.CDPipelineCommand) k8s.CDPipelineSpe
 	}
 }
 
-func (s *CDPipelineService) getCDPipelineCR(pipelineName string) (*k8s.CDPipeline, error) {
+func (s *CDPipelineService) getCDPipelineCR(pipelineName string) (*edppipelinesv1alpha1.CDPipeline, error) {
 	edpRestClient := s.Clients.EDPRestClient
-	cdPipeline := &k8s.CDPipeline{}
+	cdPipeline := &edppipelinesv1alpha1.CDPipeline{}
 
 	err := edpRestClient.Get().Namespace(context.Namespace).Resource("cdpipelines").Name(pipelineName).Do().Into(cdPipeline)
 
@@ -409,8 +410,8 @@ func (s *CDPipelineService) getCDPipelineCR(pipelineName string) (*k8s.CDPipelin
 	return cdPipeline, nil
 }
 
-func createCrd(cdPipelineName string, stage command.CDStageCommand) k8s.Stage {
-	return k8s.Stage{
+func createCrd(cdPipelineName string, stage command.CDStageCommand) edppipelinesv1alpha1.Stage {
+	return edppipelinesv1alpha1.Stage{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v2.edp.epam.com/v1alpha1",
 			Kind:       "Stage",
@@ -419,7 +420,7 @@ func createCrd(cdPipelineName string, stage command.CDStageCommand) k8s.Stage {
 			Name:      fmt.Sprintf("%s-%s", cdPipelineName, stage.Name),
 			Namespace: context.Namespace,
 		},
-		Spec: k8s.StageSpec{
+		Spec: edppipelinesv1alpha1.StageSpec{
 			Name:         stage.Name,
 			Description:  stage.Description,
 			TriggerType:  stage.TriggerType,
@@ -427,7 +428,7 @@ func createCrd(cdPipelineName string, stage command.CDStageCommand) k8s.Stage {
 			CdPipeline:   cdPipelineName,
 			QualityGates: stage.QualityGates,
 		},
-		Status: k8s.StageStatus{
+		Status: edppipelinesv1alpha1.StageStatus{
 			Available:       false,
 			LastTimeUpdated: time.Now(),
 			Status:          "initialized",
@@ -439,12 +440,12 @@ func createCrd(cdPipelineName string, stage command.CDStageCommand) k8s.Stage {
 	}
 }
 
-func saveStagesIntoK8s(edpRestClient *rest.RESTClient, cdPipelineName string, stages []command.CDStageCommand, username string) ([]k8s.Stage, error) {
-	var stagesCr []k8s.Stage
+func saveStagesIntoK8s(edpRestClient *rest.RESTClient, cdPipelineName string, stages []command.CDStageCommand, username string) ([]edppipelinesv1alpha1.Stage, error) {
+	var stagesCr []edppipelinesv1alpha1.Stage
 	for _, stage := range stages {
 		stage.Username = username
 		crd := createCrd(cdPipelineName, stage)
-		stageCr := k8s.Stage{}
+		stageCr := edppipelinesv1alpha1.Stage{}
 		err := edpRestClient.Post().Namespace(context.Namespace).Resource("stages").Body(&crd).Do().Into(&stageCr)
 		if err != nil {
 			log.Printf("An error has occurred while creating Stage object in k8s: %s", err)
@@ -458,7 +459,7 @@ func saveStagesIntoK8s(edpRestClient *rest.RESTClient, cdPipelineName string, st
 
 func checkStagesInK8s(edpRestClient *rest.RESTClient, cdPipelineName string, stages []command.CDStageCommand) error {
 	for _, stage := range stages {
-		stagesCr := &k8s.Stage{}
+		stagesCr := &edppipelinesv1alpha1.Stage{}
 		stageName := fmt.Sprintf("%s-%s", cdPipelineName, stage.Name)
 		err := edpRestClient.Get().Namespace(context.Namespace).Resource("stages").Name(stageName).Do().Into(stagesCr)
 

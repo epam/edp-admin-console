@@ -1,5 +1,5 @@
-hash: 5f39668fe1f68f4c07bfb4b03b04b494b6fe19d7202b0b3b9cc5272657b90965
-updated: 2019-12-06T15:03:22.8519212+02:00
+hash: a788fccfaed44bff8678ae8665121b5d32d5ff16a500d7f78877c2b173bf1495
+updated: 2019-12-10T09:33:57.5285428+03:00
 imports:
 - name: github.com/astaxie/beego
   version: 32ee728078c84c28f2642c70745afc8f6830044d
@@ -29,6 +29,11 @@ imports:
   - trees
   - trees/binaryheap
   - utils
+- name: github.com/epmd-edp/cd-pipeline-operator
+  version: 0eddf702e446770d1bdbdffeb211be65ce34f173
+  subpackages:
+  - pkg/apis/edp/v1alpha1
+  - v2
 - name: github.com/epmd-edp/codebase-operator
   version: 444bef021f41a2b6d8ffaacd5d116b89449818aa
   subpackages:
@@ -362,7 +367,6 @@ imports:
   version: 39a7bf85c140f972372c2a0d1ee40adbf0c8bfe1
   subpackages:
   - pkg/common
-  - pkg/util/proto
 - name: sigs.k8s.io/controller-runtime
   version: e1159d6655b260c4812fd0792cd1344ecc96a57e
   subpackages:

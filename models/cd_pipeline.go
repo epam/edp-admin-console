@@ -33,18 +33,6 @@ type CDPipelineView struct {
 	JenkinsLink string `json:"jenkinsLink"`
 }
 
-type QualityGate struct {
-	QualityGateType string  `json:"qualityGateType" valid:"Required"`
-	StepName        string  `json:"stepName" valid:"Required;Match(/^[A-z0-9-._]/)"`
-	AutotestName    *string `json:"autotestName"`
-	BranchName      *string `json:"branchName"`
-}
-
-type Autotest struct {
-	Name       string `json:"autotestName"`
-	BranchName string `json:"branchName"`
-}
-
 type CDPipelineApplicationCommand struct {
 	ApplicationName   string `json:"appName" valid:"Required;Match(/^[a-z][a-z0-9-]*[a-z0-9]$/)"`
 	InputDockerStream string `json:"inputDockerStream"`
