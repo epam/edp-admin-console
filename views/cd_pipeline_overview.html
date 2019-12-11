@@ -115,6 +115,9 @@
                                                             Kubernetes Namespace
                                                         {{end}}
                                                     </th>
+                                                    <th scope="col">Type</th>
+                                                    <th scope="col">Library</th>
+                                                    <th scope="col">Branch</th>
                                                     <th scope="col">Quality Gates</th>
                                                 </tr>
                                                 </thead>
@@ -132,6 +135,17 @@
                                                         <td>
                                                             <a href="{{.PlatformProjectLink}}" target="_blank" class="edp-link"
                                                                rel="noopener noreferrer">Link</a>
+                                                        </td>
+                                                        <td>{{.Source.Type}}</td>
+                                                        <td>
+                                                            {{if eq .Source.Type "library"}}
+                                                                {{.Source.Library.Name}}
+                                                            {{end}}
+                                                        </td>
+                                                        <td>
+                                                            {{if eq .Source.Type "library"}}
+                                                                {{.Source.Library.Branch}}
+                                                            {{end}}
                                                         </td>
                                                         <td>
                                                             {{if .QualityGates}}

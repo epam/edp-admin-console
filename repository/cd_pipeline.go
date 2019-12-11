@@ -99,13 +99,11 @@ func (this CDPipelineRepository) GetCDPipelineByName(pipelineName string) (*quer
 	}
 	cdPipeline.CodebaseBranch = branches
 
-	err = loadRelatedCodebases(cdPipeline.CodebaseBranch)
-	if err != nil {
+	if err = loadRelatedCodebases(cdPipeline.CodebaseBranch); err != nil {
 		return nil, err
 	}
 
-	err = loadRelatedDockerStreams(pipelineName, cdPipeline.CodebaseBranch)
-	if err != nil {
+	if err = loadRelatedDockerStreams(pipelineName, cdPipeline.CodebaseBranch); err != nil {
 		return nil, err
 	}
 
@@ -114,19 +112,20 @@ func (this CDPipelineRepository) GetCDPipelineByName(pipelineName string) (*quer
 		return nil, err
 	}
 
-	err = loadRelatedQualityGates(cdPipeline.Stage)
-	if err != nil {
+	if err = loadRelatedQualityGates(cdPipeline.Stage); err != nil {
 		return nil, err
 	}
 
-	for _, stage := range cdPipeline.Stage {
-		err := loadRelatedAutotest(stage.QualityGates)
-		if err != nil {
+	for _, s := range cdPipeline.Stage {
+		if err := loadRelatedAutotest(s.QualityGates); err != nil {
 			return nil, err
 		}
 
-		err = loadRelatedBranch(stage.QualityGates)
-		if err != nil {
+		if err = loadRelatedBranch(s.QualityGates); err != nil {
+			return nil, err
+		}
+
+		if err := loadRelatedSource(s); err != nil {
 			return nil, err
 		}
 	}
@@ -142,6 +141,44 @@ func (this CDPipelineRepository) GetCDPipelineByName(pipelineName string) (*quer
 	}
 
 	return &cdPipeline, nil
+}
+
+func loadRelatedSource(s *query.Stage) error {
+	if s.SourceCodebaseBranchId == nil {
+		s.Source = query.Source{
+			Type:    "default",
+			Library: nil,
+		}
+		return nil
+	}
+
+	if err := loadRelatedSourceLibrary(s); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func loadRelatedSourceLibrary(s *query.Stage) error {
+	o := orm.NewOrm()
+	b := query.CodebaseBranch{}
+	err := o.QueryTable(new(query.CodebaseBranch)).
+		RelatedSel().
+		Filter("id", *s.SourceCodebaseBranchId).
+		One(&b)
+	if err != nil {
+		return err
+	}
+
+	s.Source = query.Source{
+		Type: "library",
+		Library: &query.SourceLibrary{
+			Name:   b.Codebase.Name,
+			Branch: b.Name,
+		},
+	}
+
+	return nil
 }
 
 func loadRelatedCodebaseDockerStreams(dockerStreams []*query.CodebaseDockerStream) ([]*query.CodebaseBranch, error) {
