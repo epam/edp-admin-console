@@ -337,10 +337,22 @@ func retrieveStagesFromRequest(this *CDPipelineController) []command.CDStageComm
 	var stages []command.CDStageCommand
 
 	for index, stageName := range this.GetStrings("stageName") {
+		stgSrc := edppipelinesv1alpha1.Source{}
+		name := this.GetString(stageName + "-pipelineLibraryName")
+		if name == "default" {
+			stgSrc.Type = "default"
+		} else {
+			stgSrc.Type = "library"
+			stgSrc.Library = edppipelinesv1alpha1.Library{
+				Name:   name,
+				Branch: this.GetString(stageName + "-pipelineLibraryBranch"),
+			}
+		}
 		stageRequest := command.CDStageCommand{
 			Name:        stageName,
 			Description: this.GetString(stageName + "-stageDesc"),
 			TriggerType: this.GetString(stageName + "-triggerType"),
+			Source:      stgSrc,
 			Order:       index,
 		}
 

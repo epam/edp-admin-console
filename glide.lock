@@ -1,5 +1,5 @@
-hash: a788fccfaed44bff8678ae8665121b5d32d5ff16a500d7f78877c2b173bf1495
-updated: 2019-12-10T09:33:57.5285428+03:00
+hash: 23ab9363cf0c49c2277d791d2c516aea83e3c6589bece05d9b57012779f3b86e
+updated: 2019-12-11T14:18:42.9330285+03:00
 imports:
 - name: github.com/astaxie/beego
   version: 32ee728078c84c28f2642c70745afc8f6830044d
@@ -30,7 +30,7 @@ imports:
   - trees/binaryheap
   - utils
 - name: github.com/epmd-edp/cd-pipeline-operator
-  version: 0eddf702e446770d1bdbdffeb211be65ce34f173
+  version: 68e7752f603f1f288d7df472f9c895a380d73ba1
   subpackages:
   - pkg/apis/edp/v1alpha1
   - v2

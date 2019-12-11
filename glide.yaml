@@ -28,6 +28,6 @@ import:
   subpackages:
   - v2
 - package: github.com/epmd-edp/cd-pipeline-operator
-  version: v2.2.0-49
+  version: v2.2.0-51
   subpackages:
   - v2

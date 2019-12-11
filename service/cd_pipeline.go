@@ -427,6 +427,7 @@ func createCrd(cdPipelineName string, stage command.CDStageCommand) edppipelines
 			Order:        stage.Order,
 			CdPipeline:   cdPipelineName,
 			QualityGates: stage.QualityGates,
+			Source:       stage.Source,
 		},
 		Status: edppipelinesv1alpha1.StageStatus{
 			Available:       false,

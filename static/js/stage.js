@@ -127,6 +127,7 @@ $(function () {
         let selectedPipelineLibrary = $(this).val();
         $.each($(this).parents('.pipeline-library-row').find('.pipeline-library-branches'), function () {
             $(this).data('selected-pipeline-library') === selectedPipelineLibrary ? $(this).show() : $(this).hide();
+            $(this).prop('selectedIndex', 0);
         })
     });
 
@@ -161,6 +162,8 @@ function appendStage(stageData) {
         '<input data-mode="add" id="stageNameForm" name="stageName" type="hidden" value="' + stageData.stageName + '">' +
         '<input id="stageDescForm" name="' + stageData.stageName + '-stageDesc" type="hidden" value="' + stageData.stageDesc + '">' +
         '<input id="triggerTypeForm" name="' + stageData.stageName + '-triggerType" type="hidden" value="' + stageData.triggerType + '">' +
+        '<input id="pipelineLibraryNameForm" name="' + stageData.stageName + '-pipelineLibraryName" type="hidden" value="' + stageData.pipelineLibraryName + '">' +
+        '<input id="pipelineLibraryBranchForm" name="' + stageData.stageName + '-pipelineLibraryBranch" type="hidden" value="' + stageData.pipelineLibraryBranch + '">' +
         '    </div>').appendTo($('.stages-list'));
 
     let $stageBlockEl = $('.stage-info.' + stageData.stageName);
@@ -181,6 +184,7 @@ function resetFields() {
     $('#qualityGateType option:first').prop('selected', true);
     $('#triggerType option:first').prop('selected', true);
     $('#stage-creation input[type="text"]').val("");
+    $('#pipeline-library option:first').prop('selected', true);
 
     $('input.non-valid-input, select.non-valid-input').removeClass('non-valid-input');
     $('div.invalid-feedback').hide();
@@ -189,6 +193,8 @@ function resetFields() {
     $qualityGateTypeElems.not(':first').remove();
     $qualityGateTypeElems.find('.qualityGateType').val('manual');
     $qualityGateTypeElems.find('.autotest-block-el').addClass('hide-element');
+
+    $('.branch-block-el').addClass('hide-element');
 }
 
 function removeStage(stageName) {
@@ -276,9 +282,12 @@ function toggleEditing() {
 }
 
 function collectStageData() {
+    let pipelineLibrary = $('#pipeline-library').val();
     return {
         stageName: $('#stageName').val(),
         stageDesc: $('#stageDesc').val(),
+        pipelineLibraryName: $('#pipeline-library').val(),
+        pipelineLibraryBranch: pipelineLibrary === 'default' ? null : $('.pipeline-library-row').find('[data-selected-pipeline-library="' + pipelineLibrary + '"]').val(),
         triggerType: $('#triggerType').val(),
         qualityGates: collectQualityGates(),
     };

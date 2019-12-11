@@ -362,7 +362,7 @@
                                               data-placement="top" title=""
                                               data-original-title="Groovy pipeline library for Stage"></span>
                                     </label>
-                                    <select class="form-control element-width pipeline-library">
+                                    <select class="form-control element-width pipeline-library" id="pipeline-library">
                                         <option value="default">EDP default</option>
                                         {{if .GroovyLibs}}
                                             {{range .GroovyLibs}}
@@ -380,7 +380,7 @@
                                     {{range $pipelineLib := .GroovyLibs}}
                                         {{if .CodebaseBranch}}
                                             <select data-selected-pipeline-library="{{$pipelineLib.Name}}"
-                                                    class="form-control element-width pipeline-library-branches">
+                                                    class="form-control element-width pipeline-library-branches" id="pipeline-library-branches">
                                                 {{range .CodebaseBranch}}
                                                     <option value="{{.Name}}">{{.Name}}</option>
                                                 {{end}}

@@ -9,6 +9,7 @@ type CDStageCommand struct {
 	Description  string                             `json:"description" valid:"Required"`
 	TriggerType  string                             `json:"triggerType" valid:"Required"`
 	Order        int                                `json:"order" valid:"Match(/^[0-9]$/)"`
+	Source       edppipelinesv1alpha1.Source        `json:"source"`
 	QualityGates []edppipelinesv1alpha1.QualityGate `json:"qualityGates" valid:"Required"`
 	Username     string                             `json:"username"`
 }
