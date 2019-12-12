@@ -498,6 +498,11 @@ func (c *CDPipelineController) createOneJenkinsLink(cdPipeline *query.CDPipeline
 		return err
 	}
 
+	if edc == nil {
+		return fmt.Errorf("jenkins link can't be created for %v cd pipeline because of edp-component %v is absent in DB",
+			cdPipeline.Name, consts.Jenkins)
+	}
+
 	cdPipeline.JenkinsLink = util.CreateCICDPipelineLink(edc.Url, cdPipeline.Name)
 
 	log.Printf("Created CD Pipeline Jenkins link %v", cdPipeline.JenkinsLink)
@@ -518,9 +523,17 @@ func (c *CDPipelineController) createNativeDockerImageLinks(s []*query.CodebaseD
 		return err
 	}
 
+	if co == nil {
+		return fmt.Errorf("openshift link can't be created because of edp-component %v is absent in DB", consts.Openshift)
+	}
+
 	cj, err := c.EDPComponent.GetEDPComponent(consts.Jenkins)
 	if err != nil {
 		return err
+	}
+
+	if cj == nil {
+		return fmt.Errorf("jenkins link can't be created because of edp-component %v is absent in DB", consts.Jenkins)
 	}
 
 	for i, v := range s {
@@ -537,9 +550,18 @@ func (c *CDPipelineController) createNonNativeDockerImageLinks(s []*query.Codeba
 		return err
 	}
 
+	if cd == nil {
+		return fmt.Errorf("docker registry link can't be created because of edp-component %v is absent in DB",
+			consts.DockerRegistry)
+	}
+
 	cj, err := c.EDPComponent.GetEDPComponent(consts.Jenkins)
 	if err != nil {
 		return err
+	}
+
+	if cj == nil {
+		return fmt.Errorf("jenkins link can't be created because of edp-component %v is absent in DB", consts.Jenkins)
 	}
 
 	for i, v := range s {
@@ -551,6 +573,8 @@ func (c *CDPipelineController) createNonNativeDockerImageLinks(s []*query.Codeba
 }
 
 func (c *CDPipelineController) createPlatformLinks(stages []*query.Stage, cdPipelineName string) error {
+	log.Printf("Start creating Platform links for %v CD Pipeline", cdPipelineName)
+
 	if len(stages) == 0 {
 		return errors.New("stages can't be an empty or nil")
 	}
@@ -562,9 +586,15 @@ func (c *CDPipelineController) createPlatformLinks(stages []*query.Stage, cdPipe
 }
 
 func (c *CDPipelineController) createNativePlatformLinks(stages []*query.Stage, cdPipelineName string) error {
+	log.Printf("Start creating Openshift Platform links for %v CD Pipeline", cdPipelineName)
+
 	edc, err := c.EDPComponent.GetEDPComponent(consts.Openshift)
 	if err != nil {
 		return err
+	}
+
+	if edc == nil {
+		return fmt.Errorf("openshift link can't be created because of edp-component %v is absent in DB", consts.Openshift)
 	}
 
 	for i, v := range stages {
@@ -575,9 +605,16 @@ func (c *CDPipelineController) createNativePlatformLinks(stages []*query.Stage, 
 }
 
 func (c *CDPipelineController) createNonNativePlatformLinks(stages []*query.Stage, cdPipelineName string) error {
+	log.Printf("Start creating Kubernetes Platform links for %v CD Pipeline", cdPipelineName)
+
 	edc, err := c.EDPComponent.GetEDPComponent(consts.Kubernetes)
 	if err != nil {
 		return err
+	}
+
+	if edc == nil {
+		log.Printf("Creating Kubernetes Platform links has been skipped for %v CD Pipeline", cdPipelineName)
+		return nil
 	}
 
 	for i, v := range stages {
@@ -596,6 +633,10 @@ func (c *CDPipelineController) createJenkinsLinks(cdPipelines []*query.CDPipelin
 	edc, err := c.EDPComponent.GetEDPComponent(consts.Jenkins)
 	if err != nil {
 		return err
+	}
+
+	if edc == nil {
+		return fmt.Errorf("jenkins links can't be created because of edp-component %v is absent in DB", consts.Jenkins)
 	}
 
 	for index, pipeline := range cdPipelines {

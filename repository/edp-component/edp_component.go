@@ -2,6 +2,7 @@ package edp_component
 
 import (
 	"edp-admin-console/models/query"
+	dberror "edp-admin-console/util/error/db-errors"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -21,6 +22,11 @@ func (EDPComponent) GetEDPComponent(componentType string) (*query.EDPComponent, 
 		Filter("type", componentType).
 		One(&c)
 	if err != nil {
+		if err == orm.ErrNoRows {
+			return nil, dberror.StatusError{
+				Status: dberror.StatusReasonNotFound,
+			}
+		}
 		return nil, err
 	}
 

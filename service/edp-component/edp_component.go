@@ -5,6 +5,7 @@ import (
 	"edp-admin-console/models/query"
 	ec "edp-admin-console/repository/edp-component"
 	"edp-admin-console/util/consts"
+	dberror "edp-admin-console/util/error/db-errors"
 	"fmt"
 	"github.com/pkg/errors"
 	"log"
@@ -20,12 +21,11 @@ func (s EDPComponentService) GetEDPComponent(componentType string) (*query.EDPCo
 
 	c, err := s.IEDPComponent.GetEDPComponent(componentType)
 	if err != nil {
+		if dberror.IsNotFound(err) {
+			return nil, nil
+		}
 		return nil, errors.Wrapf(err, "an error has occurred while fetching EDP Component by %v type from DB",
 			componentType)
-	}
-
-	if c == nil {
-		return nil, errors.New(fmt.Sprintf("couldn't find %v EDP component in DB", componentType))
 	}
 
 	log.Printf("Fetched EDP Component. type: %v, url: %v", c.Type, c.Url)

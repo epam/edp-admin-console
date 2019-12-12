@@ -138,9 +138,19 @@ func (c CodebaseController) createLinksForGerritProvider(codebase query.Codebase
 		return err
 	}
 
+	if cj == nil {
+		return fmt.Errorf("jenkin link can't be created for %v codebase because of edp-component %v is absent in DB",
+			codebase.Name, consts.Jenkins)
+	}
+
 	cg, err := c.EDPComponent.GetEDPComponent(consts.Gerrit)
 	if err != nil {
 		return err
+	}
+
+	if cg == nil {
+		return fmt.Errorf("gerrit link can't be created for %v codebase because of edp-component %v is absent in DB",
+			codebase.Name, consts.Gerrit)
 	}
 
 	for i, b := range codebase.CodebaseBranch {

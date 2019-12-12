@@ -132,7 +132,7 @@
                                                             {{end}}
                                                         </td>
                                                         <td>{{.TriggerType}}</td>
-                                                        <td>
+                                                        <td class="platform-link">
                                                             <a href="{{.PlatformProjectLink}}" target="_blank" class="edp-link"
                                                                rel="noopener noreferrer">Link</a>
                                                         </td>
@@ -325,6 +325,12 @@
         </div>
     </section>
     {{template "template/footer_template.html" .}}
+
+    <div id="kubernetes-component">
+        <p>
+            The link cannot be generated due to the absence of the EDP Kubernetes component.
+        </p>
+    </div>
 
 </main>
 
