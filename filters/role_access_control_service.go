@@ -45,10 +45,10 @@ func init() {
 func IsPageAvailable(key string, contextRoles []string) bool {
 	pageRoles := getValue(key)
 	if pageRoles == nil {
-		return false
+		return true
 	}
 
-	if roles == nil || getIntersectionOfRoles(contextRoles, pageRoles) == nil {
+	if getIntersectionOfRoles(contextRoles, pageRoles) == nil {
 		return false
 	}
 	return true
