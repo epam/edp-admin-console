@@ -158,13 +158,18 @@
                             </div>
                             <div id="collapseThree" class="show route" aria-labelledby="headingThree">
                                 <div class="card-body">
+                                    {{ $isLibrary := eq $.Codebase.Type "library"}}
+                                    {{ $isBuildToolNone := eq $.Codebase.BuildTool "none"}}
+                                    {{ $libWithBuildToolNone := and $isLibrary $isBuildToolNone}}
                                     <table class="edp-card-table">
                                         <tbody>
                                         <tr>
                                             <th scope="col">Status</th>
                                             <th scope="col">Branch</th>
                                             <th scope="col">VCS</th>
-                                            <th scope="col">CI</th>
+                                            {{if not $libWithBuildToolNone}}
+                                                <th scope="col">CI</th>
+                                            {{end}}
                                         </tr>
                                         {{range .Codebase.CodebaseBranch}}
                                             <tr data-branch-name="{{.Name}}" data-branch-status="{{.Status}}">
@@ -177,11 +182,13 @@
                                                     <a href="{{.VCSLink}}" target="_blank" rel="noopener noreferrer"
                                                        class="edp-link {{if ne .Status "active"}}disabled{{end}}">Link</a>
                                                 </td>
-                                                <td>
-                                                    <a href="{{.CICDLink}}" target="_blank"
-                                                       rel="noopener noreferrer"
-                                                       class="edp-link {{if ne .Status "active"}}disabled{{end}}">Link</a>
-                                                </td>
+                                                {{if not $libWithBuildToolNone}}
+                                                    <td>
+                                                        <a href="{{.CICDLink}}" target="_blank"
+                                                           rel="noopener noreferrer"
+                                                           class="edp-link {{if ne .Status "active"}}disabled{{end}}">Link</a>
+                                                    </td>
+                                                {{end}}
                                             </tr>
                                         {{end}}
                                         </tbody>
