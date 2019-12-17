@@ -34,6 +34,9 @@ $(function () {
             stageToEdit.find('#stageDescForm').val(stageData.stageDesc).attr('name', stageData.stageName + '-stageDesc');
             stageToEdit.find('#triggerTypeForm').val(stageData.triggerType).attr('name', stageData.stageName + '-triggerType');
 
+            stageToEdit.find('#pipelineLibraryNameForm').val(stageData.pipelineLibraryName);
+            stageToEdit.find('#pipelineLibraryBranchForm').val(stageData.pipelineLibraryBranch);
+
             let $stageBlockEl = $('.stage-info.' + stageData.stageName);
             $stageBlockEl.find('.qualityGateType, .stepName, .autotestsName, .branchName').remove();
 
@@ -216,6 +219,9 @@ function fillFields(stageName) {
     $('#stageName').val($stageEl.find('#stageNameForm').val());
     $('#stageDesc').val($stageEl.find('#stageDescForm').val());
     $("#triggerType").val($stageEl.find('#triggerTypeForm').val());
+
+    $('#pipeline-library').val($stageEl.find('#pipelineLibraryNameForm').val()).change();
+    $('#pipeline-library-branches').val($stageEl.find('#pipelineLibraryBranchForm').val()).change();
 
     let qualityGateData = collectOldQualityGatesData($stageEl);
     createQualityGateRows(qualityGateData);
