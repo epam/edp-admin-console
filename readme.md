@@ -1,9 +1,11 @@
 # EDP Admin Console
 
 ## Overview
-The Admin Console provides UI to give clients an opportunity to manage business entities:
+The Admin Console management tool provides user interface to give clients an opportunity to manage business entities:
 * Create Codebases as Applications, Libraries and Autotests;
 * Create/Update CD Pipelines;
+
+_*NOTE*: To interact with Admin Console via REST API, explore the [Create Codebase Entity](documentation/rest-api.md) page._
 
 ## Add Other Code Language
 
