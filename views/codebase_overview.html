@@ -132,14 +132,18 @@
                                         <th>Job Provisioner</th>
                                         <td>{{.Codebase.JobProvisioning}}</td>
                                     </tr>
-                                    <tr>
-                                        <th>Jenkins Slave</th>
-                                        <td>{{.Codebase.JenkinsSlave}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Deployment Script</th>
-                                        <td>{{.Codebase.DeploymentScript}}</td>
-                                    </tr>
+                                    {{if .Codebase.JenkinsSlave}}
+                                        <tr>
+                                            <th>Jenkins Slave</th>
+                                            <td>{{.Codebase.JenkinsSlave}}</td>
+                                        </tr>
+                                    {{end}}
+                                    {{if .Codebase.DeploymentScript}}
+                                        <tr>
+                                            <th>Deployment Script</th>
+                                            <td>{{.Codebase.DeploymentScript}}</td>
+                                        </tr>
+                                    {{end}}
                                     </tbody>
                                 </table>
                             </div>
