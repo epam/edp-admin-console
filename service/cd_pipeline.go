@@ -26,7 +26,7 @@ import (
 	ec "edp-admin-console/service/edp-component"
 	"edp-admin-console/service/platform"
 	"fmt"
-	edppipelinesv1alpha1 "github.com/epmd-edp/cd-pipeline-operator/pkg/apis/edp/v1alpha1"
+	edppipelinesv1alpha1 "github.com/epmd-edp/cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
