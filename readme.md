@@ -1,27 +1,24 @@
 # EDP Admin Console
-
 ## Overview
-The Admin Console management tool provides user interface to give clients an opportunity to manage business entities:
+Admin Console is a central management tool in the EDP ecosystem that provides the ability to deploy infrastructure, project resources and new technologies in a simple way. 
+Using Admin Console enables to manage business entities:
 * Create Codebases as Applications, Libraries and Autotests;
 * Create/Update CD Pipelines;
 
-_*NOTE*: To interact with Admin Console via REST API, explore the [Create Codebase Entity](documentation/rest-api.md) page._
+_**NOTE**: To interact with Admin Console via REST API, explore the [Create Codebase Entity](documentation/rest-api.md) page._
 
-## Add Other Code Language
+![overview-page](readme-resource/ac_overview_page.png "overview-page") 
 
-There is an ability to extend the default code languages when creating a codebase with the clone strategy.  
-![other-language](readme-resource/ac_other_language.png "other-language")
+- <strong>Navigation bar </strong>– consists of six sections: Overview, Continuous Delivery, Applications, Services, Autotests, and Libraries. Click the necessary section to add an entity or open a home page.
+- <strong>User name</strong> – displays the registered user name. 
+- <strong>Main links</strong> – displays the corresponding links to the major adjusted toolset, to the management tool and to the OpenShift cluster.
 
-_**NOTE**: The create strategy does not allow to customize the default code language set._
- 
-In order to customize the Build Tool list, perform the following:
-1. Navigate to OpenShift, and edit the edp-admin-console deployment config map by adding the necessary code language into the BUILD TOOLS field. 
-![build-tools](readme-resource/other_build_tool.png "build-tools")
+Admin Console is a complete tool allowing to manage and control the added applications, services, autotests, and libraries to the environment as well as to create a CD pipeline and perform the following actions:
 
-_**NOTE**: Use the comma sign to separate the code languages in order to make them available, e.g. maven, gradle._
+1. [Add Applications](documentation/add_applications.md)
+2. [Add Services](documentation/add_services.md) 
+3. [Add Autotests](documentation/add_autotests.md) 
+4. [Add Libraries](documentation/add_libraries.md)
+5. [Add CD Pipelines](documentation/add_CD_pipelines.md)
 
-##  How to check the availability of the job-provision in Admin Console
-
-To check the availability of the job-provision in Admin Console expand the Advanced Settings block during the codebase creation and see all job provisions you were created: 
-
- ![provisioner-ac](readme-resource/as_job_provision.png "provisioner-ac")
+_**NOTE**: The Admin Console link is available on the OpenShift overview page for your CI/CD project._
