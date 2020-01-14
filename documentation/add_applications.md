@@ -15,7 +15,7 @@ Once clicked, the six-step menu will appear:
 
 _**NOTE**: The Version Control System Info menu is available in case this option is predefined._
 
-After the complete adding of the application, inspect the [Check Application Availability](#Check Application Availability) part.
+After the complete adding of the application, inspect the [Check Application Availability](#Check_Application_Availability) part.
 
 ## The Codebase Info Menu
 
@@ -114,7 +114,7 @@ After the complete adding of the application, inspect the [Check Application Ava
 20. Click the Create button. Once clicked, the CONFIRMATION summary will appear displaying all the specified options and settings, click Continue to complete the application addition.
     
     
-## Check Application Availability 
+## <a name="Check_Application_Availability"></a> Check Application Availability
     
 Once the application is added to the Applications list, you can check its data, simply click the application name and get access to the following:
     

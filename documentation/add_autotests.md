@@ -11,7 +11,7 @@ Once clicked, the four-step menu will appear:
 * The Advanced CI Settings Menu
 * The Version Control System Info Menu
 
-After the complete adding of the autotest, inspect the [Check Autotest Availability](##Check Autotest Availability) part.
+After the complete adding of the autotest, inspect the [Check Autotest Availability](#Check_Autotest_Availability) part.
 
 # The Codebase Info Menu 
 
@@ -73,7 +73,7 @@ There are two available strategies: clone and import. The Clone strategy flow is
 
 13. Click the Create button, check the CONFIRMATION summary, click Continue to add an autotest to the Autotests list. 
 
-## Check Autotest Availability
+## <a name="Check_Autotest_Availability"></a> Check Autotest Availability
 
 As soon as the autotest is added, it will be available in the Autotests list where it is possible to click its name and get access to the following:  
 

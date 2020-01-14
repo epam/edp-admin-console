@@ -13,7 +13,7 @@ Once clicked, the four-step menu will appear:
 
 _**NOTE**: The Version Control System Info menu is available in case this option is predefined._
 
-After the complete adding of the library, inspect the [Check Library Availability](##Check Library Availability) part.
+After the complete adding of the library, inspect the [Check Library Availability](#Check_Library_Availability) part.
 
 ## The Codebase Info Menu
 
@@ -72,7 +72,7 @@ After the complete adding of the library, inspect the [Check Library Availabilit
 12. Enter the password into the **VCS Password (or API Token)** field OR add the API Token.
 13. Click the Create button, check the CONFIRMATION summary, click Continue to add the library to the Libraries list.
 
-## Check Library Availability
+## <a name="Check_Library_Availability"></a> Check Library Availability
 
 Once you add all the necessary libraries performing the same steps as described above, they appear in the Library list. Click the library name to open the following:
 

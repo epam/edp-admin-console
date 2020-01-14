@@ -12,7 +12,7 @@ Once clicked, the four-step menu will appear:
 
 The creation of the CD pipeline becomes available as soon as an application is created including its provisioning in a branch and the necessary entities for the environment.
 
-After the complete adding of the CD pipeline, inspect the [Check CD Pipeline Availability](#Check CD Pipeline Availability) part.
+After the complete adding of the CD pipeline, inspect the [Check CD Pipeline Availability](#Check_CD_Pipeline_Availability) part.
 
 ## The Pipeline Menu
 
@@ -75,8 +75,7 @@ After the complete adding of the CD pipeline, inspect the [Check CD Pipeline Ava
 
 11. Click the Create button to start the provisioning of the pipeline. After the CD pipeline is added, the new project with the stage name will be created in OpenShift.
 
-## Check CD Pipeline Availability
-
+## <a name="Check_CD_Pipeline_Availability"></a> Check CD Pipeline Availability
 
 As soon as the CD pipeline is provisioned and added to the CD Pipelines list, there is an ability to:
 
