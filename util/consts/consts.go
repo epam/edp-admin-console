@@ -9,4 +9,11 @@ const (
 	Gerrit         = "gerrit"
 
 	EdpCICDPostfix = "-edp-cicd"
+
+	Application = "application"
+	Autotest    = "autotests"
+	Library     = "library"
+
+	CodebasePlural = "codebases"
+	CodebaseKind   = "Codebase"
 )

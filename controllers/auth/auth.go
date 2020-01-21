@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package controllers
+package auth
 
 import (
 	"context"
 	ctx "edp-admin-console/context"
 	"github.com/astaxie/beego"
-	"log"
+	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )
+
+var log = logf.Log.WithName("auth-controller")
 
 type AuthController struct {
 	beego.Controller
@@ -29,32 +31,32 @@ type AuthController struct {
 
 func (this *AuthController) Callback() {
 	authConfig := ctx.GetAuthConfig()
-	log.Println("Start callback flow...")
+	log.Info("Start callback flow...")
 	queryState := this.Ctx.Input.Query("state")
-	log.Printf("State %s has been retrived from query param", queryState)
+	log.Info("State has been retrieved from query param", "queryState", queryState)
 	sessionState := this.Ctx.Input.Session(authConfig.StateAuthKey)
-	log.Printf("State %s has been retrived from the session", sessionState)
+	log.Info("State has been retrieved from the session", "sessionState", sessionState)
 	if queryState != sessionState {
-		log.Println("State does not match")
+		log.Info("State does not match")
 		this.Abort("400")
 		return
 	}
 
 	authCode := this.Ctx.Input.Query("code")
-	log.Println("Authorization code has been retrieved from query param")
+	log.Info("Authorization code has been retrieved from query param")
 	token, err := authConfig.Oauth2Config.Exchange(context.Background(), authCode)
 
 	if err != nil {
-		log.Printf("Failed to exchange token with code: %s", authCode)
+		log.Info("Failed to exchange token with code", "code", authCode)
 		this.Abort("500")
 		return
 	}
-	log.Println("Authorization code has been successfully exchanged with token")
+	log.Info("Authorization code has been successfully exchanged with token")
 
 	ts := authConfig.Oauth2Config.TokenSource(context.Background(), token)
 
 	this.Ctx.Output.Session("token_source", ts)
-	log.Println("Token source has been saved to the session")
+	log.Info("Token source has been saved to the session")
 	path := this.getRedirectPath()
 	this.Redirect(path, 302)
 }

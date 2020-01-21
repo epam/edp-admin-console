@@ -26,10 +26,12 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"html/template"
-	"log"
 	"path"
+	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"strings"
 )
+
+var log = logf.Log.WithName("codebase-controller")
 
 type ApplicationController struct {
 	beego.Controller
@@ -46,7 +48,6 @@ type ApplicationController struct {
 }
 
 const (
-	paramWaitingForBranch   = "waitingforbranch"
 	paramWaitingForCodebase = "waitingforcodebase"
 
 	OtherLanguage = "other"
@@ -73,6 +74,7 @@ func (c *ApplicationController) GetApplicationsOverviewPage() {
 	c.Data["HasRights"] = isAdmin(contextRoles)
 	c.Data["Codebases"] = applications
 	c.Data["Type"] = query.App
+	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.TplName = "codebase.html"
 }
 
@@ -84,7 +86,7 @@ func addCodebaseInProgressIfAny(codebases []*query.Codebase, codebaseInProgress 
 			}
 		}
 
-		log.Printf("Adding codebase %s which is going to be created to the list.", codebaseInProgress)
+		log.Info("adding codebase which is going to be created to the list", "name", codebaseInProgress)
 		app := query.Codebase{
 			Name:   codebaseInProgress,
 			Status: query.Inactive,
@@ -109,14 +111,14 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 
 	contains := doesIntegrationStrategiesContainImportStrategy(c.IntegrationStrategies)
 	if contains {
-		log.Println("Import strategy is used.")
+		log.Info("Import strategy is used.")
 
 		gitServers, err := c.GitServerService.GetServers(query.GitServerCriteria{Available: true})
 		if err != nil {
 			c.Abort("500")
 			return
 		}
-		log.Printf("Fetched Git Servers: %v", gitServers)
+		log.Info("fetched Git Servers", "git servers", gitServers)
 
 		c.Data["GitServers"] = gitServers
 	}
@@ -164,15 +166,15 @@ func contains(a []string, x string) bool {
 func (c *ApplicationController) CreateApplication() {
 	flash := beego.NewFlash()
 	codebase := c.extractApplicationRequestData()
-	errMsg := validRequestData(codebase)
+	errMsg := ValidRequestData(codebase)
 	if errMsg != nil {
-		log.Printf("Failed to validate request data: %s", errMsg.Message)
+		log.Info("failed to validate request data", "message", errMsg.Message)
 		flash.Error(errMsg.Message)
 		flash.Store(&c.Controller)
 		c.Redirect("/admin/edp/application/create", 302)
 		return
 	}
-	logRequestData(codebase)
+	LogRequestData(codebase)
 
 	createdObject, err := c.CodebaseService.CreateCodebase(codebase)
 
@@ -187,7 +189,7 @@ func (c *ApplicationController) CreateApplication() {
 		return
 	}
 
-	log.Printf("Application object is saved into k8s: %s", createdObject)
+	log.Info("application object is saved into cluster", "name", createdObject.Name)
 	flash.Success("Application object is created.")
 	flash.Store(&c.Controller)
 	c.Redirect(fmt.Sprintf("/admin/edp/application/overview?%s=%s#codebaseSuccessModal", paramWaitingForCodebase, codebase.Name), 302)

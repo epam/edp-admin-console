@@ -20,18 +20,14 @@ import (
 	"edp-admin-console/models/command"
 	"edp-admin-console/models/query"
 	"edp-admin-console/service"
-	"edp-admin-console/util"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
 	"github.com/satori/go.uuid"
-	"log"
 	"net/http"
 	"path"
-	"regexp"
-	"strings"
 )
 
 type CodebaseRestController struct {
@@ -116,13 +112,13 @@ func (c *CodebaseRestController) CreateCodebase() {
 		codebase.Name = path.Base(*codebase.GitUrlPath)
 	}
 
-	errMsg := validRequestData(codebase)
+	errMsg := ValidRequestData(codebase)
 	if errMsg != nil {
-		log.Printf("Failed to validate request data: %s", errMsg.Message)
+		log.Info("Failed to validate request data", "err", errMsg.Message)
 		http.Error(c.Ctx.ResponseWriter, errMsg.Message, http.StatusBadRequest)
 		return
 	}
-	logRequestData(codebase)
+	LogRequestData(codebase)
 
 	createdObject, err := c.CodebaseService.CreateCodebase(codebase)
 
@@ -137,80 +133,11 @@ func (c *CodebaseRestController) CreateCodebase() {
 		return
 	}
 
-	log.Printf("Codebase resource is saved into k8s: %+v", createdObject)
+	log.Info("Codebase resource is saved into cluster", "codebase", createdObject.Name)
 
 	location := fmt.Sprintf("%s/%s", c.Ctx.Input.URL(), uuid.NewV4().String())
 	c.Ctx.ResponseWriter.WriteHeader(200)
 	c.Ctx.Output.Header("Location", location)
-}
-
-func validRequestData(codebase command.CreateCodebase) *ErrMsg {
-	valid := validation.Validation{}
-	var resErr error
-
-	_, err := valid.Valid(codebase)
-	resErr = err
-
-	if codebase.Strategy == "import" {
-		valid.Match(codebase.GitUrlPath, regexp.MustCompile("^\\/.*$"), "Spec.GitUrlPath")
-	}
-
-	if codebase.Repository != nil {
-		_, err := valid.Valid(codebase.Repository)
-
-		isAvailable := util.IsGitRepoAvailable(codebase.Repository.Url, codebase.Repository.Login, codebase.Repository.Password)
-
-		if !isAvailable {
-			err := &validation.Error{Key: "repository", Message: "Repository doesn't exist or invalid login and password."}
-			valid.Errors = append(valid.Errors, err)
-		}
-
-		resErr = err
-	}
-
-	if codebase.Route != nil {
-		if len(codebase.Route.Path) > 0 {
-			_, err := valid.Valid(codebase.Route)
-			resErr = err
-		} else {
-			valid.Match(codebase.Route.Site, regexp.MustCompile("^[a-z][a-z0-9-]*[a-z0-9]$"), "Route.Site.Match")
-		}
-	}
-
-	if codebase.Vcs != nil {
-		_, err := valid.Valid(codebase.Vcs)
-		resErr = err
-	}
-
-	if codebase.Database != nil {
-		_, err := valid.Valid(codebase.Database)
-		resErr = err
-	}
-
-	if !isTypeAcceptable(codebase.Type) {
-		err := &validation.Error{Key: "repository", Message: "codebase type should be: application, autotests  or library"}
-		valid.Errors = append(valid.Errors, err)
-	}
-
-	if codebase.Type == "autotests" && codebase.Strategy != "clone" {
-		err := &validation.Error{Key: "repository", Message: "strategy for autotests must be 'clone'"}
-		valid.Errors = append(valid.Errors, err)
-	}
-
-	if codebase.Type == "autotests" && codebase.Repository == nil {
-		err := &validation.Error{Key: "repository", Message: "repository for autotests can't be null"}
-		valid.Errors = append(valid.Errors, err)
-	}
-
-	if resErr != nil {
-		return &ErrMsg{"An internal error has occurred on server while validating application's form fields.", http.StatusInternalServerError}
-	}
-
-	if valid.Errors == nil {
-		return nil
-	}
-
-	return &ErrMsg{string(createErrorResponseBody(valid)), http.StatusBadRequest}
 }
 
 func createErrorResponseBody(valid validation.Validation) []byte {
@@ -232,28 +159,4 @@ func extractErrors(valid validation.Validation) []string {
 		errMap = append(errMap, fmt.Sprintf("Validation failed on %s: %s", err.Key, err.Message))
 	}
 	return errMap
-}
-
-func logRequestData(app command.CreateCodebase) {
-	var result strings.Builder
-	result.WriteString(fmt.Sprintf("Request data to create CR is valid. name=%s, strategy=%s, lang=%s, buildTool=%s, multiModule=%s, framework=%s",
-		app.Name, app.Strategy, app.Lang, app.BuildTool, app.MultiModule, app.Framework))
-
-	if app.Repository != nil {
-		result.WriteString(fmt.Sprintf(", repositoryUrl=%s, repositoryLogin=%s", app.Repository.Url, app.Repository.Login))
-	}
-
-	if app.Vcs != nil {
-		result.WriteString(fmt.Sprintf(", vcsLogin=%s", app.Vcs.Login))
-	}
-
-	if app.Route != nil {
-		result.WriteString(fmt.Sprintf(", routeSite=%s, routePath=%s", app.Route.Site, app.Route.Path))
-	}
-
-	if app.Database != nil {
-		result.WriteString(fmt.Sprintf(", dbKind=%s, dbМersion=%s, dbCapacity=%s, dbStorage=%s", app.Database.Kind, app.Database.Version, app.Database.Capacity, app.Database.Storage))
-	}
-
-	log.Println(result.String())
 }

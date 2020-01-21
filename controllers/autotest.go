@@ -10,7 +10,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
 	"html/template"
-	"log"
 	"net/http"
 	"path"
 	"regexp"
@@ -40,7 +39,7 @@ func (c *AutotestsController) CreateAutotests() {
 	codebase := c.extractAutotestsRequestData()
 	errMsg := validateAutotestsRequestData(codebase)
 	if errMsg != nil {
-		log.Printf("Failed to validate autotests request data: %s", errMsg.Message)
+		log.Info("Failed to validate autotests request data", "err", errMsg.Message)
 		flash := beego.NewFlash()
 		flash.Error(errMsg.Message)
 		flash.Store(&c.Controller)
@@ -62,7 +61,7 @@ func (c *AutotestsController) CreateAutotests() {
 		return
 	}
 
-	log.Printf("Autotests object is saved into k8s: %s", createdObject)
+	log.Info("Autotests object is saved into cluster", "name", createdObject.Name)
 	flash.Success("Autotests object is created.")
 	flash.Store(&c.Controller)
 	c.Redirect(fmt.Sprintf("/admin/edp/autotest/overview?%s=%s#codebaseSuccessModal", paramWaitingForCodebase, codebase.Name), 302)
@@ -81,7 +80,7 @@ func logAutotestsRequestData(autotests command.CreateCodebase) {
 		result.WriteString(fmt.Sprintf(", vcsLogin=%s", autotests.Vcs.Login))
 	}
 
-	log.Println(result.String())
+	log.Info(result.String())
 }
 
 func (c *AutotestsController) extractAutotestsRequestData() command.CreateCodebase {
@@ -198,14 +197,14 @@ func (c *AutotestsController) GetCreateAutotestsPage() {
 
 	contains := doesIntegrationStrategiesContainImportStrategy(c.IntegrationStrategies)
 	if contains {
-		log.Println("Import strategy is used.")
+		log.Info("Import strategy is used.")
 
 		gitServers, err := c.GitServerService.GetServers(query.GitServerCriteria{Available: true})
 		if err != nil {
 			c.Abort("500")
 			return
 		}
-		log.Printf("Fetched Git Servers: %v", gitServers)
+		log.Info("Fetched Git Servers", "git servers", gitServers)
 
 		c.Data["GitServers"] = gitServers
 	}
@@ -222,7 +221,7 @@ func (c *AutotestsController) GetCreateAutotestsPage() {
 		return
 	}
 
-	log.Println("Create strategy is removed from list due to Autotest")
+	log.Info("Create strategy is removed from list due to Autotest")
 
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
@@ -258,5 +257,6 @@ func (c *AutotestsController) GetAutotestsOverviewPage() {
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["HasRights"] = isAdmin(c.GetSession("realm_roles").([]string))
 	c.Data["Type"] = query.Autotests
+	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.TplName = "codebase.html"
 }

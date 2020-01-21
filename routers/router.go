@@ -19,6 +19,7 @@ package routers
 import (
 	"edp-admin-console/context"
 	"edp-admin-console/controllers"
+	"edp-admin-console/controllers/auth"
 	"edp-admin-console/filters"
 	"edp-admin-console/k8s"
 	"edp-admin-console/repository"
@@ -48,7 +49,7 @@ func init() {
 
 	if authEnabled {
 		context.InitAuth()
-		beego.Router("/auth/callback", &controllers.AuthController{}, "get:Callback")
+		beego.Router("/auth/callback", &auth.AuthController{}, "get:Callback")
 		beego.InsertFilter("/admin/*", beego.BeforeRouter, filters.AuthFilter)
 		beego.InsertFilter("/api/v1/edp/*", beego.BeforeRouter, filters.AuthRestFilter)
 		beego.InsertFilter("/admin/edp/*", beego.BeforeRouter, filters.RoleAccessControlFilter)
@@ -82,9 +83,10 @@ func init() {
 	clusterService := service.ClusterService{Clients: clients}
 	branchService := service.CodebaseBranchService{Clients: clients, IReleaseBranchRepository: branchRepository}
 	codebaseService := service.CodebaseService{
-		Clients:             clients,
-		ICodebaseRepository: codebaseRepository,
-		BranchService:       branchService,
+		Clients:               clients,
+		ICodebaseRepository:   codebaseRepository,
+		ICDPipelineRepository: pipelineRepository,
+		BranchService:         branchService,
 	}
 	pipelineService := service.CDPipelineService{
 		Clients:               clients,
@@ -199,6 +201,7 @@ func init() {
 		beego.NSRouter("/autotest", &autc, "post:CreateAutotests"),
 
 		beego.NSRouter("/codebase/:codebaseName/overview", &cc, "get:GetCodebaseOverviewPage"),
+		beego.NSRouter("/codebase/delete", &cc, "post:Delete"),
 		beego.NSRouter("/codebase/:codebaseName/branch", &controllers.BranchController{BranchService: branchService, CodebaseService: codebaseService}, "post:CreateCodebaseBranch"),
 
 		beego.NSRouter("/library/overview", &lc, "get:GetLibraryListPage"),

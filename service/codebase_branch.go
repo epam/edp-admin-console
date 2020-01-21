@@ -22,6 +22,8 @@ import (
 	"edp-admin-console/models/command"
 	"edp-admin-console/models/query"
 	"edp-admin-console/repository"
+	"edp-admin-console/util"
+	"edp-admin-console/util/consts"
 	"errors"
 	"fmt"
 	edpv1alpha1 "github.com/epmd-edp/codebase-operator/v2/pkg/apis/edp/v1alpha1"
@@ -52,6 +54,11 @@ func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCo
 		return nil, errors.New(fmt.Sprintf("release branch CR {%s} already exists in k8s", branchInfo.Name))
 	}
 
+	c, err := util.GetCodebaseCR(s.Clients.EDPRestClient, appName)
+	if err != nil {
+		return nil, err
+	}
+
 	spec := convertBranchInfoData(branchInfo, appName)
 	branch := &edpv1alpha1.CodebaseBranch{
 		TypeMeta: metav1.TypeMeta{
@@ -61,6 +68,14 @@ func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCo
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-%s", appName, branchInfo.Name),
 			Namespace: context.Namespace,
+			OwnerReferences: []metav1.OwnerReference{
+				{
+					APIVersion: "v2.edp.epam.com/v1alpha1",
+					Kind:       consts.CodebaseKind,
+					Name:       c.Name,
+					UID:        c.UID,
+				},
+			},
 		},
 		Spec: spec,
 		Status: edpv1alpha1.CodebaseBranchStatus{

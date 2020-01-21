@@ -6,7 +6,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="/static/css/index.css">
-    <link rel="stylesheet" href="/static/css/codebase-list.css">
 </head>
 <body>
 <main>
@@ -33,10 +32,20 @@
                         </h1>
                     {{end}}
                     {{if .Codebases}}
-                        <p> Please find below the list of {{if eq .Type "application"}}applications{{else if eq .Type "autotests"}}autotests{{else}}libraries{{end}}.</p>
+                        <p> Please find below the list
+                            of {{if eq .Type "application"}}applications{{else if eq .Type "autotests"}}autotests{{else}}libraries{{end}}
+                            .</p>
                     {{else}}
-                        <p>Looks like there're no any {{if eq .Type "application"}}applications{{else if eq .Type "autotests"}}autotests{{else}}libraries{{end}}.</p>
+                        <p>Looks like there're no
+                            any {{if eq .Type "application"}}applications{{else if eq .Type "autotests"}}autotests{{else}}libraries{{end}}
+                            .</p>
                     {{end}}
+
+                    {{ if .Error }}
+                        <div class="form-error">
+                            <p>{{ .Error }}</p>
+                        </div>
+                    {{ end }}
                 </div>
                 {{if .HasRights}}
                     <div class="flex-fill">
@@ -85,19 +94,26 @@
                                 </td>
                                 <td>{{.Language}}</td>
                                 <td>{{.BuildTool}}</td>
-                                <td></td>
+                                <td>
+                                    {{if $.HasRights}}
+                                        <button class="delete delete-codebase" data-toggle="modal"
+                                                data-codebase="{{.Name}}">
+                                            <i class="icon-trashcan"></i>
+                                        </button>
+                                    {{end}}
+                                </td>
                             </tr>
                         {{end}}
                         </tbody>
                     </table>
                 </div>
-               {{end}}
+            {{end}}
         </div>
     </section>
     {{template "template/footer_template.html" .}}
     {{template "template/modal_success_template.html" .}}
-
 </main>
+{{template "template/delete_confirmation_template.html" .}}
 <script src="/static/js/jquery-3.3.1.js"></script>
 <script src="/static/js/popper.js"></script>
 <script src="/static/js/bootstrap.js"></script>

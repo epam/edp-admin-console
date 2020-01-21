@@ -23,11 +23,11 @@ import (
 	ec "edp-admin-console/service/edp-component"
 	"edp-admin-console/util"
 	"edp-admin-console/util/consts"
+	dberror "edp-admin-console/util/error/db-errors"
 	"errors"
 	"fmt"
 	"github.com/astaxie/beego"
 	"html/template"
-	"log"
 	"strings"
 )
 
@@ -39,6 +39,8 @@ type CodebaseController struct {
 	GitServerService service.GitServerService
 	EDPComponent     ec.EDPComponentService
 }
+
+const paramWaitingForBranch = "waitingforbranch"
 
 func (c *CodebaseController) GetCodebaseOverviewPage() {
 	codebaseName := c.GetString(":codebaseName")
@@ -55,11 +57,10 @@ func (c *CodebaseController) GetCodebaseOverviewPage() {
 
 	err = c.createBranchLinks(*codebase, context.Tenant)
 	if err != nil {
-		log.Printf("An error has occurred while creating link to Git Server: %v", err)
+		log.Error(err, "an error has occurred while creating link to Git Server")
 		c.Abort("500")
 		return
 	}
-
 	codebase.CodebaseBranch = addCodebaseBranchInProgressIfAny(codebase.CodebaseBranch, c.GetString(paramWaitingForBranch))
 
 	c.Data["EDPVersion"] = context.EDPVersion
@@ -95,7 +96,7 @@ func addCodebaseBranchInProgressIfAny(branches []*query.CodebaseBranch, branchIn
 			}
 		}
 
-		log.Println("Adding branch " + branchInProgress + " which is going to be created to the list.")
+		log.Info("Adding branch which is going to be created to the list.", "name", branchInProgress)
 		branch := query.CodebaseBranch{
 			Name:   branchInProgress,
 			Status: "inactive",
@@ -159,4 +160,34 @@ func (c CodebaseController) createLinksForGerritProvider(codebase query.Codebase
 	}
 
 	return nil
+}
+
+func (c *CodebaseController) Delete() {
+	flash := beego.NewFlash()
+	cn := c.GetString("codebase-name")
+	rl := log.WithValues("codebase name", cn)
+	rl.Info("delete codebase method is invoked")
+	ct := c.GetString("codebase-type")
+	if err := c.CodebaseService.Delete(cn); err != nil {
+		if dberror.CodebaseIsUsed(err) {
+			cerr := err.(dberror.CodebaseIsUsedByCDPipeline)
+			flash.Error(cerr.Message)
+			flash.Store(&c.Controller)
+			c.Redirect(getCodebaseIsUsedURL(cerr.Codebase, cerr.Pipeline, ct), 302)
+			return
+		}
+		c.Abort("500")
+		return
+	}
+	rl.Info("delete codebase method is finished")
+	c.Redirect(getCodebaseIsDeletedURL(cn, ct), 302)
+}
+
+func getCodebaseIsUsedURL(codebaseName, pipeline, codebaseType string) string {
+	return fmt.Sprintf("/admin/edp/%v/overview?codebase=%v&pipeline=%v#codebaseIsUsed",
+		codebaseType, codebaseName, pipeline)
+}
+
+func getCodebaseIsDeletedURL(codebaseName, codebaseType string) string {
+	return fmt.Sprintf("/admin/edp/%v/overview?codebase=%v#codebaseIsDeleted", codebaseType, codebaseName)
 }

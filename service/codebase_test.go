@@ -31,7 +31,7 @@ func (mock *ApplicationEntityRepositoryMock) GetAllApplicationsWithReleaseBranch
 func TestShouldReturnApplications(t *testing.T) {
 	repositoryMock := new(ApplicationEntityRepositoryMock)
 	repositoryMock.On("GetCodebasesByCriteria", mock.Anything).Return(createApplications(), nil)
-	appService := CodebaseService{ICodebaseRepository: repositoryMock}
+	appService := codebase.CodebaseService{ICodebaseRepository: repositoryMock}
 
 	applications, err := appService.GetCodebasesByCriteria(models.CodebaseCriteria{})
 	assert.Nil(t, err)
@@ -41,7 +41,7 @@ func TestShouldReturnApplications(t *testing.T) {
 func TestShouldReturnErrorFromGetAllApplications(t *testing.T) {
 	repositoryMock := new(ApplicationEntityRepositoryMock)
 	repositoryMock.On("GetCodebasesByCriteria", mock.Anything).Return(createApplications(), errors.New("internal error"))
-	appService := CodebaseService{ICodebaseRepository: repositoryMock}
+	appService := codebase.CodebaseService{ICodebaseRepository: repositoryMock}
 
 	applications, err := appService.GetCodebasesByCriteria(models.CodebaseCriteria{})
 	assert.Error(t, err)
@@ -51,7 +51,7 @@ func TestShouldReturnErrorFromGetAllApplications(t *testing.T) {
 func TestShouldReturnApplication(t *testing.T) {
 	repositoryMock := new(ApplicationEntityRepositoryMock)
 	repositoryMock.On("GetCodebaseByName", mock.Anything, mock.Anything).Return(&models.ApplicationInfo{}, nil)
-	appService := CodebaseService{ICodebaseRepository: repositoryMock}
+	appService := codebase.CodebaseService{ICodebaseRepository: repositoryMock}
 
 	application, err := appService.GetCodebaseByName(mock.Anything)
 	assert.Nil(t, err)
@@ -61,7 +61,7 @@ func TestShouldReturnApplication(t *testing.T) {
 func TestShouldReturnErrorFromGetAllApplication(t *testing.T) {
 	repositoryMock := new(ApplicationEntityRepositoryMock)
 	repositoryMock.On("GetCodebaseByName", mock.Anything, mock.Anything).Return(&models.ApplicationInfo{}, errors.New("internal error"))
-	appService := CodebaseService{ICodebaseRepository: repositoryMock}
+	appService := codebase.CodebaseService{ICodebaseRepository: repositoryMock}
 
 	application, err := appService.GetCodebaseByName(mock.Anything)
 	assert.NotNil(t, err)
@@ -71,7 +71,7 @@ func TestShouldReturnErrorFromGetAllApplication(t *testing.T) {
 func TestShouldReturnApplicationsWithReleaseBranches(t *testing.T) {
 	repositoryMock := new(ApplicationEntityRepositoryMock)
 	repositoryMock.On("GetAllCodebasesWithReleaseBranches", mock.Anything).Return([]models.ApplicationWithReleaseBranch{}, errors.New("internal error"))
-	appService := CodebaseService{ICodebaseRepository: repositoryMock}
+	appService := codebase.CodebaseService{ICodebaseRepository: repositoryMock}
 
 	applications, err := appService.GetAllCodebasesWithReleaseBranches(models.CodebaseCriteria{})
 	assert.NotNil(t, err)
@@ -81,7 +81,7 @@ func TestShouldReturnApplicationsWithReleaseBranches(t *testing.T) {
 func TestShouldReturnErrorApplicationsWithReleaseBranches(t *testing.T) {
 	repositoryMock := new(ApplicationEntityRepositoryMock)
 	repositoryMock.On("GetAllCodebasesWithReleaseBranches", mock.Anything).Return([]models.ApplicationWithReleaseBranch{}, nil)
-	appService := CodebaseService{ICodebaseRepository: repositoryMock}
+	appService := codebase.CodebaseService{ICodebaseRepository: repositoryMock}
 
 	applications, err := appService.GetAllCodebasesWithReleaseBranches(models.CodebaseCriteria{})
 	assert.Nil(t, err)

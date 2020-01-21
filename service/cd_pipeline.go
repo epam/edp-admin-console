@@ -49,12 +49,6 @@ type ErrMsg struct {
 	StatusCode int
 }
 
-const (
-	OpenshiftProjectLink = "%s/console/project/"
-	EdpCICDPostfix       = "-edp-cicd"
-	platformType         = "platformType"
-)
-
 func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand) (*edppipelinesv1alpha1.CDPipeline, error) {
 	log.Printf("Start creating CD Pipeline: %v", cdPipeline)
 

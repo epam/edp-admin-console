@@ -32,7 +32,6 @@ import (
 	"github.com/astaxie/beego/validation"
 	edppipelinesv1alpha1 "github.com/epmd-edp/cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	"html/template"
-	"log"
 	"net/http"
 	"sort"
 )
@@ -208,14 +207,15 @@ func (c *CDPipelineController) UpdateCDPipeline() {
 
 	errMsg := validateCDPipelineUpdateRequestData(pipelineUpdateCommand)
 	if errMsg != nil {
-		log.Printf("Request data is not valid: %s", errMsg.Message)
+		log.Info("Request data is not valid", "err", errMsg.Message)
 		flash.Error(errMsg.Message)
 		flash.Store(&c.Controller)
 		c.Redirect(fmt.Sprintf("/admin/edp/cd-pipeline/%s/update", pipelineName), 302)
 		return
 	}
-	log.Printf("Request data is receieved to update CD pipeline: %s. Applications: %v. Stages: %v. Services: %v",
-		pipelineName, pipelineUpdateCommand.Applications, pipelineUpdateCommand.Stages, pipelineUpdateCommand.ThirdPartyServices)
+	log.Info("Request data is receieved to update CD pipeline",
+		"pipeline", pipelineName, "applications", pipelineUpdateCommand.Applications,
+		"stages", pipelineUpdateCommand.Stages, "services", pipelineUpdateCommand.ThirdPartyServices)
 
 	err := c.PipelineService.UpdatePipeline(pipelineUpdateCommand)
 	if err != nil {
@@ -260,14 +260,15 @@ func (c *CDPipelineController) CreateCDPipeline() {
 
 	errMsg := validateCDPipelineRequestData(cdPipelineCreateCommand)
 	if errMsg != nil {
-		log.Printf("Request data is not valid: %s", errMsg.Message)
+		log.Info("Request data is not valid", "err", errMsg.Message)
 		flash.Error(errMsg.Message)
 		flash.Store(&c.Controller)
 		c.Redirect("/admin/edp/cd-pipeline/create", 302)
 		return
 	}
-	log.Printf("Request data is receieved to create CD pipeline: %s. Applications: %v. Stages: %v. Services: %v",
-		cdPipelineCreateCommand.Name, cdPipelineCreateCommand.Applications, cdPipelineCreateCommand.Stages, cdPipelineCreateCommand.ThirdPartyServices)
+	log.Info("Request data is receieved to create CD pipeline",
+		"pipeline", cdPipelineCreateCommand.Name, "applications", cdPipelineCreateCommand.Applications,
+		"stages", cdPipelineCreateCommand.Stages, "services", cdPipelineCreateCommand.ThirdPartyServices)
 
 	_, pipelineErr := c.PipelineService.CreatePipeline(cdPipelineCreateCommand)
 	if pipelineErr != nil {
@@ -320,7 +321,7 @@ func (c *CDPipelineController) GetCDPipelineOverviewPage() {
 	}
 
 	if err := c.createPlatformLinks(cdPipeline.Stage, cdPipeline.Name); err != nil {
-		log.Println(err)
+		log.Error(err, "an error has occurred while creating platform links")
 		c.Abort("500")
 		return
 	}
@@ -379,7 +380,7 @@ func retrieveStagesFromRequest(this *CDPipelineController) []command.CDStageComm
 		return stages[i].Order < stages[j].Order
 	})
 
-	log.Printf("Stages are fetched from request: %v", stages)
+	log.Info("Stages are fetched from request", "stages", stages)
 	return stages
 }
 
@@ -402,7 +403,7 @@ func addCdPipelineInProgressIfAny(cdPipelines []*query.CDPipeline, pipelineInPro
 			}
 		}
 
-		log.Println("Adding CD Pipeline " + pipelineInProgress + " which is going to be created to the list.")
+		log.Info("Adding CD Pipeline which is going to be created to the list", "name", pipelineInProgress)
 		pipeline := query.CDPipeline{
 			Name:   pipelineInProgress,
 			Status: "inactive",
@@ -505,7 +506,7 @@ func (c *CDPipelineController) createOneJenkinsLink(cdPipeline *query.CDPipeline
 
 	cdPipeline.JenkinsLink = util.CreateCICDPipelineLink(edc.Url, cdPipeline.Name)
 
-	log.Printf("Created CD Pipeline Jenkins link %v", cdPipeline.JenkinsLink)
+	log.Info("Created CD Pipeline Jenkins link", "jenkins link", cdPipeline.JenkinsLink)
 
 	return nil
 }
@@ -573,7 +574,7 @@ func (c *CDPipelineController) createNonNativeDockerImageLinks(s []*query.Codeba
 }
 
 func (c *CDPipelineController) createPlatformLinks(stages []*query.Stage, cdPipelineName string) error {
-	log.Printf("Start creating Platform links for %v CD Pipeline", cdPipelineName)
+	log.Info("Start creating Platform links forCD Pipeline", "name", cdPipelineName)
 
 	if len(stages) == 0 {
 		return errors.New("stages can't be an empty or nil")
@@ -586,7 +587,7 @@ func (c *CDPipelineController) createPlatformLinks(stages []*query.Stage, cdPipe
 }
 
 func (c *CDPipelineController) createNativePlatformLinks(stages []*query.Stage, cdPipelineName string) error {
-	log.Printf("Start creating Openshift Platform links for %v CD Pipeline", cdPipelineName)
+	log.Info("Start creating Openshift Platform links forCD Pipeline", "name", cdPipelineName)
 
 	edc, err := c.EDPComponent.GetEDPComponent(consts.Openshift)
 	if err != nil {
@@ -605,7 +606,7 @@ func (c *CDPipelineController) createNativePlatformLinks(stages []*query.Stage, 
 }
 
 func (c *CDPipelineController) createNonNativePlatformLinks(stages []*query.Stage, cdPipelineName string) error {
-	log.Printf("Start creating Kubernetes Platform links for %v CD Pipeline", cdPipelineName)
+	log.Info("Start creating Kubernetes Platform links for CD Pipeline", "name", cdPipelineName)
 
 	edc, err := c.EDPComponent.GetEDPComponent(consts.Kubernetes)
 	if err != nil {
@@ -613,7 +614,7 @@ func (c *CDPipelineController) createNonNativePlatformLinks(stages []*query.Stag
 	}
 
 	if edc == nil {
-		log.Printf("Creating Kubernetes Platform links has been skipped for %v CD Pipeline", cdPipelineName)
+		log.Info("Creating Kubernetes Platform links has been skipped forCD Pipeline", "name", cdPipelineName)
 		return nil
 	}
 
@@ -626,7 +627,7 @@ func (c *CDPipelineController) createNonNativePlatformLinks(stages []*query.Stag
 
 func (c *CDPipelineController) createJenkinsLinks(cdPipelines []*query.CDPipeline) error {
 	if len(cdPipelines) == 0 {
-		log.Println("There're no CD Pipelines. Generating Jenkins links are skipped.")
+		log.Info("There're no CD Pipelines. Generating Jenkins links are skipped.")
 		return nil
 	}
 
@@ -641,7 +642,7 @@ func (c *CDPipelineController) createJenkinsLinks(cdPipelines []*query.CDPipelin
 
 	for index, pipeline := range cdPipelines {
 		cdPipelines[index].JenkinsLink = util.CreateCICDPipelineLink(edc.Url, pipeline.Name)
-		log.Printf("Created Jenkins link %v", pipeline.JenkinsLink)
+		log.Info("Created Jenkins link", "link", pipeline.JenkinsLink)
 	}
 
 	return nil

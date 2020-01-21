@@ -11321,3 +11321,7 @@ div#kubernetes-component {
     border: 1px solid #1a1a1a;
     font-size: 90%;
 }
+
+.form-error {
+    color: red;
+}

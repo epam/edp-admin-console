@@ -10,6 +10,16 @@ $(function () {
         if (anchor) {
             if (anchor === '#codebaseSuccessModal') {
                 showNotification(true);
+            } else if (anchor === '#codebaseIsUsed') {
+                let codebase = getUrlParameter('codebase'),
+                    pipeline = getUrlParameter('pipeline'),
+                    $modal = $("#delete-confirmation");
+                $modal.find('.invalid-feedback.codebase-is-used').show()
+                    .text(`Codebase ${codebase} is used by CD Pipeline(s) ${pipeline}`);
+                $("#delete-confirmation").data('codebase', codebase).modal('show');
+            } else if (anchor === '#codebaseIsDeleted') {
+                let codebase = getUrlParameter('codebase');
+                showNotification(true, `Codebase ${codebase} was marked for deletion.`);
             }
             location.hash = '';
         }
@@ -27,17 +37,46 @@ $(function () {
         }
         window.history.replaceState({}, document.title, uri);
     });
+
+    $('.delete-codebase').click(function () {
+        let codebase = $(this).data('codebase'),
+            $modal = $("#delete-confirmation");
+        $modal.data('codebase', codebase).modal('show');
+    });
+
+    $('.delete-confirmation').click(function () {
+        let $modal = $("#delete-confirmation"),
+            targetName = $modal.data('codebase'),
+            confirmationName = $modal.find('#codebase-name').val(),
+            $errName = $modal.find('.invalid-feedback.different-name'),
+            $errUsed = $modal.find('.invalid-feedback.codebase-is-used');
+        if (targetName !== confirmationName) {
+            $errName.show();
+            return
+        }
+        $errName.hide();
+        $errUsed.hide();
+        $errUsed.text('');
+        $("#delete-action").submit();
+    });
+
+    $('.close,.cancel-delete').click(function () {
+        let $modal = $("#delete-confirmation");
+        $modal.find('.invalid-feedback.different-name').hide();
+        $modal.find('.invalid-feedback.codebase-is-used').text('').hide();
+        $modal.find('#codebase-name').val('');
+    });
+
 });
 
-
-function showNotification(ok, delay) {
+function showNotification(ok, msg, delay) {
     $.notify({
             icon: ok ? 'glyphicon glyphicon-ok-circle alert-icon' : 'glyphicon gglyphicon-warning-sign alert-icon',
-            message: ok ? 'Provisioning has been started.' : 'Provisioning has been failed.'
+            message: msg ? msg : (ok ? 'Provisioning has been started.' : 'Provisioning has been failed.')
         },
         {
             type: ok ? 'success' : 'error',
-            delay: delay ? delay: 5000,
+            delay: delay ? delay : 5000,
             animate: {
                 enter: 'animated fadeInRight',
                 exit: 'animated fadeOutRight'

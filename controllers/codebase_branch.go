@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
-	"log"
 	"net/http"
 	"regexp"
 )
@@ -22,11 +21,12 @@ func (c *BranchController) CreateCodebaseBranch() {
 	errMsg := validCodebaseBranchRequestData(branchInfo)
 	appName := c.GetString(":codebaseName")
 	if errMsg != nil {
-		log.Printf("Failed to validate request data: %s", errMsg.Message)
+		log.Info("Failed to validate request data", "err", errMsg.Message)
 		c.Redirect(fmt.Sprintf("/admin/edp/codebase/%s/overview", appName), 302)
 		return
 	}
-	log.Printf("Request data to create CR for codebase branch is valid: {Branch Name: %s, Commit Hash: %s}", branchInfo.Name, branchInfo.Commit)
+	log.Info("Request data to create CR for codebase branch is valid",
+		"branch", branchInfo.Name, "commit hash", branchInfo.Commit)
 
 	exist := c.CodebaseService.ExistCodebaseAndBranch(appName, branchInfo.Name)
 
@@ -41,7 +41,7 @@ func (c *BranchController) CreateCodebaseBranch() {
 		return
 	}
 
-	log.Printf("BranchRelease resource is saved into k8s: %s", cb)
+	log.Info("BranchRelease resource is saved into cluster", "name", cb.Name)
 	c.Redirect(fmt.Sprintf("/admin/edp/codebase/%s/overview?%s=%s#branchSuccessModal", appName, paramWaitingForBranch, branchInfo.Name), 302)
 }
 

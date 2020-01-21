@@ -61,4 +61,5 @@ require (
 	k8s.io/apimachinery v0.0.0-20190221213512-86fb29eff628
 	k8s.io/client-go v0.0.0-20190228174230-b40b2a5939e4
 	k8s.io/kube-openapi v0.0.0-20181109181836-c59034cc13d5
+	sigs.k8s.io/controller-runtime v0.1.12
 )

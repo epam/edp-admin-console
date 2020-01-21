@@ -10,7 +10,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
 	"html/template"
-	"log"
 	"net/http"
 	"path"
 	"regexp"
@@ -51,6 +50,7 @@ func (c *LibraryController) GetLibraryListPage() {
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["HasRights"] = isAdmin(c.GetSession("realm_roles").([]string))
 	c.Data["Type"] = query.Library
+	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.TplName = "codebase.html"
 }
 
@@ -68,14 +68,14 @@ func (c *LibraryController) GetCreatePage() {
 
 	contains := doesIntegrationStrategiesContainImportStrategy(c.IntegrationStrategies)
 	if contains {
-		log.Println("Import strategy is used.")
+		log.Info("Import strategy is used.")
 
 		gitServers, err := c.GitServerService.GetServers(query.GitServerCriteria{Available: true})
 		if err != nil {
 			c.Abort("500")
 			return
 		}
-		log.Printf("Fetched Git Servers: %v", gitServers)
+		log.Info("Fetched Git Servers", "git servers", gitServers)
 
 		c.Data["GitServers"] = gitServers
 	}
@@ -111,7 +111,7 @@ func (c *LibraryController) Create() {
 	codebase := c.extractLibraryRequestData()
 	errMsg := validateLibraryRequestData(codebase)
 	if errMsg != nil {
-		log.Printf("Failed to validate library request data: %s", errMsg.Message)
+		log.Info("Failed to validate library request data", "err", errMsg.Message)
 		flash.Error(errMsg.Message)
 		flash.Store(&c.Controller)
 		c.Redirect("/admin/edp/library/create", 302)
@@ -132,7 +132,7 @@ func (c *LibraryController) Create() {
 		return
 	}
 
-	log.Printf("Library object is saved into k8s: %s", createdObject)
+	log.Info("Library object is saved into cluster", "library", createdObject.Name)
 	flash.Success("Library object is created.")
 	flash.Store(&c.Controller)
 	c.Redirect(fmt.Sprintf("/admin/edp/library/overview?%s=%s#codebaseSuccessModal", paramWaitingForCodebase, codebase.Name), 302)
@@ -236,5 +236,5 @@ func logLibraryRequestData(library command.CreateCodebase) {
 		result.WriteString(fmt.Sprintf(", vcsLogin=%s", library.Vcs.Login))
 	}
 
-	log.Println(result.String())
+	log.Info(result.String())
 }

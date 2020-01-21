@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
-	"log"
 	"net/http"
 )
 
@@ -83,12 +82,13 @@ func (c *CDPipelineRestController) CreateCDPipeline() {
 	}
 	errMsg := validateCDPipelineRequestData(cdPipelineCreateCommand)
 	if errMsg != nil {
-		log.Printf("Failed to validate request data: %s", errMsg.Message)
+		log.Info("Failed to validate request data", "err", errMsg.Message)
 		http.Error(c.Ctx.ResponseWriter, errMsg.Message, http.StatusBadRequest)
 		return
 	}
-	log.Printf("Request data is receieved to create CD pipeline: %s. Applications: %v. Stages: %v. Services: %v",
-		cdPipelineCreateCommand.Name, cdPipelineCreateCommand.Applications, cdPipelineCreateCommand.Stages, cdPipelineCreateCommand.ThirdPartyServices)
+	log.Info("Request data is receieved to create CD pipeline",
+		"pipeline", cdPipelineCreateCommand.Name, "applications", cdPipelineCreateCommand.Applications,
+		"stages", cdPipelineCreateCommand.Stages, "services", cdPipelineCreateCommand.ThirdPartyServices)
 
 	_, pipelineErr := c.CDPipelineService.CreatePipeline(cdPipelineCreateCommand)
 	if pipelineErr != nil {
@@ -122,12 +122,12 @@ func (c *CDPipelineRestController) UpdateCDPipeline() {
 
 	errMsg := validateCDPipelineUpdateRequestData(pipelineUpdateCommand)
 	if errMsg != nil {
-		log.Printf("Request data is not valid: %s", errMsg.Message)
+		log.Info("Request data is not valid", "err", errMsg.Message)
 		http.Error(c.Ctx.ResponseWriter, errMsg.Message, http.StatusBadRequest)
 		return
 	}
-	log.Printf("Request data is receieved to update CD pipeline %s. Applications: %v.",
-		pipelineUpdateCommand.Name, pipelineUpdateCommand.Applications)
+	log.Info("Request data is received to update CD pipeline",
+		"pipeline", pipelineUpdateCommand.Name, "applications", pipelineUpdateCommand.Applications)
 
 	err = c.CDPipelineService.UpdatePipeline(pipelineUpdateCommand)
 	if err != nil {
