@@ -173,9 +173,11 @@ func (c *CodebaseController) Delete() {
 			cerr := err.(dberror.CodebaseIsUsedByCDPipeline)
 			flash.Error(cerr.Message)
 			flash.Store(&c.Controller)
+			log.Error(err, cerr.Message)
 			c.Redirect(getCodebaseIsUsedURL(cerr.Codebase, cerr.Pipeline, ct), 302)
 			return
 		}
+		log.Error(err, "delete process is failed")
 		c.Abort("500")
 		return
 	}
