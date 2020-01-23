@@ -70,10 +70,11 @@ func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCo
 			Namespace: context.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				{
-					APIVersion: "v2.edp.epam.com/v1alpha1",
-					Kind:       consts.CodebaseKind,
-					Name:       c.Name,
-					UID:        c.UID,
+					APIVersion:         "v2.edp.epam.com/v1alpha1",
+					Kind:               consts.CodebaseKind,
+					Name:               c.Name,
+					UID:                c.UID,
+					BlockOwnerDeletion: newTrue(),
 				},
 			},
 		},
@@ -95,6 +96,11 @@ func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCo
 		return &edpv1alpha1.CodebaseBranch{}, err
 	}
 	return result, nil
+}
+
+func newTrue() *bool {
+	b := true
+	return &b
 }
 
 func (s *CodebaseBranchService) GetCodebaseBranchesByCriteria(criteria query.CodebaseBranchCriteria) ([]query.CodebaseBranch, error) {
