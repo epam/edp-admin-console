@@ -168,7 +168,7 @@ func (c *CodebaseController) Delete() {
 	rl := log.WithValues("codebase name", cn)
 	rl.Info("delete codebase method is invoked")
 	ct := c.GetString("codebase-type")
-	if err := c.CodebaseService.Delete(cn); err != nil {
+	if err := c.CodebaseService.Delete(cn, ct); err != nil {
 		if dberror.CodebaseIsUsed(err) {
 			cerr := err.(dberror.CodebaseIsUsedByCDPipeline)
 			flash.Error(cerr.Message)
@@ -186,6 +186,9 @@ func (c *CodebaseController) Delete() {
 }
 
 func getCodebaseIsUsedURL(codebaseName, pipeline, codebaseType string) string {
+	if codebaseType == consts.Autotest {
+		codebaseType = "autotest"
+	}
 	return fmt.Sprintf("/admin/edp/%v/overview?codebase=%v&pipeline=%v#codebaseIsUsed",
 		codebaseType, codebaseName, pipeline)
 }

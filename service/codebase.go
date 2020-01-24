@@ -289,9 +289,9 @@ func (s CodebaseService) selectApplicationNames(applicationsToPromote []*query.A
 	return result, nil
 }
 
-func (s CodebaseService) Delete(name string) error {
+func (s CodebaseService) Delete(name, codebaseType string) error {
 	clog.Info("start executing service delete method", "codebase", name)
-	cdp, err := s.ICDPipelineRepository.GetCDPipelinesUsingCodebase(name)
+	cdp, err := s.getCdPipelinesUsingCodebase(name, codebaseType)
 	if err != nil {
 		return err
 	}
@@ -299,7 +299,7 @@ func (s CodebaseService) Delete(name string) error {
 		p := strings.Join(cdp[:], ",")
 		return dberror.CodebaseIsUsedByCDPipeline{
 			Status:   dberror.StatusReasonCodebaseIsUsedByCDPipeline,
-			Message:  fmt.Sprintf("codebase %v is used by %v CD Pipeline(s). couldn't delete.", name, p),
+			Message:  fmt.Sprintf("%v %v is used by %v CD Pipeline(s). couldn't delete.", codebaseType, name, p),
 			Codebase: name,
 			Pipeline: p,
 		}
@@ -310,6 +310,28 @@ func (s CodebaseService) Delete(name string) error {
 	}
 	clog.Info("end executing service codebase delete method", "codebase", name)
 	return nil
+}
+
+func (s CodebaseService) getCdPipelinesUsingCodebase(name, codebaseType string) ([]string, error) {
+	if consts.Application == codebaseType {
+		cdp, err := s.ICDPipelineRepository.GetCDPipelinesUsingApplication(name)
+		if err != nil {
+			return nil, err
+		}
+		return cdp, nil
+	} else if consts.Autotest == codebaseType {
+		cdp, err := s.ICDPipelineRepository.GetCDPipelinesUsingAutotest(name)
+		if err != nil {
+			return nil, err
+		}
+		return cdp, nil
+	} else {
+		cdp, err := s.ICDPipelineRepository.GetCDPipelinesUsingLibrary(name)
+		if err != nil {
+			return nil, err
+		}
+		return cdp, nil
+	}
 }
 
 func (s CodebaseService) deleteCodebase(name string) error {
