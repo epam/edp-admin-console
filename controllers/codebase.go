@@ -174,7 +174,7 @@ func (c *CodebaseController) Delete() {
 			flash.Error(cerr.Message)
 			flash.Store(&c.Controller)
 			log.Error(err, cerr.Message)
-			c.Redirect(getCodebaseIsUsedURL(cerr.Codebase, cerr.Pipeline, ct), 302)
+			c.Redirect(createCodebaseIsUsedURL(cerr.Codebase, cerr.Pipeline, ct), 302)
 			return
 		}
 		log.Error(err, "delete process is failed")
@@ -182,10 +182,10 @@ func (c *CodebaseController) Delete() {
 		return
 	}
 	rl.Info("delete codebase method is finished")
-	c.Redirect(getCodebaseIsDeletedURL(cn, ct), 302)
+	c.Redirect(createCodebaseIsDeletedURL(cn, ct), 302)
 }
 
-func getCodebaseIsUsedURL(codebaseName, pipeline, codebaseType string) string {
+func createCodebaseIsUsedURL(codebaseName, pipeline, codebaseType string) string {
 	if codebaseType == consts.Autotest {
 		codebaseType = "autotest"
 	}
@@ -193,6 +193,9 @@ func getCodebaseIsUsedURL(codebaseName, pipeline, codebaseType string) string {
 		codebaseType, codebaseName, pipeline)
 }
 
-func getCodebaseIsDeletedURL(codebaseName, codebaseType string) string {
+func createCodebaseIsDeletedURL(codebaseName, codebaseType string) string {
+	if codebaseType == consts.Autotest {
+		codebaseType = "autotest"
+	}
 	return fmt.Sprintf("/admin/edp/%v/overview?codebase=%v#codebaseIsDeleted", codebaseType, codebaseName)
 }

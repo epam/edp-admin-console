@@ -44,3 +44,7 @@ type Database struct {
 	Capacity string `json:"capacity,omitempty" valid:"Required"`
 	Storage  string `json:"storage,omitempty" valid:"Required"`
 }
+
+type DeleteCodebaseCommand struct {
+	Name string `json:"name"`
+}

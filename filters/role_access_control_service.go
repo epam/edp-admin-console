@@ -40,6 +40,7 @@ func init() {
 		"POST /api/v1/edp/codebase$":                         {administrator},
 		"POST /api/v1/edp/cd-pipeline$":                      {administrator},
 		"PUT /api/v1/edp/cd-pipeline/([^/]*)$":               {administrator},
+		"DELETE /api/v1/edp/codebase$":                       {administrator},
 	}
 }
 

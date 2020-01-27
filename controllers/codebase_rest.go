@@ -20,6 +20,7 @@ import (
 	"edp-admin-console/models/command"
 	"edp-admin-console/models/query"
 	"edp-admin-console/service"
+	dberror "edp-admin-console/util/error/db-errors"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -159,4 +160,44 @@ func extractErrors(valid validation.Validation) []string {
 		errMap = append(errMap, fmt.Sprintf("Validation failed on %s: %s", err.Key, err.Message))
 	}
 	return errMap
+}
+
+func (c *CodebaseRestController) Delete() {
+	var cr command.DeleteCodebaseCommand
+	err := json.NewDecoder(c.Ctx.Request.Body).Decode(&cr)
+	if err != nil {
+		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	rl := log.WithValues("codebase name", cr.Name)
+	rl.Info("delete codebase method is invoked")
+
+	cdb, err := c.CodebaseService.GetCodebaseByName(cr.Name)
+	if err != nil {
+		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if cdb == nil {
+		msg := fmt.Sprintf("Please check codebase name. It seems there's no %s codebase.", cr.Name)
+		http.Error(c.Ctx.ResponseWriter, msg, http.StatusNotFound)
+		return
+	}
+
+	if err := c.CodebaseService.Delete(cr.Name, string(cdb.Type)); err != nil {
+		if dberror.CodebaseIsUsed(err) {
+			cerr := err.(dberror.CodebaseIsUsedByCDPipeline)
+			log.Error(err, cerr.Message)
+			http.Error(c.Ctx.ResponseWriter, cerr.Message, http.StatusConflict)
+			return
+		}
+		log.Error(err, "delete process is failed")
+		http.Error(c.Ctx.ResponseWriter, "delete process is failed", http.StatusInternalServerError)
+		return
+	}
+	rl.Info("delete codebase method is finished")
+
+	location := fmt.Sprintf("%s/%s", c.Ctx.Input.URL(), uuid.NewV4().String())
+	c.Ctx.ResponseWriter.WriteHeader(200)
+	c.Ctx.Output.Header("Location", location)
 }
