@@ -15,5 +15,6 @@ const (
 	Library     = "library"
 
 	CodebasePlural = "codebases"
+	StagePlural    = "stages"
 	CodebaseKind   = "Codebase"
 )

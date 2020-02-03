@@ -10,3 +10,12 @@ type CodebaseIsUsedByCDPipeline struct {
 func (e CodebaseIsUsedByCDPipeline) Error() string {
 	return string(e.Status)
 }
+
+type RemoveStageRestriction struct {
+	Status  StatusReason
+	Message string
+}
+
+func (e RemoveStageRestriction) Error() string {
+	return string(e.Status)
+}

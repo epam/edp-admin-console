@@ -10,3 +10,8 @@ type CDPipelineCommand struct {
 	ApplicationToApprove []string                              `json:"-"`
 	Username             string                                `json:"username"`
 }
+
+type DeleteStageCommand struct {
+	Name           string `json:"name"`
+	CDPipelineName string `json:"pipelineName"`
+}

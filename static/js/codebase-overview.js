@@ -14,7 +14,7 @@ $(function () {
                 let codebase = getUrlParameter('codebase'),
                     pipeline = getUrlParameter('pipeline'),
                     $modal = $("#delete-confirmation");
-                $modal.find('.invalid-feedback.codebase-is-used').show()
+                $modal.find('.invalid-feedback.server-error').show()
                     .text(`Codebase ${codebase} is used by CD Pipeline(s) ${pipeline}`);
                 $("#delete-confirmation").data('codebase', codebase).modal('show');
             } else if (anchor === '#codebaseIsDeleted') {
@@ -47,9 +47,9 @@ $(function () {
     $('.delete-confirmation').click(function () {
         let $modal = $("#delete-confirmation"),
             targetName = $modal.data('codebase'),
-            confirmationName = $modal.find('#codebase-name').val(),
+            confirmationName = $modal.find('#entity-name').val(),
             $errName = $modal.find('.invalid-feedback.different-name'),
-            $errUsed = $modal.find('.invalid-feedback.codebase-is-used');
+            $errUsed = $modal.find('.invalid-feedback.server-error');
         if (targetName !== confirmationName) {
             $errName.show();
             return
@@ -63,8 +63,8 @@ $(function () {
     $('.close,.cancel-delete').click(function () {
         let $modal = $("#delete-confirmation");
         $modal.find('.invalid-feedback.different-name').hide();
-        $modal.find('.invalid-feedback.codebase-is-used').text('').hide();
-        $modal.find('#codebase-name').val('');
+        $modal.find('.invalid-feedback.server-error').text('').hide();
+        $modal.find('#entity-name').val('');
     });
 
 });

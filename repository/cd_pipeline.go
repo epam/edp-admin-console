@@ -33,6 +33,9 @@ type ICDPipelineRepository interface {
 	GetCDPipelinesUsingApplication(codebaseName string) ([]string, error)
 	GetCDPipelinesUsingAutotest(codebaseName string) ([]string, error)
 	GetCDPipelinesUsingLibrary(codebaseName string) ([]string, error)
+	SelectMaxOrderBetweenStages(pipeName string) (*int, error)
+	SelectStageOrder(pipeName, stageName string) (*int, error)
+	DoesStageUsedAsSourceInAnother(pipeName, stageName string) (bool, error)
 }
 
 const (
@@ -92,6 +95,22 @@ const (
 		"left join codebase c on cb.codebase_id = c.id " +
 		"where c.type = 'library' " +
 		"  and c.name = ? ;"
+	selectMaxOrderBetweenStages = "select max(cs.\"order\") " +
+		"from cd_pipeline cp " +
+		"left join cd_stage cs on cp.id = cs.cd_pipeline_id " +
+		"where cp.name = ? ;"
+	selectStageOrder = "select cs.\"order\" " +
+		"from cd_pipeline cp " +
+		"left join cd_stage cs on cp.id = cs.cd_pipeline_id " +
+		"where cp.name = ? and cs.name = ? ;"
+	selectSourceStage = "select scds.output_codebase_docker_stream_id " +
+		"	from cd_stage cs " +
+		"left join cd_pipeline cp on cs.cd_pipeline_id = cp.id " +
+		"left join stage_codebase_docker_stream scds on cs.id = scds.cd_stage_id " +
+		"join stage_codebase_docker_stream scds2 " +
+		"on scds.output_codebase_docker_stream_id = scds2.input_codebase_docker_stream_id " +
+		"where cp.name = ? " +
+		"  and cs.name = ? ;"
 )
 
 type CDPipelineRepository struct {
@@ -459,4 +478,34 @@ func (CDPipelineRepository) GetCDPipelinesUsingLibrary(codebaseName string) ([]s
 		return nil, err
 	}
 	return name, nil
+}
+
+func (CDPipelineRepository) SelectMaxOrderBetweenStages(pipeName string) (*int, error) {
+	o := orm.NewOrm()
+	var c int
+	if err := o.Raw(selectMaxOrderBetweenStages, pipeName).QueryRow(&c); err != nil {
+		return nil, err
+	}
+	return &c, nil
+}
+
+func (CDPipelineRepository) SelectStageOrder(pipeName, stageName string) (*int, error) {
+	o := orm.NewOrm()
+	var c int
+	if err := o.Raw(selectStageOrder, pipeName, stageName).QueryRow(&c); err != nil {
+		return nil, err
+	}
+	return &c, nil
+}
+
+func (CDPipelineRepository) DoesStageUsedAsSourceInAnother(pipeName, stageName string) (bool, error) {
+	o := orm.NewOrm()
+	var c int
+	if err := o.Raw(selectSourceStage, pipeName, stageName).QueryRow(&c); err != nil {
+		if err == orm.ErrNoRows {
+			return false, nil
+		}
+		return false, err
+	}
+	return c != 0, nil
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"edp-admin-console/models"
+	"edp-admin-console/service/cd_pipeline"
 	"errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -20,7 +21,7 @@ func (mock *CDPipelineRepositoryMock) GetCDPipelineByName(pipelineName string) (
 func TestShouldReturnCDPipeline(t *testing.T) {
 	repositoryMock := new(CDPipelineRepositoryMock)
 	repositoryMock.On("GetCDPipelineByName", mock.Anything).Return(&models.CDPipelineDTO{}, nil)
-	pipelineService := CDPipelineService{ICDPipelineRepository: repositoryMock}
+	pipelineService := cd_pipeline.CDPipelineService{ICDPipelineRepository: repositoryMock}
 
 	cdPipeline, err := pipelineService.GetCDPipelineByName(mock.Anything)
 	assert.Nil(t, err)
@@ -30,7 +31,7 @@ func TestShouldReturnCDPipeline(t *testing.T) {
 func TestShouldReturnErrorCDPipeline(t *testing.T) {
 	repositoryMock := new(CDPipelineRepositoryMock)
 	repositoryMock.On("GetCDPipelineByName", mock.Anything).Return(&models.CDPipelineDTO{}, errors.New("internal error"))
-	pipelineService := CDPipelineService{ICDPipelineRepository: repositoryMock}
+	pipelineService := cd_pipeline.CDPipelineService{ICDPipelineRepository: repositoryMock}
 
 	cdPipeline, err := pipelineService.GetCDPipelineByName(mock.Anything)
 	assert.NotNil(t, err)

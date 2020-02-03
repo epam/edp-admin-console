@@ -1,5 +1,5 @@
 <div class="modal fade" tabindex="-1" role="dialog" id="delete-confirmation"
-     data-backdrop="static" data-keyboard="false">
+     data-backdrop="static" data-keyboard="false" {{if .pipeline}}data-pipeline="{{.pipeline}}"{{end}}>
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -9,20 +9,25 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p>You are going to delete application.
-                    If you are sure enter name of application:
+                <p>You are going to delete {{.kind}}.
+                    If you are sure enter name of {{.kind}}:
                 </p>
-                <form id="delete-action" method="post" action="/admin/edp/codebase/delete">
+                <form id="delete-action" method="post" action="{{.action}}">
                     <div class="form-group">
-                        <input type="text" class="form-control" id="codebase-name" name="codebase-name"
+                        <input type="text" class="form-control" id="entity-name" name="name"
                                aria-describedby="emailHelp" placeholder="Enter name">
                         <div class="invalid-feedback different-name">
                             Names are different
                         </div>
-                        <div class="invalid-feedback codebase-is-used"></div>
+                        <div class="invalid-feedback server-error"></div>
                     </div>
-                    <input type="hidden" id="codebase-type" name="codebase-type" value="{{.Type}}">
                     {{ .xsrfdata }}
+                    {{if eq .kind "codebase"}}
+                        <input type="hidden" id="codebase-type" name="codebase-type" value="{{.type}}">
+                    {{else}}
+                        <input type="hidden" id="pipeline" name="pipeline" value="{{.pipeline}}">
+                        <input type="hidden" id="order" name="order">
+                    {{end}}
                 </form>
             </div>
             <div class="modal-footer">

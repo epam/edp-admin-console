@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package service
+package cd_pipeline
 
 import (
 	"edp-admin-console/context"
@@ -23,14 +23,19 @@ import (
 	"edp-admin-console/models/command"
 	"edp-admin-console/models/query"
 	"edp-admin-console/repository"
+	"edp-admin-console/service"
 	ec "edp-admin-console/service/edp-component"
 	"edp-admin-console/service/platform"
+	"edp-admin-console/util/consts"
+	dberror "edp-admin-console/util/error/db-errors"
 	"fmt"
+	"github.com/astaxie/beego/orm"
 	edppipelinesv1alpha1 "github.com/epmd-edp/cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	"github.com/pkg/errors"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
-	"log"
+	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sort"
 	"strings"
 	"time"
@@ -39,8 +44,8 @@ import (
 type CDPipelineService struct {
 	Clients               k8s.ClientSet
 	ICDPipelineRepository repository.ICDPipelineRepository
-	CodebaseService       CodebaseService
-	BranchService         CodebaseBranchService
+	CodebaseService       service.CodebaseService
+	BranchService         service.CodebaseBranchService
 	EDPComponent          ec.EDPComponentService
 }
 
@@ -49,10 +54,11 @@ type ErrMsg struct {
 	StatusCode int
 }
 
-func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand) (*edppipelinesv1alpha1.CDPipeline, error) {
-	log.Printf("Start creating CD Pipeline: %v", cdPipeline)
+var log = logf.Log.WithName("cd-pipeline-service")
 
-	exist, err := s.CodebaseService.checkBranch(cdPipeline.Applications)
+func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand) (*edppipelinesv1alpha1.CDPipeline, error) {
+	log.V(2).Info("start creating CD Pipeline", "name", cdPipeline)
+	exist, err := s.CodebaseService.CheckBranch(cdPipeline.Applications)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +73,7 @@ func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand)
 	}
 
 	if cdPipelineReadModel != nil {
-		log.Printf("CD Pipeline %s is already exists in DB.", cdPipeline.Name)
+		log.V(2).Info("CD Pipeline already exists in DB.", "name", cdPipeline.Name)
 		return nil, models.NewCDPipelineExistsError()
 	}
 
@@ -78,7 +84,7 @@ func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand)
 	}
 
 	if pipelineCR != nil {
-		log.Printf("CD Pipeline %s is already exists in k8s.", cdPipeline.Name)
+		log.V(2).Info("CD Pipeline already exists in cluster.", "name", cdPipeline.Name)
 		return nil, models.NewCDPipelineExistsError()
 	}
 
@@ -104,39 +110,35 @@ func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand)
 	}
 
 	cdPipelineCr := &edppipelinesv1alpha1.CDPipeline{}
-	err = edpRestClient.Post().Namespace(context.Namespace).Resource("cdpipelines").Body(crd).Do().Into(cdPipelineCr)
-
+	err = edpRestClient.Post().
+		Namespace(context.Namespace).
+		Resource("cdpipelines").
+		Body(crd).
+		Do().Into(cdPipelineCr)
 	if err != nil {
-		log.Printf("An error has occurred while creating CD Pipeline object in k8s: %s", err)
-		return nil, err
+		return nil, errors.Wrap(err, "an error has occurred while creating CD Pipeline object in cluster")
 	}
-	log.Printf("Pipeline CR %v is saved into k8s", cdPipeline)
+	log.Info("CD Pipeline has been saved to cluster", "name", cdPipeline)
 
-	_, err = s.CreateStages(edpRestClient, cdPipeline)
-	if err != nil {
-		log.Printf("An error has occurred while creating Stages in k8s: %s", err)
-		return nil, err
+	if _, err = s.CreateStages(edpRestClient, cdPipeline); err != nil {
+		return nil, errors.Wrap(err, "an error has occurred while creating Stages in cluster")
 	}
-	log.Printf("Stages for CD Pipeline %s were created in k8s: %v", cdPipeline.Name, cdPipeline.Stages)
-
+	log.Info("Stages for CD Pipeline have been created in cluster", "pipe", cdPipeline.Name, "stages", cdPipeline.Stages)
 	return cdPipelineCr, nil
 }
 
 func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDPipeline, error) {
-	log.Println("Start execution of GetCDPipelineByName method...")
+	log.V(2).Info("start execution of GetCDPipelineByName method...")
 	cdPipeline, err := s.ICDPipelineRepository.GetCDPipelineByName(pipelineName)
 	if err != nil {
-		log.Printf("An error has occurred while getting CD Pipeline from database: %s", err)
-		return nil, err
+		return nil, errors.Wrapf(err, "an error has occurred while getting CD Pipeline %v from db", pipelineName)
 	}
-	if cdPipeline != nil {
 
+	if cdPipeline != nil {
 		if len(cdPipeline.Stage) != 0 {
 			sortStagesByOrder(cdPipeline.Stage)
-
 			createPlatformNames(cdPipeline.Stage, cdPipeline.Name)
-
-			log.Printf("Fetched Stages. Count: {%v}. Rows: {%v}", len(cdPipeline.Stage), cdPipeline.Stage)
+			log.V(2).Info("stages were fetched", "count", len(cdPipeline.Stage), "values", cdPipeline.Stage)
 		}
 		for i, branch := range cdPipeline.CodebaseBranch {
 			branch.AppName = branch.Codebase.Name
@@ -150,56 +152,45 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 
 		applicationsToPromote, err := s.CodebaseService.GetApplicationsToPromote(cdPipeline.Id)
 		if err != nil {
-			log.Printf("An error has occurred while getting Applications To Promote for CD Pipeline %v: %v", cdPipeline.Id, err)
-			return nil, err
+			return nil, errors.Wrapf(err, "an error has occurred while getting Applications To Promote for CD Pipeline",
+				"pipe id", cdPipeline.Id)
 		}
-
 		cdPipeline.ApplicationsToPromote = applicationsToPromote
-
-		log.Printf("Fetched CD Pipeline from DB: %+v", cdPipeline)
+		log.V(2).Info("CD Pipeline has been fetched from DB", "pipe", cdPipeline.Name)
 	}
-
 	return cdPipeline, nil
 }
 
 func (s *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPipeline command.CDPipelineCommand) ([]edppipelinesv1alpha1.Stage, error) {
-	log.Printf("Start creating CR stages: %+v\n", cdPipeline.Stages)
-
-	err := checkStagesInK8s(edpRestClient, cdPipeline.Name, cdPipeline.Stages)
-	if err != nil {
-		log.Println(err)
-		return nil, err
+	log.V(2).Info("start creating stages", "stages", cdPipeline.Stages)
+	if err := checkStagesInK8s(edpRestClient, cdPipeline.Name, cdPipeline.Stages); err != nil {
+		return nil, errors.Wrap(err, "couldn't check stages in cluster")
 	}
 
 	stagesCr, err := saveStagesIntoK8s(edpRestClient, cdPipeline.Name, cdPipeline.Stages, cdPipeline.Username)
 	if err != nil {
 		return nil, err
 	}
-
 	return stagesCr, nil
 }
 
 func (s *CDPipelineService) GetAllPipelines(criteria query.CDPipelineCriteria) ([]*query.CDPipeline, error) {
-	log.Println("Start fetching all CD Pipelines...")
+	log.V(2).Info("start fetching all CD Pipelines...")
 	cdPipelines, err := s.ICDPipelineRepository.GetCDPipelines(criteria)
 	if err != nil {
-		log.Printf("An error has occurred while getting CD Pipelines from database: %s", err)
-		return nil, err
+		return nil, errors.Wrap(err, "an error has occurred while getting CD Pipelines from database")
 	}
-	log.Printf("Fetched CD Pipelines. Count: {%v}. Rows: {%v}", len(cdPipelines), cdPipelines)
-
+	log.V(2).Info("CD Pipelines were fetched", "count", len(cdPipelines), "values", cdPipelines)
 	return cdPipelines, nil
 }
 
 func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) error {
-	log.Printf("Start updating CD Pipeline: %v", pipeline.Name)
-
+	log.V(2).Info("start updating CD Pipeline", "name", pipeline.Name)
 	if pipeline.Applications != nil {
-		exist, err := s.CodebaseService.checkBranch(pipeline.Applications)
+		exist, err := s.CodebaseService.CheckBranch(pipeline.Applications)
 		if err != nil {
 			return err
 		}
-
 		if !exist {
 			return models.NewNonValidRelatedBranchError()
 		}
@@ -209,9 +200,8 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 	if err != nil {
 		return err
 	}
-
 	if cdPipelineReadModel == nil {
-		log.Printf("CD Pipeline %s doesn't exist in DB.", pipeline.Name)
+		log.Info("CD Pipeline doesn't exist in DB.", "name", pipeline.Name)
 		return models.NewCDPipelineDoesNotExistError()
 	}
 
@@ -219,20 +209,18 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 	if err != nil {
 		return err
 	}
-
 	if pipelineCR == nil {
-		log.Printf("CD Pipeline %s doesn't exist in k8s.", pipeline.Name)
+		log.Info("CD Pipeline doesn't exist in cluster.", "name", pipeline.Name)
 		return models.NewCDPipelineDoesNotExistError()
 	}
 
 	if pipeline.Applications != nil {
-		log.Printf("Start updating Autotest for CD Pipeline: %v. New Applications: %v", pipelineCR.Spec.Name, pipeline.Applications)
-
+		log.V(2).Info("start updating Autotest",
+			"pipe name", pipelineCR.Spec.Name, "apps", pipeline.Applications)
 		var dockerStreams []string
 		for _, v := range pipeline.Applications {
 			dockerStreams = append(dockerStreams, v.InputDockerStream)
 		}
-
 		pipelineCR.Spec.InputDockerStreams = dockerStreams
 	}
 
@@ -250,12 +238,9 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 		Into(pipelineCR)
 
 	if err != nil {
-		log.Printf("An error has occurred while updating CD Pipeline object in k8s: %s", err)
-		return err
+		return errors.Wrap(err, "an error has occurred while updating CD Pipeline cluster")
 	}
-
-	log.Printf("CD Pipeline %v has been updated with new data; %v", pipeline.Name, pipeline)
-
+	log.Info("CD Pipeline has been updated", "name", pipeline.Name)
 	return nil
 }
 
@@ -266,27 +251,23 @@ func sortStagesByOrder(stages []*query.Stage) {
 }
 
 func (s *CDPipelineService) GetStage(cdPipelineName, stageName string) (*models.StageView, error) {
-	log.Printf("Start fetching Stage by CD Pipeline %s and Stage %s names...", cdPipelineName, stageName)
+	log.V(2).Info("start fetching Stage", "name", stageName)
 	stage, err := s.ICDPipelineRepository.GetStage(cdPipelineName, stageName)
 	if err != nil {
-		log.Printf("An error has occurred while getting Stage from database: %s", err)
-		return nil, err
+		return nil, errors.Wrap(err, "an error has occurred while getting Stage from DB")
 	}
 
 	if stage == nil {
-		log.Printf("Couldn't find Stage by %v name and %v CD Pipeline name", stageName, cdPipelineName)
+		log.V(2).Info("couldn't find Stage ", "stage", stageName, "pipe", cdPipelineName)
 		return nil, nil
 	}
 
 	gates, err := s.ICDPipelineRepository.GetQualityGates(stage.Id)
 	if err != nil {
-		log.Printf("An error has occurred while fetching Quality Gates from database: %v", err)
-		return nil, err
+		return nil, errors.Wrap(err, "an error has occurred while fetching Quality Gates from DB")
 	}
 	stage.QualityGates = gates
-
-	log.Printf("Fetched Stage: {%v}, Quality Gates: {%v}", stage, stage.QualityGates)
-
+	log.V(2).Info("Stages have been fetched", "stage", stage, "gates", stage.QualityGates)
 	return stage, nil
 }
 
@@ -306,8 +287,7 @@ func fillCodebaseStageMatrix(ocClient *k8s.ClientSet, cdPipeline *query.CDPipeli
 
 		dcs, err := ocClient.AppsV1Client.DeploymentConfigs(stage.PlatformProjectName).List(metav1.ListOptions{})
 		if err != nil {
-			log.Printf("An error has occurred while getting project from OpenShift: %s", err)
-			return nil, err
+			return nil, errors.Wrap(err, "an error has occurred while getting project from cluster")
 		}
 
 		for _, codebase := range cdPipeline.CodebaseBranch {
@@ -342,8 +322,7 @@ func fillCodebaseStageMatrixK8s(ocClient *k8s.ClientSet, cdPipeline *query.CDPip
 
 		dcs, err := ocClient.ExtensionClient.Deployments(stage.PlatformProjectName).List(metav1.ListOptions{})
 		if err != nil {
-			log.Printf("An error has occurred while getting project from K8s: %s", err)
-			return nil, err
+			return nil, errors.Wrap(err, "an error has occurred while getting project from cluster")
 		}
 
 		for _, codebase := range cdPipeline.CodebaseBranch {
@@ -390,17 +369,13 @@ func (s *CDPipelineService) getCDPipelineCR(pipelineName string) (*edppipelinesv
 	cdPipeline := &edppipelinesv1alpha1.CDPipeline{}
 
 	err := edpRestClient.Get().Namespace(context.Namespace).Resource("cdpipelines").Name(pipelineName).Do().Into(cdPipeline)
-
 	if k8serrors.IsNotFound(err) {
-		log.Printf("Pipeline resource %s doesn't exist.", pipelineName)
+		log.Info("pipeline doesn't exist in cluster.", "name", pipelineName)
 		return nil, nil
 	}
-
 	if err != nil {
-		log.Printf("An error has occurred while getting Pipeline CR from k8s: %s", err)
-		return nil, err
+		return nil, errors.Wrap(err, "an error has occurred while getting cd pipeline from cluster")
 	}
-
 	return cdPipeline, nil
 }
 
@@ -441,12 +416,15 @@ func saveStagesIntoK8s(edpRestClient *rest.RESTClient, cdPipelineName string, st
 		stage.Username = username
 		crd := createCrd(cdPipelineName, stage)
 		stageCr := edppipelinesv1alpha1.Stage{}
-		err := edpRestClient.Post().Namespace(context.Namespace).Resource("stages").Body(&crd).Do().Into(&stageCr)
+		err := edpRestClient.Post().
+			Namespace(context.Namespace).
+			Resource("stages").
+			Body(&crd).
+			Do().Into(&stageCr)
 		if err != nil {
-			log.Printf("An error has occurred while creating Stage object in k8s: %s", err)
-			return nil, err
+			return nil, errors.Wrap(err, "an error has occurred while creating Stage in cluster")
 		}
-		log.Printf("Stage is saved into k8s: %+v\n", stage.Name)
+		log.Info("stage has been saved into cluster", "name", stage.Name)
 		stagesCr = append(stagesCr, stageCr)
 	}
 	return stagesCr, nil
@@ -459,19 +437,87 @@ func checkStagesInK8s(edpRestClient *rest.RESTClient, cdPipelineName string, sta
 		err := edpRestClient.Get().Namespace(context.Namespace).Resource("stages").Name(stageName).Do().Into(stagesCr)
 
 		if k8serrors.IsNotFound(err) {
-			log.Printf("Stage %s doesn't exist.", stage.Name)
+			log.V(2).Info("stage doesn't exist", "name", stage.Name)
 			continue
 		}
 
 		if err != nil {
-			log.Printf("An error has occurred while getting Stage from k8s: %s", err)
-			return err
+			return errors.Wrap(err, "an error has occurred while getting Stage from cluster")
 		}
 
 		if stagesCr != nil {
-			log.Printf("CR Stage %s is already exists in k8s: %s", stageName, err)
-			return fmt.Errorf("stage %s is already exists", stage.Name)
+			return fmt.Errorf("stage %v already exists", stage.Name)
 		}
 	}
+	return nil
+}
+
+func (s CDPipelineService) DeleteCDStage(pipelineName, stageName string) error {
+	log.V(2).Info("start deleting cd stage", "stage", stageName, "pipe", pipelineName)
+	if err := s.canStageBeDeleted(pipelineName, stageName); err != nil {
+		return err
+	}
+
+	sn := fmt.Sprintf("%v-%v", pipelineName, stageName)
+	if err := s.deleteStage(sn); err != nil {
+		return err
+	}
+	log.Info("stage has been marked for deletion", "name", sn)
+	return nil
+}
+
+func (s CDPipelineService) canStageBeDeleted(pipelineName, stageName string) error {
+	mso, err := s.ICDPipelineRepository.SelectMaxOrderBetweenStages(pipelineName)
+	if err != nil {
+		return err
+	}
+	so, err := s.ICDPipelineRepository.SelectStageOrder(pipelineName, stageName)
+	if err != nil {
+		if err == orm.ErrNoRows {
+			return dberror.RemoveStageRestriction{
+				Status:  dberror.StatusRemoveStageRestriction,
+				Message: fmt.Sprintf("%v CD Stage wasn't found in CD Pipeline %v", stageName, pipelineName),
+			}
+		}
+		return err
+	}
+	u, err := s.ICDPipelineRepository.DoesStageUsedAsSourceInAnother(pipelineName, stageName)
+	if err != nil {
+		return err
+	}
+
+	if *mso == 0 && *so == 0 {
+		return dberror.RemoveStageRestriction{
+			Status:  dberror.StatusRemoveStageRestriction,
+			Message: fmt.Sprintf("Couldn't delete because of CD Pipeline %v contains only one stage %v", pipelineName, stageName),
+		}
+	}
+	if *mso != *so {
+		return dberror.RemoveStageRestriction{
+			Status:  dberror.StatusRemoveStageRestriction,
+			Message: fmt.Sprintf("%v CD Stage isn't the last in %v CD Pipeline", stageName, pipelineName),
+		}
+	}
+	if u {
+		return dberror.RemoveStageRestriction{
+			Status:  dberror.StatusRemoveStageRestriction,
+			Message: fmt.Sprintf("%v CD Stage is used as a source in another CD Pipeline", stageName),
+		}
+	}
+	return nil
+}
+
+func (s CDPipelineService) deleteStage(name string) error {
+	log.V(2).Info("start executing stage delete request", "stage", name)
+	i := &edppipelinesv1alpha1.Stage{}
+	err := s.Clients.EDPRestClient.Delete().
+		Namespace(context.Namespace).
+		Resource(consts.StagePlural).
+		Name(name).
+		Do().Into(i)
+	if err != nil {
+		return errors.Wrapf(err, "couldn't delete stage %v from cluster", name)
+	}
+	log.V(2).Info("end executing stage delete request", "stage", name)
 	return nil
 }

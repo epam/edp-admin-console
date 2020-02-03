@@ -251,7 +251,7 @@ func convertData(codebase command.CreateCodebase) edpv1alpha1.CodebaseSpec {
 	return s
 }
 
-func (s CodebaseService) checkBranch(apps []models.CDPipelineApplicationCommand) (bool, error) {
+func (s CodebaseService) CheckBranch(apps []models.CDPipelineApplicationCommand) (bool, error) {
 	for _, app := range apps {
 		exist, err := s.ICodebaseRepository.ExistActiveBranch(app.InputDockerStream)
 		if err != nil {

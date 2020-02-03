@@ -164,7 +164,7 @@ func (c CodebaseController) createLinksForGerritProvider(codebase query.Codebase
 
 func (c *CodebaseController) Delete() {
 	flash := beego.NewFlash()
-	cn := c.GetString("codebase-name")
+	cn := c.GetString("name")
 	rl := log.WithValues("codebase name", cn)
 	rl.Info("delete codebase method is invoked")
 	ct := c.GetString("codebase-type")

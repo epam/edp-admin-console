@@ -19,17 +19,19 @@ package controllers
 import (
 	"edp-admin-console/models"
 	"edp-admin-console/models/command"
-	"edp-admin-console/service"
+	"edp-admin-console/service/cd_pipeline"
+	dberror "edp-admin-console/util/error/db-errors"
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
+	uuid "github.com/satori/go.uuid"
 	"net/http"
 )
 
 type CDPipelineRestController struct {
 	beego.Controller
-	CDPipelineService service.CDPipelineService
+	CDPipelineService cd_pipeline.CDPipelineService
 }
 
 func (c *CDPipelineRestController) Prepare() {
@@ -193,4 +195,30 @@ func validateCDPipelineRequestData(cdPipeline command.CDPipelineCommand) *ErrMsg
 	}
 
 	return &ErrMsg{string(createErrorResponseBody(valid)), http.StatusBadRequest}
+}
+
+func (c *CDPipelineRestController) DeleteCDStage() {
+	var sc command.DeleteStageCommand
+	if err := json.NewDecoder(c.Ctx.Request.Body).Decode(&sc); err != nil {
+		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	log.V(2).Info("request to delete cd stage has been retrieved",
+		"pipeline", sc.CDPipelineName, "stage", sc.Name)
+	if err := c.CDPipelineService.DeleteCDStage(sc.CDPipelineName, sc.Name); err != nil {
+		if dberror.StageErrorOccurred(err) {
+			serr := err.(dberror.RemoveStageRestriction)
+			log.Error(err, serr.Message)
+			http.Error(c.Ctx.ResponseWriter, serr.Message, http.StatusConflict)
+			return
+		}
+		log.Error(err, "delete process is failed")
+		http.Error(c.Ctx.ResponseWriter, "delete process is failed", http.StatusInternalServerError)
+		return
+	}
+	log.V(2).Info("delete cd stage method is finished",
+		"pipeline", sc.CDPipelineName, "stage", sc.Name)
+	location := fmt.Sprintf("%s/%s", c.Ctx.Input.URL(), uuid.NewV4().String())
+	c.Ctx.ResponseWriter.WriteHeader(200)
+	c.Ctx.Output.Header("Location", location)
 }

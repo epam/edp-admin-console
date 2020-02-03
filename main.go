@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "edp-admin-console/routers"
+	_ "edp-admin-console/template_function"
 	"flag"
 	"github.com/astaxie/beego"
 	"github.com/operator-framework/operator-sdk/pkg/log/zap"

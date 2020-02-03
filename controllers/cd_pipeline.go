@@ -22,10 +22,12 @@ import (
 	"edp-admin-console/models/command"
 	"edp-admin-console/models/query"
 	"edp-admin-console/service"
+	"edp-admin-console/service/cd_pipeline"
 	ec "edp-admin-console/service/edp-component"
 	"edp-admin-console/service/platform"
 	"edp-admin-console/util"
 	"edp-admin-console/util/consts"
+	dberror "edp-admin-console/util/error/db-errors"
 	"errors"
 	"fmt"
 	"github.com/astaxie/beego"
@@ -39,7 +41,7 @@ import (
 type CDPipelineController struct {
 	beego.Controller
 	CodebaseService   service.CodebaseService
-	PipelineService   service.CDPipelineService
+	PipelineService   cd_pipeline.CDPipelineService
 	EDPTenantService  service.EDPTenantService
 	BranchService     service.CodebaseBranchService
 	ThirdPartyService service.ThirdPartyService
@@ -326,11 +328,14 @@ func (c *CDPipelineController) GetCDPipelineOverviewPage() {
 		return
 	}
 
+	contextRoles := c.GetSession("realm_roles").([]string)
 	c.Data["CDPipeline"] = cdPipeline
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["Type"] = "delivery"
 	c.Data["IsOpenshift"] = platform.IsOpenshift()
+	c.Data["HasRights"] = isAdmin(contextRoles)
+	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.TplName = "cd_pipeline_overview.html"
 }
 
@@ -646,4 +651,26 @@ func (c *CDPipelineController) createJenkinsLinks(cdPipelines []*query.CDPipelin
 	}
 
 	return nil
+}
+
+func (c CDPipelineController) DeleteCDStage() {
+	pn := c.GetString("pipeline")
+	sn := c.GetString("name")
+	log.V(2).Info("request to delete cd stage has been retrieved", "pipeline", pn, "stage", sn)
+	if err := c.PipelineService.DeleteCDStage(pn, sn); err != nil {
+		flash := beego.NewFlash()
+		if dberror.StageErrorOccurred(err) {
+			serr := err.(dberror.RemoveStageRestriction)
+			flash.Error(serr.Message)
+			flash.Store(&c.Controller)
+			log.Error(err, serr.Message)
+			c.Redirect(fmt.Sprintf("/admin/edp/cd-pipeline/%v/overview?stage=%v#stageIsUsedAsSource", pn, sn), 302)
+			return
+		}
+		log.Error(err, "delete process is failed")
+		c.Abort("500")
+		return
+	}
+	log.V(2).Info("delete cd stage method is finished", "pipeline", pn, "stage", sn)
+	c.Redirect(fmt.Sprintf("/admin/edp/cd-pipeline/%v/overview?stage=%v#stageSuccessModal", pn, sn), 302)
 }

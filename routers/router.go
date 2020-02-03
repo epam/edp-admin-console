@@ -25,6 +25,7 @@ import (
 	"edp-admin-console/repository"
 	edpComponentRepo "edp-admin-console/repository/edp-component"
 	"edp-admin-console/service"
+	"edp-admin-console/service/cd_pipeline"
 	edpComponentService "edp-admin-console/service/edp-component"
 	"edp-admin-console/util"
 	"github.com/astaxie/beego"
@@ -88,7 +89,7 @@ func init() {
 		ICDPipelineRepository: pipelineRepository,
 		BranchService:         branchService,
 	}
-	pipelineService := service.CDPipelineService{
+	pipelineService := cd_pipeline.CDPipelineService{
 		Clients:               clients,
 		ICDPipelineRepository: pipelineRepository,
 		CodebaseService:       codebaseService,
@@ -201,7 +202,8 @@ func init() {
 		beego.NSRouter("/autotest", &autc, "post:CreateAutotests"),
 
 		beego.NSRouter("/codebase/:codebaseName/overview", &cc, "get:GetCodebaseOverviewPage"),
-		beego.NSRouter("/codebase/delete", &cc, "post:Delete"),
+		beego.NSRouter("/codebase", &cc, "post:Delete"),
+		beego.NSRouter("/stage", &cpc, "post:DeleteCDStage"),
 		beego.NSRouter("/codebase/:codebaseName/branch", &controllers.BranchController{BranchService: branchService, CodebaseService: codebaseService}, "post:CreateCodebaseBranch"),
 
 		beego.NSRouter("/library/overview", &lc, "get:GetLibraryListPage"),
@@ -221,6 +223,7 @@ func init() {
 		beego.NSRouter("/cd-pipeline", &controllers.CDPipelineRestController{CDPipelineService: pipelineService}, "post:CreateCDPipeline"),
 		beego.NSRouter("/cd-pipeline/:name", &controllers.CDPipelineRestController{CDPipelineService: pipelineService}, "put:UpdateCDPipeline"),
 		beego.NSRouter("/codebase", &controllers.CodebaseRestController{CodebaseService: codebaseService}, "delete:Delete"),
+		beego.NSRouter("/stage", &controllers.CDPipelineRestController{CDPipelineService: pipelineService}, "delete:DeleteCDStage"),
 	)
 	beego.AddNamespace(apiV1EdpNamespace)
 
