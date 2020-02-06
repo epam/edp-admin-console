@@ -23,6 +23,17 @@ metadata:
     template.openshift.io/support-url: https://www.epam.com
 objects:
 - apiVersion: v1
+  kind: ConfigMap
+  data:
+    dns_wildcard: delivery.aws.main.edp.projects.epam.com
+    edp_name: admin-console
+    edp_version: 1.0.0
+    perf_integration_enabled: 'false'
+    vcs_integration_enabled: 'false'
+  metadata:
+    name: edp-config
+    namespace: ${NAMESPACE}
+- apiVersion: v1
   kind: Service
   metadata:
     name: edp-admin-console
@@ -78,6 +89,33 @@ objects:
           app: edp-admin-console
       spec:
         serviceAccountName: edp-admin-console
+        initContainers:
+          - image: "postgres:9.6"
+            command: ["/usr/bin/psql", "-h", "$(PG_HOST)", "-p", "$(PG_PORT)", "-U", "$(PG_USER)","-d", "$(PG_DATABASE)", "-c", "CREATE SCHEMA IF NOT EXISTS \"$(EDP_NAME)\";"]
+            imagePullPolicy: Always
+            name: db-init
+            env:
+              - name: PG_HOST
+                value: edp-database
+              - name: PG_PORT
+                value: '5432'
+              - name: PG_DATABASE
+                value: postgres
+              - name: PG_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: edp-database
+                    key: username
+              - name: PGPASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: edp-database
+                    key: password
+              - name: EDP_NAME
+                valueFrom:
+                  configMapKeyRef:
+                    name: edp-config
+                    key: edp_name
         containers:
           - name: edp-admin-console
             image: "docker-registry.default.svc:5000/${IMAGE_NAME}:${APP_VERSION}"
