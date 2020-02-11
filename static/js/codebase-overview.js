@@ -41,30 +41,16 @@ $(function () {
     $('.delete-codebase').click(function () {
         let codebase = $(this).data('codebase'),
             $modal = $("#delete-confirmation");
-        $modal.data('codebase', codebase).modal('show');
+        $('.confirmation-msg').text(`Confirm Deletion of '${codebase}'`);
+        $modal.data('name', codebase).modal('show');
     });
 
     $('.delete-confirmation').click(function () {
-        let $modal = $("#delete-confirmation"),
-            targetName = $modal.data('codebase'),
-            confirmationName = $modal.find('#entity-name').val(),
-            $errName = $modal.find('.invalid-feedback.different-name'),
-            $errUsed = $modal.find('.invalid-feedback.server-error');
-        if (targetName !== confirmationName) {
-            $errName.show();
-            return
-        }
-        $errName.hide();
-        $errUsed.hide();
-        $errUsed.text('');
-        $("#delete-action").submit();
+        deleteConfirmation();
     });
 
     $('.close,.cancel-delete').click(function () {
-        let $modal = $("#delete-confirmation");
-        $modal.find('.invalid-feedback.different-name').hide();
-        $modal.find('.invalid-feedback.server-error').text('').hide();
-        $modal.find('#entity-name').val('');
+        closeConfirmation();
     });
 
 });

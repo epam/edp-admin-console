@@ -65,31 +65,17 @@ $(function () {
         let stage = $(this).data('name'),
             order = $(this).data('order'),
             $modal = $("#delete-confirmation");
-        $modal.data('stage', stage).modal('show');
+        $('.confirmation-msg').text(`Confirm Deletion of '${stage}'`);
+        $modal.data('name', stage).modal('show');
         $('input#order').val(order);
     });
 
     $('.delete-confirmation').click(function () {
-        let $modal = $("#delete-confirmation"),
-            targetName = $modal.data('stage'),
-            confirmationName = $modal.find('#entity-name').val(),
-            $errName = $modal.find('.invalid-feedback.different-name'),
-            $errUsed = $modal.find('.invalid-feedback.server-error');
-        if (targetName !== confirmationName) {
-            $errName.show();
-            return
-        }
-        $errName.hide();
-        $errUsed.hide();
-        $errUsed.text('');
-        $("#delete-action").submit();
+        deleteConfirmation();
     });
 
     $('.close,.cancel-delete').click(function () {
-        let $modal = $("#delete-confirmation");
-        $modal.find('.invalid-feedback.different-name').hide();
-        $modal.find('.invalid-feedback.server-error').text('').hide();
-        $modal.find('#entity-name').val('');
+        closeConfirmation();
     });
 });
 

@@ -1,9 +1,10 @@
 <div class="modal fade" tabindex="-1" role="dialog" id="delete-confirmation"
-     data-backdrop="static" data-keyboard="false" {{if .pipeline}}data-pipeline="{{.pipeline}}"{{end}}>
+     data-backdrop="static" data-keyboard="false" {{if .pipeline}}data-pipeline="{{.pipeline}}"{{end}}
+    data-kind="{{.kind}}">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Confirm Deletion</h5>
+                <h5 class="modal-title confirmation-msg"></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
