@@ -96,7 +96,7 @@ objects:
             name: db-init
             env:
               - name: PG_HOST
-                value: edp-database
+                value: edp-install-wizard-db
               - name: PG_PORT
                 value: '5432'
               - name: PG_DATABASE
@@ -104,12 +104,12 @@ objects:
               - name: PG_USER
                 valueFrom:
                   secretKeyRef:
-                    name: edp-database
+                    name: super-admin-db
                     key: username
               - name: PGPASSWORD
                 valueFrom:
                   secretKeyRef:
-                    name: edp-database
+                    name: super-admin-db
                     key: password
               - name: EDP_NAME
                 valueFrom:
@@ -148,12 +148,12 @@ objects:
               - name: PG_USER
                 valueFrom:
                   secretKeyRef:
-                    name: edp-database
+                    name: super-admin-db
                     key: username
               - name: PG_PASSWORD
                 valueFrom:
                   secretKeyRef:
-                    name: edp-database
+                    name: super-admin-db
                     key: password
               - name: INTEGRATION_STRATEGIES
                 value: 'Create,Clone,Import'
@@ -174,7 +174,7 @@ objects:
                     name: edp-config
                     key: edp_name
               - name: PG_HOST
-                value: edp-database
+                value: edp-intsall-wizard-db
               - name: PG_PORT
                 value: '5432'
               - name: PG_DATABASE
