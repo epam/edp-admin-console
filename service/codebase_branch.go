@@ -80,12 +80,13 @@ func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCo
 		},
 		Spec: spec,
 		Status: edpv1alpha1.CodebaseBranchStatus{
-			Status:          "initialized",
-			LastTimeUpdated: time.Now(),
-			Username:        branchInfo.Username,
-			Action:          "codebase_branch_registration",
-			Result:          "success",
-			Value:           "inactive",
+			Status:              "initialized",
+			LastTimeUpdated:     time.Now(),
+			LastSuccessfulBuild: nil,
+			Username:            branchInfo.Username,
+			Action:              "codebase_branch_registration",
+			Result:              "success",
+			Value:               "inactive",
 		},
 	}
 

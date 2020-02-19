@@ -5,6 +5,9 @@ type CodebaseBranch struct {
 	Name                 string                  `json:"branchName" orm:"column(name)"`
 	FromCommit           string                  `json:"from_commit" orm:"column(from_commit)"`
 	Status               string                  `json:"status" orm:"column(status)"`
+	Version              *string                 `json:"version" orm:"column(version)"`
+	Build                *string                 `json:"build_number" orm:"column(build_number)"`
+	LastSuccessBuild     *string                 `json:"last_success_build" orm:"column(last_success_build)"`
 	VCSLink              string                  `json:"branchLink" orm:"-"`
 	CICDLink             string                  `json:"jenkinsLink" orm:"-"`
 	AppName              string                  `json:"appName" orm:"-"`
