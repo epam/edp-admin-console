@@ -87,14 +87,16 @@ const (
 		"left join quality_gate_stage qgs on cs.id = qgs.cd_stage_id " +
 		"left join codebase c on qgs.codebase_id = c.id " +
 		"where qgs.quality_gate = 'autotests' " +
-		"  and c.name = ? ;"
+		"  and c.name = ? " +
+		"group by cp.name;"
 	SelectCDPipelineByLibraryName = "select cp.name " +
 		"	from cd_pipeline cp " +
 		"left join cd_stage cs on cp.id = cs.cd_pipeline_id " +
 		"left join codebase_branch cb on cs.codebase_branch_id = cb.id " +
 		"left join codebase c on cb.codebase_id = c.id " +
 		"where c.type = 'library' " +
-		"  and c.name = ? ;"
+		"  and c.name = ? " +
+		"group by cp.name ;"
 	selectMaxOrderBetweenStages = "select max(cs.\"order\") " +
 		"from cd_pipeline cp " +
 		"left join cd_stage cs on cp.id = cs.cd_pipeline_id " +
