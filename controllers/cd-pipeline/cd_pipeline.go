@@ -216,7 +216,7 @@ func (c *CDPipelineController) UpdateCDPipeline() {
 		ApplicationToApprove: c.getApplicationsToPromoteFromRequest(appNameCheckboxes),
 	}
 
-	errMsg := validation.ValidateCDPipelineRequest(pipelineUpdateCommand)
+	errMsg := validation.ValidateCDPipelineUpdateRequestData(pipelineUpdateCommand)
 	if errMsg != nil {
 		log.Info("Request data is not valid", "err", errMsg.Message)
 		flash.Error(errMsg.Message)
