@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"github.com/astaxie/beego"
 	"log"
 	"strings"
@@ -18,10 +19,17 @@ func GetValuesFromConfig(name string) []string {
 	return s
 }
 
-func GetStringOrNil(value string) *string {
+func GetVersionOrNil(value, postfix string) *string {
 	if value == "" {
 		return nil
 	}
 
-	return &value
+	if postfix == "" {
+		v := value
+		return &v
+	}
+
+	v := fmt.Sprintf("%v-%v", value, postfix)
+
+	return &v
 }
