@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package service
+package codebasebranch
 
 import (
 	"edp-admin-console/context"
@@ -24,34 +24,39 @@ import (
 	"edp-admin-console/repository"
 	"edp-admin-console/util"
 	"edp-admin-console/util/consts"
-	"errors"
+	dberror "edp-admin-console/util/error/db-errors"
 	"fmt"
 	edpv1alpha1 "github.com/epmd-edp/codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	"github.com/pkg/errors"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
-	"log"
+	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	"strings"
 	"time"
 )
+
+var log = logf.Log.WithName("codebase-branch-service")
 
 type CodebaseBranchService struct {
 	Clients                  k8s.ClientSet
 	IReleaseBranchRepository repository.ICodebaseBranchRepository
+	ICDPipelineRepository    repository.ICDPipelineRepository
+	ICodebaseRepository      repository.ICodebaseRepository
+	CodebaseBranchValidation map[string]func(string, string) ([]string, error)
 }
 
 func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCodebaseBranch, appName string) (*edpv1alpha1.CodebaseBranch, error) {
-	log.Println("Start creating CR for branch release...")
+	log.V(2).Info("start creating CodebaseBranch CR", "codebase", appName, "branch", branchInfo.Name)
 	edpRestClient := s.Clients.EDPRestClient
 
 	releaseBranchCR, err := getReleaseBranchCR(edpRestClient, branchInfo.Name, appName, context.Namespace)
 	if err != nil {
-		log.Printf("An error has occurred while getting release branch CR {%s} from k8s: %s", branchInfo.Name, err)
-		return nil, err
+		return nil, errors.Wrapf(err, "an error has occurred while getting %v CodebaseBranch CR from cluster", branchInfo.Name)
 	}
 
 	if releaseBranchCR != nil {
-		log.Printf("release branch CR {%s} already exists in k8s", branchInfo.Name)
-		return nil, errors.New(fmt.Sprintf("release branch CR {%s} already exists in k8s", branchInfo.Name))
+		return nil, fmt.Errorf("CodebaseBranch %v already exists", branchInfo.Name)
 	}
 
 	c, err := util.GetCodebaseCR(s.Clients.EDPRestClient, appName)
@@ -93,8 +98,7 @@ func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCo
 	result := &edpv1alpha1.CodebaseBranch{}
 	err = edpRestClient.Post().Namespace(context.Namespace).Resource("codebasebranches").Body(branch).Do().Into(result)
 	if err != nil {
-		log.Printf("An error has occurred while creating release branch custom resource in k8s: %s", err)
-		return &edpv1alpha1.CodebaseBranch{}, err
+		return &edpv1alpha1.CodebaseBranch{}, errors.Wrap(err, "an error has occurred while creating CodebaseBranch CR in cluster")
 	}
 	return result, nil
 }
@@ -107,8 +111,7 @@ func newTrue() *bool {
 func (s *CodebaseBranchService) GetCodebaseBranchesByCriteria(criteria query.CodebaseBranchCriteria) ([]query.CodebaseBranch, error) {
 	codebaseBranches, err := s.IReleaseBranchRepository.GetCodebaseBranchesByCriteria(criteria)
 	if err != nil {
-		log.Printf("An error has occurred while getting branch entities: %s", err)
-		return nil, err
+		return nil, errors.Wrap(err, "an error has occurred while getting branch entities")
 	}
 	return codebaseBranches, nil
 }
@@ -128,14 +131,61 @@ func getReleaseBranchCR(edpRestClient *rest.RESTClient, branchName string, appNa
 	err := edpRestClient.Get().Namespace(namespace).Resource("codebasebranches").Name(fmt.Sprintf("%s-%s", appName, branchName)).Do().Into(result)
 
 	if k8serrors.IsNotFound(err) {
-		log.Printf("Current resourse %s doesn't exist.", branchName)
+		log.V(2).Info("CodebaseBranch doesn't exist in cluster", "branch", branchName)
 		return nil, nil
 	}
 
 	if err != nil {
-		log.Printf("An error has occurred while getting release branch custom resource from k8s: %s", err)
-		return nil, err
+		return nil, errors.Wrapf(err, "an error has occurred while getting CodebaseBranch CR from cluster")
 	}
 
 	return result, nil
+}
+
+func (s *CodebaseBranchService) Delete(codebase, branch string) error {
+	log.V(2).Info("start executing service codebase branch delete method",
+		"name", codebase, "branch", branch)
+	if err := s.canCodebaseBranchBeDeleted(codebase, branch); err != nil {
+		return err
+	}
+
+	crbn := fmt.Sprintf("%v-%v", codebase, branch)
+	if err := s.deleteCodebaseBranch(crbn); err != nil {
+		return err
+	}
+	log.Info("codebase branch has been marked for deletion",
+		"name", codebase, "branch", branch)
+	return nil
+}
+
+func (s *CodebaseBranchService) canCodebaseBranchBeDeleted(codebase, branch string) error {
+	c, err := s.ICodebaseRepository.GetCodebaseByName(codebase)
+	if err != nil {
+		return err
+	}
+	p, err := s.CodebaseBranchValidation[string(c.Type)](codebase, branch)
+	if err != nil {
+		return err
+	}
+	if p != nil {
+		return dberror.RemoveCodebaseBranchRestriction{
+			Status: dberror.StatusReasonCodebaseBranchIsUsedByCDPipeline,
+			Message: fmt.Sprintf("%v %v CodebaseBranch is used in %v CD Pipeline(s)",
+				c.Type, branch, strings.Join(p, ",")),
+		}
+	}
+	return nil
+}
+
+func (s *CodebaseBranchService) deleteCodebaseBranch(name string) error {
+	cb := &edpv1alpha1.CodebaseBranch{}
+	err := s.Clients.EDPRestClient.Delete().
+		Namespace(context.Namespace).
+		Resource(consts.CodebaseBranchPlural).
+		Name(name).
+		Do().Into(cb)
+	if err != nil {
+		return errors.Wrapf(err, "couldn't delete codebase branch %v from cluster", name)
+	}
+	return nil
 }

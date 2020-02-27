@@ -3,12 +3,13 @@ package db_errors
 type StatusReason string
 
 const (
-	StatusReasonNotFound                   StatusReason = "NotFound"
-	StatusReasonUnknown                    StatusReason = "Unknown"
-	StatusReasonCodebaseIsUsedByCDPipeline StatusReason = "Used"
-	StatusRemoveStageRestriction           StatusReason = "RemoveStageRestriction"
-	StatusCDStageIsNotTheLast              StatusReason = "StatusCDStageIsNotTheLast"
-	StatusRemoveCDPipelineRestriction      StatusReason = "RemoveCDPipelineRestriction"
+	StatusReasonNotFound                         StatusReason = "NotFound"
+	StatusReasonUnknown                          StatusReason = "Unknown"
+	StatusReasonCodebaseIsUsedByCDPipeline       StatusReason = "Used"
+	StatusRemoveStageRestriction                 StatusReason = "RemoveStageRestriction"
+	StatusCDStageIsNotTheLast                    StatusReason = "StatusCDStageIsNotTheLast"
+	StatusRemoveCDPipelineRestriction            StatusReason = "RemoveCDPipelineRestriction"
+	StatusReasonCodebaseBranchIsUsedByCDPipeline StatusReason = "CodebaseBranchIsUsed"
 )
 
 func IsNotFound(err error) bool {
@@ -28,6 +29,10 @@ func CDPipelineErrorOccurred(err error) bool {
 	return reasonForError(err) == StatusRemoveCDPipelineRestriction
 }
 
+func CodebaseBranchErrorOccurred(err error) bool {
+	return reasonForError(err) == StatusReasonCodebaseBranchIsUsedByCDPipeline
+}
+
 func reasonForError(err error) StatusReason {
 	switch t := err.(type) {
 	case StatusError:
@@ -37,6 +42,8 @@ func reasonForError(err error) StatusReason {
 	case RemoveStageRestriction:
 		return t.Status
 	case RemoveCDPipelineRestriction:
+		return t.Status
+	case RemoveCodebaseBranchRestriction:
 		return t.Status
 	}
 	return StatusReasonUnknown

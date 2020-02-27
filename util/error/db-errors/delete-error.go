@@ -28,3 +28,12 @@ type RemoveCDPipelineRestriction struct {
 func (e RemoveCDPipelineRestriction) Error() string {
 	return string(e.Status)
 }
+
+type RemoveCodebaseBranchRestriction struct {
+	Status  StatusReason
+	Message string
+}
+
+func (e RemoveCodebaseBranchRestriction) Error() string {
+	return string(e.Status)
+}

@@ -4,8 +4,10 @@ import (
 	validation2 "edp-admin-console/controllers/validation"
 	"edp-admin-console/models/command"
 	"edp-admin-console/service"
+	cbs "edp-admin-console/service/codebasebranch"
 	"edp-admin-console/util"
 	"edp-admin-console/util/consts"
+	dberror "edp-admin-console/util/error/db-errors"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
@@ -16,7 +18,7 @@ import (
 type BranchController struct {
 	beego.Controller
 	CodebaseService service.CodebaseService
-	BranchService   service.CodebaseBranchService
+	BranchService   cbs.CodebaseBranchService
 }
 
 func (c *BranchController) CreateCodebaseBranch() {
@@ -81,4 +83,27 @@ func validCodebaseBranchRequestData(requestData command.CreateCodebaseBranch) *v
 	}
 
 	return &validation2.ErrMsg{string(validation2.CreateErrorResponseBody(valid)), http.StatusBadRequest}
+}
+
+func (c *BranchController) Delete() {
+	cn := c.GetString("codebase-name")
+	bn := c.GetString("name")
+	rl := log.WithValues("codebase name", cn, "branch name", bn)
+	rl.V(2).Info("delete codebase branch method is invoked")
+	if err := c.BranchService.Delete(cn, bn); err != nil {
+		if dberror.CodebaseBranchErrorOccurred(err) {
+			cberr := err.(dberror.RemoveCodebaseBranchRestriction)
+			f := beego.NewFlash()
+			f.Error(cberr.Message)
+			f.Store(&c.Controller)
+			log.Error(err, cberr.Message)
+			c.Redirect(fmt.Sprintf("/admin/edp/codebase/%v/overview?name=%v#branchIsUsedSuccessModal", cn, bn), 302)
+			return
+		}
+		log.Error(err, "delete process is failed")
+		c.Abort("500")
+		return
+	}
+	rl.V(2).Info("delete codebase branch method is finished")
+	c.Redirect(fmt.Sprintf("/admin/edp/codebase/%v/overview?name=%v#branchDeletedSuccessModal", cn, bn), 302)
 }

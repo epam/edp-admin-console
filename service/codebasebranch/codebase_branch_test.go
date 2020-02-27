@@ -1,4 +1,4 @@
-package service
+package codebasebranch
 
 import (
 	"edp-admin-console/models"

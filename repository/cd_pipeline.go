@@ -36,6 +36,9 @@ type ICDPipelineRepository interface {
 	SelectMaxOrderBetweenStages(pipeName string) (*int, error)
 	SelectStageOrder(pipeName, stageName string) (*int, error)
 	SelectCDPipelinesUsingInputStageAsSource(pipeName, stageName string) ([]string, error)
+	GetCDPipelinesUsingApplicationAndBranch(codebase, branch string) ([]string, error)
+	GetCDPipelinesUsingAutotestAndBranch(codebase, branch string) ([]string, error)
+	GetCDPipelinesUsingLibraryAndBranch(codebase, branch string) ([]string, error)
 }
 
 const (
@@ -116,6 +119,33 @@ const (
 		"where cp_in.name = ? " +
 		"  and cs_in.name = ? " +
 		"  and not cp_out.name = ? ;"
+	selectCDPipelinesUsingCodebaseAndBranch = "select cp.name " +
+		"	from cd_pipeline cp " +
+		"left join cd_pipeline_docker_stream cpds on cp.id = cpds.cd_pipeline_id " +
+		"left join codebase_docker_stream cds on cpds.codebase_docker_stream_id = cds.id " +
+		"left join codebase_branch cb on cds.codebase_branch_id = cb.id " +
+		"left join codebase c on cb.codebase_id = c.id " +
+		"where c.name = ? " +
+		"  and cb.name = ? ;"
+	selectCDPipelineUsingAutotestAndBranch = "select cp.name " +
+		"	from cd_pipeline cp " +
+		"left join cd_stage cs on cp.id = cs.cd_pipeline_id " +
+		"left join quality_gate_stage qgs on cs.id = qgs.cd_stage_id " +
+		"left join codebase_branch cb on qgs.codebase_branch_id = cb.id " +
+		"left join codebase c on cb.codebase_id = c.id " +
+		"where qgs.quality_gate = 'autotests' " +
+		"  and c.name = ? " +
+		"  and cb.name = ? " +
+		"group by cp.name;"
+	selectCDPipelineUsingLibraryAndBranch = "select cp.name " +
+		"	from cd_pipeline cp " +
+		"left join cd_stage cs on cp.id = cs.cd_pipeline_id " +
+		"left join codebase_branch cb on cs.codebase_branch_id = cb.id " +
+		"left join codebase c on cb.codebase_id = c.id " +
+		"where c.type = 'library' " +
+		"  and c.name = ? " +
+		"  and cb.name = ? " +
+		"group by cp.name;"
 )
 
 type CDPipelineRepository struct {
@@ -510,6 +540,33 @@ func (CDPipelineRepository) SelectCDPipelinesUsingInputStageAsSource(pipeName, s
 		if err == orm.ErrNoRows {
 			return nil, nil
 		}
+		return nil, err
+	}
+	return p, nil
+}
+
+func (CDPipelineRepository) GetCDPipelinesUsingApplicationAndBranch(codebase, branch string) ([]string, error) {
+	o := orm.NewOrm()
+	var p []string
+	if _, err := o.Raw(selectCDPipelinesUsingCodebaseAndBranch, codebase, branch).QueryRows(&p); err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+func (CDPipelineRepository) GetCDPipelinesUsingAutotestAndBranch(codebase, branch string) ([]string, error) {
+	o := orm.NewOrm()
+	var p []string
+	if _, err := o.Raw(selectCDPipelineUsingAutotestAndBranch, codebase, branch).QueryRows(&p); err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+func (CDPipelineRepository) GetCDPipelinesUsingLibraryAndBranch(codebase, branch string) ([]string, error) {
+	o := orm.NewOrm()
+	var p []string
+	if _, err := o.Raw(selectCDPipelineUsingLibraryAndBranch, codebase, branch).QueryRows(&p); err != nil {
 		return nil, err
 	}
 	return p, nil
