@@ -1,4 +1,11 @@
 $(function () {
+
+    $(document).ready(function () {
+        $('#versioningType').change(function() {
+            checkVersioningType($(this).val())
+        });
+    });
+
     let REGEX = {
         CAPACITY: /\w/,
         SERVICE_PATH: /^\/.*$/,

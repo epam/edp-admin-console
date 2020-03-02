@@ -43,13 +43,24 @@ $(function () {
 
     $('#btn-modal-close, #btn-cross-close').click(function () {
         $('.branch-exists-modal').hide();
-        $('#branchName,#commitNumber').val('').removeClass('non-valid-input');
+        if ($('#versioningPostfix').length) {
+            $('#branchName,#commitNumber').removeClass('non-valid-input');
+            restoreBranchModalWindowValues()
+        } else {
+            $('#branchName,#commitNumber').val('').removeClass('non-valid-input');
+        }
         $('.invalid-feedback.branch-name').hide();
         $('.invalid-feedback.commit-message').hide();
     });
 
     $('.modal-release-branch').click(function () {
         $('#releaseBranchModal').modal('show');
+        if ($('#versioningPostfix').length) {
+            let branchName = $('#branchName').val(),
+                branchVersion = $('#startFrom').val(),
+                masterBranchVersion = $('#masterBranchVersion').val();
+            saveBranchModalWindowValues(branchName, branchVersion, masterBranchVersion)
+        }
     });
 
     $('#create-release-branch').click(function () {
@@ -83,6 +94,24 @@ $(function () {
 
     $('.close,.cancel-delete').click(function () {
         closeConfirmation();
+    });
+
+    $('#releaseBranch').change(function () {
+        let $createNewBranchModalEl = $('.create-new-branch-modal'),
+            $versioningPostfixEl = $createNewBranchModalEl.find('.versioning-postfix'),
+            $masterBranchNameInputEl = $createNewBranchModalEl.find('.master-branch-version');
+
+        if ($(this).is(":checked")) {
+            $versioningPostfixEl.attr('disabled', false);
+            $versioningPostfixEl.removeClass('hide-element');
+            $masterBranchNameInputEl.attr('disabled', false);
+            $masterBranchNameInputEl.removeClass('hide-element');
+        } else {
+            $versioningPostfixEl.attr('disabled', true);
+            $versioningPostfixEl.addClass('hide-element');
+            $masterBranchNameInputEl.attr('disabled', true);
+            $masterBranchNameInputEl.addClass('hide-element');
+        }
     });
 });
 
@@ -146,4 +175,20 @@ function showNotification(ok, delay, successMsg) {
                 exit: 'animated fadeOutRight'
             }
         });
+}
+
+function saveBranchModalWindowValues(branchName, branchVersion, masterBranchVersion) {
+    sessionStorage.setItem("branch", JSON.stringify({
+        "branchName": branchName,
+        "branchVersion": branchVersion,
+        "masterBranchVersion": masterBranchVersion
+    }))
+}
+
+function restoreBranchModalWindowValues() {
+    let branchConf = sessionStorage.getItem("branch");
+    branchConf = JSON.parse(branchConf);
+    $('#branchName').val(branchConf.branchName);
+    $('#startFrom').val(branchConf.branchVersion);
+    $('#masterBranchVersion').val(branchConf.masterBranchVersion)
 }

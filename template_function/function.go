@@ -2,7 +2,9 @@ package template_function
 
 import (
 	"github.com/astaxie/beego"
+	"github.com/blang/semver"
 	"github.com/pkg/errors"
+	"strings"
 )
 
 func init() {
@@ -12,6 +14,28 @@ func init() {
 	if err := beego.AddFuncMap("params", params); err != nil {
 		panic("couldn't register 'params' function to go template")
 	}
+	if err := beego.AddFuncMap("trimSuffix", trimSuffix); err != nil {
+		panic("couldn't register 'trimSuffix' function to go template")
+	}
+	if err := beego.AddFuncMap("incrementVersion", incrementVersion); err != nil {
+		panic("couldn't register 'incrementVersion' function to go template")
+	}
+}
+
+func trimSuffix(v, s string) string {
+	return strings.TrimSuffix(v, s)
+}
+
+func incrementVersion(v string) (*string, error) {
+	pv, err := semver.Make(v)
+	if err != nil {
+		return nil, err
+	}
+
+	pv.Minor += 1
+
+	res := trimSuffix(pv.String(), "-SNAPSHOT")
+	return &res, nil
 }
 
 func add(a, b int) int {
