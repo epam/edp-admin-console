@@ -5,6 +5,7 @@ import (
 	"github.com/blang/semver"
 	"github.com/pkg/errors"
 	"strings"
+	"time"
 )
 
 func init() {
@@ -19,6 +20,9 @@ func init() {
 	}
 	if err := beego.AddFuncMap("incrementVersion", incrementVersion); err != nil {
 		panic("couldn't register 'incrementVersion' function to go template")
+	}
+	if err := beego.AddFuncMap("getCurrentYear", getCurrentYear); err != nil {
+		panic("couldn't register 'getCurrentYear' function to go template")
 	}
 }
 
@@ -55,4 +59,8 @@ func params(values ...interface{}) (map[string]interface{}, error) {
 		p[k] = values[i+1]
 	}
 	return p, nil
+}
+
+func getCurrentYear() int {
+	return time.Now().Year()
 }
