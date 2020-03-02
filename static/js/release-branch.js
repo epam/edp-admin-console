@@ -104,11 +104,14 @@ $(function () {
         if ($(this).is(":checked")) {
             $versioningPostfixEl.attr('disabled', false);
             $versioningPostfixEl.removeClass('hide-element');
+            $versioningPostfixEl.append('<option versioning-postfix="RC">RC</option>\n',
+                '<option versioning-postfix="GA">GA</option>');
             $masterBranchNameInputEl.attr('disabled', false);
             $masterBranchNameInputEl.removeClass('hide-element');
         } else {
             $versioningPostfixEl.attr('disabled', true);
             $versioningPostfixEl.addClass('hide-element');
+            $versioningPostfixEl.empty()
             $masterBranchNameInputEl.attr('disabled', true);
             $masterBranchNameInputEl.addClass('hide-element');
         }
