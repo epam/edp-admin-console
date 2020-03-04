@@ -44,3 +44,7 @@ func EncodeStructToBytes(s interface{}) ([]byte, error) {
 	}
 	return reqBodyBytes.Bytes(), nil
 }
+
+func TrimSuffix(v, s string) string {
+	return strings.TrimSuffix(v, s)
+}

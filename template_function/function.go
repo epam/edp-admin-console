@@ -1,10 +1,11 @@
 package template_function
 
 import (
+	"edp-admin-console/models/query"
+	"edp-admin-console/util"
 	"github.com/astaxie/beego"
 	"github.com/blang/semver"
 	"github.com/pkg/errors"
-	"strings"
 	"time"
 )
 
@@ -15,8 +16,8 @@ func init() {
 	if err := beego.AddFuncMap("params", params); err != nil {
 		panic("couldn't register 'params' function to go template")
 	}
-	if err := beego.AddFuncMap("trimSuffix", trimSuffix); err != nil {
-		panic("couldn't register 'trimSuffix' function to go template")
+	if err := beego.AddFuncMap("getMasterBranchVersion", getMasterBranchVersion); err != nil {
+		panic("couldn't register 'getMasterBranchVersion' function to go template")
 	}
 	if err := beego.AddFuncMap("incrementVersion", incrementVersion); err != nil {
 		panic("couldn't register 'incrementVersion' function to go template")
@@ -26,8 +27,14 @@ func init() {
 	}
 }
 
-func trimSuffix(v, s string) string {
-	return strings.TrimSuffix(v, s)
+func getMasterBranchVersion(cb []*query.CodebaseBranch) string {
+	for _, g := range cb {
+		if g.Name == "master" {
+			v := g.Version
+			return util.TrimSuffix(*v, "-SNAPSHOT")
+		}
+	}
+	return ""
 }
 
 func incrementVersion(v string) (*string, error) {
@@ -38,7 +45,7 @@ func incrementVersion(v string) (*string, error) {
 
 	pv.Minor += 1
 
-	res := trimSuffix(pv.String(), "-SNAPSHOT")
+	res := util.TrimSuffix(pv.String(), "-SNAPSHOT")
 	return &res, nil
 }
 
