@@ -103,9 +103,8 @@ func (c *AutotestsController) extractAutotestsRequestData() command.CreateCodeba
 	sp := c.GetString("snapshotStaticField")
 	codebase.Versioning.StartFrom = util.GetVersionOrNil(startVersioningFrom, sp)
 
-	if o := OtherLanguage; codebase.Lang == OtherLanguage {
-		codebase.Framework = &o
-	}
+	framework := c.GetString("framework")
+	codebase.Framework = &framework
 
 	if codebase.Strategy == strings.ToLower(ImportStrategy) {
 		codebase.GitServer = c.GetString("gitServer")

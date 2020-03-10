@@ -161,9 +161,8 @@ func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
 	sp := c.GetString("snapshotStaticField")
 	library.Versioning.StartFrom = util.GetVersionOrNil(startVersioningFrom, sp)
 
-	if o := OtherLanguage; library.Lang == OtherLanguage {
-		library.Framework = &o
-	}
+	framework := c.GetString("framework")
+	library.Framework = &framework
 
 	if library.Strategy == strings.ToLower(ImportStrategy) {
 		library.GitServer = c.GetString("gitServer")

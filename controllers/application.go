@@ -231,12 +231,8 @@ func (c *ApplicationController) extractApplicationRequestData() command.CreateCo
 		codebase.GitServer = "gerrit"
 	}
 
-	if o := OtherLanguage; codebase.Lang == OtherLanguage {
-		codebase.Framework = &o
-	} else {
-		framework := c.GetString("framework")
-		codebase.Framework = &framework
-	}
+	framework := c.GetString("framework")
+	codebase.Framework = &framework
 
 	isMultiModule, _ := c.GetBool("isMultiModule", false)
 	codebase.MultiModule = isMultiModule
