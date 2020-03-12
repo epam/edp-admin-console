@@ -176,7 +176,7 @@ objects:
                     name: edp-config
                     key: edp_name
               - name: PG_HOST
-                value: edp-intsall-wizard-db
+                value: edp-install-wizard-db
               - name: PG_PORT
                 value: '5432'
               - name: PG_DATABASE
