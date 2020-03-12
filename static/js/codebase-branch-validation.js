@@ -130,21 +130,19 @@ $(function () {
     $('#releaseBranch').change(function () {
         let $createNewBranchModalEl = $('.create-new-branch-modal'),
             $versioningPostfixEl = $createNewBranchModalEl.find('.versioning-postfix'),
-            $masterBranchNameInputEl = $createNewBranchModalEl.find('.master-branch-version');
+            $masterBranchVersionInputEl = $createNewBranchModalEl.find('.master-branch-version'),
+            $branchNameInputEl = $createNewBranchModalEl.find('.branch-name');
 
         if ($(this).is(":checked")) {
-            $versioningPostfixEl.attr('disabled', false);
-            $versioningPostfixEl.removeClass('hide-element');
+            $branchNameInputEl.attr('readonly', true);
+            $versioningPostfixEl.attr('disabled', false).removeClass('hide-element');
             $versioningPostfixEl.append('<option versioning-postfix="RC">RC</option>\n',
                 '<option versioning-postfix="GA">GA</option>');
-            $masterBranchNameInputEl.attr('disabled', false);
-            $masterBranchNameInputEl.removeClass('hide-element');
+            $masterBranchVersionInputEl.attr('disabled', false).removeClass('hide-element');
         } else {
-            $versioningPostfixEl.attr('disabled', true);
-            $versioningPostfixEl.addClass('hide-element');
-            $versioningPostfixEl.empty()
-            $masterBranchNameInputEl.attr('disabled', true);
-            $masterBranchNameInputEl.addClass('hide-element');
+            $branchNameInputEl.removeAttr('readonly');
+            $versioningPostfixEl.attr('disabled', true).addClass('hide-element').empty();
+            $masterBranchVersionInputEl.attr('disabled', true).addClass('hide-element');
         }
     });
 });
