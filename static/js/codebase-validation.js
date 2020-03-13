@@ -246,16 +246,12 @@ $(function () {
 
     $('.application-submit,.autotest-submit,.library-submit').click(function (event) {
         validateMainInfo(event);
-        if ($('#versioningType').val() === "edp") {
-            validateAdvancedInfo(event);
-        }
+        validateAdvancedInfo(event);
     });
 
     $('.advanced-settings-submit').click(function (event) {
         validateMainInfo(event);
-        if ($('#versioningType').val() === "edp") {
-            validateAdvancedInfo(event);
-        }
+        validateAdvancedInfo(event);
     });
 
     $('.vcs-submit,.create-library,.create-autotest').click(function (event) {
@@ -355,6 +351,10 @@ $(function () {
     }
 
     function validateAdvancedInfo(event) {
+        if ($('#versioningType').val() === "default") {
+            return true
+        }
+
         let $advancedBlockEl = $('.advanced-settings-block');
 
         resetErrors($advancedBlockEl);
