@@ -20,9 +20,8 @@ function isBranchVersionValid(branchVersion) {
 }
 
 function checkBranchVersion(branchVersion) {
-    return /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|(?!.*RC|.*GA|.*SNAPSHOT)\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$/i.test(branchVersion)
+    return /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)?$/i.test(branchVersion)
 }
-
 function trimMinorVersionComponent(version) {
     let components = version.split('.');
 
