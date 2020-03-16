@@ -1,39 +1,45 @@
 # Local Development
-## Requirements:
-* Go version (great than 1.13)
+### Requirements
+* GoLang version higher than 1.13;
 
-_**NOTE**: Make sure that environment variable GOPATH and GOROOT are added in PATH:_
-```
-export GOPATH=C:\Users\<<username>>\go
-export GOROOT=C:\Go
-```
+>_**NOTE**: The GOPATH and GOROOT environment variables should be added in PATH._
+>```
+>export GOPATH=C:\Users\<<username>>\go
+>export GOROOT=C:\Go
+>``
 
-* PostgreSQL client (great than 9.5 version)
-* Configured access to the VCS (see [Gerrit Setup for Developer](https://kb.epam.com/display/EPMDEDP/Gerrit+Setup+for+Developer))
-* GoLand Intellij Idea or another IDE
+* PostgreSQL client version higher than 9.5;
+* Configured access to the VCS, for details, refer to the [Gerrit Setup for Developer](https://kb.epam.com/display/EPMDEDP/Gerrit+Setup+for+Developer) page;
+* GoLand Intellij IDEA or another IDE.
 
-## Running operator:
-1. Clone repository
-2. Open folder in GoLand Intellij Idea and select Add Configuration → Go Build
-![add-config](../readme-resource/add_config.png "add-config") 
-3. Set the path to the main.go file in Files field and path to the Working directory for operator
-![build-config](../readme-resource/build_config.png "build-config") 
-4. Create a PostgreSQL database, schema, and user for EDP Admin Console operator:
-    ```
-    ## Creating database with user
-    CREATE DATABASE edp-install-wizard-db WITH ENCODING 'UTF8';
-    CREATE USER postgres WITH PASSWORD 'password';
-    GRANT ALL PRIVILEGES ON DATABASE 'edp-install-wizard-db' to postgres;
-     
-    ## Creating schema
+## Operator Launch
+In order to run the operator, follow the steps below:
+
+1. Clone repository;
+2. Open folder in GoLand Intellij IDEA, click the ![add_config_button](../readme-resource/add_config_button.png "add_config_button") button and select the **Go Build** option:
+   ![add_configuration](../readme-resource/add_configuration.png "add_configuration") 
+3. In Configuration tab, fill in the following:
+   
+    3.1. In the Field field, indicate the path to the main.go file;
+       
+    3.2. In the Working directory field, indicate the path to the operator;
+       
+    3.3. In the Environment field, specify the platform name (OpenShift/Kubernetes);
+    ![build-config](../readme-resource/build_config.png "build-config") 
+4. Create the PostgreSQL database, schema, and a user for the EDP Admin Console operator:
+     * Create database with a user:
+   ```yaml
+   CREATE DATABASE edp-install-wizard-db WITH ENCODING 'UTF8';
+   CREATE USER postgres WITH PASSWORD 'password';
+   GRANT ALL PRIVILEGES ON DATABASE 'edp-install-wizard-db' to postgres;
+   ``` 
+     * Create a schema:
+   ```yaml
     CREATE SCHEMA [IF NOT EXISTS] 'develop';
-    ```
-    EDP Admin Console operator supports  two modes for running: 
-    * local
-    * prod
-    
-    For local deploy modify <strong>edp-admin-console/conf/app.conf</strong> and set the following parameters:
-    ```
+   ```
+   EDP Admin Console operator supports two modes for running: local and prod.
+   For local deploy, modify ```<strong>edp-admin-console/conf/app.conf</strong>``` and set the following parameters:
+   ```
     runmode=local
     [local]
     dbEnabled=true
@@ -43,15 +49,14 @@ export GOROOT=C:\Go
     pgUser=postgres
     pgPassword=password
     edpName=develop
-    ```
-5. Run 'go build main.go' (Shift+F10)
-![deploy-operator](../readme-resource/deploy_operator.png "deploy-operator") 
+   ```
+5. Run 'go build main.go' (Shift+F10);
+6. After the successful setup, follow the [http://localhost:8080](http://localhost:8080) URL address to check the result:
 
-6. After a successful setup and launching, you can see the result on http://localhost:8080
 ![check-deploy](../readme-resource/check_deploy.png "check-deploy") 
 
 ## Exceptional Cases
-After Run 'go build main.go' see error: 
+After starting the Go build process, the following error will appear: 
 ```
 go: finding github.com/openshift/api v3.9.0
 go: finding github.com/openshift/client-go v3.9.0
@@ -60,8 +65,8 @@ C:\Users\<<username>>\Desktop\EDP\edp-admin-console\go.mod:36: require github.co
 
 Compilation finished with exit code 1
 ```
+To resolve the issue, update the go dependency by applying the Golang command:
 
-This problem can resolve by manual update go dependency using command:
 ```
 go get github.com/openshift/api@v3.9.0
 ```
