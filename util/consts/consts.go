@@ -19,6 +19,7 @@ const (
 	CodebaseKind         = "Codebase"
 
 	ImportStrategy = "import"
+	LanguageJava   = "Java"
 )
 
 var DefaultBuildNumber = "0"
