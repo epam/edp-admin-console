@@ -3,8 +3,8 @@ package controllers
 import (
 	"edp-admin-console/context"
 	validation2 "edp-admin-console/controllers/validation"
-	"edp-admin-console/models"
 	"edp-admin-console/models/command"
+	edperror "edp-admin-console/models/error"
 	"edp-admin-console/models/query"
 	"edp-admin-console/service"
 	cbs "edp-admin-console/service/codebasebranch"
@@ -129,27 +129,29 @@ func (c *LibraryController) Create() {
 
 	createdObject, err := c.CodebaseService.CreateCodebase(codebase)
 	if err != nil {
-		switch err.(type) {
-		case *models.CodebaseAlreadyExistsError:
-			flash.Error("Library %v already exists.", codebase.Name)
-			flash.Store(&c.Controller)
-			c.Redirect("/admin/edp/library/create", 302)
-			return
-		case *models.CodebaseWithGitUrlPathAlreadyExistsError:
-			flash.Error("Library %v with %v project path already exists.", codebase.Name, *codebase.GitUrlPath)
-			flash.Store(&c.Controller)
-			c.Redirect("/admin/edp/library/create", 302)
-			return
-		default:
-			c.Abort("500")
-			return
-		}
+		c.checkError(err, flash, codebase.Name, codebase.GitUrlPath)
+		return
 	}
 
 	log.Info("Library object is saved into cluster", "library", createdObject.Name)
 	flash.Success("Library object is created.")
 	flash.Store(&c.Controller)
 	c.Redirect(fmt.Sprintf("/admin/edp/library/overview?%s=%s#codebaseSuccessModal", paramWaitingForCodebase, codebase.Name), 302)
+}
+
+func (c *LibraryController) checkError(err error, flash *beego.FlashData, name string, url *string) {
+	switch err.(type) {
+	case *edperror.CodebaseAlreadyExistsError:
+		flash.Error("Library %v already exists.", name)
+		flash.Store(&c.Controller)
+		c.Redirect("/admin/edp/library/create", 302)
+	case *edperror.CodebaseWithGitUrlPathAlreadyExistsError:
+		flash.Error("Library %v with %v project path already exists.", name, *url)
+		flash.Store(&c.Controller)
+		c.Redirect("/admin/edp/library/create", 302)
+	default:
+		c.Abort("500")
+	}
 }
 
 func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
@@ -161,7 +163,7 @@ func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
 		JenkinsSlave:     c.GetString("jenkinsSlave"),
 		JobProvisioning:  c.GetString("jobProvisioning"),
 		DeploymentScript: c.GetString("deploymentScript"),
-		Name:             c.GetString("nameOfApp"),
+		Name:             c.GetString("appName"),
 	}
 
 	library.Versioning.Type = c.GetString("versioningType")

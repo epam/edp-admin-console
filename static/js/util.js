@@ -91,7 +91,7 @@ function createConfirmTable(formName) {
 
     addBlock(null, null,
         {
-            'Name': 'nameOfApp',
+            'Name': 'appName',
             'Description': 'description',
             'Code language': 'appLang',
             'Framework': 'framework',

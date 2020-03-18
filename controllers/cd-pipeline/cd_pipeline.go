@@ -21,6 +21,7 @@ import (
 	"edp-admin-console/controllers/validation"
 	"edp-admin-console/models"
 	"edp-admin-console/models/command"
+	edperror "edp-admin-console/models/error"
 	"edp-admin-console/models/query"
 	"edp-admin-console/service"
 	"edp-admin-console/service/cd_pipeline"
@@ -233,12 +234,12 @@ func (c *CDPipelineController) UpdateCDPipeline() {
 	if err != nil {
 
 		switch err.(type) {
-		case *models.CDPipelineDoesNotExistError:
+		case *edperror.CDPipelineDoesNotExistError:
 			flash.Error(fmt.Sprintf("cd pipeline %v doesn't exist", pipelineName))
 			flash.Store(&c.Controller)
 			c.Redirect(fmt.Sprintf("/admin/edp/cd-pipeline/%s/update", pipelineName), http.StatusFound)
 			return
-		case *models.NonValidRelatedBranchError:
+		case *edperror.NonValidRelatedBranchError:
 			flash.Error(fmt.Sprintf("one or more applications have non valid branches: %v", pipelineUpdateCommand.Applications))
 			flash.Store(&c.Controller)
 			c.Redirect(fmt.Sprintf("/admin/edp/cd-pipeline/%s/update", pipelineName), http.StatusBadRequest)
@@ -286,12 +287,12 @@ func (c *CDPipelineController) CreateCDPipeline() {
 	if pipelineErr != nil {
 
 		switch pipelineErr.(type) {
-		case *models.CDPipelineExistsError:
+		case *edperror.CDPipelineExistsError:
 			flash.Error(fmt.Sprintf("cd pipeline %v is already exists", cdPipelineCreateCommand.Name))
 			flash.Store(&c.Controller)
 			c.Redirect("/admin/edp/cd-pipeline/create", http.StatusFound)
 			return
-		case *models.NonValidRelatedBranchError:
+		case *edperror.NonValidRelatedBranchError:
 			flash.Error(fmt.Sprintf("one or more applications have non valid branches: %v", cdPipelineCreateCommand.Applications))
 			flash.Store(&c.Controller)
 			c.Redirect("/admin/edp/cd-pipeline/create", http.StatusBadRequest)

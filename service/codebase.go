@@ -21,6 +21,7 @@ import (
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
 	"edp-admin-console/models/command"
+	edperror "edp-admin-console/models/error"
 	"edp-admin-console/models/query"
 	"edp-admin-console/repository"
 	cbs "edp-admin-console/service/codebasebranch"
@@ -57,17 +58,17 @@ func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*edpv1
 	}
 	if codebaseCr != nil {
 		clog.Info("codebase already exists in cluster", "name", codebaseCr.Name)
-		return nil, models.NewCodebaseAlreadyExistsError()
+		return nil, edperror.NewCodebaseAlreadyExistsError()
 	}
 
 	if s.findCodebaseByName(codebase.Name) {
 		clog.Info("Codebase already exists in DB", "name", codebase.Name)
-		return nil, models.NewCodebaseAlreadyExistsError()
+		return nil, edperror.NewCodebaseAlreadyExistsError()
 	}
 
 	if s.findCodebaseByProjectPath(codebase.GitUrlPath) {
 		clog.Info("Codebase with the same gitUrlPath already exists in DB", "gitUrlPath", *codebase.GitUrlPath)
-		return nil, models.NewCodebaseWithGitUrlPathAlreadyExistsError()
+		return nil, edperror.NewCodebaseWithGitUrlPathAlreadyExistsError()
 	}
 
 	edpClient := s.Clients.EDPRestClient

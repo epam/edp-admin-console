@@ -302,7 +302,7 @@ $(function () {
         if (!isFieldValid($(this), REGEX.RELATIVE_PATH)) {
             return;
         }
-        $('#nameOfApp').val($(this).val().match(/([^\/]*)\/*$/)[1]);
+        $('#appName').val($(this).val().match(/([^\/]*)\/*$/)[1]);
     });
 
     function setJenkinsSlave(el) {

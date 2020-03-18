@@ -19,8 +19,8 @@ package controllers
 import (
 	"edp-admin-console/context"
 	"edp-admin-console/controllers/validation"
-	"edp-admin-console/models"
 	"edp-admin-console/models/command"
+	edperror "edp-admin-console/models/error"
 	"edp-admin-console/models/query"
 	"edp-admin-console/service"
 	cbs "edp-admin-console/service/codebasebranch"
@@ -187,27 +187,29 @@ func (c *ApplicationController) CreateApplication() {
 
 	createdObject, err := c.CodebaseService.CreateCodebase(codebase)
 	if err != nil {
-		switch err.(type) {
-		case *models.CodebaseAlreadyExistsError:
-			flash.Error("Application %v already exists.", codebase.Name)
-			flash.Store(&c.Controller)
-			c.Redirect("/admin/edp/application/create", 302)
-			return
-		case *models.CodebaseWithGitUrlPathAlreadyExistsError:
-			flash.Error("Application %v with %v project path already exists.", codebase.Name, *codebase.GitUrlPath)
-			flash.Store(&c.Controller)
-			c.Redirect("/admin/edp/application/create", 302)
-			return
-		default:
-			c.Abort("500")
-			return
-		}
+		c.checkError(err, flash, codebase.Name, codebase.GitUrlPath)
+		return
 	}
 
 	log.Info("application object is saved into cluster", "name", createdObject.Name)
 	flash.Success("Application object is created.")
 	flash.Store(&c.Controller)
 	c.Redirect(fmt.Sprintf("/admin/edp/application/overview?%s=%s#codebaseSuccessModal", paramWaitingForCodebase, codebase.Name), 302)
+}
+
+func (c *ApplicationController) checkError(err error, flash *beego.FlashData, name string, url *string) {
+	switch err.(type) {
+	case *edperror.CodebaseAlreadyExistsError:
+		flash.Error("Application %v already exists.", name)
+		flash.Store(&c.Controller)
+		c.Redirect("/admin/edp/application/create", 302)
+	case *edperror.CodebaseWithGitUrlPathAlreadyExistsError:
+		flash.Error("Application %v with %v project path already exists.", name, *url)
+		flash.Store(&c.Controller)
+		c.Redirect("/admin/edp/application/create", 302)
+	default:
+		c.Abort("500")
+	}
 }
 
 func (c *ApplicationController) extractApplicationRequestData() command.CreateCodebase {
@@ -219,7 +221,7 @@ func (c *ApplicationController) extractApplicationRequestData() command.CreateCo
 		JenkinsSlave:     c.GetString("jenkinsSlave"),
 		JobProvisioning:  c.GetString("jobProvisioning"),
 		DeploymentScript: c.GetString("deploymentScript"),
-		Name:             c.GetString("nameOfApp"),
+		Name:             c.GetString("appName"),
 	}
 
 	codebase.Versioning.Type = c.GetString("versioningType")

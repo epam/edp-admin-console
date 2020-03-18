@@ -18,8 +18,8 @@ package controllers
 
 import (
 	"edp-admin-console/controllers/validation"
-	"edp-admin-console/models"
 	"edp-admin-console/models/command"
+	edperror "edp-admin-console/models/error"
 	"edp-admin-console/models/query"
 	"edp-admin-console/service"
 	dberror "edp-admin-console/util/error/db-errors"
@@ -113,20 +113,8 @@ func (c *CodebaseRestController) CreateCodebase() {
 
 	createdObject, err := c.CodebaseService.CreateCodebase(codebase)
 	if err != nil {
-		switch err.(type) {
-		case *models.CodebaseAlreadyExistsError:
-			errMsg := fmt.Sprintf("Codebase %v already exists.", codebase.Name)
-			http.Error(c.Ctx.ResponseWriter, errMsg, http.StatusBadRequest)
-			return
-		case *models.CodebaseWithGitUrlPathAlreadyExistsError:
-			errMsg := fmt.Sprintf("Codebase %v with %v project path already exists.", codebase.Name, *codebase.GitUrlPath)
-			http.Error(c.Ctx.ResponseWriter, errMsg, http.StatusBadRequest)
-			return
-		default:
-			errMsg := fmt.Sprintf("Failed to create codebase: %v", err.Error())
-			http.Error(c.Ctx.ResponseWriter, errMsg, http.StatusInternalServerError)
-			return
-		}
+		c.checkError(err, codebase.Name, codebase.GitUrlPath)
+		return
 	}
 
 	log.Info("Codebase resource is saved into cluster", "codebase", createdObject.Name)
@@ -134,6 +122,20 @@ func (c *CodebaseRestController) CreateCodebase() {
 	location := fmt.Sprintf("%s/%s", c.Ctx.Input.URL(), uuid.NewV4().String())
 	c.Ctx.ResponseWriter.WriteHeader(200)
 	c.Ctx.Output.Header("Location", location)
+}
+
+func (c *CodebaseRestController) checkError(err error, name string, url *string) {
+	switch err.(type) {
+	case *edperror.CodebaseAlreadyExistsError:
+		errMsg := fmt.Sprintf("Codebase %v already exists.", name)
+		http.Error(c.Ctx.ResponseWriter, errMsg, http.StatusBadRequest)
+	case *edperror.CodebaseWithGitUrlPathAlreadyExistsError:
+		errMsg := fmt.Sprintf("Codebase %v with %v project path already exists.", name, *url)
+		http.Error(c.Ctx.ResponseWriter, errMsg, http.StatusBadRequest)
+	default:
+		errMsg := fmt.Sprintf("Failed to create codebase: %v", err.Error())
+		http.Error(c.Ctx.ResponseWriter, errMsg, http.StatusInternalServerError)
+	}
 }
 
 func (c *CodebaseRestController) Delete() {

@@ -18,8 +18,8 @@ package controllers
 
 import (
 	"edp-admin-console/controllers/validation"
-	"edp-admin-console/models"
 	"edp-admin-console/models/command"
+	edperror "edp-admin-console/models/error"
 	"edp-admin-console/service/cd_pipeline"
 	dberror "edp-admin-console/util/error/db-errors"
 	"encoding/json"
@@ -96,10 +96,10 @@ func (c *CDPipelineRestController) CreateCDPipeline() {
 	if pipelineErr != nil {
 
 		switch pipelineErr.(type) {
-		case *models.CDPipelineExistsError:
+		case *edperror.CDPipelineExistsError:
 			http.Error(c.Ctx.ResponseWriter, fmt.Sprintf("cd pipeline %v is already exists", cdPipelineCreateCommand.Name), http.StatusFound)
 			return
-		case *models.NonValidRelatedBranchError:
+		case *edperror.NonValidRelatedBranchError:
 			http.Error(c.Ctx.ResponseWriter, fmt.Sprintf("one or more applications have non valid branches: %v", cdPipelineCreateCommand.Applications), http.StatusBadRequest)
 			return
 		default:
@@ -135,10 +135,10 @@ func (c *CDPipelineRestController) UpdateCDPipeline() {
 	if err != nil {
 
 		switch err.(type) {
-		case *models.CDPipelineDoesNotExistError:
+		case *edperror.CDPipelineDoesNotExistError:
 			http.Error(c.Ctx.ResponseWriter, fmt.Sprintf("cd pipeline %v doesn't exist", pipelineUpdateCommand.Name), http.StatusNotFound)
 			return
-		case *models.NonValidRelatedBranchError:
+		case *edperror.NonValidRelatedBranchError:
 			http.Error(c.Ctx.ResponseWriter, fmt.Sprintf("one or more applications have non valid branches: %v", pipelineUpdateCommand.Name), http.StatusNotFound)
 			return
 		default:

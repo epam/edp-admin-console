@@ -21,6 +21,7 @@ import (
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
 	"edp-admin-console/models/command"
+	edperror "edp-admin-console/models/error"
 	"edp-admin-console/models/query"
 	"edp-admin-console/repository"
 	"edp-admin-console/service"
@@ -65,7 +66,7 @@ func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand)
 	}
 
 	if !exist {
-		return nil, models.NewNonValidRelatedBranchError()
+		return nil, edperror.NewNonValidRelatedBranchError()
 	}
 
 	cdPipelineReadModel, err := s.GetCDPipelineByName(cdPipeline.Name)
@@ -75,7 +76,7 @@ func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand)
 
 	if cdPipelineReadModel != nil {
 		log.V(2).Info("CD Pipeline already exists in DB.", "name", cdPipeline.Name)
-		return nil, models.NewCDPipelineExistsError()
+		return nil, edperror.NewCDPipelineExistsError()
 	}
 
 	edpRestClient := s.Clients.EDPRestClient
@@ -86,7 +87,7 @@ func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand)
 
 	if pipelineCR != nil {
 		log.V(2).Info("CD Pipeline already exists in cluster.", "name", cdPipeline.Name)
-		return nil, models.NewCDPipelineExistsError()
+		return nil, edperror.NewCDPipelineExistsError()
 	}
 
 	crd := &edppipelinesv1alpha1.CDPipeline{
@@ -193,7 +194,7 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 			return err
 		}
 		if !exist {
-			return models.NewNonValidRelatedBranchError()
+			return edperror.NewNonValidRelatedBranchError()
 		}
 	}
 
@@ -203,7 +204,7 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 	}
 	if cdPipelineReadModel == nil {
 		log.Info("CD Pipeline doesn't exist in DB.", "name", pipeline.Name)
-		return models.NewCDPipelineDoesNotExistError()
+		return edperror.NewCDPipelineDoesNotExistError()
 	}
 
 	pipelineCR, err := s.getCDPipelineCR(pipeline.Name)
@@ -212,7 +213,7 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 	}
 	if pipelineCR == nil {
 		log.Info("CD Pipeline doesn't exist in cluster.", "name", pipeline.Name)
-		return models.NewCDPipelineDoesNotExistError()
+		return edperror.NewCDPipelineDoesNotExistError()
 	}
 
 	if pipeline.Applications != nil {
