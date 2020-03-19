@@ -492,8 +492,9 @@ func (c *CDPipelineController) createNativeDockerImageLinks(s []*query.CodebaseD
 	}
 
 	for i, v := range s {
+		s[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, v.CodebaseBranch.Codebase.Name,
+			util.ProcessBranchVersionSlashToDash(v.CodebaseBranch.Name, v.CodebaseBranch.Release))
 		s[i].ImageLink = util.CreateNativeDockerStreamLink(co.Url, context.Namespace, v.OcImageStreamName)
-		s[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, v.CodebaseBranch.Codebase.Name, v.CodebaseBranch.Name)
 	}
 
 	return nil
@@ -521,7 +522,8 @@ func (c *CDPipelineController) createNonNativeDockerImageLinks(s []*query.Codeba
 
 	for i, v := range s {
 		s[i].ImageLink = util.CreateNonNativeDockerStreamLink(cd.Url, v.OcImageStreamName)
-		s[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, v.CodebaseBranch.Codebase.Name, v.CodebaseBranch.Name)
+		s[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, v.CodebaseBranch.Codebase.Name,
+			util.ProcessBranchVersionSlashToDash(v.CodebaseBranch.Name, v.CodebaseBranch.Release))
 	}
 
 	return nil
