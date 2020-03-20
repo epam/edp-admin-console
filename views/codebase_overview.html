@@ -21,11 +21,11 @@
             <div class="edp-form wide col-12 nosidepadding" id="createAppForm">
                 <h1 class="edp-form-header">
                     {{if eq .Type "application"}}
-                    <a href="/admin/edp/application/overview" class="edp-back-link"></a>
+                        <a href="/admin/edp/application/overview" class="edp-back-link"></a>
                     {{else if eq .Type "autotests"}}
-                    <a href="/admin/edp/autotest/overview" class="edp-back-link"></a>
+                        <a href="/admin/edp/autotest/overview" class="edp-back-link"></a>
                     {{else}}
-                    <a href="/admin/edp/library/overview" class="edp-back-link"></a>
+                        <a href="/admin/edp/library/overview" class="edp-back-link"></a>
                     {{end}}
                     {{.TypeCaption}} "{{.Codebase.Name}}"
                 </h1>
@@ -45,73 +45,73 @@
                         <div id="collapseOne" class="show" aria-labelledby="headingOne">
                             <div class="card-body">
                                 <table class="edp-card-table">
-                                        <tbody>
-                                        <tr >
-                                            <th style="width: 50%">Language</th>
-                                            <td>{{.Codebase.Language}}</td>
+                                    <tbody>
+                                    <tr>
+                                        <th style="width: 50%">Language</th>
+                                        <td>{{.Codebase.Language}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Build Tool</th>
+                                        <td>{{.Codebase.BuildTool}}</td>
+                                    </tr>
+                                    {{if .Codebase.Framework}}
+                                        <tr>
+                                            <th>Framework</th>
+                                            <td>{{.Codebase.Framework}}</td>
+                                        </tr>
+                                    {{end}}
+                                    <tr>
+                                        <th>Strategy</th>
+                                        <td>{{.Codebase.Strategy}}</td>
+                                    </tr>
+                                    {{if .Codebase.TestReportFramework }}
+                                        <tr>
+                                            <th>Test Report Framework</th>
+                                            <td>{{.Codebase.TestReportFramework}}</td>
+                                        </tr>
+                                    {{end}}
+                                    {{if .Codebase.GitUrl }}
+                                        <tr>
+                                            <th>Git Url</th>
+                                            <td>{{.Codebase.GitUrl}}</td>
+                                        </tr>
+                                    {{end}}
+                                    {{if ne (len .Codebase.Description) 0}}
+                                        <tr>
+                                            <th>Description</th>
+                                            <td>{{.Codebase.Description}}</td>
+                                        </tr>
+                                    {{end}}
+                                    {{if and .Codebase.RouteSite .Codebase.RoutePath }}
+                                        <tr>
+                                            <th>Expose Service Site</th>
+                                            <td>{{.Codebase.RouteSite}}</td>
                                         </tr>
                                         <tr>
-                                            <th>Build Tool</th>
-                                            <td>{{.Codebase.BuildTool}}</td>
+                                            <th>Expose Service Path</th>
+                                            <td>{{.Codebase.RoutePath}}</td>
                                         </tr>
-                                        {{if .Codebase.Framework}}
-                                            <tr>
-                                                <th>Framework</th>
-                                                <td>{{.Codebase.Framework}}</td>
-                                            </tr>
-                                        {{end}}
+                                    {{end}}
+                                    {{if and .Codebase.DbKind .Codebase.DbVersion .Codebase.DbCapacity .Codebase.DbStorage }}
                                         <tr>
-                                            <th>Strategy</th>
-                                            <td>{{.Codebase.Strategy}}</td>
+                                            <th>Db Kind</th>
+                                            <td>{{.Codebase.DbKind}}</td>
                                         </tr>
-                                        {{if .Codebase.TestReportFramework }}
-                                            <tr>
-                                                <th>Test Report Framework</th>
-                                                <td>{{.Codebase.TestReportFramework}}</td>
-                                            </tr>
-                                        {{end}}
-                                        {{if .Codebase.GitUrl }}
-                                            <tr>
-                                                <th>Git Url</th>
-                                                <td>{{.Codebase.GitUrl}}</td>
-                                            </tr>
-                                        {{end}}
-                                        {{if ne (len .Codebase.Description) 0}}
-                                            <tr>
-                                                <th>Description</th>
-                                                <td>{{.Codebase.Description}}</td>
-                                            </tr>
-                                        {{end}}
-                                        {{if and .Codebase.RouteSite .Codebase.RoutePath }}
-                                            <tr>
-                                                <th>Expose Service Site</th>
-                                                <td>{{.Codebase.RouteSite}}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Expose Service Path</th>
-                                                <td>{{.Codebase.RoutePath}}</td>
-                                            </tr>
-                                        {{end}}
-                                        {{if and .Codebase.DbKind .Codebase.DbVersion .Codebase.DbCapacity .Codebase.DbStorage }}
-                                            <tr>
-                                                <th>Db Kind</th>
-                                                <td>{{.Codebase.DbKind}}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Db Version</th>
-                                                <td>{{.Codebase.DbVersion}}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Db Capacity</th>
-                                                <td>{{.Codebase.DbCapacity}}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Db Storage</th>
-                                                <td>{{.Codebase.DbStorage}}</td>
-                                            </tr>
-                                        {{end}}
-                                        </tbody>
-                                    </table>
+                                        <tr>
+                                            <th>Db Version</th>
+                                            <td>{{.Codebase.DbVersion}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Db Capacity</th>
+                                            <td>{{.Codebase.DbCapacity}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Db Storage</th>
+                                            <td>{{.Codebase.DbStorage}}</td>
+                                        </tr>
+                                    {{end}}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -125,11 +125,12 @@
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapse-advanced-settings" class="show route" aria-labelledby="head-advanced-settings">
+                        <div id="collapse-advanced-settings" class="show route"
+                             aria-labelledby="head-advanced-settings">
                             <div class="card-body">
                                 <table class="edp-card-table">
                                     <tbody>
-                                    <tr >
+                                    <tr>
                                         <th style="width: 50%">Job Provisioner</th>
                                         <td>{{.Codebase.JobProvisioning}}</td>
                                     </tr>
@@ -150,10 +151,10 @@
                                         <td>{{.Codebase.VersioningType}}</td>
                                     </tr>
                                     {{if .Codebase.StartVersioningFrom}}
-                                    <tr>
-                                        <th>Start Versioning From</th>
-                                        <td>{{.Codebase.StartVersioningFrom}}</td>
-                                    </tr>
+                                        <tr>
+                                            <th>Start Versioning From</th>
+                                            <td>{{.Codebase.StartVersioningFrom}}</td>
+                                        </tr>
                                     {{end}}
                                     </tbody>
                                 </table>
@@ -187,9 +188,9 @@
                                                 <th scope="col">CI</th>
                                             {{end}}
                                             {{if $isVersioningTypeEdp}}
-                                            <th scope="col">Version</th>
-                                            <th scope="col">Build Number</th>
-                                            <th scope="col">Last Successful Build</th>
+                                                <th scope="col">Version</th>
+                                                <th scope="col">Build Number</th>
+                                                <th scope="col">Last Successful Build</th>
                                             {{end}}
                                             <th scope="col"></th>
                                         </tr>
@@ -212,33 +213,33 @@
                                                     </td>
                                                 {{end}}
                                                 {{if $isVersioningTypeEdp}}
-                                                {{if or .Version}}
-                                                    <td>
-                                                        {{.Version}}
-                                                    </td>
-                                                {{else}}
-                                                    <td>
-                                                        —
-                                                    </td>
-                                                {{end}}
-                                                {{if or .Build}}
-                                                    <td>
-                                                        {{.Build}}
-                                                    </td>
-                                                {{else}}
-                                                    <td>
-                                                        —
-                                                    </td>
-                                                {{end}}
-                                                {{if or .LastSuccessBuild}}
-                                                    <td>
-                                                        {{.LastSuccessBuild}}
-                                                    </td>
-                                                {{else}}
-                                                    <td>
-                                                        —
-                                                    </td>
-                                                {{end}}
+                                                    {{if or .Version}}
+                                                        <td>
+                                                            {{.Version}}
+                                                        </td>
+                                                    {{else}}
+                                                        <td>
+                                                            —
+                                                        </td>
+                                                    {{end}}
+                                                    {{if or .Build}}
+                                                        <td>
+                                                            {{.Build}}
+                                                        </td>
+                                                    {{else}}
+                                                        <td>
+                                                            —
+                                                        </td>
+                                                    {{end}}
+                                                    {{if or .LastSuccessBuild}}
+                                                        <td>
+                                                            {{.LastSuccessBuild}}
+                                                        </td>
+                                                    {{else}}
+                                                        <td>
+                                                            —
+                                                        </td>
+                                                    {{end}}
                                                 {{end}}
                                                 <td>
                                                     {{if and (ne "master" .Name) $.HasRights}}
@@ -254,7 +255,9 @@
                                         </tbody>
                                     </table>
                                     <div class="form-group"></div>
-                                    <button type="button" class="modal-release-branch btn btn-primary" aria-controls="">Create</button>
+                                    <button type="button" class="modal-release-branch btn btn-primary" aria-controls="">
+                                        Create
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -276,13 +279,13 @@
                             <div class="card-body">
                                 <table class="action-log-table edp-card-table">
                                     <tbody>
-                                        <tr>
-                                            <th scope="col" style="width: 20%">Date</th>
-                                            <th scope="col" style="width: 25%">User</th>
-                                            <th scope="col" style="width: 22.5%">Action</th>
-                                            <th scope="col" style="width: 10%">Result</th>
-                                            <th scope="col" style="width: 22.5%">Message</th>
-                                        </tr>
+                                    <tr>
+                                        <th scope="col" style="width: 20%">Date</th>
+                                        <th scope="col" style="width: 25%">User</th>
+                                        <th scope="col" style="width: 22.5%">Action</th>
+                                        <th scope="col" style="width: 10%">Result</th>
+                                        <th scope="col" style="width: 22.5%">Message</th>
+                                    </tr>
                                     {{range .Codebase.ActionLog}}
                                         <tr>
                                             <td>{{.LastTimeUpdate.Format "02.01.2006 15:04:05 (UTC-07)" }}</td>
@@ -318,15 +321,15 @@
                     <form id="create-branch-action" action="/admin/edp/codebase/{{.Codebase.Name}}/branch"
                           method="post">
                         {{if .Codebase.StartVersioningFrom}}
-                        <div class="form-group">
-                            <input type="checkbox" value="true" id="releaseBranch"
-                                   name="releaseBranch">
-                            <label class="form-check-label" for="releaseBranch">
-                                Release Branch
-                                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                      title="Select the check box in order to create a release branch."></span>
-                            </label>
-                        </div>
+                            <div class="form-group">
+                                <input type="checkbox" value="true" id="releaseBranch"
+                                       name="releaseBranch">
+                                <label class="form-check-label" for="releaseBranch">
+                                    Release Branch
+                                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                          title="Select the check box in order to create a release branch."></span>
+                                </label>
+                            </div>
                         {{end}}
 
                         <div class="form-group">
@@ -335,11 +338,7 @@
                                       title="Type the branch name that will be created in the Version Control System."></span>
                             </label>
                             <input type="text" class="form-control branch-name" id="branchName" name="name"
-                                   placeholder="Enter Branch Name"
-                                   {{if .Codebase.StartVersioningFrom}}
-                                    value={{ getMasterBranchVersion .Codebase.CodebaseBranch }}
-                                   {{end}}
-                            >
+                                   placeholder="Enter Branch Name">
                             <div class="error-block branch-exists-modal invalid-feedback" style="display: none;"></div>
                             <div class="invalid-feedback branch-name">
                                 The Branch Name field should not be empty and may contain lower-case letters,
@@ -360,36 +359,43 @@
                         </div>
 
                         {{if .Codebase.StartVersioningFrom}}
-                        <div class="form-group">
-                            <label>Branch Version
-                                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                      title="Enter the necessary branch version for the artifact."></span>
-                            </label>
-                            <div class="d-flex">
-                                <input type="text" class="form-control branch-version" id="branch-version" name="version"
-                                       placeholder="Enter Version" value={{ getMasterBranchVersion .Codebase.CodebaseBranch }}>
-                                <input name="versioningPostfix" type="text" class="form-control versioning-postfix"
-                                       id="versioningPostfix" value="SNAPSHOT" readonly="readonly">
+                            <div class="form-group">
+                                <label>Branch Version
+                                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                          title="Enter the necessary branch version for the artifact."></span>
+                                </label>
+                                <div class="d-flex">
+                                    <input type="text" class="form-control branch-version" id="branch-version"
+                                           name="version"
+                                           placeholder="Enter Version"
+                                           value={{ getMasterBranchVersion .Codebase.CodebaseBranch }}>
+                                    <input name="versioningPostfix" type="text" class="form-control versioning-postfix"
+                                           id="versioningPostfix" value="SNAPSHOT" readonly="readonly">
+                                </div>
+                                <div class="invalid-feedback branch-version">
+                                    The branch version field cannot be empty and should be filled out in compliance with
+                                    the semantic versioning rules. The correct example: 1.2.3 or 10.10.10.
+                                </div>
                             </div>
-                            <div class="invalid-feedback branch-version">
-                                The branch version field cannot be empty and should be filled out in compliance with the semantic versioning rules. The correct example: 1.2.3 or 10.10.10.
+                            <div class="form-group master-branch-version hide-element">
+                                <label>Master Branch Version
+                                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                          title="Type the branch version that will be used in a master branch after the release creation."></span>
+                                </label>
+                                <div class="d-flex">
+                                    <input type="text" class="form-control" id="master-branch-version"
+                                           name="masterVersion"
+                                           placeholder="Enter Master Branch Version"
+                                           value={{ incrementVersion (getMasterBranchVersion .Codebase.CodebaseBranch) }}>
+                                    <input name="snapshotStaticField" type="text"
+                                           class="snapshot-static-field form-control pull-right"
+                                           id="snapshotStaticField" value="SNAPSHOT" readonly="readonly">
+                                </div>
+                                <div class="invalid-feedback master-branch-version">
+                                    The branch version field cannot be empty and should be filled out in compliance with
+                                    the semantic versioning rules. The correct example: 1.2.3 or 10.10.10.
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group master-branch-version hide-element">
-                            <label>Master Branch Version
-                                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                      title="Type the branch version that will be used in a master branch after the release creation."></span>
-                            </label>
-                            <div class="d-flex">
-                                <input type="text" class="form-control" id="master-branch-version" name="masterVersion"
-                                    placeholder="Enter Master Branch Version" value={{ incrementVersion (getMasterBranchVersion .Codebase.CodebaseBranch) }}>
-                                <input name="snapshotStaticField" type="text" class="snapshot-static-field form-control pull-right"
-                                       id="snapshotStaticField" value="SNAPSHOT" readonly="readonly">
-                            </div>
-                            <div class="invalid-feedback master-branch-version">
-                                The branch version field cannot be empty and should be filled out in compliance with the semantic versioning rules. The correct example: 1.2.3 or 10.10.10.
-                            </div>
-                        </div>
                         {{end}}
                         {{ .xsrfdata }}
                     </form>

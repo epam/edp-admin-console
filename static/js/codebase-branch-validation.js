@@ -70,7 +70,7 @@ $(function () {
     $('#create-release-branch').click(function () {
         $('.branch-exists-modal').hide();
         let isBranchValid = true;
-        if (!$('#releaseBranch').is(':checked')) {
+        if ($('#releaseBranch').not(':checked')) {
             isBranchValid = handleBranchNameValidation();
         }
         let isCommitValid = handleCommitHashValidation();
@@ -96,12 +96,6 @@ $(function () {
             if (isBranchValid && isCommitValid && isVersionValid) {
                 $('#create-branch-action').submit();
             }
-        }
-    });
-
-    $('#branchName').focusout(function () {
-        if (!$('#releaseBranch').is(':checked')) {
-            handleBranchNameValidation();
         }
     });
 
@@ -134,6 +128,13 @@ $(function () {
         closeConfirmation();
     });
 
+    $('#branchName').on('input', function () {
+        if ($('#releaseBranch').not(":checked")) {
+            $('#versioningPostfix').val("SNAPSHOT");
+            $('#versioningPostfix').val($('#versioningPostfix').val() + processBranchName($(this).val()));
+        }
+    });
+
     $('#branch-version').on('input', function () {
         if ($('#releaseBranch').is(":checked")) {
             $('#branchName').val("release/" + trimMinorVersionComponent($(this).val()));
@@ -150,6 +151,8 @@ $(function () {
             $branchVersionInputEl = $createNewBranchModalEl.find('.branch-version');
 
         if ($(this).is(":checked")) {
+            $('#branchName').removeClass('non-valid-input');
+            $('.invalid-feedback.branch-name').hide();
             $branchNameInputEl.attr('readonly', true).val("release/" + trimMinorVersionComponent($branchVersionInputEl.val()));
             $versioningPostfixEl.val("RC");
             $masterBranchVersionInputEl.attr('disabled', false).removeClass('hide-element');

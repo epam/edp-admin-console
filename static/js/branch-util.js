@@ -22,6 +22,14 @@ function isBranchVersionValid(branchVersion) {
 function checkBranchVersion(branchVersion) {
     return /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)?$/i.test(branchVersion)
 }
+
+function processBranchName(name) {
+    if (!name.trim()) {
+        return `${name}`.toUpperCase()
+    }
+    return `-${name}`.toUpperCase()
+}
+
 function trimMinorVersionComponent(version) {
     let components = version.split('.');
 
