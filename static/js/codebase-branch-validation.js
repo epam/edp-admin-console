@@ -70,7 +70,7 @@ $(function () {
     $('#create-release-branch').click(function () {
         $('.branch-exists-modal').hide();
         let isBranchValid = true;
-        if ($('#releaseBranch').not(':checked')) {
+        if ($('#releaseBranch').is(':not(:checked)')) {
             isBranchValid = handleBranchNameValidation();
         }
         let isCommitValid = handleCommitHashValidation();
@@ -129,7 +129,7 @@ $(function () {
     });
 
     $('#branchName').on('input', function () {
-        if ($('#releaseBranch').not(":checked")) {
+        if ($('#releaseBranch').is(':not(:checked)')) {
             $('#versioningPostfix').val("SNAPSHOT");
             $('#versioningPostfix').val($('#versioningPostfix').val() + processBranchName($(this).val()));
         }
