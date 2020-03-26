@@ -124,20 +124,26 @@ func (c CodebaseController) createBranchLinks(codebase query.Codebase, tenant st
 }
 
 func (c CodebaseController) createLinksForGitProvider(codebase query.Codebase, tenant string) error {
-	w := beego.AppConfig.String("dnsWildcard")
 	g, err := c.GitServerService.GetGitServer(*codebase.GitServer)
 	if err != nil {
 		return err
 	}
-
 	if g == nil {
 		return errors.New(fmt.Sprintf("unexpected behaviour. couldn't find %v GitServer in DB", *codebase.GitServer))
 	}
 
+	jc, err := c.EDPComponent.GetEDPComponent(consts.Jenkins)
+	if err != nil {
+		return err
+	}
+	if jc == nil {
+		return fmt.Errorf("jenkin link can't be created for %v codebase because of edp-component %v is absent in DB",
+			codebase.Name, consts.Jenkins)
+	}
+
 	for i, b := range codebase.CodebaseBranch {
 		codebase.CodebaseBranch[i].VCSLink = util.CreateGitLink(g.Hostname, *codebase.GitProjectPath, b.Name)
-		j := fmt.Sprintf("https://%s-%s-edp-cicd.%s", consts.Jenkins, tenant, w)
-		codebase.CodebaseBranch[i].CICDLink = util.CreateCICDApplicationLink(j, codebase.Name,
+		codebase.CodebaseBranch[i].CICDLink = util.CreateCICDApplicationLink(jc.Url, codebase.Name,
 			util.ProcessBranchVersionSlashToDash(b.Name, b.Release))
 	}
 
