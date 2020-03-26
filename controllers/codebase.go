@@ -144,7 +144,7 @@ func (c CodebaseController) createLinksForGitProvider(codebase query.Codebase, t
 	for i, b := range codebase.CodebaseBranch {
 		codebase.CodebaseBranch[i].VCSLink = util.CreateGitLink(g.Hostname, *codebase.GitProjectPath, b.Name)
 		codebase.CodebaseBranch[i].CICDLink = util.CreateCICDApplicationLink(jc.Url, codebase.Name,
-			util.ProcessBranchVersionSlashToDash(b.Name, b.Release))
+			util.ProcessNameToKubernetesConvention(b.Name))
 	}
 
 	return nil
@@ -174,7 +174,7 @@ func (c CodebaseController) createLinksForGerritProvider(codebase query.Codebase
 	for i, b := range codebase.CodebaseBranch {
 		codebase.CodebaseBranch[i].VCSLink = util.CreateGerritLink(cg.Url, codebase.Name, b.Name)
 		codebase.CodebaseBranch[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, codebase.Name,
-			util.ProcessBranchVersionSlashToDash(b.Name, b.Release))
+			util.ProcessNameToKubernetesConvention(b.Name))
 	}
 
 	return nil
