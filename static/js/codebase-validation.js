@@ -497,7 +497,7 @@ $(function () {
 
         if (needRoute) {
             let $serviceNameInputEl = $('#routeSite'),
-                isServiceNameValid = isFieldValid($serviceNameInputEl, REGEX.SERVICE_NAME);
+                isServiceNameValid = isCodebaseSiteFieldValid($serviceNameInputEl, REGEX.SERVICE_NAME);
 
             if (!isServiceNameValid) {
                 $('.route-site.invalid-feedback').show();
