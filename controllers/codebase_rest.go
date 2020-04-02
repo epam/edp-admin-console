@@ -173,7 +173,7 @@ func validRequestData(codebase command.CreateCodebase) *ErrMsg {
 			_, err := valid.Valid(codebase.Route)
 			resErr = err
 		} else {
-			valid.Match(codebase.Route.Site, regexp.MustCompile("^[a-z][a-z0-9-]*[a-z0-9]$"), "Route.Site.Match")
+			valid.Match(codebase.Route.Site, regexp.MustCompile("^$|^[a-z][a-z0-9-]*[a-z0-9]$"), "Route.Site.Match")
 		}
 	}
 
