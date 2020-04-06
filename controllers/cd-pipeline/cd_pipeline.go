@@ -38,6 +38,7 @@ import (
 	edppipelinesv1alpha1 "github.com/epmd-edp/cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	"html/template"
 	"net/http"
+	"regexp"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sort"
 )
@@ -494,10 +495,18 @@ func (c *CDPipelineController) createNativeDockerImageLinks(s []*query.CodebaseD
 	for i, v := range s {
 		s[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, v.CodebaseBranch.Codebase.Name,
 			util.ProcessNameToKubernetesConvention(v.CodebaseBranch.Name))
-		s[i].ImageLink = util.CreateNativeDockerStreamLink(co.Url, context.Namespace, v.OcImageStreamName)
+		s[i].ImageLink = util.CreateNativeDockerStreamLink(co.Url, context.Namespace,
+			getImageStreamName(v.CodebaseBranch.Release, v.OcImageStreamName))
 	}
 
 	return nil
+}
+
+func getImageStreamName(release bool, imageStream string) string {
+	if release {
+		return regexp.MustCompile(`\/([0-9]\d*)\.([0-9]\d*)`).ReplaceAllString(imageStream, "-$1-$2")
+	}
+	return imageStream
 }
 
 func (c *CDPipelineController) createNonNativeDockerImageLinks(s []*query.CodebaseDockerStream) error {
@@ -521,7 +530,8 @@ func (c *CDPipelineController) createNonNativeDockerImageLinks(s []*query.Codeba
 	}
 
 	for i, v := range s {
-		s[i].ImageLink = util.CreateNonNativeDockerStreamLink(cd.Url, v.OcImageStreamName)
+		s[i].ImageLink = util.CreateNonNativeDockerStreamLink(cd.Url,
+			getImageStreamName(v.CodebaseBranch.Release, v.OcImageStreamName))
 		s[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, v.CodebaseBranch.Codebase.Name,
 			util.ProcessNameToKubernetesConvention(v.CodebaseBranch.Name))
 	}
