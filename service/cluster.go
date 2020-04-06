@@ -18,9 +18,12 @@ package service
 
 import (
 	"edp-admin-console/k8s"
+	"edp-admin-console/service/logger"
+	"go.uber.org/zap"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"log"
 )
+
+var log = logger.GetLogger()
 
 type ClusterService struct {
 	Clients k8s.ClientSet
@@ -32,7 +35,7 @@ func (this ClusterService) GetAllStorageClasses() ([]string, error) {
 
 	classList, err := storageClient.StorageClasses().List(metav1.ListOptions{})
 	if err != nil {
-		log.Printf("An error has occurred while getting storage classes: %s", err)
+		log.Error("An error has occurred while getting storage classes", zap.Error(err))
 		return nil, err
 	}
 

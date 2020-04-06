@@ -3,7 +3,7 @@ package service
 import (
 	"edp-admin-console/models/query"
 	"edp-admin-console/repository"
-	"log"
+	"go.uber.org/zap"
 )
 
 type ThirdPartyService struct {
@@ -11,13 +11,13 @@ type ThirdPartyService struct {
 }
 
 func (s ThirdPartyService) GetAllServices() ([]query.ThirdPartyService, error) {
-	log.Println("Start execution of GetAllServices method...")
+	log.Debug("Start execution of GetAllServices method...")
 	services, err := s.IServiceCatalogRepository.GetAllServices()
 	if err != nil {
-		log.Printf("An error has occurred while getting services from database: %s", err)
+		log.Error("An error has occurred while getting services from database", zap.Error(err))
 		return nil, err
 	}
-	log.Printf("Fetched services. Count: %v. Rows: %v", len(services), services)
-
+	log.Info("Fetched services",
+		zap.Int("count", len(services)), zap.Any("services", services))
 	return services, nil
 }

@@ -20,39 +20,39 @@ import (
 	ctx "context"
 	appCtx "edp-admin-console/context"
 	bgCtx "github.com/astaxie/beego/context"
-	"log"
+	"go.uber.org/zap"
 	"net/http"
 	"regexp"
 	"strings"
 )
 
 func AuthRestFilter(context *bgCtx.Context) {
-	log.Println("Start auth rest filter..")
+	log.Debug("Start auth rest filter..")
 	token := context.Input.Header("Authorization")
 	if token == "" {
-		log.Println("There are no token in the session")
+		log.Error("There are no token in the session")
 		http.Error(context.ResponseWriter, "The request header doesn't contain token.", http.StatusBadRequest)
 		return
 	}
 
 	token, err := tryToRemoveBearerPrefix(token)
 	if err != nil {
-		log.Println("An error has occurred while checking regexp.")
+		log.Error("An error has occurred while checking regexp.")
 		http.Error(context.ResponseWriter, "Internal Error", http.StatusInternalServerError)
 		return
 	}
 
 	idToken, err := appCtx.GetAuthConfig().Verifier.Verify(ctx.Background(), token)
 	if err != nil {
-		log.Printf("Token presented in the session is not valid")
+		log.Error("Token presented in the session is not valid")
 		http.Error(context.ResponseWriter, "Token presented in the session is not valid", http.StatusUnauthorized)
 		return
 	}
 
 	realmRoles := getRealmRoles(context, idToken)
-	log.Printf("Roles %s has been retrieved from the token", realmRoles)
+	log.Info("Roles have been retrieved from the token", zap.Strings("roles", realmRoles))
 	usr := getUserInfoFromToken(context, idToken, "preferred_username")
-	log.Printf("Username {%s} has been fetched from token", usr)
+	log.Info("Username has been fetched from token", zap.String("username", usr))
 	context.Output.Session("realm_roles", realmRoles)
 	context.Output.Session("username", usr)
 }

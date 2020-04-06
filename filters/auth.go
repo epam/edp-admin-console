@@ -19,57 +19,60 @@ package filters
 import (
 	ctx "context"
 	appCtx "edp-admin-console/context"
+	"edp-admin-console/service/logger"
 	"encoding/json"
 	bgCtx "github.com/astaxie/beego/context"
 	"github.com/coreos/go-oidc"
 	"github.com/satori/go.uuid"
+	"go.uber.org/zap"
 	"golang.org/x/oauth2"
-	"log"
 	"net/http"
 	"strings"
 )
 
+var log = logger.GetLogger()
+
 func AuthFilter(context *bgCtx.Context) {
-	log.Println("Start auth filter..")
+	log.Debug("Start auth filter..")
 	tsRaw := context.Input.Session("token_source")
 	if tsRaw == nil {
-		log.Println("There are no token source in the session")
+		log.Debug("There are no token source in the session")
 		startAuth(context)
 		return
 	}
 	ts := tsRaw.(oauth2.TokenSource)
 	token, err := ts.Token()
 	if err != nil {
-		log.Printf("Token source presented in the session is not valid")
+		log.Debug("Token source presented in the session is not valid")
 		startAuth(context)
 		return
 	}
 	idToken, err := appCtx.GetAuthConfig().Verifier.Verify(ctx.Background(), token.AccessToken)
 	if err != nil {
-		log.Printf("Token presented in the session is not valid")
+		log.Debug("Token presented in the session is not valid")
 		startAuth(context)
 		return
 	}
 	realmRoles := getRealmRoles(context, idToken)
-	log.Printf("Roles %s has been retrieved from the token", realmRoles)
+	log.Info("Roles have been retrieved from the token", zap.Strings("roles", realmRoles))
 	context.Output.Session("realm_roles", realmRoles)
 	username := getUserInfoFromToken(context, idToken, "name")
-	log.Printf("Username {%s} has been fetched from token", username)
+	log.Info("Username has been fetched from token", zap.String("username", username))
 	context.Output.Session("username", username)
 }
 
 func getRealmRoles(context *bgCtx.Context, token *oidc.IDToken) []string {
-	log.Printf("Start to check roles ...")
+	log.Debug("Start to check roles ...")
 	var claim map[string]*json.RawMessage
 	err := token.Claims(&claim)
 	if err != nil {
-		log.Printf("Error has been occurred during the parsing token %+v", token)
+		log.Error("Error has been occurred during the parsing token", zap.Any("token", token))
 		context.Abort(200, "500")
 	}
 	var realmAccess map[string]*[]string
 	err = json.Unmarshal(*claim["realm_access"], &realmAccess)
 	if err != nil {
-		log.Printf("Error has been occurred during the parsing token %+v", token)
+		log.Error("Error has been occurred during the parsing token", zap.Any("token", token))
 		context.Abort(200, "500")
 	}
 
@@ -79,7 +82,8 @@ func getRealmRoles(context *bgCtx.Context, token *oidc.IDToken) []string {
 func startAuth(context *bgCtx.Context) {
 	authConfig := appCtx.GetAuthConfig()
 	state := uuid.NewV4().String()
-	log.Printf("State %s has been generated, saved in the session and added in the auth request", state)
+	log.Info("State has been generated, saved in the session and added in the auth request",
+		zap.String("state", state))
 	context.Output.Session(authConfig.StateAuthKey, state)
 	if context.Request.Method == "GET" {
 		context.Output.Session("request_path", context.Request.URL.Path)
@@ -91,7 +95,7 @@ func getUserInfoFromToken(context *bgCtx.Context, token *oidc.IDToken, userKey s
 	var claim map[string]*json.RawMessage
 	err := token.Claims(&claim)
 	if err != nil {
-		log.Printf("Error has been occurred during the parsing token %+v", token)
+		log.Error("Error has been occurred during the parsing token", zap.Any("token", token))
 		context.Abort(200, "500")
 	}
 	return strings.Replace(string(*claim[userKey]), "\"", "", -1)

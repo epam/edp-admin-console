@@ -5,19 +5,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
-	"log"
+	"go.uber.org/zap"
 	"strings"
 )
 
 func GetValuesFromConfig(name string) []string {
 	values := beego.AppConfig.String(name)
 	if values == "" {
-		log.Printf("'%v' env variable is empty.", name)
+		log.Debug("variable is empty.", zap.String("name", name))
 		return nil
 	}
 
 	s := strings.Split(values, ",")
-	log.Printf("Fetched data from %v env variable: %v", name, s)
+	log.Info("Fetched data variable",
+		zap.String("name", name), zap.Strings("values", s))
 	return s
 }
 

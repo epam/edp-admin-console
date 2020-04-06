@@ -17,10 +17,12 @@
 package util
 
 import (
-	"log"
+	"edp-admin-console/service/logger"
 	"os"
 	"testing"
 )
+
+var log = logger.GetLogger()
 
 func TestCheckExistingPublicRepository(t *testing.T) {
 	gitUrl := "https://github.com/epmd-edp/java-maven-springboot.git"

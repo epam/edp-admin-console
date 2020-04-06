@@ -17,9 +17,11 @@
 package k8s
 
 import (
+	"edp-admin-console/service/logger"
 	edppipelinesv1alpha1 "github.com/epmd-edp/cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	edpv1alpha1 "github.com/epmd-edp/codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	appsV1Client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
+	"go.uber.org/zap"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -29,9 +31,9 @@ import (
 	storageV1Client "k8s.io/client-go/kubernetes/typed/storage/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"log"
 )
 
+var log = logger.GetLogger()
 var k8sConfig clientcmd.ClientConfig
 var SchemeGroupVersion = schema.GroupVersion{Group: "v2.edp.epam.com", Version: "v1alpha1"}
 
@@ -53,31 +55,31 @@ func init() {
 func CreateOpenShiftClients() ClientSet {
 	coreClient, err := getCoreClient()
 	if err != nil {
-		log.Printf("An error has occurred while getting core client: %s", err)
+		log.Error("An error has occurred while getting core client", zap.Error(err))
 		panic(err)
 	}
 
 	crClient, err := getApplicationClient()
 	if err != nil {
-		log.Printf("An error has occurred while getting custom resource client: %s", err)
+		log.Error("An error has occurred while getting custom resource client", zap.Error(err))
 		panic(err)
 	}
 
 	storageClient, err := getStorageClient()
 	if err != nil {
-		log.Printf("An error has occurred while getting custom resource client: %s", err)
+		log.Error("An error has occurred while getting custom resource client", zap.Error(err))
 		panic(err)
 	}
 
 	openshiftAppClient, err := getOpenshiftApplicationClient()
 	if err != nil {
-		log.Printf("An error has occurred while getting oenshift application resource client: %s", err)
+		log.Error("An error has occurred while getting oenshift application resource client", zap.Error(err))
 		panic(err)
 	}
 
 	extClient, err := getExtensionClient()
 	if err != nil {
-		log.Printf("An error has occurred while getting k8s extension client: %s", err)
+		log.Error("An error has occurred while getting k8s extension client", zap.Error(err))
 		panic(err)
 	}
 

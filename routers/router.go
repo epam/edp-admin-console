@@ -29,10 +29,13 @@ import (
 	"edp-admin-console/service/cd_pipeline"
 	cbs "edp-admin-console/service/codebasebranch"
 	edpComponentService "edp-admin-console/service/edp-component"
+	"edp-admin-console/service/logger"
 	"edp-admin-console/util"
 	"github.com/astaxie/beego"
-	"log"
+	"go.uber.org/zap"
 )
+
+var log = logger.GetLogger()
 
 const (
 	integrationStrategies = "integrationStrategies"
@@ -44,10 +47,12 @@ const (
 )
 
 func init() {
-	log.Printf("Start application in %s mode with %s EDP version...", beego.AppConfig.String("runmode"), context.EDPVersion)
+	log.Info("Start application...",
+		zap.String("mode", beego.AppConfig.String("runmode")),
+		zap.String("edp version", context.EDPVersion))
 	authEnabled, err := beego.AppConfig.Bool("keycloakAuthEnabled")
 	if err != nil {
-		log.Printf("Cannot read property keycloakAuthEnabled: %v. Set default: true", err)
+		log.Error("Cannot read property keycloakAuthEnabled. Set default: true", zap.Error(err))
 		authEnabled = true
 	}
 
@@ -64,7 +69,7 @@ func init() {
 
 	dbEnable, err := beego.AppConfig.Bool("dbEnabled")
 	if err != nil {
-		log.Printf("Cannot read property dbEnabled: %v. Set default: true", err)
+		log.Error("Cannot read property dbEnabled. Set default: true", zap.Error(err))
 		dbEnable = true
 	}
 
@@ -119,22 +124,22 @@ func init() {
 
 	integrationStrategies := util.GetValuesFromConfig(integrationStrategies)
 	if integrationStrategies == nil {
-		log.Fatalf("integrationStrategies config variable is empty.")
+		log.Fatal("integrationStrategies config variable is empty.")
 	}
 
 	buildTools := util.GetValuesFromConfig(buildTools)
 	if buildTools == nil {
-		log.Fatalf("buildTools config variable is empty.")
+		log.Fatal("buildTools config variable is empty.")
 	}
 
 	vt := util.GetValuesFromConfig(versioningTypes)
 	if vt == nil {
-		log.Fatalf("versioningTypes config variable is empty.")
+		log.Fatal("versioningTypes config variable is empty.")
 	}
 
 	ds := util.GetValuesFromConfig(deploymentScript)
 	if ds == nil {
-		log.Fatalf("deploymentScript config variable is empty.")
+		log.Fatal("deploymentScript config variable is empty.")
 	}
 
 	is := make([]string, len(integrationStrategies))
