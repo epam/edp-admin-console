@@ -28,7 +28,8 @@ There are two available strategies: clone and import. The Clone strategy flow is
     ![addtest2](../readme-resource/addtest2.png "addtest2")
 
     a. Import - this strategy allows configuring a replication from the Git server.
-
+    >_**NOTE**: In order to use the import strategy, make sure to adjust it by following the [Adjust Import Strategy](../documentation/import-strategy.md) page._
+    
     b. In the **Git Server** field, select the necessary Git server from the drop-down list.
 
     c. In the Relative path field, indicate the respective path to the repository, e.g. **/epmd-edp/examples/basic/edp-auto-tests-simple-example**.

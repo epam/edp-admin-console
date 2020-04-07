@@ -17,7 +17,7 @@ The added application will be listed in the Applications list allowing you to do
 
 ![inspect-app](../readme-resource/inspectapp.png "inspect-app")
 
-1. Create another application by clicking the Create button and performing the same steps as described [here](documentation/add_applications.md);
+1. Create another application by clicking the Create button and performing the same steps as described [here](../documentation/add_applications.md);
 2. Remove application with the corresponding database and Jenkins pipelines:
     - Click the delete icon next to the application name;
     - Type the required application name;
@@ -78,4 +78,4 @@ _**NOTE**: The default **master** branch cannot be removed._
 
 ### Related Articles
 
-* [Add Applications](documentation/add_applications.md)
+* [Add Applications](../documentation/add_applications.md)

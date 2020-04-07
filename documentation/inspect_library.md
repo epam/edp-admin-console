@@ -17,7 +17,7 @@ The added library will be listed in the Libraries list allowing you to do the fo
 
 ![inspect-lib](../readme-resource/inspectlibrary.png "inspect-lib")
 
-1. Create another library by clicking the Create button and performing the same steps as described [here](documentation/add_libraries.md);
+1. Create another library by clicking the Create button and performing the same steps as described [here](../documentation/add_libraries.md);
 2. Remove library with the corresponding database and Jenkins pipelines:
     - Click the delete icon next to the library name;
     - Type the required library name;
@@ -78,4 +78,4 @@ _**NOTE**: The default **master** branch cannot be removed._
 
 ### Related Articles
 
-* [Add Libraries](documentation/libraries.md)
+* [Add Libraries](../documentation/add_libraries.md)

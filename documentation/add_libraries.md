@@ -20,10 +20,11 @@ _**NOTE**: The Version Control System Info menu is available in case this option
 1. In the **Codebase Integration Strategy** field, select the necessary option that is the configuration strategy for the replication with Gerrit:
     - Create – creates a project on the pattern in accordance with a code language, a build tool, and a framework.
     - Clone – clones the indicated repository into EPAM Delivery Platform.
+    >_**NOTE**: While cloning the existing repository, you have to fill in the additional fields as well._
+    
     - Import - allows configuring a replication from the Git server. While importing the existing repository, you have to select the Git server and define the respective path to the repository.
-
-    _**NOTE**: While cloning the existing repository, you have to fill in the additional fields as well._
-
+    > _**NOTE**: In order to use the import strategy, make sure to adjust it by following the [Adjust Import Strategy](../documentation/import-strategy.md) page._ 
+    
 2. In the **Git Repository URL** field, specify the link to the repository that is to be cloned.
 3. Select the **Codebase Authentication** check box and fill in the requested fields:
     - Repository Login – enter your login data.

@@ -17,7 +17,7 @@ The added autotest will be listed in the Autotests list allowing you to do the f
 
 ![inspect-autotest](../readme-resource/inspectautotest.png "inspect-autotest")
 
-1. Add another autotest by clicking the Create button and performing the same steps as described [here](documentation/add_autotests.md);
+1. Add another autotest by clicking the Create button and performing the same steps as described [here](../documentation/add_autotests.md);
 2. Remove autotest with the corresponding database and Jenkins pipelines:
     - Click the delete icon next to the autotest name;
     - Type the required autotest name;
@@ -78,4 +78,4 @@ _**NOTE**: The default **master** branch cannot be removed._
 
 ### Related Articles
 
-* [Add Autotests](documentation/add_autotests.md)
+* [Add Autotests](../documentation/add_autotests.md)
