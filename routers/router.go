@@ -26,8 +26,10 @@ import (
 	"edp-admin-console/service"
 	edpComponentService "edp-admin-console/service/edp-component"
 	"edp-admin-console/util"
-	"github.com/astaxie/beego"
+	"fmt"
 	"log"
+
+	"github.com/astaxie/beego"
 )
 
 const (
@@ -48,13 +50,13 @@ func init() {
 
 	if authEnabled {
 		context.InitAuth()
-		beego.Router("/auth/callback", &controllers.AuthController{}, "get:Callback")
-		beego.InsertFilter("/admin/*", beego.BeforeRouter, filters.AuthFilter)
-		beego.InsertFilter("/api/v1/edp/*", beego.BeforeRouter, filters.AuthRestFilter)
-		beego.InsertFilter("/admin/edp/*", beego.BeforeRouter, filters.RoleAccessControlFilter)
-		beego.InsertFilter("/api/v1/edp/*", beego.BeforeRouter, filters.RoleAccessControlRestFilter)
+		beego.Router(fmt.Sprintf("%s/auth/callback", context.BasePath), &controllers.AuthController{}, "get:Callback")
+		beego.InsertFilter(fmt.Sprintf("%s/admin/*", context.BasePath), beego.BeforeRouter, filters.AuthFilter)
+		beego.InsertFilter(fmt.Sprintf("%s/api/v1/edp/*", context.BasePath), beego.BeforeRouter, filters.AuthRestFilter)
+		beego.InsertFilter(fmt.Sprintf("%s/admin/edp/*", context.BasePath), beego.BeforeRouter, filters.RoleAccessControlFilter)
+		beego.InsertFilter(fmt.Sprintf("%s/api/v1/edp/*", context.BasePath), beego.BeforeRouter, filters.RoleAccessControlRestFilter)
 	} else {
-		beego.InsertFilter("/*", beego.BeforeRouter, filters.StubAuthFilter)
+		beego.InsertFilter(fmt.Sprintf("%s/*", context.BasePath), beego.BeforeRouter, filters.StubAuthFilter)
 	}
 
 	dbEnable, err := beego.AppConfig.Bool("dbEnabled")
@@ -99,7 +101,8 @@ func init() {
 	ps := service.JobProvisioning{IJobProvisioningRepository: pr}
 
 	beego.ErrorController(&controllers.ErrorController{})
-	beego.Router("/", &controllers.MainController{EDPTenantService: edpService}, "get:Index")
+	beego.Router(fmt.Sprintf("%s/", context.BasePath), &controllers.MainController{EDPTenantService: edpService}, "get:Index")
+	beego.SetStaticPath(fmt.Sprintf("%s/static", context.BasePath), "static")
 
 	integrationStrategies := util.GetValuesFromConfig(integrationStrategies)
 	if integrationStrategies == nil {
@@ -182,7 +185,7 @@ func init() {
 		EDPComponent:      ecs,
 	}
 
-	adminEdpNamespace := beego.NewNamespace("/admin/edp",
+	adminEdpNamespace := beego.NewNamespace(fmt.Sprintf("%s/admin/edp", context.BasePath),
 		beego.NSRouter("/overview", &ec, "get:GetEDPComponents"),
 		beego.NSRouter("/application/overview", &appc, "get:GetApplicationsOverviewPage"),
 		beego.NSRouter("/application/create", &appc, "get:GetCreateApplicationPage"),
@@ -208,7 +211,7 @@ func init() {
 	)
 	beego.AddNamespace(adminEdpNamespace)
 
-	apiV1EdpNamespace := beego.NewNamespace("/api/v1/edp",
+	apiV1EdpNamespace := beego.NewNamespace(fmt.Sprintf("%s/api/v1/edp", context.BasePath),
 		beego.NSRouter("/codebase", &controllers.CodebaseRestController{CodebaseService: codebaseService}, "post:CreateCodebase"),
 		beego.NSRouter("/codebase", &controllers.CodebaseRestController{CodebaseService: codebaseService}, "get:GetCodebases"),
 		beego.NSRouter("/codebase/:codebaseName", &controllers.CodebaseRestController{CodebaseService: codebaseService}, "get:GetCodebase"),
@@ -220,7 +223,7 @@ func init() {
 	)
 	beego.AddNamespace(apiV1EdpNamespace)
 
-	apiV1Namespace := beego.NewNamespace("/api/v1",
+	apiV1Namespace := beego.NewNamespace(fmt.Sprintf("%s/api/v1", context.BasePath),
 		beego.NSRouter("/storage-class", &controllers.OpenshiftRestController{ClusterService: clusterService}, "get:GetAllStorageClasses"),
 		beego.NSRouter("/repository/available", &controllers.RepositoryRestController{}, "post:IsGitRepoAvailable"),
 	)
