@@ -29,6 +29,7 @@ type AutotestsController struct {
 
 	IntegrationStrategies []string
 	BuildTools            []string
+	TestReportTools       []string
 	DeploymentScript      []string
 }
 
@@ -234,6 +235,7 @@ func (c *AutotestsController) GetCreateAutotestsPage() {
 	c.Data["CodeBaseIntegrationStrategy"] = true
 	c.Data["JenkinsSlaves"] = s
 	c.Data["BuildTools"] = c.BuildTools
+	c.Data["TestReportTools"] = c.TestReportTools
 	c.Data["JobProvisioners"] = p
 	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.Data["BasePath"] = context.BasePath
