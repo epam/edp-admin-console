@@ -473,27 +473,30 @@ $(function () {
                     }
                 }
 
-                _sendPostRequest.bind(this)(false, '/api/v1/repository/available', creds, function (isAvailable) {
-                    if (isRepoPrivate) {
-                        if (isAvailable) {
-                            isValid = true;
+                _sendPostRequest.bind(this)(false, '/api/v1/repository/available', creds, $('input[name="_xsrf"]').val(),
+                    function (isAvailable) {
+                        if (isRepoPrivate) {
+                            if (isAvailable) {
+                                isValid = true;
+                            } else {
+                                $('.git-creds').show();
+                                $repoUrl.addClass('is-invalid');
+                                $repoLogin.addClass('is-invalid');
+                                $repoPassword.addClass('is-invalid');
+                                isValid = false;
+                            }
                         } else {
-                            $('.git-creds').show();
-                            $repoUrl.addClass('is-invalid');
-                            $repoLogin.addClass('is-invalid');
-                            $repoPassword.addClass('is-invalid');
-                            isValid = false;
+                            if (isAvailable) {
+                                isValid = true;
+                            } else {
+                                $gitRepoMsg.show();
+                                $repoUrl.addClass('is-invalid');
+                                isValid = false;
+                            }
                         }
-                    } else {
-                        if (isAvailable) {
-                            isValid = true;
-                        } else {
-                            $gitRepoMsg.show();
-                            $repoUrl.addClass('is-invalid');
-                            isValid = false;
-                        }
-                    }
-                });
+                    }, function () {
+                        console.log('an error has occurred while checking repository accessibility')
+                    });
 
             } else {
                 isValid = false;

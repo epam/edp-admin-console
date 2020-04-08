@@ -13,13 +13,16 @@ function getUrlParameter(sParam) {
     }
 }
 
-function _sendPostRequest(async, url, data, successCallback, failCallback) {
+function _sendPostRequest(async, url, data, token, successCallback, failCallback) {
     $.ajax({
         url: url,
         contentType: "application/json",
         type: "POST",
         data: JSON.stringify(data),
         async: async,
+        headers: {
+            'X-Csrftoken': token
+        },
         success: function (resp) {
             successCallback(resp);
         },
