@@ -42,7 +42,7 @@ func (s EDPComponentService) GetEDPComponents() ([]*query.EDPComponent, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "an error has occurred while fetching EDP Components from DB")
 	}
-	log.Info("edp components have been fetched", zap.Any("length", c))
+	log.Info("edp components have been fetched", zap.Any("length", len(c)))
 
 	for i, v := range c {
 		modifyPlatformLinks(v.Url, v.Type, c[i])
