@@ -63,7 +63,7 @@ func InitAuth() {
 	oauth2Config := oauth2.Config{
 		ClientID:     parameters.ClientId,
 		ClientSecret: parameters.ClientSecret,
-		RedirectURL:  parameters.Host + BasePath + parameters.CallBackEndpoint,
+		RedirectURL:  parameters.Host + parameters.CallBackEndpoint,
 		Endpoint:     provider.Endpoint(),
 	}
 
