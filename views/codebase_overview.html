@@ -64,6 +64,12 @@
                                         <th>Strategy</th>
                                         <td>{{.Codebase.Strategy}}</td>
                                     </tr>
+                                    {{if .Codebase.GitProjectPath }}
+                                    <tr>
+                                        <th>Relative path</th>
+                                        <td>{{.Codebase.GitProjectPath}}</td>
+                                    </tr>
+                                    {{end}}
                                     {{if .Codebase.TestReportFramework }}
                                         <tr>
                                             <th>Test Report Framework</th>
