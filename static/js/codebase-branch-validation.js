@@ -73,7 +73,7 @@ $(function () {
     $('#create-release-branch').click(function () {
         $('.branch-exists-modal').hide();
         let isBranchValid = true;
-        if ($('#releaseBranch').is(':not(:checked)')) {
+        if (!$('#releaseBranch').length || $('#releaseBranch').is(':not(:checked)')) {
             isBranchValid = handleBranchNameValidation();
         }
         let isCommitValid = handleCommitHashValidation();
