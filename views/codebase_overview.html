@@ -205,7 +205,7 @@
                                         {{range .Codebase.CodebaseBranch}}
                                             <tr data-branch-name="{{.Name}}" data-branch-status="{{.Status}}">
                                                 <td>
-                                                    <img src="{{if eq .Status "active"}}/static/img/green_circle.svg{{else if eq .Status "failed"}}/static/img/red_circle.svg{{else}}/static/img/grey_circle.svg{{end}}"
+                                                    <img src="{{if eq .Status "active"}}{{ $.BasePath }}/static/img/green_circle.svg{{else if eq .Status "failed"}}{{ $.BasePath }}/static/img/red_circle.svg{{else}}{{ $.BasePath }}/static/img/grey_circle.svg{{end}}"
                                                          alt="" style="width:25px; height:25px;">
                                                 </td>
                                                 <td>{{.Name}}</td>
