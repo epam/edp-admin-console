@@ -142,6 +142,7 @@ $(function () {
     });
 
     $('#languageSelection').on('change', function (e) {
+        $('.frameworkError').hide();
         if ($(this).find('input:checked').val() === "Java") {
             $('#framework-java8').prop('checked', true);
         }
