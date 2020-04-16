@@ -183,7 +183,7 @@ func (s *CodebaseBranchService) Delete(codebase, branch string) error {
 		return err
 	}
 
-	crbn := fmt.Sprintf("%v-%v", codebase, branch)
+	crbn := fmt.Sprintf("%v-%v", codebase, util.ProcessNameToKubernetesConvention(branch))
 	if err := s.deleteCodebaseBranch(crbn); err != nil {
 		return err
 	}
