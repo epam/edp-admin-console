@@ -87,6 +87,12 @@ func (CodebaseRepository) GetCodebasesByCriteria(criteria query.CodebaseCriteria
 			}
 		}
 
+		if c.JiraServerId != nil {
+			if err := loadRelatedJiraServerName(c); err != nil {
+				return nil, err
+			}
+		}
+
 		if c.JenkinsSlaveId != nil {
 			err := loadRelatedJenkinsSlaveName(c)
 			if err != nil {
@@ -138,6 +144,12 @@ func (CodebaseRepository) GetCodebaseByName(name string) (*query.Codebase, error
 		}
 	}
 
+	if codebase.JiraServerId != nil {
+		if err := loadRelatedJiraServerName(&codebase); err != nil {
+			return nil, err
+		}
+	}
+
 	if codebase.JenkinsSlaveId != nil {
 		err = loadRelatedJenkinsSlaveName(&codebase)
 		if err != nil {
@@ -182,6 +194,12 @@ func (CodebaseRepository) GetCodebaseById(id int) (*query.Codebase, error) {
 	if codebase.GitServerId != nil {
 		err = loadRelatedGitServerName(&codebase)
 		if err != nil {
+			return nil, err
+		}
+	}
+
+	if codebase.JiraServerId != nil {
+		if err := loadRelatedJiraServerName(&codebase); err != nil {
 			return nil, err
 		}
 	}
@@ -265,6 +283,19 @@ func loadRelatedGitServerName(codebase *query.Codebase) error {
 
 	codebase.GitServer = &server.Name
 
+	return nil
+}
+
+func loadRelatedJiraServerName(codebase *query.Codebase) error {
+	o := orm.NewOrm()
+	server := query.JiraServer{}
+	err := o.QueryTable(new(query.JiraServer)).
+		Filter("id", codebase.JiraServerId).
+		One(&server)
+	if err != nil {
+		return err
+	}
+	codebase.JiraServer = &server.Name
 	return nil
 }
 

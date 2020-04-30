@@ -30,6 +30,8 @@ type Codebase struct {
 	DeploymentScript    string            `json:"deploymentScript" orm:"deployment_script"`
 	VersioningType      string            `json:"versioningType" orm:"versioning_type"`
 	StartVersioningFrom *string           `json:"startFrom" orm:"start_versioning_from"`
+	JiraServerId        *int              `json:"-" orm:"column(jira_server_id)"`
+	JiraServer          *string           `json:"jiraServer" orm:"-"`
 }
 
 func (c *Codebase) TableName() string {

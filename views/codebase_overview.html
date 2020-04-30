@@ -164,6 +164,12 @@
                                             <td>{{.Codebase.StartVersioningFrom}}</td>
                                         </tr>
                                     {{end}}
+                                    {{if .Codebase.JiraServer}}
+                                        <tr>
+                                            <th>Jira server</th>
+                                            <td>{{.Codebase.JiraServer}}</td>
+                                        </tr>
+                                    {{end}}
                                     </tbody>
                                 </table>
                             </div>
