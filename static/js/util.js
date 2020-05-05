@@ -125,6 +125,12 @@ function createConfirmTable(formName) {
         delete advancedBlock['Start Versioning From'];
     }
 
+    if ($('#jiraServerToggle').is(':checked')) {
+        advancedBlock['Jira Server'] = 'jiraServer'
+    } else {
+        delete advancedBlock['Jira Server'];
+    }
+
     addBlock(null, "ADVANCED SETTINGS", advancedBlock);
 
     if (!isFound('strategy') || getValue('strategy') === "clone") {
