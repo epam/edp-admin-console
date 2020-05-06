@@ -98,6 +98,32 @@
                 </select>
             </div>
 
+            <div class="form-group">
+                <label for="commitMessagePattern">Specify pattern to validate commit message
+                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                          title="Specify pattern to validate commit message."></span>
+                </label>
+                <input name="commitMessagePattern" type="text" class="form-control"
+                       id="commitMessagePattern"
+                       placeholder="Commit message pattern">
+                <div class="invalid-feedback commitMessagePattern">
+                    The commit message pattern field cannot be empty.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="ticketNamePattern">Specify pattern to find number tickets in commit message
+                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                          title="Specify pattern to find number tickets in commit message."></span>
+                </label>
+                <input name="ticketNamePattern" type="text" class="form-control"
+                       id="ticketNamePattern"
+                       placeholder="Ticket number pattern">
+                <div class="invalid-feedback ticketNamePattern">
+                    The ticket name pattern field cannot be empty.
+                </div>
+            </div>
+
             {{if eq .Type "application" }}
                 <button type="button" class="advanced-settings-submit edp-submit-form-btn btn btn-primary"
                         data-toggle="collapse"

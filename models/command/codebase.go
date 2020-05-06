@@ -22,6 +22,8 @@ type CreateCodebase struct {
 	JobProvisioning     string      `json:"jobProvisioning"`
 	DeploymentScript    string      `json:"deploymentScript"`
 	JiraServer          *string     `json:"jiraServer,omitempty"`
+	CommitMessageRegex  string      `json:"commitMessagePattern"`
+	TicketNameRegex     string      `json:"ticketNamePattern"`
 }
 
 type Repository struct {

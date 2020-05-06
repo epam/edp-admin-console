@@ -116,7 +116,9 @@ function createConfirmTable(formName) {
         'Job Provisioner': 'jobProvisioning',
         'Jenkins Slave': 'jenkinsSlave',
         'Deployment Script': 'deploymentScript',
-        'Versioning Type': 'versioningType'
+        'Versioning Type': 'versioningType',
+        'Commit Message Pattern': 'commitMessagePattern',
+        'Ticket Name Pattern': 'ticketNamePattern'
     };
 
     if ($('#versioningType').val() === 'edp') {

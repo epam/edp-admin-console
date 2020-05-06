@@ -171,14 +171,16 @@ func (c *LibraryController) checkError(err error, flash *beego.FlashData, name s
 
 func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
 	library := command.CreateCodebase{
-		Lang:             c.GetString("appLang"),
-		BuildTool:        c.GetString("buildTool"),
-		Strategy:         strings.ToLower(c.GetString("strategy")),
-		Type:             "library",
-		JenkinsSlave:     c.GetString("jenkinsSlave"),
-		JobProvisioning:  c.GetString("jobProvisioning"),
-		DeploymentScript: c.GetString("deploymentScript"),
-		Name:             c.GetString("appName"),
+		Lang:               c.GetString("appLang"),
+		BuildTool:          c.GetString("buildTool"),
+		Strategy:           strings.ToLower(c.GetString("strategy")),
+		Type:               "library",
+		JenkinsSlave:       c.GetString("jenkinsSlave"),
+		JobProvisioning:    c.GetString("jobProvisioning"),
+		DeploymentScript:   c.GetString("deploymentScript"),
+		Name:               c.GetString("appName"),
+		CommitMessageRegex: c.GetString("commitMessagePattern"),
+		TicketNameRegex:    c.GetString("ticketNamePattern"),
 	}
 
 	if s := c.GetString("jiraServer"); len(s) > 0 {

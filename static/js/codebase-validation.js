@@ -17,7 +17,9 @@ $(function () {
         REPO_LOGIN: /\w/,
         REPO_PASSWORD: /\w/,
         REPO_URL: /(?:^git|^ssh|^https?|^git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/,
-        RELATIVE_PATH: /^\/.*$/
+        RELATIVE_PATH: /^\/.*$/,
+        EDP_COMMIT_MSG_REGEX: '^\\[EPMDEDP-\\d{4}\\]:+.*$',
+        EDP_TICKET_NAME_REGEX: '\\[EPMDEDP-\\d{4}\\]',
     };
 
     let DEPLOYMENT_SCRIPT = {
@@ -68,6 +70,10 @@ $(function () {
         }
     }();
 
+    !function() {
+        $('#commitMessagePattern').val(REGEX.EDP_COMMIT_MSG_REGEX);
+        $('#ticketNamePattern').val(REGEX.EDP_TICKET_NAME_REGEX);
+    }();
 
     $('#jiraServerToggle').change(function () {
         let $jiraEl = $('.jiraServerBlock');
@@ -370,10 +376,6 @@ $(function () {
     }
 
     function validateAdvancedInfo(event) {
-        if ($('#versioningType').val() === "default") {
-            return true
-        }
-
         let $advancedBlockEl = $('.advanced-settings-block');
 
         resetErrors($advancedBlockEl);
@@ -574,14 +576,30 @@ $(function () {
     function isAdvancedInfoValid() {
         let $advancedSettingsEl = $('.advanced-settings-block'),
             $versioningInputEl = $('.start-versioning-from'),
+            isStartVersioningFromValid = true,
+            isCommitMessageRegexValid = $('#commitMessagePattern').val().length !== 0,
+            isTicketNameRegexValid = $('#ticketNamePattern').val().length !== 0;
 
-            isStartVersioningFromValid = isBranchVersionValid($versioningInputEl);
+        if ($('#versioningType').val() === "edp") {
+            isStartVersioningFromValid = isBranchVersionValid($versioningInputEl)
+        }
+
         if (!isStartVersioningFromValid) {
             $('.invalid-feedback.startVersioningFrom').show();
             $advancedSettingsEl.addClass('is-invalid');
         }
 
-        return isStartVersioningFromValid
+        if (!isCommitMessageRegexValid) {
+            $('.invalid-feedback.commitMessagePattern').show();
+            $('#commitMessagePattern').addClass('is-invalid');
+        }
+
+        if (!isTicketNameRegexValid) {
+            $('.invalid-feedback.ticketNamePattern').show();
+            $('#ticketNamePattern').addClass('is-invalid');
+        }
+
+        return isStartVersioningFromValid && isCommitMessageRegexValid && isTicketNameRegexValid
     }
 
     function isVCSValid() {

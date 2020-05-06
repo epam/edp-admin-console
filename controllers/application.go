@@ -221,14 +221,16 @@ func (c *ApplicationController) checkError(err error, flash *beego.FlashData, na
 
 func (c *ApplicationController) extractApplicationRequestData() command.CreateCodebase {
 	codebase := command.CreateCodebase{
-		Lang:             c.GetString("appLang"),
-		BuildTool:        c.GetString("buildTool"),
-		Strategy:         strings.ToLower(c.GetString("strategy")),
-		Type:             "application",
-		JenkinsSlave:     c.GetString("jenkinsSlave"),
-		JobProvisioning:  c.GetString("jobProvisioning"),
-		DeploymentScript: c.GetString("deploymentScript"),
-		Name:             c.GetString("appName"),
+		Lang:               c.GetString("appLang"),
+		BuildTool:          c.GetString("buildTool"),
+		Strategy:           strings.ToLower(c.GetString("strategy")),
+		Type:               "application",
+		JenkinsSlave:       c.GetString("jenkinsSlave"),
+		JobProvisioning:    c.GetString("jobProvisioning"),
+		DeploymentScript:   c.GetString("deploymentScript"),
+		Name:               c.GetString("appName"),
+		CommitMessageRegex: c.GetString("commitMessagePattern"),
+		TicketNameRegex:    c.GetString("ticketNamePattern"),
 	}
 
 	if s := c.GetString("jiraServer"); len(s) > 0 {

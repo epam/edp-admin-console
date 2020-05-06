@@ -209,16 +209,18 @@ func getSecret(name string, username string, password string) *v1.Secret {
 
 func convertData(codebase command.CreateCodebase) edpv1alpha1.CodebaseSpec {
 	cs := edpv1alpha1.CodebaseSpec{
-		Lang:             codebase.Lang,
-		Framework:        codebase.Framework,
-		BuildTool:        codebase.BuildTool,
-		Strategy:         edpv1alpha1.Strategy(codebase.Strategy),
-		Type:             codebase.Type,
-		GitServer:        codebase.GitServer,
-		JenkinsSlave:     codebase.JenkinsSlave,
-		JobProvisioning:  codebase.JobProvisioning,
-		DeploymentScript: codebase.DeploymentScript,
-		JiraServer:       codebase.JiraServer,
+		Lang:                 codebase.Lang,
+		Framework:            codebase.Framework,
+		BuildTool:            codebase.BuildTool,
+		Strategy:             edpv1alpha1.Strategy(codebase.Strategy),
+		Type:                 codebase.Type,
+		GitServer:            codebase.GitServer,
+		JenkinsSlave:         codebase.JenkinsSlave,
+		JobProvisioning:      codebase.JobProvisioning,
+		DeploymentScript:     codebase.DeploymentScript,
+		JiraServer:           codebase.JiraServer,
+		CommitMessagePattern: codebase.CommitMessageRegex,
+		TicketNamePattern:    codebase.TicketNameRegex,
 	}
 	if cs.Strategy == "import" {
 		cs.GitUrlPath = codebase.GitUrlPath
