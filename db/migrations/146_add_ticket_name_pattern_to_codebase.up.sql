@@ -1,0 +1,1 @@
+alter table codebase add ticket_name_pattern text not null;
