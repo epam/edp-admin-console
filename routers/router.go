@@ -251,6 +251,8 @@ func init() {
 		beego.NSRouter("/codebase/:codebaseName/overview", &cc, "get:GetCodebaseOverviewPage"),
 		beego.NSRouter("/codebase", &cc, "post:Delete"),
 		beego.NSRouter("/codebase/branch/delete", &cbc, "post:Delete"),
+		beego.NSRouter("/codebase/:name/update", &cc, "get:GetEditCodebasePage"),
+		beego.NSRouter("/codebase/:name/update", &cc, "post:Update"),
 		beego.NSRouter("/stage", &cpc, "post:DeleteCDStage"),
 		beego.NSRouter("/cd-pipeline/delete", &cpc, "post:DeleteCDPipeline"),
 		beego.NSRouter("/codebase/:codebaseName/branch", &cbc, "post:CreateCodebaseBranch"),

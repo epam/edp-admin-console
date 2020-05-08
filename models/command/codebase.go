@@ -57,3 +57,9 @@ type Versioning struct {
 	Type      string  `json:"type" valid:"Required"`
 	StartFrom *string `json:"startFrom,omitempty"`
 }
+
+type UpdateCodebaseCommand struct {
+	Name               string `valid:"Required;Match(/^[a-z][a-z0-9-]*[a-z0-9]$/)"`
+	CommitMessageRegex string `valid:"Required"`
+	TicketNameRegex    string `valid:"Required"`
+}

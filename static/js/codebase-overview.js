@@ -19,6 +19,8 @@ $(function () {
             } else if (anchor === '#codebaseIsDeleted') {
                 let codebase = getUrlParameter('codebase');
                 showNotification(true, `Codebase ${codebase} was marked for deletion.`);
+            } else if (anchor === '#codebaseUpdateSuccessModal') {
+                showNotification(true, 'The codebase has been updated successfully.');
             }
             location.hash = '';
         }

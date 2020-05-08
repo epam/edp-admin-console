@@ -252,3 +252,18 @@ func IsCodebaseTypeAcceptable(getParam string) bool {
 	}
 	return false
 }
+
+func ValidateCodebaseUpdateRequestData(c command.UpdateCodebaseCommand) *ErrMsg {
+	v := validation.Validation{}
+	_, err := v.Valid(c)
+	if err != nil {
+		return &ErrMsg{"an error has occurred while validating Codebase update request body.",
+			http.StatusInternalServerError}
+	}
+
+	if v.Errors == nil {
+		return nil
+	}
+
+	return &ErrMsg{string(CreateErrorResponseBody(v)), http.StatusBadRequest}
+}

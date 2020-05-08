@@ -103,8 +103,11 @@
                     <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                           title="Specify pattern to validate commit message."></span>
                 </label>
-                <input name="commitMessagePattern" type="text" class="form-control"
+                <input name="commitMessagePattern"
+                       type="text"
+                       class="form-control"
                        id="commitMessagePattern"
+                       value="^\[EPMDEDP-\d{4}\]:.*$"
                        placeholder="Commit message pattern">
                 <div class="invalid-feedback commitMessagePattern">
                     The commit message pattern field cannot be empty.
@@ -116,8 +119,11 @@
                     <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
                           title="Specify pattern to find number tickets in commit message."></span>
                 </label>
-                <input name="ticketNamePattern" type="text" class="form-control"
+                <input name="ticketNamePattern"
+                       type="text"
+                       class="form-control"
                        id="ticketNamePattern"
+                       value="\[EPMDEDP-\d{4}\]'"
                        placeholder="Ticket number pattern">
                 <div class="invalid-feedback ticketNamePattern">
                     The ticket name pattern field cannot be empty.

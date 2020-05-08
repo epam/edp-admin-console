@@ -18,6 +18,8 @@ package controllers
 
 import (
 	"edp-admin-console/context"
+	"edp-admin-console/controllers/validation"
+	"edp-admin-console/models/command"
 	"edp-admin-console/models/query"
 	"edp-admin-console/service"
 	cbs "edp-admin-console/service/codebasebranch"
@@ -218,4 +220,58 @@ func createCodebaseIsDeletedURL(codebaseName, codebaseType string) string {
 		codebaseType = "autotest"
 	}
 	return fmt.Sprintf("/admin/edp/%v/overview?codebase=%v#codebaseIsDeleted", codebaseType, codebaseName)
+}
+
+func (c *CodebaseController) GetEditCodebasePage() {
+	flash := beego.ReadFromRequest(&c.Controller)
+	if flash.Data["error"] != "" {
+		c.Data["CodebaseUpdateError"] = flash.Data["error"]
+	}
+
+	n := c.GetString(":name")
+	log.Debug("start executing GetEditCodebasePage method", zap.String("name", n))
+
+	codebase, err := c.CodebaseService.GetCodebaseByName(n)
+	if err != nil {
+		log.Error("couldn't get codebase from db", zap.Error(err))
+		c.Abort("500")
+		return
+	}
+
+	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
+	c.Data["BasePath"] = context.BasePath
+	c.Data["Codebase"] = codebase
+	c.Data["Type"] = codebase.Type
+	c.TplName = "edit_codebase.html"
+}
+
+func (c *CodebaseController) Update() {
+	flash := beego.NewFlash()
+	name := c.GetString("name")
+	log.Debug("start executing Update method", zap.String("name", name))
+
+	cc := command.UpdateCodebaseCommand{
+		Name:               name,
+		CommitMessageRegex: c.GetString("commitMessagePattern"),
+		TicketNameRegex:    c.GetString("ticketNamePattern"),
+	}
+
+	errMsg := validation.ValidateCodebaseUpdateRequestData(cc)
+	if errMsg != nil {
+		log.Error("Codebase update request data is invalid", zap.String("err", errMsg.Message))
+		flash.Error(errMsg.Message)
+		flash.Store(&c.Controller)
+		c.Redirect(fmt.Sprintf("%v/admin/edp/codebase/%v/update", context.BasePath, cc.Name), 302)
+		return
+	}
+
+	codebase, err := c.CodebaseService.Update(cc)
+	if err != nil {
+		log.Error("couldn't update codebase", zap.Error(err))
+		c.Abort("500")
+		return
+	}
+
+	c.Redirect(fmt.Sprintf("%v/admin/edp/%v/overview#codebaseUpdateSuccessModal",
+		context.BasePath, codebase.Spec.Type), 302)
 }

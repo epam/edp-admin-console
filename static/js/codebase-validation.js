@@ -17,9 +17,7 @@ $(function () {
         REPO_LOGIN: /\w/,
         REPO_PASSWORD: /\w/,
         REPO_URL: /(?:^git|^ssh|^https?|^git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/,
-        RELATIVE_PATH: /^\/.*$/,
-        EDP_COMMIT_MSG_REGEX: '^\\[EPMDEDP-\\d{4}\\]:+.*$',
-        EDP_TICKET_NAME_REGEX: '\\[EPMDEDP-\\d{4}\\]',
+        RELATIVE_PATH: /^\/.*$/
     };
 
     let DEPLOYMENT_SCRIPT = {
@@ -68,11 +66,6 @@ $(function () {
                     console.log(resp);
                 })
         }
-    }();
-
-    !function() {
-        $('#commitMessagePattern').val(REGEX.EDP_COMMIT_MSG_REGEX);
-        $('#ticketNamePattern').val(REGEX.EDP_TICKET_NAME_REGEX);
     }();
 
     $('#jiraServerToggle').change(function () {

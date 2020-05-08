@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EDP Admin Console</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/index.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/cd-pipeline.css">
+</head>
+<body>
+<main>
+    {{template "template/header_template.html" .}}
+    <section class="content d-flex">
+        <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
+            {{template "template/navbar_template.html" .}}
+        </aside>
+        <div class="flex-fill pl-4 pr-4 wrapper">
+
+            <form class="edp-form" id="updateCodebase" method="post"
+                  action="{{ .BasePath }}/admin/edp/codebase/{{.Codebase.Name}}/update">
+                <h1 class="edp-form-header">
+                    <a href="{{ .BasePath }}/admin/edp/{{.Codebase.Type}}/overview" class="edp-back-link"></a>
+                    Edit Codebase
+                </h1>
+                <p>Edit pattern to validate commit messages.</p>
+
+                {{if .CodebaseUpdateError}}
+                    <div class="backend-validation-error">
+                        {{.CodebaseUpdateError}}
+                    </div>
+                {{end}}
+
+                <div class="accordion" id="updateCodebase">
+
+                    <div class="card pattern">
+                        <div class="card-header" id="headingOne" aria-expanded="true" aria-controls="collapseOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button">
+                                    Commit message patterns
+                                </button>
+                            </h5>
+                        </div>
+
+                        <div id="collapseOne" class="show"
+                             aria-expanded="false" aria-controls="collapseOne"
+                             data-parent="#updateCodebase">
+                            <div class="card-body">
+
+                                <div class="row">
+                                    <div class="form-group col-sm-4">
+                                        <label for="commitMessagePattern">Commit Message Pattern
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Specify Commit Message Pattern."></span>
+                                        </label>
+                                        <div class="d-flex">
+                                            <input name="commitMessagePattern"
+                                                   value="{{.Codebase.CommitMessagePattern}}"
+                                                   class="form-control"
+                                                   id="commitMessagePattern"
+                                                   placeholder="Commit Message Pattern">
+                                        </div>
+                                        <div class="invalid-feedback commitMessagePattern">
+                                            Commit Message Pattern cannot be empty.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="form-group col-sm-4">
+                                        <label for="ticketNamePattern">Ticket Name Pattern
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Specify Ticket Name Pattern."></span>
+                                        </label>
+                                        <div class="d-flex">
+                                            <input name="ticketNamePattern"
+                                                   value="{{.Codebase.TicketNamePattern}}"
+                                                   class="form-control"
+                                                   id="ticketNamePattern"
+                                                   placeholder="Ticket Name Pattern">
+                                        </div>
+                                        <div class="invalid-feedback ticketNamePattern">
+                                            Ticket Name Pattern cannot be empty.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="button" class="update-codebase edp-submit-form-btn btn btn-primary"
+                                        data-toggle="collapse" aria-expanded="false">
+                                    Proceed
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                {{ .xsrfdata }}
+
+                <input name="name" value="{{.Codebase.Name}}" type="hidden">
+
+            </form>
+        </div>
+    </section>
+    {{template "template/footer_template.html" .}}
+    {{template "template/modal_success_template.html" .}}
+</main>
+
+<script src="{{ .BasePath }}/static/js/jquery-3.3.1.js"></script>
+<script src="{{ .BasePath }}/static/js/popper.js"></script>
+<script src="{{ .BasePath }}/static/js/bootstrap.js"></script>
+<script src="{{ .BasePath }}/static/js/edit-codebase.js"></script>
+<script src="{{ .BasePath }}/static/js/bootstrap-notify.js"></script>
+</body>
+</html>
