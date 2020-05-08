@@ -273,5 +273,12 @@ func (c *CodebaseController) Update() {
 	}
 
 	c.Redirect(fmt.Sprintf("%v/admin/edp/%v/overview#codebaseUpdateSuccessModal",
-		context.BasePath, codebase.Spec.Type), 302)
+		context.BasePath, getType(codebase.Spec.Type)), 302)
+}
+
+func getType(codebaseType string) string {
+	if codebaseType == "autotests" {
+		return "autotest"
+	}
+	return codebaseType
 }
