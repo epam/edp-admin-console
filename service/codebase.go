@@ -379,11 +379,11 @@ func (s *CodebaseService) Update(command command.UpdateCodebaseCommand) (*edpv1a
 		return nil, errors.Wrapf(err, "couldn't get codebase from cluster %v", command.Name)
 	}
 
-	c.Spec.CommitMessagePattern = command.CommitMessageRegex
-	c.Spec.TicketNamePattern = command.TicketNameRegex
+	c.Spec.CommitMessagePattern = &command.CommitMessageRegex
+	c.Spec.TicketNamePattern = &command.TicketNameRegex
 	log.Debug("new values",
-		zap.String("commitMessagePattern", c.Spec.CommitMessagePattern),
-		zap.String("ticketNamePattern", c.Spec.TicketNamePattern))
+		zap.String("commitMessagePattern", *c.Spec.CommitMessagePattern),
+		zap.String("ticketNamePattern", *c.Spec.TicketNamePattern))
 
 	if err := s.executeUpdateRequest(c); err != nil {
 		return nil, err

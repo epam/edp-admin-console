@@ -69,15 +69,33 @@ $(function () {
     }();
 
     $('#jiraServerToggle').change(function () {
-        let $jiraEl = $('.jiraServerBlock');
+        let $jiraEl = $('.jiraServerBlock'),
+            $commitMessagePatternBlockEl = $('.commitMessagePatternBlock'),
+            $ticketNamePatternBlockEl = $('.ticketNamePatternBlock');
         if ($(this).is(':checked')) {
             $jiraEl.removeClass('hide-element')
                 .find('select[name="jiraServer"]')
+                .prop('disabled', false);
+
+            $commitMessagePatternBlockEl.removeClass('hide-element')
+                .find('input[id="commitMessagePattern"]')
+                .prop('disabled', false);
+
+            $ticketNamePatternBlockEl.removeClass('hide-element')
+                .find('input[id="ticketNamePattern"]')
                 .prop('disabled', false);
             return;
         }
         $jiraEl.addClass('hide-element')
             .find('select[name="jiraServer"]')
+            .prop('disabled', true);
+
+        $commitMessagePatternBlockEl.addClass('hide-element')
+            .find('input[id="commitMessagePattern"]')
+            .prop('disabled', true);
+
+        $ticketNamePatternBlockEl.addClass('hide-element')
+            .find('input[id="ticketNamePattern"]')
             .prop('disabled', true);
     });
 

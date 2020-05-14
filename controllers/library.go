@@ -171,20 +171,26 @@ func (c *LibraryController) checkError(err error, flash *beego.FlashData, name s
 
 func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
 	library := command.CreateCodebase{
-		Lang:               c.GetString("appLang"),
-		BuildTool:          c.GetString("buildTool"),
-		Strategy:           strings.ToLower(c.GetString("strategy")),
-		Type:               "library",
-		JenkinsSlave:       c.GetString("jenkinsSlave"),
-		JobProvisioning:    c.GetString("jobProvisioning"),
-		DeploymentScript:   c.GetString("deploymentScript"),
-		Name:               c.GetString("appName"),
-		CommitMessageRegex: c.GetString("commitMessagePattern"),
-		TicketNameRegex:    c.GetString("ticketNamePattern"),
+		Lang:             c.GetString("appLang"),
+		BuildTool:        c.GetString("buildTool"),
+		Strategy:         strings.ToLower(c.GetString("strategy")),
+		Type:             "library",
+		JenkinsSlave:     c.GetString("jenkinsSlave"),
+		JobProvisioning:  c.GetString("jobProvisioning"),
+		DeploymentScript: c.GetString("deploymentScript"),
+		Name:             c.GetString("appName"),
 	}
 
 	if s := c.GetString("jiraServer"); len(s) > 0 {
 		library.JiraServer = &s
+	}
+
+	if v := c.GetString("commitMessagePattern"); len(v) > 0 {
+		library.CommitMessageRegex = &v
+	}
+
+	if v := c.GetString("ticketNamePattern"); len(v) > 0 {
+		library.TicketNameRegex = &v
 	}
 
 	library.Versioning.Type = c.GetString("versioningType")
