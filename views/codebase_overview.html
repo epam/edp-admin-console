@@ -175,14 +175,18 @@
                                             <td>{{.Codebase.JiraServer}}</td>
                                         </tr>
                                     {{end}}
+                                    {{if .Codebase.CommitMessagePattern}}
                                     <tr>
                                         <th>Commit Message Pattern</th>
                                         <td>{{.Codebase.CommitMessagePattern}}</td>
                                     </tr>
+                                    {{end}}
+                                    {{if .Codebase.TicketNamePattern}}
                                     <tr>
                                         <th>Ticket Name Pattern</th>
                                         <td>{{.Codebase.TicketNamePattern}}</td>
                                     </tr>
+                                    {{end}}
                                     </tbody>
                                 </table>
                             </div>
