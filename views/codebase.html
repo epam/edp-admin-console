@@ -96,12 +96,14 @@
                                 <td>{{.Language}}</td>
                                 <td>{{.BuildTool}}</td>
                                 <td>
-                                    <a href="{{ $.BasePath }}/admin/edp/codebase/{{.Name}}/update"
-                                       class="{{if ne .Status "active"}}disabled{{end}}">
-                                        <button class="delete">
-                                            <i class="icon-pencil"></i>
-                                        </button>
-                                    </a>
+                                    {{if .JiraServer}}
+                                        <a href="{{ $.BasePath }}/admin/edp/codebase/{{.Name}}/update"
+                                           class="{{if ne .Status "active"}}disabled{{end}}">
+                                            <button class="delete">
+                                                <i class="icon-pencil"></i>
+                                            </button>
+                                        </a>
+                                    {{end}}
                                 </td>
                                 <td>
                                     {{if $.HasRights}}

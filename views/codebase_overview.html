@@ -28,11 +28,13 @@
                         <a href="{{ .BasePath }}/admin/edp/library/overview" class="edp-back-link"></a>
                     {{end}}
                     {{.TypeCaption}} "{{.Codebase.Name}}"
-                    <a href="{{ .BasePath }}/admin/edp/codebase/{{.Codebase.Name}}/update">
-                        <button class="delete">
-                            <i class="icon-pencil"></i>
-                        </button>
-                    </a>
+                    {{if .Codebase.JiraServer}}
+                        <a href="{{ .BasePath }}/admin/edp/codebase/{{.Codebase.Name}}/update">
+                            <button class="delete">
+                                <i class="icon-pencil"></i>
+                            </button>
+                        </a>
+                    {{end}}
                 </h1>
                 <p>Find below the {{.TypeSingular}} details, manage branches and track all the happened actions.</p>
 
