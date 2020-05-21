@@ -13,19 +13,17 @@ require (
 	github.com/docker/docker v1.13.1 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
-	github.com/epmd-edp/cd-pipeline-operator/v2 v2.2.0-52
+	github.com/epmd-edp/cd-pipeline-operator/v2 v2.3.0-58.0.20200520111933-aefa684da6d1
 	github.com/epmd-edp/codebase-operator/v2 v2.3.0-95.0.20200514095748-92497054f7da
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/lib/pq v1.0.0
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/openshift/client-go v3.9.0+incompatible
-	github.com/operator-framework/operator-sdk v0.0.0-20190530173525-d6f9cdf2f52e
 	github.com/pkg/errors v0.8.1
 	github.com/pquerna/cachecontrol v0.0.0-20180517163645-1555304b9b35 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
-	github.com/spf13/pflag v1.0.3
 	github.com/stretchr/testify v1.4.0
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	go.uber.org/zap v1.14.1
@@ -36,5 +34,4 @@ require (
 	k8s.io/api v0.0.0-20190222213804-5cb15d344471
 	k8s.io/apimachinery v0.0.0-20190221213512-86fb29eff628
 	k8s.io/client-go v0.0.0-20190228174230-b40b2a5939e4
-	sigs.k8s.io/controller-runtime v0.1.12
 )

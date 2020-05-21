@@ -393,11 +393,12 @@ func retrieveStagesFromRequest(this *CDPipelineController) []command.CDStageComm
 			}
 		}
 		stageRequest := command.CDStageCommand{
-			Name:        stageName,
-			Description: this.GetString(stageName + "-stageDesc"),
-			TriggerType: this.GetString(stageName + "-triggerType"),
-			Source:      stgSrc,
-			Order:       index,
+			Name:            stageName,
+			Description:     this.GetString(stageName + "-stageDesc"),
+			TriggerType:     this.GetString(stageName + "-triggerType"),
+			Source:          stgSrc,
+			Order:           index,
+			JobProvisioning: this.GetString(stageName + "-jobProvisioning"),
 		}
 
 		for _, stepName := range this.GetStrings(stageName + "-stageStepName") {
