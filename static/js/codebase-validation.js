@@ -588,8 +588,9 @@ $(function () {
         let $advancedSettingsEl = $('.advanced-settings-block'),
             $versioningInputEl = $('.start-versioning-from'),
             isStartVersioningFromValid = true,
-            isCommitMessageRegexValid = $('#commitMessagePattern').val().length !== 0,
-            isTicketNameRegexValid = $('#ticketNamePattern').val().length !== 0;
+            jiraIntegration = $('#jiraServerToggle').is(':checked'),
+            isCommitMessageRegexValid = jiraIntegration ? $('#commitMessagePattern').val().length !== 0 : true,
+            isTicketNameRegexValid = jiraIntegration ? $('#ticketNamePattern').val().length !== 0 : true;
 
         if ($('#versioningType').val() === "edp") {
             isStartVersioningFromValid = isBranchVersionValid($versioningInputEl)
