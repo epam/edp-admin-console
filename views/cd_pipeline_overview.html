@@ -190,18 +190,17 @@
                                                                         <th>{{.QualityGateType}}</th>
                                                                         <th>{{.StepName}}</th>
 
-                                                                        {{if eq "autotests" .QualityGateType}}
-                                                                            <th>
-                                                                                <a href="{{ $.BasePath }}/admin/edp/codebase/{{.Autotest.Name}}/overview"
-                                                                                   class="edp-link">{{.Autotest.Name}}</a>
-                                                                            </th>
-                                                                            <th>
-                                                                                {{.Branch.Name}}
-                                                                            </th>
-                                                                        {{end}}
-                                                                        <th></th>
-                                                                        <th></th>
-                                                                    {{else}}
+                                                                            {{if eq "autotests" .QualityGateType}}
+                                                                                <th>
+                                                                                    <a href="{{ $.BasePath }}/admin/edp/codebase/{{.Autotest.Name}}/overview" class="edp-link">{{.Autotest.Name}}</a>
+                                                                                </th>
+                                                                                <th>
+                                                                                    {{.Branch.Name}}
+                                                                                </th>
+                                                                            {{end}}
+                                                                                <th></th>
+                                                                                <th></th>
+                                                                            {{else}}
 
                                                                         </tr>
                                                                     {{end}}
