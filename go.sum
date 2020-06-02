@@ -83,11 +83,13 @@ github.com/emirpasic/gods v1.9.0/go.mod h1:YfzfFFoVP/catgzJb4IKIqXjX78Ha8FMSDh3y
 github.com/epmd-edp/cd-pipeline-operator/v2 v2.2.0-50/go.mod h1:ygALtMzvxjLfbXLfGqZ+eGjsARgBdyf6IvoTl5NF5Kk=
 github.com/epmd-edp/cd-pipeline-operator/v2 v2.2.0-52 h1:nZskamdDerK2mC71mRk4mtc7QjU8s4i1K4ASnhYRsSQ=
 github.com/epmd-edp/cd-pipeline-operator/v2 v2.2.0-52/go.mod h1:UJqDk1DeNhWOOAcXq1IrZzzgyBwm0jlpIDffMRBQzOw=
+github.com/epmd-edp/cd-pipeline-operator/v2 v2.2.1-57.0.20200602074800-2a4f99f9e45e h1:kN92FOscvmPEeZX5C70ZU+J5l7FXjmxgNy9WXPpai5k=
 github.com/epmd-edp/cd-pipeline-operator/v2 v2.2.1-57.0.20200602074800-2a4f99f9e45e/go.mod h1:xZHytUHbJsO9a4/JokMU2gXVXVXrNhLxIuYeMVPFCUc=
 github.com/epmd-edp/cd-pipeline-operator/v2 v2.3.0-58.0.20200520111933-aefa684da6d1/go.mod h1:6gL6eKIwqaTBjub4CYmAuhDDQz2t6DKaYIjlcTIRA7k=
 github.com/epmd-edp/codebase-operator/v2 v2.2.0-83 h1:PEUfehspiz94klzvZtIE5kecgPEm5KBcvAT+t8ZNiUo=
 github.com/epmd-edp/codebase-operator/v2 v2.2.0-83/go.mod h1:6kjTmuLnM8sgZERseD2F/IAo+DGVcbnJEJKSfxERE3g=
 github.com/epmd-edp/codebase-operator/v2 v2.3.0-88/go.mod h1:MqnZsWXSdziAmOYznnMW+C3M160So5AMuJoCSL84t8M=
+github.com/epmd-edp/codebase-operator/v2 v2.3.0-95.0.20200514095748-92497054f7da h1:Xc380z6el5EJ7yfbYySIOajdzmqcHjUz+Yn82faub1o=
 github.com/epmd-edp/codebase-operator/v2 v2.3.0-95.0.20200514095748-92497054f7da/go.mod h1:2joXoCeTqQ1MjTHfp5yoMfnWy/3zuznNOxGioCvyVDY=
 github.com/epmd-edp/edp-component-operator v0.0.0-20191029131047-d87b7a6d3bb0/go.mod h1:k4OqvjIznqyXgdpp1iuuSdSk4BdjiJ3j3eesPIIqO+s=
 github.com/epmd-edp/gerrit-operator/v2 v2.1.0-52/go.mod h1:NUerZ1Gse7TCf0ltzTx08Un4WztLGmLzW9FZ4npRM6g=

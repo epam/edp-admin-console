@@ -1,1 +1,0 @@
-alter table codebase alter column commit_message_pattern drop not null;

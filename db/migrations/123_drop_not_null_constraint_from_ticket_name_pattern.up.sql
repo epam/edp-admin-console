@@ -1,1 +1,0 @@
-alter table codebase alter column ticket_name_pattern drop not null;
