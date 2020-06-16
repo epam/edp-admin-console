@@ -32,6 +32,10 @@ function _sendPostRequest(async, url, data, token, successCallback, failCallback
     });
 }
 
+function htmlEncode(value){
+    return $('<div/>').text(value).html();
+}
+
 function isFieldValid(elementToValidate, regex) {
     let check = function (value) {
         return regex.test(value);
@@ -81,7 +85,7 @@ function createConfirmTable(formName) {
             }
             $.each(block, function (key, property) {
                 let value = getValue(property);
-                value = typeof property === 'boolean' ? (property ? "&#10004;" : "&#10008;") : getValue(property);
+                value = typeof property === 'boolean' ? (property ? "&#10004;" : "&#10008;") : htmlEncode(getValue(property));
                 if (value) {
                     if (key === 'Start Versioning From') {
                         result += '<tr><td>' + key + '</td><td>' + value + '-SNAPSHOT' + '</td></tr>';
