@@ -89,7 +89,7 @@
             <div class="form-group jiraServerBlock hide-element">
                 <label for="jiraServer">Select Jira Server
                     <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                          title="Select Jira Server you want to integrate application with."></span>
+                          title="Select Jira server that will be integrated with the codebase (application, library, autotest)."></span>
                 </label>
                 <select class="form-control jiraServer" name="jiraServer" disabled>
                     {{range .JiraServer}}
@@ -99,9 +99,9 @@
             </div>
 
             <div class="form-group commitMessagePatternBlock hide-element">
-                <label for="commitMessagePattern">Specify pattern to validate commit message
+                <label for="commitMessagePattern">Specify the pattern to validate a commit message
                     <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                          title="Specify pattern to validate commit message."></span>
+                          title="Specify the pattern to validate a commit message."></span>
                 </label>
                 <input name="commitMessagePattern"
                        type="text"
@@ -115,9 +115,9 @@
             </div>
 
             <div class="form-group ticketNamePatternBlock hide-element">
-                <label for="ticketNamePattern">Specify pattern to find number tickets in commit message
+                <label for="ticketNamePattern">Specify the pattern to find a Jira ticket number in a commit message
                     <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                          title="Specify pattern to find number tickets in commit message."></span>
+                          title="Specify the pattern to find a Jira ticket number in a commit message."></span>
                 </label>
                 <input name="ticketNamePattern"
                        type="text"
