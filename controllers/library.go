@@ -12,13 +12,14 @@ import (
 	"edp-admin-console/util/auth"
 	"edp-admin-console/util/consts"
 	"fmt"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/validation"
-	"go.uber.org/zap"
 	"html/template"
 	"net/http"
 	"regexp"
 	"strings"
+
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/validation"
+	"go.uber.org/zap"
 )
 
 type LibraryController struct {
@@ -147,11 +148,11 @@ func (c *LibraryController) checkError(err error, flash *beego.FlashData, name s
 	case *edperror.CodebaseAlreadyExistsError:
 		flash.Error("Library %v already exists.", name)
 		flash.Store(&c.Controller)
-		c.Redirect("/admin/edp/library/create", 302)
+		c.Redirect(fmt.Sprintf("%s/admin/edp/library/create", context.BasePath), 302)
 	case *edperror.CodebaseWithGitUrlPathAlreadyExistsError:
 		flash.Error("Library %v with %v project path already exists.", name, *url)
 		flash.Store(&c.Controller)
-		c.Redirect("/admin/edp/library/create", 302)
+		c.Redirect(fmt.Sprintf("%s/admin/edp/library/create", context.BasePath), 302)
 	default:
 		c.Abort("500")
 	}
