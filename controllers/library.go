@@ -166,6 +166,7 @@ func (c *LibraryController) checkError(err error, flash *beego.FlashData, name s
 		flash.Store(&c.Controller)
 		c.Redirect(fmt.Sprintf("%s/admin/edp/library/create", context.BasePath), 302)
 	default:
+		log.Error("couldn't create codebase", zap.Error(err))
 		c.Abort("500")
 	}
 }

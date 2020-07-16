@@ -134,6 +134,7 @@ func (c *CodebaseRestController) checkError(err error, name string, url *string)
 		errMsg := fmt.Sprintf("Codebase %v with %v project path already exists.", name, *url)
 		http.Error(c.Ctx.ResponseWriter, errMsg, http.StatusBadRequest)
 	default:
+		log.Error("couldn't create codebase", zap.Error(err))
 		errMsg := fmt.Sprintf("Failed to create codebase: %v", err.Error())
 		http.Error(c.Ctx.ResponseWriter, errMsg, http.StatusInternalServerError)
 	}

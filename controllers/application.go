@@ -217,6 +217,7 @@ func (c *ApplicationController) checkError(err error, flash *beego.FlashData, na
 		flash.Store(&c.Controller)
 		c.Redirect(fmt.Sprintf("%s/admin/edp/application/create", context.BasePath), 302)
 	default:
+		log.Error("couldn't create codebase", zap.Error(err))
 		c.Abort("500")
 	}
 }
