@@ -32,3 +32,5 @@ _**NOTE**: The Admin Console link is available on the OpenShift overview page fo
 * [Add Other Code Language](documentation/add_other_code_language.md)
 * [Adjust VCS Integration With Jira Server](documentation/jira_vcs_integration.md)
 * [Local Development](documentation/local_development.md)
+* [GitHub Integration](https://github.com/epmd-edp/jenkins-operator/blob/release-2.3/documentation/github-integration.md#github-integration)
+* [GitLab Integration](https://github.com/epmd-edp/jenkins-operator/blob/master/documentation/gitlab-integration.md#gitlab-integration)
