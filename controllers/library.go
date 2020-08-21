@@ -39,6 +39,7 @@ type LibraryController struct {
 	BuildTools            []string
 	VersioningTypes       []string
 	DeploymentScript      []string
+	CiTools               []string
 }
 
 func (c *LibraryController) GetLibraryListPage() {
@@ -129,6 +130,7 @@ func (c *LibraryController) GetCreatePage() {
 	c.Data["BasePath"] = context.BasePath
 	c.Data["JiraServer"] = servers
 	c.Data["DiagramPageEnabled"] = context.DiagramPageEnabled
+	c.Data["CiTools"] = c.CiTools
 	c.TplName = "create_library.html"
 }
 
@@ -183,6 +185,7 @@ func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
 		JobProvisioning:  c.GetString("jobProvisioning"),
 		DeploymentScript: c.GetString("deploymentScript"),
 		Name:             c.GetString("appName"),
+		CiTool:           c.GetString("ciTool"),
 	}
 
 	if s := c.GetString("jiraServer"); len(s) > 0 {

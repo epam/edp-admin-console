@@ -24,6 +24,7 @@ type CreateCodebase struct {
 	JiraServer          *string     `json:"jiraServer,omitempty"`
 	CommitMessageRegex  *string     `json:"commitMessagePattern"`
 	TicketNameRegex     *string     `json:"ticketNamePattern"`
+	CiTool              string      `json:"ciTool" valid:"Required"`
 }
 
 type Repository struct {

@@ -80,6 +80,18 @@
                 </div>
             {{end}}
 
+            <div class="form-group ciTools hide-element">
+                <label for="ciTool">Select CI tool
+                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                          title="Select CI tool which will be used for building your codebase"></span>
+                </label>
+                <select class="form-control ciTool" name="ciTool">
+                    {{range $tool := .CiTools}}
+                        <option>{{$tool}}</option>
+                    {{end}}
+                </select>
+            </div>
+
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" id="jiraServerToggle"
                        {{if not .JiraServer}}disabled{{end}}>

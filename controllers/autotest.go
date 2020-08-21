@@ -38,6 +38,7 @@ type AutotestsController struct {
 	VersioningTypes       []string
 	TestReportTools       []string
 	DeploymentScript      []string
+	CiTools               []string
 }
 
 func (c *AutotestsController) CreateAutotests() {
@@ -108,6 +109,7 @@ func (c *AutotestsController) extractAutotestsRequestData() command.CreateCodeba
 		JobProvisioning:  c.GetString("jobProvisioning"),
 		DeploymentScript: c.GetString("deploymentScript"),
 		Name:             c.GetString("appName"),
+		CiTool:           c.GetString("ciTool"),
 	}
 
 	if s := c.GetString("jiraServer"); len(s) > 0 {
@@ -276,6 +278,7 @@ func (c *AutotestsController) GetCreateAutotestsPage() {
 	c.Data["BasePath"] = context.BasePath
 	c.Data["JiraServer"] = servers
 	c.Data["DiagramPageEnabled"] = context.DiagramPageEnabled
+	c.Data["CiTools"] = c.CiTools
 	c.TplName = "create_autotest.html"
 }
 

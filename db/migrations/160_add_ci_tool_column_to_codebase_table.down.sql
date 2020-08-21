@@ -1,0 +1,1 @@
+alter table codebase drop column ci_tool;

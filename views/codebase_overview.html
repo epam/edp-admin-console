@@ -161,6 +161,12 @@
                                             <td>{{.Codebase.DeploymentScript}}</td>
                                         </tr>
                                     {{end}}
+                                    {{if .Codebase.CiTools}}
+                                        <tr>
+                                            <th>CI tool</th>
+                                            <td>{{.Codebase.CiTool}}</td>
+                                        </tr>
+                                    {{end}}
                                     <tr>
                                         <th>Versioning Type</th>
                                         <td>{{.Codebase.VersioningType}}</td>

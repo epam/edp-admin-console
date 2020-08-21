@@ -122,7 +122,8 @@ function createConfirmTable(formName) {
         'Deployment Script': 'deploymentScript',
         'Versioning Type': 'versioningType',
         'Commit Message Pattern': 'commitMessagePattern',
-        'Ticket Name Pattern': 'ticketNamePattern'
+        'Ticket Name Pattern': 'ticketNamePattern',
+        'CI tool': 'ciTool'
     };
 
     if ($('#versioningType').val() === 'edp') {

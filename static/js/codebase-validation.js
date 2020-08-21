@@ -25,6 +25,12 @@ $(function () {
         HELM_CHART: "helm-chart"
     };
 
+    let INTEGRATION_STRATEGIES = {
+        CREATE: 'create',
+        CLONE: 'clone',
+        IMPORT: 'import'
+    };
+
     $('.tooltip-icon').add('[data-toggle="tooltip"]').tooltip();
 
     !function () {
@@ -140,9 +146,9 @@ $(function () {
     }
 
     function toggleStrategy(strategy) {
-        if (strategy === 'clone') {
+        if (strategy === INTEGRATION_STRATEGIES.CLONE) {
             activateCloneBlock();
-        } else if (strategy === 'create') {
+        } else if (strategy === INTEGRATION_STRATEGIES.CREATE) {
             activateCreateBlock();
         } else {
             activateImportBlock();
@@ -150,7 +156,9 @@ $(function () {
     }
 
     !function () {
-        toggleStrategy($('#strategy').val().toLowerCase());
+        let strategy = $('#strategy').val().toLowerCase();
+        toggleStrategy(strategy);
+        toggleCiToolView(strategy);
     }();
 
     function checkVersioningType(value) {
@@ -228,7 +236,21 @@ $(function () {
 
     $('#strategy').change(function () {
         toggleStrategy(this.value.toLowerCase());
+        toggleCiToolView(this.value.toLowerCase());
     });
+
+    function toggleCiToolView(strategy) {
+        let $ciEl = $('div.ciTools');
+        if (INTEGRATION_STRATEGIES.IMPORT === strategy.toLowerCase()) {
+            $ciEl.removeClass('hide-element')
+                .find('select[name="ciTool"]');
+            return
+        }
+        $ciEl.addClass('hide-element')
+            .find('select[name="ciTool"]')
+            .val('Jenkins');
+
+    }
 
     $('#btn-modal-continue').click(function () {
         $('form.edp-form').submit();

@@ -1,0 +1,1 @@
+alter table codebase add if not exists ci_tool text;

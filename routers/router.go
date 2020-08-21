@@ -47,6 +47,7 @@ const (
 	versioningTypes       = "versioningTypes"
 	testReportTools       = "testReportTools"
 	deploymentScript      = "deploymentScript"
+	ciTools               = "ciTools"
 
 	CreateStrategy = "Create"
 )
@@ -155,6 +156,11 @@ func init() {
 		log.Fatal("deploymentScript config variable is empty.")
 	}
 
+	ciTools := util.GetValuesFromConfig(ciTools)
+	if ciTools == nil {
+		log.Fatal("ciTools config variable is empty.")
+	}
+
 	is := make([]string, len(integrationStrategies))
 	copy(is, integrationStrategies)
 
@@ -171,6 +177,7 @@ func init() {
 		BuildTools:            buildTools,
 		VersioningTypes:       vt,
 		DeploymentScript:      ds,
+		CiTools:               ciTools,
 	}
 
 	autis := make([]string, len(integrationStrategies))
@@ -190,6 +197,7 @@ func init() {
 		VersioningTypes:       vt,
 		TestReportTools:       testReportTools,
 		DeploymentScript:      ds,
+		CiTools:               ciTools,
 	}
 
 	lc := controllers.LibraryController{
@@ -204,6 +212,7 @@ func init() {
 		BuildTools:            buildTools,
 		VersioningTypes:       vt,
 		DeploymentScript:      ds,
+		CiTools:               ciTools,
 	}
 
 	ec := controllers.EDPTenantController{

@@ -221,6 +221,7 @@ func convertData(codebase command.CreateCodebase) edpv1alpha1.CodebaseSpec {
 		JiraServer:           codebase.JiraServer,
 		CommitMessagePattern: codebase.CommitMessageRegex,
 		TicketNamePattern:    codebase.TicketNameRegex,
+		CiTool:               codebase.CiTool,
 	}
 	if cs.Strategy == "import" {
 		cs.GitUrlPath = codebase.GitUrlPath

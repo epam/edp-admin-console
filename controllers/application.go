@@ -53,6 +53,7 @@ type ApplicationController struct {
 	BuildTools            []string
 	VersioningTypes       []string
 	DeploymentScript      []string
+	CiTools               []string
 }
 
 const (
@@ -166,6 +167,7 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 	c.Data["BasePath"] = context.BasePath
 	c.Data["JiraServer"] = servers
 	c.Data["DiagramPageEnabled"] = context.DiagramPageEnabled
+	c.Data["CiTools"] = c.CiTools
 	c.TplName = "create_application.html"
 }
 
@@ -233,6 +235,7 @@ func (c *ApplicationController) extractApplicationRequestData() command.CreateCo
 		JenkinsSlave:     c.GetString("jenkinsSlave"),
 		JobProvisioning:  c.GetString("jobProvisioning"),
 		DeploymentScript: c.GetString("deploymentScript"),
+		CiTool:           c.GetString("ciTool"),
 		Name:             c.GetString("appName"),
 	}
 

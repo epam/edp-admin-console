@@ -18,6 +18,7 @@ github.com/Azure/go-autorest/tracing v0.5.0/go.mod h1:r/s2XiOKccPW3HrqB+W0TQzfbt
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
+github.com/DATA-DOG/go-sqlmock v1.4.1/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
 github.com/Knetic/govaluate v3.0.0+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/Microsoft/go-winio v0.4.14 h1:+hMXMk01us9KgxGb7ftKQt2Xpf5hH/yky+TDA+qxleU=
 github.com/Microsoft/go-winio v0.4.14/go.mod h1:qXqCSQ3Xa7+6tgxaGTIe4Kpcdsi+P8jBhyzoq1bpyYA=
@@ -89,6 +90,10 @@ github.com/epmd-edp/cd-pipeline-operator/v2 v2.3.0-58.0.20200520111933-aefa684da
 github.com/epmd-edp/codebase-operator/v2 v2.3.0-88/go.mod h1:MqnZsWXSdziAmOYznnMW+C3M160So5AMuJoCSL84t8M=
 github.com/epmd-edp/codebase-operator/v2 v2.3.0-95.0.20200514095748-92497054f7da h1:Xc380z6el5EJ7yfbYySIOajdzmqcHjUz+Yn82faub1o=
 github.com/epmd-edp/codebase-operator/v2 v2.3.0-95.0.20200514095748-92497054f7da/go.mod h1:2joXoCeTqQ1MjTHfp5yoMfnWy/3zuznNOxGioCvyVDY=
+github.com/epmd-edp/codebase-operator/v2 v2.3.0-95.0.20200825094900-f2576b63dd98 h1:GUzAuAAkgcBMFNopaWeZzF/R5rE7gI8y1vb/bh1RVOs=
+github.com/epmd-edp/codebase-operator/v2 v2.3.0-95.0.20200825094900-f2576b63dd98/go.mod h1:qLuEkWCxTzh0QfkzzkNJoW+3tmuN0EV4zVa1OF5kXAA=
+github.com/epmd-edp/codebase-operator/v2 v2.3.0-95.0.20200825100527-b8b553645568 h1:D6UXwAhbo8bh7+nbf27s5gsxu+bmyHstcz7a/2Ix1Mc=
+github.com/epmd-edp/codebase-operator/v2 v2.3.0-95.0.20200825100527-b8b553645568/go.mod h1:qLuEkWCxTzh0QfkzzkNJoW+3tmuN0EV4zVa1OF5kXAA=
 github.com/epmd-edp/edp-component-operator v0.0.0-20191029131047-d87b7a6d3bb0/go.mod h1:k4OqvjIznqyXgdpp1iuuSdSk4BdjiJ3j3eesPIIqO+s=
 github.com/epmd-edp/gerrit-operator/v2 v2.1.0-52/go.mod h1:NUerZ1Gse7TCf0ltzTx08Un4WztLGmLzW9FZ4npRM6g=
 github.com/epmd-edp/jenkins-operator/v2 v2.1.0-32/go.mod h1:yVeuimCbYOgqjwMiqc1piFj3HohgfcYMjE4fWl2lPVw=
@@ -96,6 +101,7 @@ github.com/epmd-edp/jenkins-operator/v2 v2.1.0-47/go.mod h1:n5IZrwC++e8lEAxac12v
 github.com/epmd-edp/jenkins-operator/v2 v2.1.0-61/go.mod h1:n5IZrwC++e8lEAxac12vei/DJCSLGGV9Na/io9wmhWs=
 github.com/epmd-edp/jenkins-operator/v2 v2.3.0-130.0.20200213115806-646ef85ab062/go.mod h1:pC0Q2OK3QyKGJoTgZptCPs49oC3AoIS4gPf7VJ+YMt8=
 github.com/epmd-edp/jenkins-operator/v2 v2.3.0-130.0.20200416062406-16c330e09a19/go.mod h1:lhEvImddh3dQ60upbreE1/7GZUoe5pkFRQuxDs3vZFA=
+github.com/epmd-edp/jenkins-operator/v2 v2.3.0-130.0.20200525102742-f56cd8641faa/go.mod h1:XjqQ2LkGCsKV2Gke+K+AevHIbIDZtJlCkv2pq7e6DQ8=
 github.com/epmd-edp/keycloak-operator v1.0.18-alpha-39/go.mod h1:n78SGdVQhCkr29STKtz2qKDnYBiWk4TUoGATKF6nOH8=
 github.com/epmd-edp/keycloak-operator v1.0.31-alpha-56/go.mod h1:uXEmg98UyXkMVe9deHTkz0wF7fb47geazmAoiQAb/Zw=
 github.com/evanphx/json-patch v4.0.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQLiYLvXMP4fmwYFNcr97nuDLSk=
