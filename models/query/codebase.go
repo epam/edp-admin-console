@@ -34,6 +34,7 @@ type Codebase struct {
 	JiraServer           *string           `json:"jiraServer" orm:"-"`
 	CommitMessagePattern string            `json:"commitMessagePattern" orm:"commit_message_pattern"`
 	TicketNamePattern    string            `json:"ticketNamePattern" orm:"ticket_name_pattern"`
+	CiTool               string            `json:"ciTool" orm:"ci_tool"`
 }
 
 func (c *Codebase) TableName() string {
