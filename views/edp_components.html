@@ -21,16 +21,18 @@
                 <table class="table">
                     <tbody>
                         {{ range $i, $val := .EDPComponents }}
-                            <tr>
-                                <td width="25px">
-                                    <a href="{{ $val.Url }}" target="_blank" rel="noopener noreferrer">
-                                        <img src="data:image/svg+xml;base64,{{ $val.Icon }}" alt="{{ $val.Type }}" height="45" width="42"/>
-                                    </a>
-                                </td>
-                                <td>
-                                    <a href="{{ $val.Url }}" target="_blank" rel="noopener noreferrer" class="component-name">{{ $val.Type }}</a>
-                                </td>
-                            </tr>
+                            {{if $val.Visible}}
+                                <tr>
+                                    <td width="25px">
+                                        <a href="{{ $val.Url }}" target="_blank" rel="noopener noreferrer">
+                                            <img src="data:image/svg+xml;base64,{{ $val.Icon }}" alt="{{ $val.Type }}" height="45" width="42"/>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{{ $val.Url }}" target="_blank" rel="noopener noreferrer" class="component-name">{{ $val.Type }}</a>
+                                    </td>
+                                </tr>
+                            {{end}}
                         {{end}}
                     </tbody>
                 </table>

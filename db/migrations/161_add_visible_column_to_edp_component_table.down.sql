@@ -1,0 +1,1 @@
+alter table edp_component drop column visible;
