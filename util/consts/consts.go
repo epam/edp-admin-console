@@ -20,6 +20,8 @@ const (
 
 	ImportStrategy = "import"
 	LanguageJava   = "Java"
+
+	DefaultVersioningType = "default"
 )
 
 var DefaultBuildNumber = "0"
