@@ -1,0 +1,1 @@
+alter type "action" add value 'put_branch_for_gitlab_ci_codebase';
