@@ -73,7 +73,7 @@ hit Edit and Add → type the run.json to open this file.
 
 There is an ability to run the autotests locally using the IntelliJIDEA application. To launch the rest-autotests project for the local verification, perform the following steps:
 
-1. Clone the project to the local machine. For detailed information on how to clone the project, please refer [here](../documentation/cicd_customization/clone_project_using_gitbash.md).
+1. Clone the project to the local machine. For detailed information on how to clone the project, please refer [here](../cicd_customization/clone_project_using_gitbash.md).
 
 2. Open the project in IntelliJIDEA and find the **run.json** file to copy out the necessary command value, then click the Add Configuration button, hit the plus sign → go to Maven and paste the copied command value into the Command line field→ click Apply and OK → hit the necessary button to run the added command value:
     ![launch_autotest](../customization_resources/launch_autotest.png) 
