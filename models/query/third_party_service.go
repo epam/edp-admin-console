@@ -6,7 +6,7 @@ type ThirdPartyService struct {
 	Description string `json:"description" orm:"column(description)"`
 	Version     string `json:"version" orm:"column(version)"`
 	Url         string `json:"url" orm:"column(url)"`
-	Icon        string `json:"icon" orm:"column(icon)"`
+	Icon        string `json:"-" orm:"column(icon)"`
 }
 
 func (cb *ThirdPartyService) TableName() string {
