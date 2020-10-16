@@ -71,7 +71,7 @@ func InitDb() {
 	orm.RegisterModel(new(query.Codebase), new(query.ActionLog), new(query.CodebaseBranch), new(query.ThirdPartyService),
 		new(query.CDPipeline), new(query.JobProvisioning), new(query.Stage), new(query.QualityGate), new(query.ApplicationsToPromote),
 		new(query.CodebaseDockerStream), new(query.GitServer), new(query.JenkinsSlave),
-		new(query.EDPComponent), new(query.JiraServer))
+		new(query.EDPComponent), new(query.JiraServer), new(query.PerfServer))
 }
 
 func checkErr(err error) {

@@ -1,0 +1,1 @@
+alter table if exists codebase drop column if exists perf_server_name;
