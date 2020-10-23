@@ -248,6 +248,13 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 		Do().
 		Into(pipelineCR)
 
+	if _, err = s.CreateStages(edpRestClient, pipeline); err != nil {
+		return errors.Wrap(err, "an error has occurred while creating Stages in cluster")
+	}
+	log.Info("Stages for CD Pipeline have been created in cluster",
+		zap.String("pipe", pipeline.Name),
+		zap.Any("stages", pipeline.Stages))
+
 	if err != nil {
 		return errors.Wrap(err, "an error has occurred while updating CD Pipeline cluster")
 	}

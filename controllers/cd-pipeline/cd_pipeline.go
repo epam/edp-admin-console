@@ -262,11 +262,13 @@ func (c *CDPipelineController) UpdateCDPipeline() {
 	flash := beego.NewFlash()
 	appNameCheckboxes := c.GetStrings("app")
 	pipelineName := c.GetString(":name")
+	stages := retrieveStagesFromRequest(c)
 
 	pipelineUpdateCommand := command.CDPipelineCommand{
 		Name:                 pipelineName,
 		Applications:         c.convertApplicationWithBranchesData(appNameCheckboxes),
 		ApplicationToApprove: c.getApplicationsToPromoteFromRequest(appNameCheckboxes),
+		Stages:               stages,
 	}
 
 	errMsg := validation.ValidateCDPipelineUpdateRequestData(pipelineUpdateCommand)

@@ -133,7 +133,8 @@ func (c *CDPipelineRestController) UpdateCDPipeline() {
 	}
 	log.Info("Request data is received to update CD pipeline",
 		zap.String("pipeline", pipelineUpdateCommand.Name),
-		zap.Any("applications", pipelineUpdateCommand.Applications))
+		zap.Any("applications", pipelineUpdateCommand.Applications),
+		zap.Any("stages", pipelineUpdateCommand.Stages))
 
 	err = c.CDPipelineService.UpdatePipeline(pipelineUpdateCommand)
 	if err != nil {
