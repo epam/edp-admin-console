@@ -41,6 +41,7 @@ type ICDPipelineRepository interface {
 	GetCDPipelinesUsingAutotestAndBranch(codebase, branch string) ([]string, error)
 	GetCDPipelinesUsingLibraryAndBranch(codebase, branch string) ([]string, error)
 	GetAllCodebaseDockerStreams() ([]string, error)
+	SelectCountStages(pipeName string) (*int, error)
 }
 
 const (
@@ -155,6 +156,8 @@ const (
 		" left join codebase_docker_stream cds on scds.input_codebase_docker_stream_id = cds.id" +
 		" left join codebase_docker_stream cds1 on scds.output_codebase_docker_stream_id = cds1.id " +
 		" where cd_stage_id = ?;"
+	selectCountStages = "select count(*) from cd_stage cs " +
+		"left join cd_pipeline cp on cs.cd_pipeline_id = cp.id where cp.name = ?;"
 )
 
 type CDPipelineRepository struct {
@@ -633,4 +636,13 @@ func (CDPipelineRepository) getStageCodebaseDockerStream(stageId int) ([]query.S
 		return nil, err
 	}
 	return ds, nil
+}
+
+func (CDPipelineRepository) SelectCountStages(pipeName string) (*int, error) {
+	o := orm.NewOrm()
+	var c int
+	if err := o.Raw(selectCountStages, pipeName).QueryRow(&c); err != nil {
+		return nil, err
+	}
+	return &c, nil
 }

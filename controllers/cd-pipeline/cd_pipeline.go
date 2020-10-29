@@ -262,7 +262,13 @@ func (c *CDPipelineController) UpdateCDPipeline() {
 	flash := beego.NewFlash()
 	appNameCheckboxes := c.GetStrings("app")
 	pipelineName := c.GetString(":name")
-	stages := retrieveStagesFromRequest(c)
+	var stageCount, err = c.getCDPipelineStageCount(pipelineName)
+	if err != nil {
+		log.Error("an error has occurred while getting stage count", zap.Error(err))
+		c.Abort("500")
+		return
+	}
+	stages := retrieveStagesFromRequest(c, *stageCount)
 
 	pipelineUpdateCommand := command.CDPipelineCommand{
 		Name:                 pipelineName,
@@ -285,7 +291,7 @@ func (c *CDPipelineController) UpdateCDPipeline() {
 		zap.Any("stages", pipelineUpdateCommand.Stages),
 		zap.Any("services", pipelineUpdateCommand.ThirdPartyServices))
 
-	err := c.PipelineService.UpdatePipeline(pipelineUpdateCommand)
+	err = c.PipelineService.UpdatePipeline(pipelineUpdateCommand)
 	if err != nil {
 
 		switch err.(type) {
@@ -315,7 +321,13 @@ func (c *CDPipelineController) CreateCDPipeline() {
 	appNameCheckboxes := c.GetStrings("app")
 	pipelineName := c.GetString("pipelineName")
 	serviceCheckboxes := c.GetStrings("service")
-	stages := retrieveStagesFromRequest(c)
+	var stageCount, err = c.getCDPipelineStageCount(pipelineName)
+	if err != nil {
+		log.Error("an error has occurred while getting stage count", zap.Error(err))
+		c.Abort("500")
+		return
+	}
+	stages := retrieveStagesFromRequest(c, *stageCount)
 
 	cdPipelineCreateCommand := command.CDPipelineCommand{
 		Name:                 pipelineName,
@@ -416,7 +428,7 @@ func (c *CDPipelineController) GetCDPipelineOverviewPage() {
 	c.TplName = "cd_pipeline_overview.html"
 }
 
-func retrieveStagesFromRequest(this *CDPipelineController) []command.CDStageCommand {
+func retrieveStagesFromRequest(this *CDPipelineController, stageCount int) []command.CDStageCommand {
 	var stages []command.CDStageCommand
 
 	for index, stageName := range this.GetStrings("stageName") {
@@ -431,12 +443,13 @@ func retrieveStagesFromRequest(this *CDPipelineController) []command.CDStageComm
 				Branch: this.GetString(stageName + "-pipelineLibraryBranch"),
 			}
 		}
+
 		stageRequest := command.CDStageCommand{
 			Name:            stageName,
 			Description:     this.GetString(stageName + "-stageDesc"),
 			TriggerType:     this.GetString(stageName + "-triggerType"),
 			Source:          stgSrc,
-			Order:           index,
+			Order:           index + stageCount,
 			JobProvisioning: this.GetString(stageName + "-jobProvisioning"),
 		}
 
@@ -744,4 +757,12 @@ func (c CDPipelineController) DeleteCDPipeline() {
 	}
 	log.Debug("delete cd pipeline method is finished", zap.String("name", n))
 	c.Redirect(fmt.Sprintf("%s/admin/edp/cd-pipeline/overview?name=%v#cdPipelineDeletedSuccessModal", context.BasePath, n), 302)
+}
+
+func (c *CDPipelineController) getCDPipelineStageCount(pipelineName string) (*int, error) {
+	var existedStageNumber, err = c.PipelineService.GetStageCount(pipelineName)
+	if err != nil {
+		return nil, fmt.Errorf("an error has occurred while getting the number of stages of cd-pipeline")
+	}
+	return existedStageNumber, nil
 }

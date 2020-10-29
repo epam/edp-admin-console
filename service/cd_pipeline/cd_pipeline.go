@@ -612,3 +612,13 @@ func (s CDPipelineService) GetAllCodebaseDockerStreams() ([]string, error) {
 	log.Info("CodebaseDockerStreams were fetched", zap.Strings("streams", streams))
 	return streams, nil
 }
+
+func (s CDPipelineService) GetStageCount(pipeName string) (*int, error) {
+	log.Debug("start counting the number of stages of cd-pipeline")
+	count, err := s.ICDPipelineRepository.SelectCountStages(pipeName)
+	if err != nil {
+		return nil, errors.Wrap(err, "an error has occurred while counting the number of stages of cd-pipeline")
+	}
+	log.Info("stages of cd-pipeline were counted")
+	return count, nil
+}
