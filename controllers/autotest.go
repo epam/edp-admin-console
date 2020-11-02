@@ -111,6 +111,7 @@ func (c *AutotestsController) extractAutotestsRequestData() command.CreateCodeba
 		DeploymentScript: c.GetString("deploymentScript"),
 		Name:             c.GetString("appName"),
 		CiTool:           c.GetString("ciTool"),
+		DefaultBranch:    c.GetString("defaultBranchName"),
 	}
 
 	if js := c.GetString("jenkinsSlave"); len(js) > 0 {
