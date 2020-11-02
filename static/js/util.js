@@ -110,7 +110,7 @@ function createConfirmTable(formName) {
             'Framework': 'framework',
             'Build tool': 'buildTool',
             'Integration with VCS is enabled': $('.vcs-block').length !== 0,
-            'Multi-module project': isFound('isMultiModule')
+            'Multi-module project': !!isFound('isMultiModule')
         });
 
     addBlock(null, "CODEBASE",
@@ -154,7 +154,7 @@ function createConfirmTable(formName) {
         });
     }
 
-    if (!isFound('strategy') || getValue('strategy') === "clone") {
+    if (isFound('strategy') || getValue('strategy') === "clone") {
         addBlock(
             null, null,
             {'Repository': 'gitRepoUrl'});
