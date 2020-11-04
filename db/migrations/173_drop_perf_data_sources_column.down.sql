@@ -1,0 +1,1 @@
+alter table if exists codebase add perf_data_sources text;

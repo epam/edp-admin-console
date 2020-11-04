@@ -1,0 +1,1 @@
+drop table if exists perf_data_sources;
