@@ -16,3 +16,11 @@ func (m MockPerfBoard) GetPerfServers() ([]*query.PerfServer, error) {
 	}
 	return args.Get(0).([]*query.PerfServer), args.Error(1)
 }
+
+func (m MockPerfBoard) GetPerfServerName(id int) (*query.PerfServer, error) {
+	panic("implement me!!!")
+}
+
+func (m MockPerfBoard) GetCodebaseDataSources(codebaseId int) ([]string, error) {
+	panic("implement me!!!")
+}
