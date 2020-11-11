@@ -19,7 +19,7 @@ The general EDP Pipeline Framework consists of several parts:
 
 Get acquainted with the sections below to get detailed information about the EDP pipelines and their stages:  
 
-#### [1. Code Review Pipeline](#code_review_pipeline)
+### [1. Code Review Pipeline](#code_review_pipeline)
 [1.1 Code Review Pipeline. EDP Library Pipelines Description](#crp_description)
 
 [1.2 Code Review Pipeline Stages](#crp_stages)
@@ -28,7 +28,7 @@ Get acquainted with the sections below to get detailed information about the EDP
         
 [1.4 Code Review Pipeline. Using EDP Library Stages in the Pipeline](#crp_use_lib)
     
-#### [2. Build Pipeline](#build_pipeline)
+### [2. Build Pipeline](#build_pipeline)
 [2.1 Build Pipeline. EDP Library Pipelines Description](#bp_description)
 
 [2.2 Build Pipeline Stages](#bp_stages)
@@ -37,9 +37,9 @@ Get acquainted with the sections below to get detailed information about the EDP
 
 [2.4 Build Pipeline. Using EDP Library Stages in the Pipeline](#bp_use_lib)
 
-#### [3. EDP Stages Library Description](#stages_lib_description)
-#### [4. EDP Stages Framework](#edp_stages_framework") 
-#### [5. Deploy Pipeline](#deploy_pipeline) 
+### [3. EDP Stages Library Description](#stages_lib_description)
+### [4. EDP Stages Framework](#edp_stages_framework) 
+### [5. Deploy Pipeline](#deploy_pipeline) 
 [5.1 Deploy Pipeline. EDP Library Pipelines Description](#dp_description)
 
 [5.2 Deploy Pipeline. EDP Library Stages Description](#dp_stages_lib_description)
@@ -79,7 +79,7 @@ Table 1. <a name="table1"></a> Enums and Interfaces with the respective properti
 
 |Enums | Interfaces|
 |-------|-------|
-|_PlatformType:_ <br /><br /> - OPENSHIFT <br /> - KUBERNETES <br /> <br />_JobType:_ <br /><br /> - CODEREVIEW <br /> - BUILD <br /> - DEPLOY <br /><br />_BuildToolType:_ <br /><br /> - MAVEN <br /> - GRADLE <br /> - NPM <br /> - DOTNET| <br /><br />_**Platform()**_ - contains methods for working with platform CLI. At the moment only OpenShift is supported. <br /><br />**Properties**:<br /><br /> Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this". <br /> <br />**Methods**:<br /><br /> getJsonPathValue(String k8s_kind, String k8s_kind_name, String jsonPath): return String value of specific parameter of particular object using jsonPath utility. <br /><br />**Example**: <br /><br />`context.platform.getJsonPathValue(''cm'', ''project-settings'', ''.data.username'')`. <br /><br />_**BuildTool()**_ - contains methods for working with different buildTool from ENUM BuildToolType. Should be invoked on slave build agents. <br /><br />**Properties**: <br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this". Nexus object - Object of class Nexus. <br /><br />**Methods**:<br /><br /> init: return parameters of buildTool that are needed for running stages. <br /><br />**Example**: <br /><br /> `context.buildTool = new BuildToolFactory().getBuildToolImpl(context.application.config.build_tool, this, context.nexus) context.buildTool.init()`.|
+|_PlatformType:_ <br /><br /> - OPENSHIFT <br /> - KUBERNETES <br /> <br />_JobType:_ <br /><br /> - CODEREVIEW <br /> - BUILD <br /> - DEPLOY <br /><br />_BuildToolType:_ <br /><br /> - MAVEN <br /> - GRADLE <br /> - NPM <br /> - DOTNET| <br /><br />_**Platform()**_ - contains methods for working with platform CLI. At the moment only OpenShift is supported. <br /><br />**Properties**:<br /><br /> Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this". <br /> <br />**Methods**:<br /><br /> getJsonPathValue(String k8s_kind, String k8s_kind_name, String jsonPath): return <br />String value of specific parameter of particular object using jsonPath utility. <br /><br />**Example**: <br /><br />`context.platform.getJsonPathValue(''cm'', ''project-settings'', ''.data.username'')`. <br /><br />_**BuildTool()**_ - contains methods for working with different buildTool from ENUM BuildToolType. <br />Should be invoked on slave build agents. <br /><br />**Properties**: <br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this". <br />Nexus object - Object of class Nexus. <br /><br />**Methods**:<br /><br /> init: return parameters of buildTool that are needed for running stages. <br /><br />**Example**: <br /><br /> `context.buildTool = new BuildToolFactory().getBuildToolImpl(context.application.config.build_tool, this, context.nexus) context.buildTool.init()`.|
 
 Table 2. <a name="table2"></a> Classes with the respective properties, methods, and examples.
 
@@ -97,7 +97,7 @@ Table 2. <a name="table2"></a> Classes with the respective properties, methods, 
 Each EDP stage implementation has run method that is as input parameter required to pass a context map with different keys. Some stages can implement the logic for several build tools and application types, some of them are specific.
 
 The Code Review pipeline includes the following default stages: **Checkout → Gerrit Checkout → Compile → Tests → Sonar**.
-> **INFO**: To get the full description of every stage, please refer to the [EDP Stages Framework](#edp_stages_framework") section.
+> **INFO**: To get the full description of every stage, please refer to the [EDP Stages Framework](#edp_stages_framework) section.
 
 ### 1.3 Code Review Pipeline. How to Redefine or Extend the EDP Pipeline Stages Library <a name="crp_extend"></a>
 
@@ -271,7 +271,7 @@ Table 3. <a name="table3"></a> Enums and Interfaces with the respective properti
 
 |Enums| Interfaces|
 |---|---|
-|_PlatformType:_<br /><br />- OPENSHIFT<br />- KUBERNETES<br /><br />_JobType:_<br /><br />- CODEREVIEW<br />- BUILD<br />- DEPLOY<br /><br />_BuildToolType_:<br /><br />- MAVEN<br />- GRADLE<br />- NPM<br />- DOTNET<br />| _**Platform()**_ -  contains methods for working with platform CLI. At the moment only OpenShift is supported.<br /><br />**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this".<br /><br />**Methods**:<br /><br />getJsonPathValue(String k8s_kind, String k8s_kind_name, String jsonPath): return String value of specific parameter of particular object using jsonPath utility.<br /><br />**Example**:<br /><br />`context.platform.getJsonPathValue("cm","project-settings",".data.username")`<br /><br />_**BuildTool()**_ - contains methods for working with different buildTool from ENUM BuildToolType. Should be invoked on slave build agents.<br /><br />**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this".<br />Nexus object - Object of class Nexus. See description below:<br /><br />**Methods**:<br /><br />init: return parameters of buildTool that are needed for running stages.<br /><br />**Example**:<br /><br />`context.buildTool = new BuildToolFactory().getBuildToolImpl(context.application.config.build_tool, this, context.nexus)` <br />`context.buildTool.init()`|
+|_PlatformType:_<br /><br />- OPENSHIFT<br />- KUBERNETES<br /><br />_JobType:_<br /><br />- CODEREVIEW<br />- BUILD<br />- DEPLOY<br /><br />_BuildToolType_:<br /><br />- MAVEN<br />- GRADLE<br />- NPM<br />- DOTNET<br />| _**Platform()**_ -  contains methods for working with platform CLI. At the moment only OpenShift is supported.<br /><br />**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this".<br /><br />**Methods**:<br /><br />getJsonPathValue(String k8s_kind, String k8s_kind_name, String jsonPath): return <br />String value of specific parameter of particular object using jsonPath utility.<br /><br />**Example**:<br /><br />`context.platform.getJsonPathValue("cm","project-settings",".data.username")`<br /><br />_**BuildTool()**_ - contains methods for working with different buildTool from ENUM BuildToolType. <br />Should be invoked on slave build agents.<br /><br />**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this".<br />Nexus object - Object of class Nexus. See description below:<br /><br />**Methods**:<br /><br />init: return parameters of buildTool that are needed for running stages.<br /><br />**Example**:<br /><br />`context.buildTool = new BuildToolFactory().getBuildToolImpl(context.application.config.build_tool, this, context.nexus)` <br />`context.buildTool.init()`|
 
 Table 4. <a name="table4"></a> Classes with the respective properties, methods, and examples.
 
@@ -290,7 +290,7 @@ Each EDP stage implementation has run method that is as input parameter required
 Some stages can implement the logic for several build tools and application types, some of them are specific.
 
 The Build pipeline includes the following default stages: **Checkout → Gerrit Checkout → Compile → Get version → Tests → Sonar → Build → Build Docker Image → Push → Git tag**.
-> **INFO**: To get the full description of every stage, please refer to the [EDP Stages Framework](#edp_stages_framework") section.
+> **INFO**: To get the full description of every stage, please refer to the [EDP Stages Framework](#edp_stages_framework) section.
 
 ### 2.3 Build Pipeline. How to Redefine or Extend EDP Pipeline Stages Library <a name="bp_extend"></a>
 
@@ -448,7 +448,7 @@ Table 5. <a name="table5"></a> Enums and Classes with the respective properties,
 
 |Enums| Classes|
 |---|---|
-|_ProjectType_:<br /><br /> - APPLICATION<br />  - AUTOTESTS<br />  - LIBRARY| _**StageFactory()**_ - Class that contains methods getting an implementation of the particular stage either EDP from shared library or custom from application repository.<br /><br />**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this".<br /><br />Map stages - Map of stages implementations.<br /><br />**Methods**:<br /><br />loadEdpStages(): return a list of Classes that describes EDP stages implementations.<br /><br />loadCustomStages(String directory): return a list of Classes that describes EDP custom stages from application repository from "directory". The "directory" should have an absolute path to files with classes of custom stages implementations. Should be run from slave agent.<br /><br />add(Class clazz): register class for some particular stage in stages map of StageFactory class.<br /><br />getStage(String name, String buildTool, String type): return an object of the class for a particular stage from stages property based on stage name and buildTool, type of application.<br /><br />**Example**:<br /><br />`context.factory = new StageFactory(script: this)`<br />`context.factory.loadEdpStages().each() { context.factory.add(it) }`<br />`context.factory.loadCustomStages("${context.workDir}/stages").each() { context.factory.add(it) }`<br />`context.factory.getStage(stageName.toLowerCase(),context.application.config.build_tool.toLowerCase(),context.application.config.type).run(context)`|
+|_ProjectType_:<br /><br /> - APPLICATION<br />  - AUTOTESTS<br />  - LIBRARY| _**StageFactory()**_ - Class that contains methods getting an implementation of the particular stage either EDP <br />from shared library or custom from application repository.<br /><br />**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this".<br /><br />Map stages - Map of stages implementations.<br /><br />**Methods**:<br /><br />loadEdpStages(): return a list of Classes that describes EDP stages implementations.<br /><br />loadCustomStages(String directory): return a list of Classes that describes EDP custom stages from application <br />repository from "directory". The "directory" should have an absolute path to files with classes of custom stages<br /> implementations. Should be run from slave agent.<br /><br />add(Class clazz): register class for some particular stage in stages map of StageFactory class.<br /><br />getStage(String name, String buildTool, String type): return an object of the class for a particular stage <br />from stages property based on stage name and buildTool, type of application.<br /><br />**Example**:<br /><br />`context.factory = new StageFactory(script: this)`<br />`context.factory.loadEdpStages().each() { context.factory.add(it) }`<br />`context.factory.loadCustomStages("${context.workDir}/stages").each() { context.factory.add(it) }`<br />`context.factory.getStage(stageName.toLowerCase(),context.application.config.build_tool.toLowerCase(),`<br />`context.application.config.type).run(context)`|
 
 ## 4. EDP Stages Framework <a name="edp_stages_framework"></a>
 
@@ -499,7 +499,7 @@ Table 8. <a name="table8"></a> Enums and Interfaces with the respective properti
 
 |Enums|Interfaces|
 |---|---|
-|_PlatformType_:<br /><br />- OPENSHIFT<br />- KUBERNETES<br /><br />_JobType_:<br />- CODEREVIEW<br />- BUILD<br />- DEPLOY<br /><br />_BuildToolType_:<br />- MAVEN<br />- GRADLE<br />- NPM<br />- DOTNET | **Platform()** - contains methods for working with platform CLI. At the moment only OpenShift is supported.<br /><br />**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this". <br /><br />**Methods**:<br /><br />getJsonPathValue(String k8s_kind, String k8s_kind_name, String jsonPath): return String value of specific parameter of particular object using jsonPath utility. <br /><br />**Example**:<br /><br /> `context.platform.getJsonPathValue("cm","project-settings",".data.username")` <br /><br />BuildTool() - contains methods for working with different buildTool from ENUM BuildToolType.(Should be invoked on slave build agents)**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this". <br /><br />Nexus object - Object of class Nexus.<br /><br />**Methods**:<br /><br />init: return parameters of buildTool that are needed for running stages. <br /><br />**Example**:<br /><br />`context.buildTool = new BuildToolFactory().getBuildToolImpl(context.application.config.build_tool, this, context.nexus)`<br />`context.buildTool.init()` |
+|_PlatformType_:<br /><br />- OPENSHIFT<br />- KUBERNETES<br /><br />_JobType_:<br />- CODEREVIEW<br />- BUILD<br />- DEPLOY<br /><br />_BuildToolType_:<br />- MAVEN<br />- GRADLE<br />- NPM<br />- DOTNET | **Platform()** - contains methods for working with platform CLI. At the moment only OpenShift is supported.<br /><br />**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this". <br /><br />**Methods**:<br /><br />getJsonPathValue(String k8s_kind, String k8s_kind_name, String jsonPath): return <br />String value of specific parameter of particular object using jsonPath utility. <br /><br />**Example**:<br /><br /> `context.platform.getJsonPathValue("cm","project-settings",".data.username")` <br /><br />BuildTool() - contains methods for working with different buildTool from ENUM BuildToolType. <br />(Should be invoked on slave build agents)**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this". <br /><br />Nexus object - Object of class Nexus.<br /><br />**Methods**:<br /><br />init: return parameters of buildTool that are needed for running stages. <br /><br />**Example**:<br /><br />`context.buildTool = new BuildToolFactory().getBuildToolImpl(context.application.config.build_tool, this, context.nexus)`<br />`context.buildTool.init()` |
 
 Table 9. <a name="table9"></a> Classes with the respective properties, methods, and examples.
 
@@ -521,7 +521,7 @@ Table 10. <a name="table10"></a> Classes with the respective properties, methods
 
 |Classes|Description (properties, methods, and examples)|
 |---|---|
-|**StageFactory()** - Class that contains methods getting implementation of particular stage either EDP from shared library or custom from application repository.|**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this"<br /><br />Map stages - Map of stages implementations<br /><br />**Methods**:<br /><br />loadEdpStages(): return list of Classes that describes EDP stages implementations<br /><br />loadCustomStages(String directory): return list of Classes that describes EDP custom stages from application repository from "directory". The "directory" should be absolute path to files with classes of custom stages implementations. Should be run from slave agent.<br /><br />add(Class clazz): register class for some particular stage in stages map of StageFactory class<br /><br />getStage(String name, String buildTool, String type): return object of the class for particular stage from stages property based on stage name and buildTool, type of application<br /><br /><br />**Example**:<br /><br />`context.factory = new StageFactory(script: this)`<br />`context.factory.loadEdpStages().each() { context.factory.add(it) }`<br />`context.factory.loadCustomStages("${context.workDir}/stages").each() { context.factory.add(it) }`<br />`context.factory.getStage(stageName.toLowerCase(),context.application.config.build_tool.toLowerCase(),context.application.config.type).run(context)`.|
+|**StageFactory()** - Class that contains methods getting implementation of particular stage either EDP from shared library or custom from application repository.|**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this"<br /><br />Map stages - Map of stages implementations<br /><br />**Methods**:<br /><br />loadEdpStages(): return list of Classes that describes EDP stages implementations<br /><br />loadCustomStages(String directory): return list of Classes that describes EDP custom stages from <br />application repository from "directory". The "directory" should be absolute path to files <br />with classes of custom stages implementations. Should be run from slave agent.<br /><br />add(Class clazz): register class for some particular stage in stages map of StageFactory class<br /><br />getStage(String name, String buildTool, String type): return object of the class for particular stage <br />from stages property based on stage name and buildTool, type of application<br /><br /><br />**Example**:<br /><br />`context.factory = new StageFactory(script: this)`<br />`context.factory.loadEdpStages().each() { context.factory.add(it) }`<br />`context.factory.loadCustomStages("${context.workDir}/stages").each() { context.factory.add(it) }`<br />`context.factory.getStage(stageName.toLowerCase(),context.application.config.build_tool.toLowerCase(),`<br />`context.application.config.type).run(context)`.|
 
 ### 5.3 Deploy Pipeline Stages <a name="dp_stages"></a>
 
@@ -665,3 +665,10 @@ pipeline {
 	}
 }
 ```
+<details><summary>test</summary>
+
+   1. First.
+   1. Second.
+   1. Third.
+   
+</details>
