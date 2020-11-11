@@ -77,9 +77,13 @@ The corresponding enums, interfaces, classes, and their methods can be used sepa
 
 Table 1. <a name="table1"></a> Enums and Interfaces with the respective properties, methods, and examples.
 
+<center>
+
 |Enums | Interfaces|
 |-------|-------|
 |_PlatformType:_ <br /><br /> - OPENSHIFT <br /> - KUBERNETES <br /> <br />_JobType:_ <br /><br /> - CODEREVIEW <br /> - BUILD <br /> - DEPLOY <br /><br />_BuildToolType:_ <br /><br /> - MAVEN <br /> - GRADLE <br /> - NPM <br /> - DOTNET| <br /><br />_**Platform()**_ - contains methods for working with platform CLI. <br />At the moment only OpenShift is supported. <br /><br />**Properties**:<br /><br /> Script script - Object with type script, in most cases if class <br />created from Jenkins pipelines it is "this". <br /> <br />**Methods**:<br /><br /> getJsonPathValue(String k8s_kind, String k8s_kind_name, <br />String jsonPath): return String value of specific parameter <br />of particular object using jsonPath utility. <br /><br />**Example**: <br /><br />`context.platform.getJsonPathValue(''cm'', `<br />`''project-settings'', ''.data.username'')`. <br /><br />_**BuildTool()**_ - contains methods for working with different <br />buildTool from ENUM BuildToolType. <br />Should be invoked on slave build agents. <br /><br />**Properties**: <br /><br />Script script - Object with type script, in most cases if class <br />created from Jenkins pipelines it is "this". <br />Nexus object - Object of class Nexus. <br /><br />**Methods**:<br /><br /> init: return parameters of buildTool that are needed <br />for running stages. <br /><br />**Example**: <br /><br /> `context.buildTool = new BuildToolFactory().`<br />`getBuildToolImpl`<br />`(context.application.config.build_tool, this, `<br />`context.nexus) context.buildTool.init()`.|
+
+</center>
 
 Table 2. <a name="table2"></a> Classes with the respective properties, methods, and examples.
 
@@ -268,11 +272,13 @@ The corresponding enums, interfaces, classes, and their methods can be used sepa
 function (please refer to [Table 3](#table3) and [Table 4](#table4)).
 
 Table 3. <a name="table3"></a> Enums and Interfaces with the respective properties, methods, and examples.
+<center>
 
 |Enums| Interfaces|
 |---|---|
-|_PlatformType:_<br /><br />- OPENSHIFT<br />- KUBERNETES<br /><br />_JobType:_<br /><br />- CODEREVIEW<br />- BUILD<br />- DEPLOY<br /><br />_BuildToolType_:<br /><br />- MAVEN<br />- GRADLE<br />- NPM<br />- DOTNET<br />| _**Platform()**_ -  contains methods for working with platform CLI. At the moment only OpenShift is supported.<br /><br />**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this".<br /><br />**Methods**:<br /><br />getJsonPathValue(String k8s_kind, String k8s_kind_name, String jsonPath): return <br />String value of specific parameter of particular object using jsonPath utility.<br /><br />**Example**:<br /><br />`context.platform.getJsonPathValue("cm","project-settings",".data.username")`<br /><br />_**BuildTool()**_ - contains methods for working with different buildTool from ENUM BuildToolType. <br />Should be invoked on slave build agents.<br /><br />**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this".<br />Nexus object - Object of class Nexus. See description below:<br /><br />**Methods**:<br /><br />init: return parameters of buildTool that are needed for running stages.<br /><br />**Example**:<br /><br />`context.buildTool = new BuildToolFactory().getBuildToolImpl(context.application.config.build_tool, this, context.nexus)` <br />`context.buildTool.init()`|
+|_PlatformType:_<br /><br />- OPENSHIFT<br />- KUBERNETES<br /><br />_JobType:_<br /><br />- CODEREVIEW<br />- BUILD<br />- DEPLOY<br /><br />_BuildToolType_:<br /><br />- MAVEN<br />- GRADLE<br />- NPM<br />- DOTNET<br />| _**Platform()**_ -  contains methods for working with platform CLI. <br />At the moment only OpenShift is supported.<br /><br />**Properties**:<br /><br />Script script - Object with type script, in most cases if class <br />created from Jenkins pipelines it is "this".<br /><br />**Methods**:<br /><br />getJsonPathValue(String k8s_kind, String k8s_kind_name,<br /> String jsonPath): return String value of specific parameter <br />of particular object using jsonPath utility.<br /><br />**Example**:<br /><br />`context.platform.getJsonPathValue("cm","project-settings",`<br />`".data.username")`<br /><br />_**BuildTool()**_ - contains methods for working with different <br />buildTool from ENUM BuildToolType. <br />Should be invoked on slave build agents.<br /><br />**Properties**:<br /><br />Script script - Object with type script, in most cases if class <br />created from Jenkins pipelines it is "this".<br />Nexus object - Object of class Nexus. See description below:<br /><br />**Methods**:<br /><br />init: return parameters of buildTool that are needed for <br />running stages.<br /><br />**Example**:<br /><br />`context.buildTool = new BuildToolFactory().getBuildToolImpl`<br />`(context.application.config.build_tool, this, `<br />`context.nexus)context.buildTool.init()`|
 
+</center>
 Table 4. <a name="table4"></a> Classes with the respective properties, methods, and examples.
 
 |Classes| Description (properties, methods, and examples)|
@@ -497,10 +503,13 @@ The corresponding enums and interfaces with their methods can be used separately
 
 Table 8. <a name="table8"></a> Enums and Interfaces with the respective properties, methods, and examples.
 
+<center>
+
 |Enums|Interfaces|
 |---|---|
-|_PlatformType_:<br /><br />- OPENSHIFT<br />- KUBERNETES<br /><br />_JobType_:<br />- CODEREVIEW<br />- BUILD<br />- DEPLOY<br /><br />_BuildToolType_:<br />- MAVEN<br />- GRADLE<br />- NPM<br />- DOTNET | **Platform()** - contains methods for working with platform CLI. At the moment only OpenShift is supported.<br /><br />**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this". <br /><br />**Methods**:<br /><br />getJsonPathValue(String k8s_kind, String k8s_kind_name, String jsonPath): return <br />String value of specific parameter of particular object using jsonPath utility. <br /><br />**Example**:<br /><br /> `context.platform.getJsonPathValue("cm","project-settings",".data.username")` <br /><br />BuildTool() - contains methods for working with different buildTool from ENUM BuildToolType. <br />(Should be invoked on slave build agents)**Properties**:<br /><br />Script script - Object with type script, in most cases if class created from Jenkins pipelines it is "this". <br /><br />Nexus object - Object of class Nexus.<br /><br />**Methods**:<br /><br />init: return parameters of buildTool that are needed for running stages. <br /><br />**Example**:<br /><br />`context.buildTool = new BuildToolFactory().getBuildToolImpl(context.application.config.build_tool, this, context.nexus)`<br />`context.buildTool.init()` |
+|_PlatformType_:<br /><br />- OPENSHIFT<br />- KUBERNETES<br /><br />_JobType_:<br />- CODEREVIEW<br />- BUILD<br />- DEPLOY<br /><br />_BuildToolType_:<br />- MAVEN<br />- GRADLE<br />- NPM<br />- DOTNET | **Platform()** - contains methods for working with platform CLI. <br />At the moment only OpenShift is supported.<br /><br />**Properties**:<br /><br />Script script - Object with type script, in most cases if class <br />created from Jenkins pipelines it is "this". <br /><br />**Methods**:<br /><br />getJsonPathValue(String k8s_kind, String k8s_kind_name, <br />String jsonPath): return String value of specific parameter <br />of particular object using jsonPath utility. <br /><br />**Example**:<br /><br /> `context.platform.getJsonPathValue("cm","project-settings",`<br />`".data.username")` <br /><br />BuildTool() - contains methods for working with different buildTool <br />from ENUM BuildToolType. <br />(Should be invoked on slave build agents)<br /><br />**Properties**:<br /><br />Script script - Object with type script, in most cases if class <br />created from Jenkins pipelines it is "this". <br /><br />Nexus object - Object of class Nexus.<br /><br />**Methods**:<br /><br />init: return parameters of buildTool that are needed for <br />running stages. <br /><br />**Example**:<br /><br />`context.buildTool = new BuildToolFactory().getBuildToolImpl`<br />`(context.application.config.build_tool, this, context.nexus)`<br />`context.buildTool.init()` |
 
+</center>
 Table 9. <a name="table9"></a> Classes with the respective properties, methods, and examples.
 
 |Classes|Description (properties, methods, and examples)|
