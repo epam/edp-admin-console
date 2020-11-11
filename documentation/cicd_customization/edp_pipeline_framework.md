@@ -665,10 +665,3 @@ pipeline {
 	}
 }
 ```
-<details><summary>test</summary>
-
-   1. First.
-   1. Second.
-   1. Third.
-   
-</details>
