@@ -65,6 +65,7 @@ func (c *DiagramController) GetDiagramPage() {
 	c.Data["CodebaseDockerStreamsJson"] = sJson
 	c.Data["DiagramPageEnabled"] = context.DiagramPageEnabled
 	c.Data["Type"] = diagramPageType
+	c.Data["BasePath"] = context.BasePath
 	c.TplName = "delivery_dashboard_diagram.html"
 }
 
