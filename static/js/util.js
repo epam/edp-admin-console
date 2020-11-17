@@ -113,7 +113,8 @@ function createConfirmTable(formName) {
 
     addBlock(null, "CODEBASE",
         {
-            'Integration method': 'strategy'
+            'Integration method': 'strategy',
+            'Default branch': 'defaultBranchName'
         });
 
     let advancedBlock = {

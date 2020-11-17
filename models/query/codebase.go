@@ -35,6 +35,7 @@ type Codebase struct {
 	CommitMessagePattern string            `json:"commitMessagePattern" orm:"commit_message_pattern"`
 	TicketNamePattern    string            `json:"ticketNamePattern" orm:"ticket_name_pattern"`
 	CiTool               string            `json:"ciTool" orm:"ci_tool"`
+	DefaultBranch        string            `json:"defaultBranch" orm:"column(default_branch)"`
 }
 
 func (c *Codebase) TableName() string {
