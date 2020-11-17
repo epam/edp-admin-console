@@ -37,6 +37,7 @@ type Codebase struct {
 	CiTool               string            `json:"ciTool" orm:"ci_tool"`
 	PerfServerId         *int              `json:"-" orm:"column(perf_server_id)"`
 	Perf                 *Perf             `json:"perf" orm:"-"`
+	DefaultBranch        string            `json:"defaultBranch" orm:"column(default_branch)"`
 }
 
 type Perf struct {
