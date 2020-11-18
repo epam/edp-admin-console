@@ -29,10 +29,8 @@ func init() {
 
 func getMasterBranchVersion(cb []*query.CodebaseBranch) string {
 	for _, g := range cb {
-		if g.Name == "master" {
-			v := g.Version
-			return util.TrimSuffix(*v, "-SNAPSHOT")
-		}
+		v := g.Version
+		return util.TrimSuffix(*v, "-SNAPSHOT")
 	}
 	return ""
 }
