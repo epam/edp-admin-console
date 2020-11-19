@@ -331,7 +331,7 @@
                                                     {{end}}
                                                 {{end}}
                                                 <td>
-                                                    {{if and (ne "master" .Name) $.HasRights}}
+                                                    {{if and (ne $.Codebase.DefaultBranch .Name) $.HasRights}}
                                                         <button class="delete delete-branch"
                                                                 data-toggle="modal"
                                                                 data-name="{{.Name}}">
