@@ -23,7 +23,12 @@ import (
 
 type ICodebaseBranchRepository interface {
 	GetCodebaseBranchesByCriteria(criteria query.CodebaseBranchCriteria) ([]query.CodebaseBranch, error)
+	SelectDefaultBranchName(appName string) ([]string, error)
 }
+
+const (
+	SelectDefaultBranchName      = "select default_branch from codebase where name = ?;"
+)
 
 type CodebaseBranchRepository struct {
 	ICodebaseBranchRepository
@@ -42,4 +47,13 @@ func (CodebaseBranchRepository) GetCodebaseBranchesByCriteria(criteria query.Cod
 	_, err := qs.OrderBy("name").All(&branches)
 
 	return branches, err
+}
+
+func (CodebaseBranchRepository) SelectDefaultBranchName(appName string) ([]string, error) {
+	o := orm.NewOrm()
+	var defaultBranch []string
+	if _, err := o.Raw(SelectDefaultBranchName, appName).QueryRows(&defaultBranch); err != nil {
+		return nil, err
+	}
+	return defaultBranch, nil
 }

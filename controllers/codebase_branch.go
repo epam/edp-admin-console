@@ -39,7 +39,13 @@ func (c *BranchController) CreateCodebaseBranch() {
 		mv := c.GetString("masterVersion")
 		mp := c.GetString("snapshotStaticField")
 		masterVersion := util.GetVersionOrNil(mv, mp)
-		err := c.BranchService.UpdateCodebaseBranch(appName, "master", masterVersion)
+		var defaultBranch, err = c.getDefaultBranchName(appName)
+		if err != nil {
+			log.Error("an error has occurred while getting default branch name", zap.Error(err))
+			c.Abort("500")
+			return
+		}
+		err = c.BranchService.UpdateCodebaseBranch(appName, defaultBranch[0], masterVersion)
 		if err != nil {
 			c.Abort("500")
 			return
@@ -132,4 +138,12 @@ func (c *BranchController) Delete() {
 		zap.String("codebase name", cn),
 		zap.String("branch name", bn))
 	c.Redirect(fmt.Sprintf("%s/admin/edp/codebase/%v/overview?name=%v#branchDeletedSuccessModal", context.BasePath, cn, bn), 302)
+}
+
+func (c *BranchController) getDefaultBranchName(appName string) ([]string, error) {
+	var defaultBranch, err = c.BranchService.GetDefaultBranchName(appName)
+	if err != nil {
+		return nil, fmt.Errorf("an error has occurred while getting default branch of application")
+	}
+	return defaultBranch, nil
 }
