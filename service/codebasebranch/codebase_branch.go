@@ -223,3 +223,13 @@ func (s *CodebaseBranchService) deleteCodebaseBranch(name string) error {
 	}
 	return nil
 }
+
+func (s *CodebaseBranchService) GetDefaultBranchName(appName string) (*string, error) {
+	log.Debug("start getting default branch of application")
+	defaultBranch, err := s.IReleaseBranchRepository.SelectDefaultBranchName(appName)
+	if err != nil {
+		return nil, errors.Wrap(err, "an error has occurred while getting default branch of application")
+	}
+	log.Info("default branch of application", zap.String("name", *defaultBranch))
+	return defaultBranch, nil
+}

@@ -19,11 +19,17 @@ package repository
 import (
 	"edp-admin-console/models/query"
 	"github.com/astaxie/beego/orm"
+	"github.com/epmd-edp/perf-operator/v2/pkg/util/common"
 )
 
 type ICodebaseBranchRepository interface {
 	GetCodebaseBranchesByCriteria(criteria query.CodebaseBranchCriteria) ([]query.CodebaseBranch, error)
+	SelectDefaultBranchName(appName string) (*string, error)
 }
+
+const (
+	selectDefaultBranchName = "select default_branch from codebase where name = ?;"
+)
 
 type CodebaseBranchRepository struct {
 	ICodebaseBranchRepository
@@ -42,4 +48,13 @@ func (CodebaseBranchRepository) GetCodebaseBranchesByCriteria(criteria query.Cod
 	_, err := qs.OrderBy("name").All(&branches)
 
 	return branches, err
+}
+
+func (CodebaseBranchRepository) SelectDefaultBranchName(appName string) (*string, error) {
+	o := orm.NewOrm()
+	var defaultBranch string
+	if err := o.Raw(selectDefaultBranchName, appName).QueryRow(&defaultBranch); err != nil {
+		return nil, err
+	}
+	return common.GetStringP(defaultBranch), nil
 }
