@@ -57,6 +57,8 @@ Discover the steps below to apply the GitLab integration correctly:
         * JIRA_INTEGRATION_ENABLED;
 
     * Check the *Execute concurrent builds if necessary* option;
+    * Check the *Restrict where this project can be run* option;
+    * Fill in the *Label Expression* field by typing the *master* branch name.
 
     * In the **Build** section, perform the following:
         * Select *DSL Script*;
