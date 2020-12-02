@@ -81,14 +81,28 @@ $('#strategy').change(function () {
     togglePerfDataSourcesView();
 });
 
+$('select.ciTool').change(function () {
+    toggleJenkinsDsView();
+});
+
 function togglePerfDataSourcesView() {
     let strategyType = $('#strategy').val(),
-        $dsDivEl = $('.dataSources').find('div input[value="GitLab"]').parent('div'),
+        $gitLabDsDivEl = $('.dataSources').find('div input[value="GitLab"]').parent('div'),
         importStrategy = 'import';
 
     if (importStrategy === strategyType.toLowerCase()) {
-        $dsDivEl.removeClass('hide-element');
+        $gitLabDsDivEl.removeClass('hide-element');
+        toggleJenkinsDsView();
         return
     }
-    $dsDivEl.addClass('hide-element');
+    $gitLabDsDivEl.addClass('hide-element');
+}
+
+function toggleJenkinsDsView() {
+    let $jenkinsDsDivEl = $('.dataSources').find('div input[value="Jenkins"]').parent('div');
+    if ($('select.ciTool option').filter(':selected').val() === 'GitLab CI') {
+        $jenkinsDsDivEl.addClass('hide-element');
+        return
+    }
+    $jenkinsDsDivEl.removeClass('hide-element');
 }
