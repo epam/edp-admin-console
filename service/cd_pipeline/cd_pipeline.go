@@ -32,6 +32,12 @@ import (
 	"edp-admin-console/util/consts"
 	dberror "edp-admin-console/util/error/db-errors"
 	"fmt"
+	openshiftAPi "github.com/openshift/api/apps/v1"
+	v1 "k8s.io/api/apps/v1"
+	"sort"
+	"strings"
+	"time"
+
 	"github.com/astaxie/beego/orm"
 	edppipelinesv1alpha1 "github.com/epmd-edp/cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	"github.com/pkg/errors"
@@ -39,9 +45,6 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
-	"sort"
-	"strings"
-	"time"
 )
 
 type CDPipelineService struct {
@@ -300,40 +303,71 @@ func fillCodebaseStageMatrix(ocClient *k8s.ClientSet, cdPipeline *query.CDPipeli
 
 		dcs, err := ocClient.AppsV1Client.DeploymentConfigs(stage.PlatformProjectName).List(metav1.ListOptions{})
 		if err != nil {
-			return nil, errors.Wrap(err, "an error has occurred while getting project from cluster")
+			return nil, errors.Wrap(err, "an error has occurred while getting deployment configs from cluster")
+		}
+
+		ds, err := ocClient.K8sAppV1Client.Deployments(stage.PlatformProjectName).List(metav1.ListOptions{})
+		if err != nil {
+			return nil, errors.Wrap(err, "an error has occurred while getting deployment from cluster")
 		}
 
 		for _, codebase := range cdPipeline.CodebaseBranch {
-			var key = query.CDCodebaseStageMatrixKey{
+			dv := findDockerVersion(dcs, ds, codebase.AppName, codebase.Codebase.DeploymentScript)
+
+			matrix[query.CDCodebaseStageMatrixKey{
 				CodebaseBranch: codebase,
 				Stage:          stage,
+			}] = query.CDCodebaseStageMatrixValue{
+				DockerVersion: dv,
 			}
-			var value = query.CDCodebaseStageMatrixValue{
-				DockerVersion: "no deploy",
-			}
-			for _, dc := range dcs.Items {
-				for _, container := range dc.Spec.Template.Spec.Containers {
-					if container.Name == codebase.AppName {
-						var containerImage = container.Image
-						var delimeter = strings.LastIndex(containerImage, ":")
-						if delimeter > 0 {
-							value.DockerVersion = string(containerImage[(delimeter + 1):len(containerImage)])
-						}
-					}
-				}
-			}
-			matrix[key] = value
 		}
 
 	}
 	return matrix, nil
 }
 
+func findDockerVersion(dcs *openshiftAPi.DeploymentConfigList, ds *v1.DeploymentList, codebaseName, deploymentScript string) string {
+	if deploymentScript == "openshift-template" {
+		return getDockerVersionInDeploymentConfig(dcs, codebaseName)
+	}
+	return getDockerVersionInDeployment(ds, codebaseName)
+}
+
+func getDockerVersionInDeploymentConfig(dcs *openshiftAPi.DeploymentConfigList, codebase string) string {
+	for _, dc := range dcs.Items {
+		for _, container := range dc.Spec.Template.Spec.Containers {
+			if container.Name == codebase {
+				var containerImage = container.Image
+				var delimeter = strings.LastIndex(containerImage, ":")
+				if delimeter > 0 {
+					return containerImage[(delimeter + 1):]
+				}
+			}
+		}
+	}
+	return "no deploy"
+}
+
+func getDockerVersionInDeployment(ds *v1.DeploymentList, codebase string) string {
+	for _, dc := range ds.Items {
+		for _, container := range dc.Spec.Template.Spec.Containers {
+			if container.Name == codebase {
+				var containerImage = container.Image
+				var delimeter = strings.LastIndex(containerImage, ":")
+				if delimeter > 0 {
+					return containerImage[(delimeter + 1):]
+				}
+			}
+		}
+	}
+	return "no deploy"
+}
+
 func fillCodebaseStageMatrixK8s(ocClient *k8s.ClientSet, cdPipeline *query.CDPipeline) (map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, error) {
 	var matrix = make(map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, len(cdPipeline.CodebaseBranch)*len(cdPipeline.Stage))
 	for _, stage := range cdPipeline.Stage {
 
-		dcs, err := ocClient.ExtensionClient.Deployments(stage.PlatformProjectName).List(metav1.ListOptions{})
+		dcs, err := ocClient.K8sAppV1Client.Deployments(stage.PlatformProjectName).List(metav1.ListOptions{})
 		if err != nil {
 			return nil, errors.Wrap(err, "an error has occurred while getting project from cluster")
 		}
@@ -392,7 +426,7 @@ func (s *CDPipelineService) getCDPipelineCR(pipelineName string) (*edppipelinesv
 	return cdPipeline, nil
 }
 
-func createCrd(cdPipelineName string, stage command.CDStageCommand) edppipelinesv1alpha1.Stage {
+func createCr(cdPipelineName string, stage command.CDStageCommand) edppipelinesv1alpha1.Stage {
 	return edppipelinesv1alpha1.Stage{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v2.edp.epam.com/v1alpha1",
@@ -427,7 +461,7 @@ func saveStagesIntoK8s(edpRestClient *rest.RESTClient, cdPipelineName string, st
 	var stagesCr []edppipelinesv1alpha1.Stage
 	for _, stage := range stages {
 		stage.Username = username
-		crd := createCrd(cdPipelineName, stage)
+		crd := createCr(cdPipelineName, stage)
 		stageCr := edppipelinesv1alpha1.Stage{}
 		err := edpRestClient.Post().
 			Namespace(context.Namespace).
