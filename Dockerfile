@@ -1,4 +1,4 @@
-FROM golang:1.10.3-alpine3.8
+FROM alpine:3.11.6
 
 ENV USER_UID=1001 \
     USER_NAME=admin-console \
