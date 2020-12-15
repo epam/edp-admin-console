@@ -2,7 +2,8 @@ FROM alpine:3.11.6
 
 ENV USER_UID=1001 \
     USER_NAME=admin-console \
-    HOME=/home/admin-console
+    HOME=/home/admin-console \
+    PATH="/go/bin:${PATH}"
 
 RUN addgroup --gid ${USER_UID} ${USER_NAME} \
     && adduser --disabled-password --uid ${USER_UID} --ingroup ${USER_NAME} --home ${HOME} ${USER_NAME}
