@@ -1,32 +1,33 @@
 package command
 
 type CreateCodebase struct {
-	Name                string      `json:"name" valid:"Required;Match(/^[a-z][a-z0-9-]*[a-z0-9]$/)"`
-	DefaultBranch       string      `json:"defaultBranch" valid:"Required"`
-	Strategy            string      `json:"strategy"`
-	Lang                string      `json:"lang" valid:"Required"`
-	Framework           *string     `json:"framework,omitempty"`
-	BuildTool           string      `json:"buildTool" valid:"Required"`
-	TestReportFramework *string     `json:"testReportFramework"`
-	MultiModule         bool        `json:"multiModule,omitempty"`
-	Type                string      `json:"type,omitempty" valid:"Required"`
-	Repository          *Repository `json:"repository,omitempty"`
-	Route               *Route      `json:"route,omitempty"`
-	Database            *Database   `json:"database,omitempty"`
-	Vcs                 *Vcs        `json:"vcs,omitempty"`
-	Description         *string     `json:"description,omitempty"`
-	Username            string      `json:"username"`
-	GitServer           string      `json:"gitServer"`
-	Versioning          Versioning  `json:"versioning"`
-	GitUrlPath          *string     `json:"gitUrlPath"`
-	JenkinsSlave        *string     `json:"jenkinsSlave,omitempty"`
-	JobProvisioning     *string     `json:"jobProvisioning,omitempty"`
-	DeploymentScript    string      `json:"deploymentScript"`
-	JiraServer          *string     `json:"jiraServer,omitempty"`
-	CommitMessageRegex  *string     `json:"commitMessagePattern"`
-	TicketNameRegex     *string     `json:"ticketNamePattern"`
-	CiTool              string      `json:"ciTool" valid:"Required"`
-	Perf                *Perf       `json:"perf,omitempty"`
+	Name                     string      `json:"name" valid:"Required;Match(/^[a-z][a-z0-9-]*[a-z0-9]$/)"`
+	DefaultBranch            string      `json:"defaultBranch" valid:"Required"`
+	Strategy                 string      `json:"strategy"`
+	Lang                     string      `json:"lang" valid:"Required"`
+	Framework                *string     `json:"framework,omitempty"`
+	BuildTool                string      `json:"buildTool" valid:"Required"`
+	TestReportFramework      *string     `json:"testReportFramework"`
+	MultiModule              bool        `json:"multiModule,omitempty"`
+	Type                     string      `json:"type,omitempty" valid:"Required"`
+	Repository               *Repository `json:"repository,omitempty"`
+	Route                    *Route      `json:"route,omitempty"`
+	Database                 *Database   `json:"database,omitempty"`
+	Vcs                      *Vcs        `json:"vcs,omitempty"`
+	Description              *string     `json:"description,omitempty"`
+	Username                 string      `json:"username"`
+	GitServer                string      `json:"gitServer"`
+	Versioning               Versioning  `json:"versioning"`
+	GitUrlPath               *string     `json:"gitUrlPath"`
+	JenkinsSlave             *string     `json:"jenkinsSlave,omitempty"`
+	JobProvisioning          *string     `json:"jobProvisioning,omitempty"`
+	DeploymentScript         string      `json:"deploymentScript"`
+	JiraServer               *string     `json:"jiraServer,omitempty"`
+	CommitMessageRegex       *string     `json:"commitMessagePattern"`
+	TicketNameRegex          *string     `json:"ticketNamePattern"`
+	CiTool                   string      `json:"ciTool" valid:"Required"`
+	Perf                     *Perf       `json:"perf,omitempty"`
+	JiraIssueMetadataPayload *string     `json:"jiraIssueMetadataPayload"`
 }
 
 type Perf struct {

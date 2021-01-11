@@ -13,6 +13,7 @@ import (
 	"edp-admin-console/util"
 	"edp-admin-console/util/auth"
 	"edp-admin-console/util/consts"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -148,8 +149,14 @@ func (c *LibraryController) GetCreatePage() {
 
 func (c *LibraryController) Create() {
 	flash := beego.NewFlash()
-	codebase := c.extractLibraryRequestData()
-	errMsg := validateLibraryRequestData(codebase)
+	codebase, err := c.extractLibraryRequestData()
+	if err != nil {
+		log.Error("couldn't create codebase", zap.Error(err))
+		c.Abort("500")
+		return
+	}
+
+	errMsg := validateLibraryRequestData(*codebase)
 	if errMsg != nil {
 		log.Error("Failed to validate library request data", zap.String("err", errMsg.Message))
 		flash.Error(errMsg.Message)
@@ -157,9 +164,9 @@ func (c *LibraryController) Create() {
 		c.Redirect(fmt.Sprintf("%s/admin/edp/library/create", context.BasePath), 302)
 		return
 	}
-	logLibraryRequestData(codebase)
+	logLibraryRequestData(*codebase)
 
-	createdObject, err := c.CodebaseService.CreateCodebase(codebase)
+	createdObject, err := c.CodebaseService.CreateCodebase(*codebase)
 	if err != nil {
 		c.checkError(err, flash, codebase.Name, codebase.GitUrlPath)
 		return
@@ -187,8 +194,8 @@ func (c *LibraryController) checkError(err error, flash *beego.FlashData, name s
 	}
 }
 
-func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
-	library := command.CreateCodebase{
+func (c *LibraryController) extractLibraryRequestData() (*command.CreateCodebase, error) {
+	library := &command.CreateCodebase{
 		Lang:             c.GetString("appLang"),
 		BuildTool:        c.GetString("buildTool"),
 		Strategy:         strings.ToLower(c.GetString("strategy")),
@@ -209,6 +216,13 @@ func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
 
 	if s := c.GetString("jiraServer"); len(s) > 0 {
 		library.JiraServer = &s
+
+		payload, err := c.extractJsonJiraIssueMetadataPayload()
+		if err != nil {
+			return nil, err
+		}
+
+		library.JiraIssueMetadataPayload = &payload
 	}
 
 	if v := c.GetString("commitMessagePattern"); len(v) > 0 {
@@ -267,7 +281,21 @@ func (c *LibraryController) extractLibraryRequestData() command.CreateCodebase {
 		}
 	}
 
-	return library
+	return library, nil
+}
+
+func (c *LibraryController) extractJsonJiraIssueMetadataPayload() (string, error) {
+	fieldNames := c.GetStrings("jiraFieldName")
+	jiraPatterns := c.GetStrings("jiraPattern")
+	payload := make(map[string]string, len(fieldNames))
+	for i, name := range fieldNames {
+		payload[name] = jiraPatterns[i]
+	}
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonPayload), nil
 }
 
 func validateLibraryRequestData(library command.CreateCodebase) *validation2.ErrMsg {

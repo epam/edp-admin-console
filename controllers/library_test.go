@@ -9,7 +9,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/session"
-	"github.com/epmd-edp/codebase-operator/v2/pkg/util"
+	"github.com/epam/edp-codebase-operator/v2/pkg/util"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -148,7 +148,8 @@ func TestExtractLibraryRequestData_ReturnsDtoWithPerfField(t *testing.T) {
 	lc.Ctx.Input.CruSession.Flush()
 	lc.Ctx.Input.CruSession.Set("username", "stub-value")
 
-	c := lc.extractLibraryRequestData()
+	c, err := lc.extractLibraryRequestData()
+	assert.NoError(t, err)
 	assert.Equal(t, "stub-name", c.Perf.Name)
 }
 
@@ -164,6 +165,7 @@ func TestExtractLibraryRequestData_ReturnsDtoWithoutPerfField(t *testing.T) {
 	lc.Ctx.Input.CruSession.Flush()
 	lc.Ctx.Input.CruSession.Set("username", "stub-value")
 
-	c := lc.extractLibraryRequestData()
+	c, err := lc.extractLibraryRequestData()
+	assert.NoError(t, err)
 	assert.Nil(t, c.Perf)
 }

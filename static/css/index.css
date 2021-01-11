@@ -11355,3 +11355,7 @@ div#kubernetes-component {
 .navbar-text-padding {
     padding-left: 15px;
 }
+
+.div-jira-row-width {
+    width: 200px;
+}

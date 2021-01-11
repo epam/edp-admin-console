@@ -18,8 +18,8 @@ package k8s
 
 import (
 	"edp-admin-console/service/logger"
+	edpv1alpha1 "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	edppipelinesv1alpha1 "github.com/epmd-edp/cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
-	edpv1alpha1 "github.com/epmd-edp/codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	appsV1Client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	"go.uber.org/zap"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -191,6 +191,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&edppipelinesv1alpha1.CDPipelineList{},
 		&edppipelinesv1alpha1.Stage{},
 		&edppipelinesv1alpha1.StageList{},
+		&edpv1alpha1.JiraServer{},
+		&edpv1alpha1.JiraServerList{},
 	)
 
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)

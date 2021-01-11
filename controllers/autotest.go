@@ -13,6 +13,7 @@ import (
 	"edp-admin-console/util"
 	"edp-admin-console/util/auth"
 	"edp-admin-console/util/consts"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -46,8 +47,14 @@ type AutotestsController struct {
 
 func (c *AutotestsController) CreateAutotests() {
 	flash := beego.NewFlash()
-	codebase := c.extractAutotestsRequestData()
-	errMsg := validateAutotestsRequestData(codebase)
+	codebase, err := c.extractAutotestsRequestData()
+	if err != nil {
+		log.Error("couldn't create codebase", zap.Error(err))
+		c.Abort("500")
+		return
+	}
+
+	errMsg := validateAutotestsRequestData(*codebase)
 	if errMsg != nil {
 		log.Error("Failed to validate autotests request data", zap.String("err", errMsg.Message))
 		flash := beego.NewFlash()
@@ -56,9 +63,9 @@ func (c *AutotestsController) CreateAutotests() {
 		c.Redirect(fmt.Sprintf("%s/admin/edp/autotest/create", context.BasePath), 302)
 		return
 	}
-	logAutotestsRequestData(codebase)
+	logAutotestsRequestData(*codebase)
 
-	createdObject, err := c.CodebaseService.CreateCodebase(codebase)
+	createdObject, err := c.CodebaseService.CreateCodebase(*codebase)
 	if err != nil {
 		c.checkError(err, flash, codebase.Name, codebase.GitUrlPath)
 		return
@@ -102,8 +109,8 @@ func logAutotestsRequestData(autotests command.CreateCodebase) {
 	log.Info(result.String())
 }
 
-func (c *AutotestsController) extractAutotestsRequestData() command.CreateCodebase {
-	codebase := command.CreateCodebase{
+func (c *AutotestsController) extractAutotestsRequestData() (*command.CreateCodebase, error) {
+	codebase := &command.CreateCodebase{
 		Lang:             c.GetString("appLang"),
 		BuildTool:        c.GetString("buildTool"),
 		Strategy:         strings.ToLower(c.GetString("strategy")),
@@ -124,6 +131,13 @@ func (c *AutotestsController) extractAutotestsRequestData() command.CreateCodeba
 
 	if s := c.GetString("jiraServer"); len(s) > 0 {
 		codebase.JiraServer = &s
+
+		payload, err := c.extractJsonJiraIssueMetadataPayload()
+		if err != nil {
+			return nil, err
+		}
+
+		codebase.JiraIssueMetadataPayload = &payload
 	}
 
 	if v := c.GetString("commitMessagePattern"); len(v) > 0 {
@@ -190,7 +204,21 @@ func (c *AutotestsController) extractAutotestsRequestData() command.CreateCodeba
 		}
 	}
 
-	return codebase
+	return codebase, nil
+}
+
+func (c *AutotestsController) extractJsonJiraIssueMetadataPayload() (string, error) {
+	fieldNames := c.GetStrings("jiraFieldName")
+	jiraPatterns := c.GetStrings("jiraPattern")
+	payload := make(map[string]string, len(fieldNames))
+	for i, name := range fieldNames {
+		payload[name] = jiraPatterns[i]
+	}
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonPayload), nil
 }
 
 func validateAutotestsRequestData(autotests command.CreateCodebase) *validation2.ErrMsg {

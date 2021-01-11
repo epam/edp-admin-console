@@ -143,6 +143,48 @@
                 </div>
             </div>
 
+            <div class="form-group jiraIssueMetadata hide-element">
+
+                <div class="jira-issue-metadata-row">
+                    <div class="d-flex justify-content-start">
+                        <div class="form-group w-40 mr-4 mb-2 div-jira-row-width">
+                            <label for="jiraFieldName"
+                                   class="jiraFieldNameLabel">Jira Field Name
+                                <span class="tooltip-icon" data-toggle="tooltip"
+                                      data-placement="top" title=""
+                                      data-original-title="Select Jira field name"></span>
+                            </label>
+                            <select name="jiraFieldName" class="jiraIssueFields jiraFieldName"
+                                    placeholder="Select a Jira field...">
+                                <option value="">Select a Jira field...</option>
+                            </select>
+                        </div>
+                        <div class="form-group w-50 mr-4 mb-2">
+                            <label for="jiraPattern"
+                                   class="jiraPatternLabel">Jira Pattern
+                                <span class="tooltip-icon" data-toggle="tooltip"
+                                      data-placement="top" title=""
+                                      data-original-title="Define Jira pattern"></span>
+                            </label>
+                            <input name="jiraPattern" type="text" class="form-control element-width jiraPattern" id="jiraPattern"
+                                   placeholder="Enter Jira pattern">
+                        </div>
+
+                        <button type="button" class="delete remove-jira-issue-metadata-row">
+                            <i class="icon-trashcan"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+                <button type="button" class="add-jira-field circle plus"></button>
+
+                <div class="invalid-feedback jira-row-invalid-msg">
+                    Some of the above fields are invalid. Jira Field Name and Jira pattern fields should not be an empty.
+                </div>
+
+            </div>
+
             {{template "../template/perf_template.html" .}}
 
             {{if eq .Type "application" }}
@@ -205,7 +247,8 @@
                         Proceed
                     </button>
 
-                    <button type="submit" class="adv-setting-create-library create-library edp-submit-form-btn btn btn-primary">
+                    <button type="submit"
+                            class="adv-setting-create-library create-library edp-submit-form-btn btn btn-primary">
                         Create
                     </button>
                 {{end}}

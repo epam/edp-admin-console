@@ -27,7 +27,7 @@ import (
 	"edp-admin-console/util/consts"
 	dberror "edp-admin-console/util/error/db-errors"
 	"fmt"
-	edpv1alpha1 "github.com/epmd-edp/codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	edpv1alpha1 "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"

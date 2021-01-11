@@ -78,7 +78,10 @@ $(function () {
     $('#jiraServerToggle').change(function () {
         let $jiraEl = $('.jiraServerBlock'),
             $commitMessagePatternBlockEl = $('.commitMessagePatternBlock'),
-            $ticketNamePatternBlockEl = $('.ticketNamePatternBlock');
+            $ticketNamePatternBlockEl = $('.ticketNamePatternBlock'),
+            $jiraIssueMetadata = $('.jiraIssueMetadata'),
+            $jiraIssueSelects = $('section .jiraIssueMetadata .jira-issue-metadata-row select.jiraIssueFields'),
+            $jiraPatternInputs = $('section .jiraIssueMetadata .jira-issue-metadata-row input.jiraPattern');
         if ($(this).is(':checked')) {
             $jiraEl.removeClass('hide-element')
                 .find('select[name="jiraServer"]')
@@ -91,6 +94,11 @@ $(function () {
             $ticketNamePatternBlockEl.removeClass('hide-element')
                 .find('input[id="ticketNamePattern"]')
                 .prop('disabled', false);
+
+            $jiraIssueSelects.prop('disabled', false);
+            $jiraPatternInputs.prop('disabled', false);
+
+            $jiraIssueMetadata.removeClass('hide-element');
             return;
         }
         $jiraEl.addClass('hide-element')
@@ -104,6 +112,11 @@ $(function () {
         $ticketNamePatternBlockEl.addClass('hide-element')
             .find('input[id="ticketNamePattern"]')
             .prop('disabled', true);
+
+        $jiraIssueSelects.prop('disabled', true);
+        $jiraPatternInputs.prop('disabled', true);
+
+        $jiraIssueMetadata.addClass('hide-element');
     });
 
     function activateCloneBlock() {
@@ -658,7 +671,7 @@ $(function () {
         }
 
         let $defaultBranchInputEl = $('.default-branch-name'),
-        isDefaultBranchNameValid = isFieldValid($defaultBranchInputEl, REGEX.CODEBASE_DEFAULT_BRANCH);
+            isDefaultBranchNameValid = isFieldValid($defaultBranchInputEl, REGEX.CODEBASE_DEFAULT_BRANCH);
         if (!isDefaultBranchNameValid) {
             $('.default-branch-name-validation.regex-error').show();
             $defaultBranchInputEl.addClass('is-invalid');
@@ -697,7 +710,11 @@ $(function () {
             isStartVersioningFromValid = true,
             jiraIntegration = $('#jiraServerToggle').is(':checked'),
             isCommitMessageRegexValid = jiraIntegration ? $('#commitMessagePattern').val().length !== 0 : true,
-            isTicketNameRegexValid = jiraIntegration ? $('#ticketNamePattern').val().length !== 0 : true;
+            isTicketNameRegexValid = jiraIntegration ? $('#ticketNamePattern').val().length !== 0 : true,
+            $jiraInputs = $('section .jira-issue-metadata-row input.jiraPattern'),
+            $jiraSelects = $('section .jira-issue-metadata-row select.jiraIssueFields'),
+            areJiraInputFieldsValid = true,
+            areJiraSelectsValid = true;
 
         if ($('#versioningType').val() === "edp") {
             isStartVersioningFromValid = isBranchVersionValid($versioningInputEl)
@@ -718,7 +735,34 @@ $(function () {
             $('#ticketNamePattern').addClass('is-invalid');
         }
 
-        return isStartVersioningFromValid && isCommitMessageRegexValid && isTicketNameRegexValid
+        $.each($jiraInputs, function () {
+            if ($(this).val() === "") {
+                areJiraInputFieldsValid = false;
+                $(this)
+                    .parents('.jira-issue-metadata-row')
+                    .parents('.jiraIssueMetadata')
+                    .find('.invalid-feedback.jira-row-invalid-msg')
+                    .show();
+
+                $(this).addClass('is-invalid');
+            }
+        });
+
+        $.each($jiraSelects, function () {
+            if ($(this).find('option:selected').val() === "") {
+                areJiraSelectsValid = false;
+                $(this)
+                    .parents('.jira-issue-metadata-row')
+                    .parents('.jiraIssueMetadata')
+                    .find('.invalid-feedback.jira-row-invalid-msg')
+                    .show();
+
+                $(this).addClass('is-invalid');
+            }
+        });
+
+        return isStartVersioningFromValid && isCommitMessageRegexValid &&
+            isTicketNameRegexValid && areJiraInputFieldsValid && areJiraSelectsValid
     }
 
     function isVCSValid() {

@@ -321,6 +321,7 @@ func init() {
 	apiV1Namespace := beego.NewNamespace(fmt.Sprintf("%s/api/v1", context.BasePath),
 		beego.NSRouter("/storage-class", &controllers.OpenshiftRestController{ClusterService: clusterService}, "get:GetAllStorageClasses"),
 		beego.NSRouter("/repository/available", &controllers.RepositoryRestController{}, "post:IsGitRepoAvailable"),
+		beego.NSRouter("/jira/:serverName/metadata/fields", &controllers.JiraRestController{Clients: clients}, "get:GetJiraMetadataFields"),
 	)
 	beego.AddNamespace(apiV1Namespace)
 }

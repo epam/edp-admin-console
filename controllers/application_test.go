@@ -9,7 +9,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/session"
-	"github.com/epmd-edp/codebase-operator/v2/pkg/util"
+	"github.com/epam/edp-codebase-operator/v2/pkg/util"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -146,7 +146,8 @@ func TestExtractApplicationRequestDataMethod_ReturnsDtoWithPerfField(t *testing.
 	apc.Ctx.Input.CruSession.Flush()
 	apc.Ctx.Input.CruSession.Set("username", "stub-value")
 
-	c := apc.extractApplicationRequestData()
+	c, err := apc.extractApplicationRequestData()
+	assert.NoError(t, err)
 	assert.Equal(t, "stub-name", c.Perf.Name)
 }
 
@@ -162,6 +163,7 @@ func TestExtractApplicationRequestDataMethod_ReturnsDtoWithoutPerfField(t *testi
 	apc.Ctx.Input.CruSession.Flush()
 	apc.Ctx.Input.CruSession.Set("username", "stub-value")
 
-	c := apc.extractApplicationRequestData()
+	c, err := apc.extractApplicationRequestData()
+	assert.NoError(t, err)
 	assert.Nil(t, c.Perf)
 }
