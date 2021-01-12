@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="{{ .BasePath }}/static/css/index.css">
     <link rel="stylesheet" href="{{ .BasePath }}/static/css/cd-pipeline-list.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/jquery.dataTables-1.10.23.css">
 </head>
 <body>
 <main>
@@ -47,7 +48,7 @@
             {{if .ActiveApplicationsAndBranches}}
                 {{if .CDPipelines }}
                     <div class="edp-table-container">
-                        <table class="table edp-table">
+                        <table id="edp-table" class="table edp-table">
                             <thead>
                             <tr>
                                 <th class="status-width" scope="col">Status</th>
@@ -110,5 +111,7 @@
 <script src="{{ .BasePath }}/static/js/confirmation-popup.js"></script>
 <script src="{{ .BasePath }}/static/js/continuous_delivery.js"></script>
 <script src="{{ .BasePath }}/static/js/bootstrap-notify.js"></script>
+<script src="{{ .BasePath }}/static/js/jquery.dataTables-1.10.23.js"></script>
+<script src="{{ .BasePath }}/static/js/view.js"></script>
 </body>
 </html>
