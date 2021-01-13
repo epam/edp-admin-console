@@ -1,0 +1,1 @@
+alter table if exists codebase add jira_issue_metadata_payload text;
