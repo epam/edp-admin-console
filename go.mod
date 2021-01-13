@@ -6,6 +6,7 @@ replace github.com/openshift/api => github.com/openshift/api v0.0.0-201808011710
 
 require (
 	github.com/Microsoft/go-winio v0.4.14 // indirect
+	github.com/andygrunwald/go-jira v1.12.0
 	github.com/astaxie/beego v1.12.0
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/coreos/go-oidc v2.0.0+incompatible
@@ -13,8 +14,8 @@ require (
 	github.com/docker/docker v1.13.1 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
+	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210112152817-7bdf8b631489
 	github.com/epmd-edp/cd-pipeline-operator/v2 v2.3.0-58.0.20200520111933-aefa684da6d1
-	github.com/epmd-edp/codebase-operator/v2 v2.3.0-95.0.20201106143626-fac13626a6f8
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/lib/pq v1.0.0
 	github.com/mitchellh/go-homedir v1.1.0 // indirect

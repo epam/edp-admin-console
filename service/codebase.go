@@ -31,7 +31,7 @@ import (
 	"edp-admin-console/util/consts"
 	dberror "edp-admin-console/util/error/db-errors"
 	"fmt"
-	edpv1alpha1 "github.com/epmd-edp/codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	edpv1alpha1 "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"k8s.io/api/core/v1"
@@ -284,6 +284,10 @@ func convertData(codebase command.CreateCodebase) edpv1alpha1.CodebaseSpec {
 			Name:        codebase.Perf.Name,
 			DataSources: codebase.Perf.DataSources,
 		}
+	}
+
+	if codebase.JiraServer != nil {
+		cs.JiraIssueMetadataPayload = codebase.JiraIssueMetadataPayload
 	}
 
 	return cs

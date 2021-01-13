@@ -7,6 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="{{ .BasePath }}/static/css/index.css">
     <link rel="stylesheet" href="{{ .BasePath }}/static/css/validation.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/circle.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/selectize.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/jira-issue-row.css">
 </head>
 <body>
 <main>
@@ -137,6 +140,7 @@
     </section>
     {{template "template/footer_template.html" .}}
     {{template "template/confirmation_popup_template.html" .}}
+    {{template "template/jira_issue_metadata_template.html" .}}
 
 </main>
 <script src="{{ .BasePath }}/static/js/jquery-3.3.1.js"></script>
@@ -148,5 +152,7 @@
 <script src="{{ .BasePath }}/static/js/codebase-validation.js"></script>
 <script src="{{ .BasePath }}/static/js/perf-block.js"></script>
 <script src="{{ .BasePath }}/static/js/bootstrap-notify.js"></script>
+<script src="{{ .BasePath }}/static/js/selectize.js"></script>
+<script src="{{ .BasePath }}/static/js/jira-block.js"></script>
 </body>
 </html>

@@ -17,6 +17,7 @@ const (
 	StagePlural          = "stages"
 	CDPipelinePlural     = "cdpipelines"
 	CodebaseKind         = "Codebase"
+	JiraServerPlural     = "jiraservers"
 
 	ImportStrategy = "import"
 	LanguageJava   = "Java"

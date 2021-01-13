@@ -89,16 +89,22 @@ function createConfirmTable(formName) {
             $.each(block, function (key, property) {
                 let value = typeof property === 'boolean' ? (property ? "&#10004;" : "&#10008;") : htmlEncode(getValueFunc(property));
                 if (value) {
-                    if (key === 'Start Versioning From') {
-                        result += '<tr><td>' + key + '</td><td>' + value + '-SNAPSHOT' + '</td></tr>';
-                    } else {
-                        result += '<tr><td>' + key + '</td><td>' + value + '</td></tr>';
-                    }
+                    result += '<tr><td>' + key + '</td><td>' + _generateResultValue(property, key, value) + '</td></tr>';
                 }
             });
             $(result).appendTo($("#window-table"));
         }
     };
+
+    function _generateResultValue(property, key, value) {
+        if (key === 'Start Versioning From') {
+            return `${value}-SNAPSHOT`;
+        } else if (property === 'jiraPattern') {
+            return $(`section .jiraIssueMetadata .jira-issue-metadata-row select.jiraIssueFields option:contains(${key})`)
+                .parents('.jira-issue-metadata-row').find('input.jiraPattern').val();
+        }
+        return value;
+    }
 
     $('<tbody class="window-table-body">').appendTo($("#window-table"));
 
@@ -138,6 +144,11 @@ function createConfirmTable(formName) {
 
     if ($('#jiraServerToggle').is(':checked')) {
         advancedBlock['Jira Server'] = 'jiraServer'
+
+        let jiraFieldNames = $('section .jiraIssueMetadata .jira-issue-metadata-row select.jiraIssueFields option:selected');
+        $.each(jiraFieldNames, function () {
+            advancedBlock[$(this).text()] = 'jiraPattern'
+        });
     } else {
         delete advancedBlock['Jira Server'];
     }

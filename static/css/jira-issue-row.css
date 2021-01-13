@@ -1,0 +1,5 @@
+.circle.plus.disable:before,
+.circle.plus.disable:after {
+    background: #ffffff9e;
+    box-shadow: 1px 1px 1px #ffffff9e;
+}
