@@ -1,0 +1,1 @@
+alter table codebase drop column if exists jira_issue_metadata_payload;
