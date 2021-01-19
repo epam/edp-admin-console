@@ -735,31 +735,33 @@ $(function () {
             $('#ticketNamePattern').addClass('is-invalid');
         }
 
-        $.each($jiraInputs, function () {
-            if ($(this).val() === "") {
-                areJiraInputFieldsValid = false;
-                $(this)
-                    .parents('.jira-issue-metadata-row')
-                    .parents('.jiraIssueMetadata')
-                    .find('.invalid-feedback.jira-row-invalid-msg')
-                    .show();
+        if ($('#jiraServerToggle').is(':checked')) {
+            $.each($jiraInputs, function () {
+                if ($(this).val() === "") {
+                    areJiraInputFieldsValid = false;
+                    $(this)
+                        .parents('.jira-issue-metadata-row')
+                        .parents('.jiraIssueMetadata')
+                        .find('.invalid-feedback.jira-row-invalid-msg')
+                        .show();
 
-                $(this).addClass('is-invalid');
-            }
-        });
+                    $(this).addClass('is-invalid');
+                }
+            });
 
-        $.each($jiraSelects, function () {
-            if ($(this).find('option:selected').val() === "") {
-                areJiraSelectsValid = false;
-                $(this)
-                    .parents('.jira-issue-metadata-row')
-                    .parents('.jiraIssueMetadata')
-                    .find('.invalid-feedback.jira-row-invalid-msg')
-                    .show();
+            $.each($jiraSelects, function () {
+                if ($(this).find('option:selected').val() === "") {
+                    areJiraSelectsValid = false;
+                    $(this)
+                        .parents('.jira-issue-metadata-row')
+                        .parents('.jiraIssueMetadata')
+                        .find('.invalid-feedback.jira-row-invalid-msg')
+                        .show();
 
-                $(this).addClass('is-invalid');
-            }
-        });
+                    $(this).addClass('is-invalid');
+                }
+            });
+        }
 
         return isStartVersioningFromValid && isCommitMessageRegexValid &&
             isTicketNameRegexValid && areJiraInputFieldsValid && areJiraSelectsValid

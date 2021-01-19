@@ -201,6 +201,14 @@
                                             <td>{{.Codebase.TicketNamePattern}}</td>
                                         </tr>
                                     {{end}}
+                                    {{if .Codebase.JiraIssueFields}}
+                                        {{range $key, $value := .Codebase.JiraIssueFields}}
+                                            <tr>
+                                                <th>{{$key}}</th>
+                                                <td>{{$value}}</td>
+                                            </tr>
+                                        {{end}}
+                                    {{end}}
                                     </tbody>
                                 </table>
                             </div>

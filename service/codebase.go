@@ -30,6 +30,7 @@ import (
 	"edp-admin-console/util"
 	"edp-admin-console/util/consts"
 	dberror "edp-admin-console/util/error/db-errors"
+	"encoding/json"
 	"fmt"
 	edpv1alpha1 "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	"github.com/pkg/errors"
@@ -50,6 +51,8 @@ type CodebaseService struct {
 	BranchService         cbs.CodebaseBranchService
 	PerfService           perfboard.PerfBoard
 }
+
+const issuesLinksKey = "issuesLinks"
 
 func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*edpv1alpha1.Codebase, error) {
 	clog.Info("start creating Codebase resource", zap.String("name", codebase.Name))
@@ -156,8 +159,28 @@ func (s CodebaseService) GetCodebaseByName(name string) (*query.Codebase, error)
 		}
 	}
 
+	if c.JiraServer != nil {
+		payload, err := getFieldMap(*c.JiraIssueMetadataPayload, []string{issuesLinksKey})
+		if err != nil {
+			return nil, err
+		}
+		c.JiraIssueFields = payload
+	}
 	clog.Info("codebase has been fetched from db", zap.String("name", c.Name))
 	return c, nil
+}
+
+func getFieldMap(payload string, keysToDelete []string) (map[string]interface{}, error) {
+	requestPayload := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(payload), &requestPayload); err != nil {
+		return nil, err
+	}
+	for k := range requestPayload {
+		if keysToDelete != nil && util.Contains(keysToDelete, k) {
+			delete(requestPayload, k)
+		}
+	}
+	return requestPayload, nil
 }
 
 func (s *CodebaseService) findCodebaseByName(name string) bool {

@@ -16,12 +16,12 @@ $(function () {
     !function preloadJiraMetadataFields() {
         $('select.jiraServer option').each(function (i, v) {
             let jiraServer = $(v).val();
-            _sendGetRequest(true, `${$('input[id="basepath"]').val()}/api/v1/jira/${jiraServer}/metadata/fields`,
-                function (fields) {
-                    _setData(jiraServer, fields);
-                }, function () {
-                    console.error('an error has occurred while fetching Jira metadata fields')
-                })
+            let fields = {
+                "components": "Component/s",
+                "labels": "Labels",
+                "fixVersions": "Fix Version/s"
+            };
+            _setData(jiraServer, fields);
         });
     }();
 
