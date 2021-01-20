@@ -222,7 +222,7 @@ func (c *LibraryController) extractLibraryRequestData() (*command.CreateCodebase
 			return nil, err
 		}
 
-		library.JiraIssueMetadataPayload = &payload
+		library.JiraIssueMetadataPayload = payload
 	}
 
 	if v := c.GetString("commitMessagePattern"); len(v) > 0 {
@@ -284,18 +284,22 @@ func (c *LibraryController) extractLibraryRequestData() (*command.CreateCodebase
 	return library, nil
 }
 
-func (c *LibraryController) extractJsonJiraIssueMetadataPayload() (string, error) {
+func (c *LibraryController) extractJsonJiraIssueMetadataPayload() (*string, error) {
 	fieldNames := c.GetStrings("jiraFieldName")
 	jiraPatterns := c.GetStrings("jiraPattern")
+	if fieldNames == nil && jiraPatterns == nil {
+		return nil, nil
+	}
+
 	payload := make(map[string]string, len(fieldNames))
 	for i, name := range fieldNames {
 		payload[name] = jiraPatterns[i]
 	}
 	jsonPayload, err := json.Marshal(payload)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return string(jsonPayload), nil
+	return util.GetStringP(string(jsonPayload)), nil
 }
 
 func validateLibraryRequestData(library command.CreateCodebase) *validation2.ErrMsg {

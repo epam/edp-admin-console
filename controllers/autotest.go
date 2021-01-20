@@ -137,7 +137,7 @@ func (c *AutotestsController) extractAutotestsRequestData() (*command.CreateCode
 			return nil, err
 		}
 
-		codebase.JiraIssueMetadataPayload = &payload
+		codebase.JiraIssueMetadataPayload = payload
 	}
 
 	if v := c.GetString("commitMessagePattern"); len(v) > 0 {
@@ -207,18 +207,22 @@ func (c *AutotestsController) extractAutotestsRequestData() (*command.CreateCode
 	return codebase, nil
 }
 
-func (c *AutotestsController) extractJsonJiraIssueMetadataPayload() (string, error) {
+func (c *AutotestsController) extractJsonJiraIssueMetadataPayload() (*string, error) {
 	fieldNames := c.GetStrings("jiraFieldName")
 	jiraPatterns := c.GetStrings("jiraPattern")
+	if fieldNames == nil && jiraPatterns == nil {
+		return nil, nil
+	}
+
 	payload := make(map[string]string, len(fieldNames))
 	for i, name := range fieldNames {
 		payload[name] = jiraPatterns[i]
 	}
 	jsonPayload, err := json.Marshal(payload)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return string(jsonPayload), nil
+	return util.GetStringP(string(jsonPayload)), nil
 }
 
 func validateAutotestsRequestData(autotests command.CreateCodebase) *validation2.ErrMsg {

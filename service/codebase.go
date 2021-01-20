@@ -159,7 +159,7 @@ func (s CodebaseService) GetCodebaseByName(name string) (*query.Codebase, error)
 		}
 	}
 
-	if c.JiraServer != nil {
+	if c.JiraServer != nil && c.JiraIssueMetadataPayload != nil {
 		payload, err := getFieldMap(*c.JiraIssueMetadataPayload, []string{issuesLinksKey})
 		if err != nil {
 			return nil, err
