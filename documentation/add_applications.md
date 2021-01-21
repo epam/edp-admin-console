@@ -12,6 +12,7 @@ Once clicked, the six-step menu will appear:
 * The Version Control System Info Menu
 * The Exposing Service Info Menu
 * The Database Menu
+* Test
 
 _**NOTE**: The Version Control System Info menu is available in case this option is predefined._
 
