@@ -59,7 +59,7 @@ $(function () {
             return
         }
 
-        let $row = _getTemplate();
+        let $row = getTemplate();
         $row.insertBefore($('.add-jira-field'));
 
         let removeButtonId = generateId();
@@ -83,7 +83,7 @@ $(function () {
             .removeClass('hide-element');
 
         let $deleteBtn = $newSelect.parents('.jira-issue-metadata-row').find(`button.remove-jira-issue-metadata-row.${removeButtonId}`);
-        $('.jiraIssueMetadata').on('click', `.remove-jira-issue-metadata-row.${removeButtonId}`, _removeJiraIssueRow.bind($deleteBtn));
+        $('.jiraIssueMetadata').on('click', `.remove-jira-issue-metadata-row.${removeButtonId}`, removeJiraIssueRow.bind($deleteBtn));
 
         let $select = $newSelect.parents('.jira-issue-metadata-row').find(`select.${selectId}`);
         $('.jiraIssueMetadata').on('change', `.${selectId}`, toggleSelectOption.bind($select));
@@ -100,85 +100,20 @@ $(function () {
             $newSelect[$newSelect.length - 1].selectize.addOption({value: i, text: item})
         });
 
-        _tryToDisableButton();
+        tryToDisableButton();
     });
-
-    function generateId() {
-        return Date.now().toString(36) + Math.random().toString(36).substring(2);
-    }
-
-    function _getTemplate() {
-        return $('.jiraIssueMetadata .jira-issue-metadata-row').length === 0
-            ? $('.full-template.jira-issue-metadata-row').clone()
-            : $('.partial-template.jira-issue-metadata-row').clone();
-    }
-
-    function _tryToDisableButton() {
-        if ($('.jiraIssueMetadata .jira-issue-metadata-row').length === maxJiraFields) {
-            $('.add-jira-field.circle.plus').addClass('disable').attr('disabled');
-            return
-        }
-    }
-
-    function _enableButton() {
-        $('.add-jira-field.circle.plus').removeClass('disable').removeAttr('disabled');
-    }
 
     $('.delete.remove-jira-issue-metadata-row').click(function () {
-        _removeJiraIssueRow.bind(this)();
+        removeJiraIssueRow.bind(this)();
     });
-
-    function _removeJiraIssueRow() {
-        let $row = $(this).parents('.jira-issue-metadata-row'),
-            $rows = $('section .jira-issue-metadata-row');
-        if ($row.is(':first-child') && $rows.length >= 2) {
-            let $fieldLabel = $('.jiraFieldNameLabel.template').clone(),
-                $patternLabel = $('.jiraPatternLabel.template').clone();
-            $fieldLabel.insertBefore($($rows[1]).find('select.jiraIssueFields'));
-            $fieldLabel.removeClass('template').removeClass('hide-element');
-            $patternLabel.insertBefore($($rows[1]).find('input.jiraPattern'));
-            $patternLabel.removeClass('template').removeClass('hide-element');
-        }
-
-        toggleSelectOptions.bind($row.find('select.jiraIssueFields'))();
-        $row.remove();
-        _enableButton();
-    }
 
     $('.jiraServer').change(function () {
         $('section div.jira-issue-metadata-row').remove();
-        _enableButton();
+        enableButton();
     });
-
-    function toggleSelectOption() {
-        toggleSelectOptions.bind(this)();
-    }
 
     $('.jiraIssueFields.jiraFieldName').change(function () {
         toggleSelectOptions.bind(this)();
     });
 
-    function toggleSelectOptions() {
-        let oldData;
-        if (typeof $(this).attr('data-old') !== 'undefined') {
-            oldData = $.parseJSON($(this).attr('data-old'));
-        }
-
-        let selectedOption = $(this).find('option:selected').val();
-        $.each($('section .jira-issue-metadata-row select'), function () {
-            if ($(this).find('option:selected').val() === selectedOption) {
-                return
-            }
-            this.selectize.removeOption(selectedOption);
-
-            if (typeof oldData !== 'undefined') {
-                this.selectize.addOption({value: oldData.key, text: oldData.value});
-            }
-        });
-
-        $(this).attr('data-old', JSON.stringify({
-            key: $(this).val(),
-            value: $(this).text()
-        }));
-    }
 });

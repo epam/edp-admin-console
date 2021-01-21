@@ -6,7 +6,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="{{ .BasePath }}/static/css/index.css">
-    <link rel="stylesheet" href="{{ .BasePath }}/static/css/cd-pipeline.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/validation.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/circle.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/selectize.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/jira-issue-row.css">
 </head>
 <body>
 <main>
@@ -37,7 +40,7 @@
                         <div class="card-header" id="headingOne" aria-expanded="true" aria-controls="collapseOne">
                             <h5 class="mb-0">
                                 <button class="btn btn-link collapsed" type="button">
-                                    Commit message patterns
+                                    Jira configuration
                                 </button>
                             </h5>
                         </div>
@@ -85,6 +88,34 @@
                                     </div>
                                 </div>
 
+                                {{if .Codebase.JiraIssueFields}}
+                                    <div class="form-group jiraIssueMetadata hide-element"
+                                         data-conf="{{.Codebase.JiraIssueMetadataPayload}}">
+
+                                        <button type="button" class="add-jira-field circle plus"></button>
+
+                                        <div class="invalid-feedback jira-row-invalid-msg">
+                                            Some of the above fields are invalid. Jira Field Name and Jira pattern
+                                            fields
+                                            should not be an empty.
+                                        </div>
+
+                                    </div>
+                                {{else}}
+                                    <div class="form-group jiraIssueMetadata"
+                                         data-conf>
+
+                                        <button type="button" class="add-jira-field circle plus"></button>
+
+                                        <div class="invalid-feedback jira-row-invalid-msg">
+                                            Some of the above fields are invalid. Jira Field Name and Jira pattern
+                                            fields
+                                            should not be an empty.
+                                        </div>
+
+                                    </div>
+                                {{end}}
+
                                 <button type="button" class="update-codebase edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse" aria-expanded="false">
                                     Proceed
@@ -103,6 +134,7 @@
     </section>
     {{template "template/footer_template.html" .}}
     {{template "template/modal_success_template.html" .}}
+    {{template "template/jira_issue_metadata_template.html" .}}
 </main>
 
 <script src="{{ .BasePath }}/static/js/jquery-3.3.1.js"></script>
@@ -110,5 +142,8 @@
 <script src="{{ .BasePath }}/static/js/bootstrap.js"></script>
 <script src="{{ .BasePath }}/static/js/edit-codebase.js"></script>
 <script src="{{ .BasePath }}/static/js/bootstrap-notify.js"></script>
+<script src="{{ .BasePath }}/static/js/selectize.js"></script>
+<script src="{{ .BasePath }}/static/js/jira-util.js"></script>
+<script src="{{ .BasePath }}/static/js/jira-block-edit.js"></script>
 </body>
 </html>

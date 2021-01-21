@@ -438,9 +438,11 @@ func (s *CodebaseService) Update(command command.UpdateCodebaseCommand) (*edpv1a
 
 	c.Spec.CommitMessagePattern = &command.CommitMessageRegex
 	c.Spec.TicketNamePattern = &command.TicketNameRegex
+	c.Spec.JiraIssueMetadataPayload = command.JiraIssueMetadataPayload
 	log.Debug("new values",
 		zap.String("commitMessagePattern", *c.Spec.CommitMessagePattern),
-		zap.String("ticketNamePattern", *c.Spec.TicketNamePattern))
+		zap.String("ticketNamePattern", *c.Spec.TicketNamePattern),
+		zap.Any("jiraIssueMetadataPayload", c.Spec.JiraIssueMetadataPayload))
 
 	if err := s.executeUpdateRequest(c); err != nil {
 		return nil, err

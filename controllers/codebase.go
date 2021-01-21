@@ -266,10 +266,18 @@ func (c *CodebaseController) Update() {
 	name := c.GetString("name")
 	log.Debug("start executing Update method", zap.String("name", name))
 
+	payload, err := extractJsonJiraIssueMetadataPayload(c.GetStrings("jiraFieldName"), c.GetStrings("jiraPattern"))
+	if err != nil {
+		log.Error("couldn't update codebase", zap.Error(err))
+		c.Abort("500")
+		return
+	}
+
 	cc := command.UpdateCodebaseCommand{
-		Name:               name,
-		CommitMessageRegex: c.GetString("commitMessagePattern"),
-		TicketNameRegex:    c.GetString("ticketNamePattern"),
+		Name:                     name,
+		CommitMessageRegex:       c.GetString("commitMessagePattern"),
+		TicketNameRegex:          c.GetString("ticketNamePattern"),
+		JiraIssueMetadataPayload: payload,
 	}
 
 	errMsg := validation.ValidateCodebaseUpdateRequestData(cc)

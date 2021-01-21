@@ -13,7 +13,6 @@ import (
 	"edp-admin-console/util"
 	"edp-admin-console/util/auth"
 	"edp-admin-console/util/consts"
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -217,7 +216,7 @@ func (c *LibraryController) extractLibraryRequestData() (*command.CreateCodebase
 	if s := c.GetString("jiraServer"); len(s) > 0 {
 		library.JiraServer = &s
 
-		payload, err := c.extractJsonJiraIssueMetadataPayload()
+		payload, err := extractJsonJiraIssueMetadataPayload(c.GetStrings("jiraFieldName"), c.GetStrings("jiraPattern"))
 		if err != nil {
 			return nil, err
 		}
@@ -282,24 +281,6 @@ func (c *LibraryController) extractLibraryRequestData() (*command.CreateCodebase
 	}
 
 	return library, nil
-}
-
-func (c *LibraryController) extractJsonJiraIssueMetadataPayload() (*string, error) {
-	fieldNames := c.GetStrings("jiraFieldName")
-	jiraPatterns := c.GetStrings("jiraPattern")
-	if fieldNames == nil && jiraPatterns == nil {
-		return nil, nil
-	}
-
-	payload := make(map[string]string, len(fieldNames))
-	for i, name := range fieldNames {
-		payload[name] = jiraPatterns[i]
-	}
-	jsonPayload, err := json.Marshal(payload)
-	if err != nil {
-		return nil, err
-	}
-	return util.GetStringP(string(jsonPayload)), nil
 }
 
 func validateLibraryRequestData(library command.CreateCodebase) *validation2.ErrMsg {

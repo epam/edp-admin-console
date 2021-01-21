@@ -268,7 +268,7 @@ func (c *ApplicationController) extractApplicationRequestData() (*command.Create
 	if s := c.GetString("jiraServer"); len(s) > 0 {
 		codebase.JiraServer = &s
 
-		payload, err := c.extractJsonJiraIssueMetadataPayload()
+		payload, err := extractJsonJiraIssueMetadataPayload(c.GetStrings("jiraFieldName"), c.GetStrings("jiraPattern"))
 		if err != nil {
 			return nil, err
 		}
@@ -362,15 +362,13 @@ func (c *ApplicationController) extractApplicationRequestData() (*command.Create
 	return codebase, nil
 }
 
-func (c *ApplicationController) extractJsonJiraIssueMetadataPayload() (*string, error) {
-	fieldNames := c.GetStrings("jiraFieldName")
-	jiraPatterns := c.GetStrings("jiraPattern")
-	if fieldNames == nil && jiraPatterns == nil {
+func extractJsonJiraIssueMetadataPayload(jiraFieldNames, jiraPatterns []string) (*string, error) {
+	if jiraFieldNames == nil && jiraPatterns == nil {
 		return nil, nil
 	}
 
-	payload := make(map[string]string, len(fieldNames))
-	for i, name := range fieldNames {
+	payload := make(map[string]string, len(jiraFieldNames))
+	for i, name := range jiraFieldNames {
 		payload[name] = jiraPatterns[i]
 	}
 	jsonPayload, err := json.Marshal(payload)
