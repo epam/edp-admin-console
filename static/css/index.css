@@ -5437,6 +5437,18 @@ input[type="button"].btn-block {
     padding: 1.25rem;
 }
 
+.card-body-tooltip {
+    flex: 1 1 auto;
+    padding: 1.25rem;
+}
+
+.div-tooltip {
+    border: solid #bbb 1px !important;
+    background-color: #f8f8f8 !important;
+    font-weight: 0 !important;
+    font-size: 14px;
+}
+
 .card-title {
     margin-bottom: 0.75rem;
 }

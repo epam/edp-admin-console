@@ -88,33 +88,65 @@
                                     </div>
                                 </div>
 
-                                {{if .Codebase.JiraIssueFields}}
-                                    <div class="form-group jiraIssueMetadata hide-element"
-                                         data-conf="{{.Codebase.JiraIssueMetadataPayload}}">
+                                {{if or (eq .Type "application") (eq .Type "library") }}
+                                    {{if .Codebase.JiraIssueFields}}
+                                        <div class="jiraIssueMetadata hide-element"
+                                             data-conf="{{.Codebase.JiraIssueMetadataPayload}}">
+                                            <label class="form-group">Advance mapping
+                                                <a data-toggle="collapse" href="#jiraAdvanceMappingTooltip"
+                                                   aria-expanded="false"
+                                                   aria-controls="jiraAdvanceMappingTooltip">
+                                                    <img alt="question mark"
+                                                         src="{{ .BasePath }}/static/img/question_mark.png"
+                                                         width="16px" height="16px">
+                                                </a>
+                                            </label>
+                                            <div class="collapse" id="jiraAdvanceMappingTooltip">
+                                                <div class="div-tooltip card card-body-tooltip">
+                                                    <p>
+                                                        <b>Note</b>: There are three predefined variables which you can
+                                                        use
+                                                        - <b>EDP_COMPONENT</b>, <b>EDP_VERSION</b> and
+                                                        <b>EDP_GITTAG</b>. </br>
+                                                        Those variables will be replaced with values in the
+                                                        feature. </br>
+                                                        </br>
+                                                        So, you can vary combination of those variables to reach values
+                                                        you
+                                                        need. </br>
+                                                        </br>
+                                                        <b>Examples</b>: </br>
+                                                        - <b>EDP_COMPONENT</b>-hello-world-<b>EDP_VERSION</b> </br>
+                                                        - <b>EDP_GITTAG</b>-<b>EDP_VERSION</b> </br>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="add-jira-field circle plus"></button>
 
-                                        <button type="button" class="add-jira-field circle plus"></button>
+                                            <div class="invalid-feedback jira-row-invalid-msg">
+                                                Some of the above fields are invalid. Jira Field Name and Jira pattern
+                                                fields
+                                                should not be an empty.
+                                            </div>
 
-                                        <div class="invalid-feedback jira-row-invalid-msg">
-                                            Some of the above fields are invalid. Jira Field Name and Jira pattern
-                                            fields
-                                            should not be an empty.
                                         </div>
+                                    {{else}}
+                                        <div class="jiraIssueMetadata" data-conf>
 
-                                    </div>
-                                {{else}}
-                                    <div class="form-group jiraIssueMetadata"
-                                         data-conf>
+                                            {{template "template/jira_advance_mapping_help_template.html" .}}
 
-                                        <button type="button" class="add-jira-field circle plus"></button>
+                                            <button type="button" class="add-jira-field circle plus"></button>
 
-                                        <div class="invalid-feedback jira-row-invalid-msg">
-                                            Some of the above fields are invalid. Jira Field Name and Jira pattern
-                                            fields
-                                            should not be an empty.
+                                            <div class="invalid-feedback jira-row-invalid-msg">
+                                                Some of the above fields are invalid. Jira Field Name and Jira pattern
+                                                fields
+                                                should not be an empty.
+                                            </div>
+
                                         </div>
-
-                                    </div>
+                                    {{end}}
                                 {{end}}
+
 
                                 <button type="button" class="update-codebase edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse" aria-expanded="false">
