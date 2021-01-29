@@ -51,6 +51,8 @@ _**NOTE**: The Version Control System Info menu is available in case this option
     
 6. Specify the name of the default branch where you want the development to be performed.
 
+    _**NOTE**: The default branch cannot be deleted._
+
 7. Select any of the supported application languages with its framework in the **Application Code Language/framework** field:
 
     - Java – selecting Java allows using Java 8 or Java 11.
