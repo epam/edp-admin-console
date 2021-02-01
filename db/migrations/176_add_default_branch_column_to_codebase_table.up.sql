@@ -1,1 +1,0 @@
-alter table if exists codebase add default_branch text;
