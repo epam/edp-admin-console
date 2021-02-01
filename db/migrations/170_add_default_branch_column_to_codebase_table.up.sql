@@ -1,0 +1,1 @@
+alter table if exists codebase add column if not exists default_branch text;
