@@ -61,8 +61,8 @@ func init() {
 		zap.String("edp version", context.EDPVersion))
 	authEnabled, err := beego.AppConfig.Bool("keycloakAuthEnabled")
 	if err != nil {
-		log.Error("Cannot read property keycloakAuthEnabled. Set default: true", zap.Error(err))
-		authEnabled = true
+		log.Error("Cannot read property keycloakAuthEnabled. Set default: false", zap.Error(err))
+		authEnabled = false
 	}
 
 	if authEnabled {
