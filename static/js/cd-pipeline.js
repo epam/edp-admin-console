@@ -4,6 +4,14 @@ $(function () {
         PIPELINE_NAME: /^[a-z0-9]([-a-z0-9]*[a-z0-9])$/
     };
 
+    !function () {
+        _sendGetRequest(true, `${$('input[id="basepath"]').val()}/api/v1/edp/cd-pipeline`,
+            function (pipes) {
+                $('.pipeline-block').attr('data-pipes', JSON.stringify(pipes));
+            }, function (resp) {
+                console.error(resp)
+            });
+    }();
 
     function validatePipelineInfo(event) {
         let $pipelineBlockEl = $('.pipeline-block');
@@ -24,14 +32,26 @@ $(function () {
 
     function isPipelineInfoValid() {
         let $pipelineNameInputEl = $('#pipelineName'),
-            isPipelineNameValid = isFieldValid($pipelineNameInputEl, REGEX.PIPELINE_NAME);
+            isPipelineNameValid = isFieldValid($pipelineNameInputEl, REGEX.PIPELINE_NAME),
+            isNameInUse = false;
 
         if (!isPipelineNameValid) {
             $('.invalid-feedback.pipeline-name-validation').show();
             $pipelineNameInputEl.addClass('is-invalid');
         }
 
-        return isPipelineNameValid;
+        let $pipeExistsErrorBlock = $('.pipe-exists');
+        if (_isPipeNameInUse()) {
+            isNameInUse = true;
+            $pipeExistsErrorBlock.show();
+            $pipelineNameInputEl.addClass('pipe-exists-invalid');
+        } else {
+            isNameInUse = false;
+            $pipeExistsErrorBlock.hide();
+            $pipelineNameInputEl.removeClass('pipe-exists-invalid');
+        }
+
+        return isPipelineNameValid && !isNameInUse;
     }
 
     function validateApplicationInfo(event) {
@@ -52,7 +72,7 @@ $(function () {
     }
 
     function isApplicationInfoValid() {
-        let isApplicationBlockValid = $('.app-checkbox').is(':checked');
+        let isApplicationBlockValid = $('.app-checkbox[name="app"]').is(':checked');
 
         if (!isApplicationBlockValid) {
             $('.app-checkbox-error').show();
@@ -61,7 +81,7 @@ $(function () {
         return isApplicationBlockValid;
     }
 
-    function validateStageInfo() {
+    function validateStageInfo(event) {
         let $stageBlockEl = $('.stage-block');
 
         resetErrors($stageBlockEl);
@@ -83,7 +103,6 @@ $(function () {
         let isStageValid = $('.stages-list .stage-info').length > 0;
 
         if (!isStageValid) {
-            $('.invalid-feedback.pipeline-name-validation').show();
             $('.stage-error').show();
         }
 
@@ -92,7 +111,7 @@ $(function () {
 
     function resetErrors($el) {
         $el.find('input.is-invalid').removeClass('is-invalid');
-        $el.find('.invalid-feedback').hide();
+        $el.find('.invalid-feedback:not(.pipe-exists)').hide();
     }
 
     $('.application-checkbox :checkbox').change(function () {
@@ -113,12 +132,30 @@ $(function () {
         let isPipelineValueValid = isPipelineValid();
         if (!isPipelineValueValid) {
             $('#pipelineName').addClass('non-valid-input');
-            $('.invalid-feedback.pipeline-name').show();
+            $('.invalid-feedback.pipeline-name-validation').show();
         } else {
             $('#pipelineName').removeClass('non-valid-input');
-            $('.invalid-feedback.pipeline-name').hide();
+            $('.invalid-feedback.pipeline-name-validation').hide();
+        }
+
+        let $pipeExistsErrorBlock = $('.pipe-exists');
+        if (_isPipeNameInUse()) {
+            $pipeExistsErrorBlock.show();
+            $(this).addClass('pipe-exists-invalid');
+        } else {
+            $pipeExistsErrorBlock.hide();
+            $(this).removeClass('pipe-exists-invalid');
         }
     });
+
+    function _isPipeNameInUse() {
+        let pipes = JSON.parse($('.pipeline-block').attr('data-pipes')),
+            pipe = $.grep(pipes, function (c) {
+                return c.name === $('#pipelineName').val()
+            });
+        return pipe.length === 1;
+    }
+
 
     function isPipelineValid() {
         let $pipelineNameEl = $('#pipelineName');
@@ -133,11 +170,11 @@ $(function () {
         validatePipelineInfo(event);
     });
 
-    $('.application-info-button').click(function () {
+    $('.application-info-button').click(function (event) {
         validateApplicationInfo(event);
     });
 
-    $('.stage-info-button').click(function () {
+    $('.stage-info-button').click(function (event) {
         validateStageInfo(event);
     });
 

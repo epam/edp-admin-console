@@ -27,3 +27,8 @@
     pointer-events: none;
     opacity: 0.4;
 }
+
+.codebase-exists-invalid,.pipe-exists-invalid {
+    border: 1px solid #D35D47;
+    border-radius: 3px;
+}

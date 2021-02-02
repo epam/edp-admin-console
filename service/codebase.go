@@ -142,6 +142,11 @@ func (s CodebaseService) GetCodebaseByName(name string) (*query.Codebase, error)
 		return nil, errors.Wrapf(err, "an error has occurred while getting %v codebase from db", name)
 	}
 
+	if c == nil {
+		log.Info("codebase doesn't exist", zap.String("name", name))
+		return nil, nil
+	}
+
 	if c.PerfServerId != nil {
 		ps, err := s.PerfService.GetPerfServerName(*c.PerfServerId)
 		if err != nil {
