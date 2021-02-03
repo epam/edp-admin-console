@@ -50,6 +50,19 @@
             </div>
         {{end}}
 
+        {{if eq .Type "library" }}
+            <div class="form__radio-btn-wrapper">
+                <input name="appLang" type="radio" class="form__radio-btn"
+                       id="appLang-Terraform" value="terraform"
+                       data-target=".formSubsection-terraform">
+                <label class="form__radio-label" for="appLang-Terraform">
+                    <img class="form__radio-label-icon"
+                         src="{{ .BasePath }}/static/img/terraform-logo.png" alt="logo">
+                    <span class="form__radio-label-text">Terraform</span>
+                </label>
+            </div>
+        {{end}}
+
         {{if eq .Type "application" }}
         <div class="form__radio-btn-wrapper">
             <input name="appLang" type="radio" class="form__radio-btn"

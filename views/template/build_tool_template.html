@@ -80,4 +80,16 @@
             </select>
         </div>
 
+    {{if eq .Type "library" }}
+        <div class="js-form-subsection form-subsection formSubsection-terraform hide-element">
+            <label for="buildTool">Select Build Tool
+                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                    title="Select application build tool."></span>
+            </label>
+            <select class="form-control buildTool terraform-build-tools" name="buildTool">
+                <option data-build-tool="terraform">Terraform</option>
+            </select>
+        </div>
+    {{end}}
+
 </div>
