@@ -20,7 +20,6 @@ import (
 	"edp-admin-console/controllers/validation"
 	"edp-admin-console/models/command"
 	edperror "edp-admin-console/models/error"
-	"edp-admin-console/models/query"
 	"edp-admin-console/service/cd_pipeline"
 	dberror "edp-admin-console/util/error/db-errors"
 	"encoding/json"
@@ -55,18 +54,6 @@ func (c *CDPipelineRestController) GetCDPipelineByName() {
 	}
 
 	c.Data["json"] = cdPipeline
-	c.ServeJSON()
-}
-
-func (c *CDPipelineRestController) GetAllPipelines() {
-	log.Info("fetching all pipelines")
-	pipes, err := c.CDPipelineService.GetAllPipelines(query.CDPipelineCriteria{})
-	if err != nil {
-		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	c.Data["json"] = pipes
 	c.ServeJSON()
 }
 

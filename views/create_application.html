@@ -54,7 +54,24 @@
                              data-parent="#accordionCreateCodebase">
                             <div class="card-body">
 
-                                {{template "template/codebase_name_field_template.html" .}}
+                                <div class="form-group app-name">
+                                    <label for="appName">Application Name
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Application name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters."></span>
+                                    </label>
+                                    <input name="appName" type="text" class="codebase-name form-control"
+                                           id="appName"
+                                           placeholder="Type your application name">
+                                    <div class="codebase-name-validation invalid-feedback regex-error">
+                                        Application name may contain only: lower-case letters, numbers and dashes and
+                                        cannot start and end with dash. Minimum 2 characters.
+                                    </div>
+                                    <div class="app-name-duplicate-validation">
+                                        <div class="invalid-feedback duplicate-msg">
+                                            Current application is already exists.
+                                        </div>
+                                    </div>
+                                </div>
 
                                 {{template "template/default_branch_template.html" .}}
 

@@ -52,8 +52,21 @@
                         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
                              data-parent="#accordionCreateCodebase">
                             <div class="card-body">
-
-                                {{template "template/codebase_name_field_template.html" .}}
+                                <div class="form-group app-name">
+                                    <label for="appName">Library Name
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Project name may contain only: lower-case letters, numbers and dashes and cannot start and end with dash. Minimum 2 characters."></span>
+                                    </label>
+                                    <input name="appName" type="text" class="codebase-name form-control" id="appName"
+                                           placeholder="Type your library name">
+                                    <div class="codebase-name-validation invalid-feedback regex-error">
+                                        Library name may contain only: lower-case letters, numbers and dashes
+                                        and cannot start and end with dash. Minimum 2 characters.
+                                    </div>
+                                    <div class="app-name-duplicate-validation invalid-feedback duplicate-msg">
+                                        Current library is already exists.
+                                    </div>
+                                </div>
 
                                 {{template "template/default_branch_template.html" .}}
 

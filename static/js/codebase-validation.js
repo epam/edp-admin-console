@@ -75,15 +75,6 @@ $(function () {
         }
     }();
 
-    !function () {
-        _sendGetRequest(true, `${$('input[id="basepath"]').val()}/api/v1/edp/codebase`,
-            function (codebases) {
-                $('.main-block').attr('data-codebases', JSON.stringify(codebases));
-            }, function (resp) {
-                console.error(resp)
-            });
-    }();
-
     $('#jiraServerToggle').change(function () {
         let $jiraEl = $('.jiraServerBlock'),
             $commitMessagePatternBlockEl = $('.commitMessagePatternBlock'),
@@ -457,26 +448,6 @@ $(function () {
         $('#appName').val($(this).val().match(/([^\/]*)\/*$/)[1]);
     });
 
-    $('#appName').focusout(function () {
-        let $codebaseExistsErrorBlock = $('.codebase-exists'),
-            $codebaseNameInput = $('.codebase-name');
-        if (_isCodebaseNameInUse()) {
-            $codebaseExistsErrorBlock.show();
-            $codebaseNameInput.addClass('codebase-exists-invalid');
-            return
-        }
-        $codebaseExistsErrorBlock.hide();
-        $codebaseNameInput.removeClass('codebase-exists-invalid');
-    });
-
-    function _isCodebaseNameInUse() {
-        let codebases = JSON.parse($('.main-block').attr('data-codebases')),
-            codebase = $.grep(codebases, function (c) {
-                return c.name === $('#appName').val()
-            });
-        return codebase.length === 1;
-    }
-
     function setJenkinsSlave(el) {
         let $slave = getSlaveElement(el);
         if ($slave.length) {
@@ -598,7 +569,7 @@ $(function () {
 
     function resetErrors($el) {
         $el.find('input.is-invalid').removeClass('is-invalid');
-        $el.find('.invalid-feedback:not(.codebase-exists)').hide();
+        $el.find('.invalid-feedback').hide();
     }
 
     function isCodebaseInfoValid() {
@@ -695,17 +666,8 @@ $(function () {
             isCodebaseNameValid = isFieldValid($codebaseInputEl, REGEX.CODEBASE_NAME);
             if (!isCodebaseNameValid) {
                 $('.codebase-name-validation.regex-error').show();
-                $codebaseInputEl.addClass('codebase-exists-invalid');
+                $codebaseInputEl.addClass('is-invalid');
             }
-        }
-
-        let $codebaseExistsErrorBlock = $('.codebase-exists');
-        if (_isCodebaseNameInUse()) {
-            $codebaseExistsErrorBlock.show();
-            $codebaseInputEl.addClass('codebase-exists-invalid');
-        } else {
-            $codebaseExistsErrorBlock.hide();
-            $codebaseInputEl.removeClass('codebase-exists-invalid');
         }
 
         let $defaultBranchInputEl = $('.default-branch-name'),
@@ -737,10 +699,6 @@ $(function () {
             }
         } else {
             $('.appLangError').show();
-        }
-
-        if ($('.codebase-exists').css('display') === 'block') {
-            isCodebaseNameValid = false;
         }
 
         return isCodebaseNameValid && isDefaultBranchNameValid && isDescriptionValid && isLanguageChosen && isFrameworkChosen;

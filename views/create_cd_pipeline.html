@@ -51,9 +51,6 @@
                                     <input name="pipelineName" type="text" class="form-control"
                                            id="pipelineName"
                                            placeholder="Enter pipeline name ">
-                                    <div class="pipe-exists invalid-feedback">
-                                        Pipeline name already in use. Use a different name.
-                                    </div>
                                     <div class="invalid-feedback pipeline-name-validation">
                                         Pipeline name may contain only: lower-case letters, numbers and dashes
                                         and
@@ -69,7 +66,6 @@
                                 </button>
                             </div>
                         </div>
-                        <input type="hidden" id=basepath value="{{ .BasePath }}">
                     </div>
 
                     <div class="card application-block">
