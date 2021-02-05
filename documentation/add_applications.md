@@ -26,7 +26,14 @@ _**NOTE**: The Version Control System Info menu is available in case this option
                
     _**NOTE**: In order to use the import strategy, make sure to adjust it by following the [Adjust Import Strategy](../documentation/import-strategy.md) page._ 
 
-2. In the **Git Repository URL** field, specify the link to the repository that is to be cloned.
+2. In the **Git Repository URL** field, specify the link to the repository that is to be cloned. If the Import strategy is selected, specify the following fields:
+     
+     ![add-app2](../readme-resource/import_strategy.png "add-app2")
+   
+   a. Git Server where the repository is located.
+   
+   b. Relative path to the repository on the server.
+    
 3. Select the **Codebase Authentication** check box and fill in the requested fields:
     - Repository Login – enter your login data.
     - Repository password (or API Token) – enter your password or indicate the API Token.
@@ -42,7 +49,11 @@ _**NOTE**: The Version Control System Info menu is available in case this option
 
     _**INFO:** If the Import strategy is used, the Application Name field will not be displayed._
     
-6. Select any of the supported application languages with its framework in the **Application Code Language/framework** field:
+6. Specify the name of the default branch where you want the development to be performed.
+
+    _**NOTE**: The default branch cannot be deleted._
+
+7. Select any of the supported application languages with its framework in the **Application Code Language/framework** field:
 
     - Java – selecting Java allows using Java 8 or Java 11.
     - JavaScript - selecting JavaScript allows using the React framework.
@@ -53,22 +64,20 @@ _**NOTE**: The Version Control System Info menu is available in case this option
 
     _**NOTE**: The Create strategy does not allow to customize the default code language set._
     
-7. Choose the necessary build tool in the Select Build Tool field:
+8. Choose the necessary build tool in the Select Build Tool field:
 
     - Java - selecting Java allows using the Gradle or Maven tool.
     - JavaScript - selecting JavaScript allows using the NPM tool.
     - .Net - selecting .Net allows using the .Net tool.
 
     _**NOTE**: The Select Build Tool field disposes of the default tools and can be changed in accordance with the selected code language._
-8. Select the **Multi-Module Project** check box that becomes available if the Java code language and the Maven build tool are selected. 
+9. Select the **Multi-Module Project** check box that becomes available if the Java code language and the Maven build tool are selected. Click the Proceed button to be switched to the next menu.
 
     _**NOTE**: If your project is a multi-modular, add a property to the project root POM-file:_
 
     `<deployable.module> for a Maven project.`
 
     `<DeployableModule> for a DotNet project.`
-
-9. Click the Proceed button to be switched to the next menu.
 
     ## The Advanced Settings Menu
 
@@ -95,24 +104,33 @@ _**NOTE**: The Version Control System Info menu is available in case this option
 the GitLab CI tool can be additionally adjusted. For details, please refer to the [Adjust GitLab CI Tool](../documentation/ci-tool.md) page.
 
     >_**NOTE**: The GitLab CI tool is available only with the Import strategy and makes the **Jira integration** feature unavailable._
-
+                                                                                                                                                                                                                                                                  
+    ![add-app3](../readme-resource/add_app3_ji2.png "add-app3_2")
 15. Select the **Integrate with Jira Server** checkbox in case it is required to connect Jira tickets with the commits and have a respective label in the Fix Version field.
     >_**NOTE**: To adjust the Jira integration functionality, first apply the necessary changes described on the [Adjust Integration With Jira Server](../documentation/jira-server.md) page, and setup the [VCS Integration With Jira Server](../documentation/jira_vcs_integration.md). Pay attention that the Jira integration feature is not available when using the GitLab CI tool._ 
-                                                                                                                                                                                 
-    ![add-app3](../readme-resource/add_app3_ji2.png "add-app3_2")
-
-16. As soon as the Jira server is set, select it in the **Select Jira Server** field.
+                                                                                                                                                                                    
+16. In the **Select Jira Server** field, select the Jira server.
 17. Indicate the pattern using any character, which is followed on the project, to validate a commit message.
-18. Indicate the pattern using any character, which is followed on the project, to find a Jira ticket number in a commit message.
-19. Click the Proceed button to be switched to the next menu.
+18. Indicate the pattern using any character, which is followed on the project, to find a Jira ticket number in a commit message. Click the Proceed button to be switched to the next menu.
+ 
+    ![add-app3](../readme-resource/integrate_perf.png "add-app3_2")
+   
+19. Select the **Integrate with Perf Server** checkbox in case it is required to connect to the [PERF Board](https://kb.epam.com/display/EPMDMO/Project+Performance+Board) (_Project Performance Board_). 
+Such functionality allows monitoring the overall team performance and setting up necessary metrics. 
+    >_**NOTE**: To adjust the Perf Server integration functionality, first deploy Perf Operator. To get more information about the Perf Operator installation and architecture, please refer to the [PERF Operator](https://github.com/epam/edp-perf-operator#perf-operator) page._ 
+    
+20. In the **Select Perf Server** field, select the name of the Perf server with which the integration should be performed. Click the Proceed button to be switched to the next menu.
+
+    ![add-app3](../readme-resource/perf_integration_menu.png "add-app3_2")
+
+21. Select the necessary DataSource (_Jenkins/GitLab, Sonar_) from which the data should be transferred to the Project Performance Board. 
 
     ## The Version Control System Info Menu
 
     ![add-app4](../readme-resource/addapp_4.png "add-app4")
     
-20. Enter the login credentials into the **VCS Login** field.
-21. Enter the password into the **VCS Password (or API Token)** field OR add the API Token.
-22. Click the Proceed button to be switched to the next menu.
+22. Enter the login credentials into the **VCS Login** field.
+23. Enter the password into the **VCS Password (or API Token)** field OR add the API Token. Click the Proceed button to be switched to the next menu.
     
     >_**NOTE**: The VCS Info step is skipped in case there is no need to integrate the version control for the application deployment. If the cloned application includes the VCS, this step should be completed as well._
 
@@ -120,15 +138,13 @@ the GitLab CI tool can be additionally adjusted. For details, please refer to th
 
     ![add-app5](../readme-resource/addapp_5.png "add-app5")
 
-23. Select the **Need Route** check box to create a route component in the OpenShift project for the externally reachable host name. As a result, the added application will be accessible in a browser.
+24. Select the **Need Route** check box to create a route component in the OpenShift project for the externally reachable host name. As a result, the added application will be accessible in a browser.
     
-    Fill in the necessary fields:
+    Fill in the necessary fields and proceed to the final menu:
     
     - Name – type the name by entering at least two characters and by using the lower-case letters, numbers and inner dashes. The mentioned name will be as a prefix for the host name.
     - Path – specify the path starting with the **/api** characters. The mentioned path will be at the end of the URL path.
     
-24. Click the Proceed button to be switched to the final menu.
-
     ## The Database Menu
 
     ![add-app6](../readme-resource/addapp_6.png "add-app6")

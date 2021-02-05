@@ -37,7 +37,7 @@ After the complete adding of the CD pipeline, inspect the [Check CD Pipeline Ava
 
     ![addcdpipe3](../readme-resource/addcdpipe3.png "addcdpipe3")
 
-7. Click the plus sign icon in the **Stages** menu and fill in the necessary fields in the Adding Stage window:
+7. Click the plus sign icon in the **Stages** menu and fill in the necessary fields in the Adding Stage window: <a name="adding_stage_window"></a>
 
     ![addcdpipe4](../readme-resource/addcdpipe4.png "addcdpipe4")
 
@@ -90,7 +90,12 @@ As soon as the CD pipeline is provisioned and added to the CD Pipelines list, th
     - apply the necessary changes and click the Proceed button to confirm the editions:
     
     ![addcdpip8](../readme-resource/addcdpipe8.png "addcdpipe8")
-
+    
+    - add new extra stages steps by clicking the plus sign icon and filling in the necessary fields in the [Adding Stage](#adding_stage_window) window. 
+       
+     ![addcdpip8](../readme-resource/addcdpipe12.png "addcdpipe8") 
+     
+    _**NOTE**: The added stage will appear in the Stages menu allowing to review its details or delete._    
 3. Check the CD pipeline data and details by clicking the CD pipeline name in the CD Pipelines list:
 
     - the main link on the top of the details page refers to Jenkins;
@@ -99,9 +104,9 @@ As soon as the CD pipeline is provisioned and added to the CD Pipelines list, th
 
     - the Applications menu has the main information about the applications with the respective codebase Docker streams and links to Jenkins and Gerrit as well as the signification of the promotion in CD pipeline; 
 
-    - the Stages menu includes the stages data that was previously mentioned, the direct links to the respective to every stage OpenShift page, and the link to the Autotest details page in case there are added autotests.
+    - the Stages menu includes the stages data that was previously mentioned, the direct links to the respective to every stage OpenShift page, and the link to the Autotest details page in case there are added autotests.  
     
-      _**NOTE**: In order to **remove a stage**, click the corresponding delete icon, type the CD pipeline name and confirm the deletion by clicking the Delete button. If you remove the last stage, the whole CD pipeline will be removed as the CD pipeline does not exist without stages._
+      _**NOTE**: The deletion of stages is performed sequentially, starting from the latest created stage. In order to **remove a stage**, click the corresponding delete icon, type the CD pipeline name and confirm the deletion by clicking the Delete button. If you remove the last stage, the whole CD pipeline will be removed as the CD pipeline does not exist without stages._
       
     ![addcdpip9](../readme-resource/addcdpipe9.png "addcdpipe9")
 

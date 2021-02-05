@@ -39,7 +39,10 @@ _**NOTE**: The Version Control System Info menu is available in case this option
 
     _**INFO**: If the Import strategy is used, the Library Name field will not be displayed._
 
-6. Select any of the supported code languages in the **Library Code Language** block:
+6. Specify the name of the default branch where you want the development to be performed.
+
+    _**NOTE**: The default branch cannot be deleted._
+7. Select any of the supported code languages in the **Library Code Language** block:
 
     - Java – selecting Java allows specify Java 8 or Java 11, and further usage of the Gradle or Maven tool.
     - JavaScript - selecting JavaScript allows using the NPM tool.
@@ -50,19 +53,19 @@ _**NOTE**: The Version Control System Info menu is available in case this option
 
     _**NOTE**: The Create strategy does not allow to customize the default code language set._
 
-7. The **Select Build Tool** field disposes of the default tools and can be changed in accordance with the selected code language.
+8. The **Select Build Tool** field disposes of the default tools and can be changed in accordance with the selected code language.
 
-8. Click the Proceed button to be switched to the next menu.
+9. Click the Proceed button to be switched to the next menu.
 
     ## The Advanced Settings Menu
     
     ![addlib3](../readme-resource/add_lib_250.png "addlib3")
 
-9. Select the CI pipeline provisioner that will be used to handle a codebase. For details, refer to the [Add Job Provision](https://github.com/epmd-edp/jenkins-operator/blob/master/documentation/add-job-provision.md#add-job-provision) instruction and become familiar with the main steps to add an additional job provisioner.
+10. Select the CI pipeline provisioner that will be used to handle a codebase. For details, refer to the [Add Job Provision](https://github.com/epmd-edp/jenkins-operator/blob/master/documentation/add-job-provision.md#add-job-provision) instruction and become familiar with the main steps to add an additional job provisioner.
 
-10. Select Jenkins slave that will be used to handle a codebase. For details, refer to the [Add Jenkins Slave](https://github.com/epmd-edp/jenkins-operator/blob/master/documentation/add-jenkins-slave.md#add-jenkins-slave) instruction and inspect the steps that should be done to add a new Jenkins slave.
+11. Select Jenkins slave that will be used to handle a codebase. For details, refer to the [Add Jenkins Slave](https://github.com/epmd-edp/jenkins-operator/blob/master/documentation/add-jenkins-slave.md#add-jenkins-slave) instruction and inspect the steps that should be done to add a new Jenkins slave.
 
-11. Select the necessary codebase versioning type:
+12. Select the necessary codebase versioning type:
          
     * **default** - the previous versioning logic that is realized in EDP Admin Console 2.2.0 and lower versions. Using the default versioning type, in order to specify the version of the current artifacts, images, and tags in the Version Control System, a developer should navigate to the corresponding file and change the version **manually**.
           
@@ -75,25 +78,37 @@ _**NOTE**: The Version Control System Info menu is available in case this option
       a. Type the version number from which you want the artifacts to be versioned.
          
     _**NOTE**: The Start Version From field should be filled out in compliance with the semantic versioning rules, e.g. 1.2.3 or 10.10.10._    
-12. In the **Select CI Tool** field, choose the necessary tool: Jenkins or GitLab CI, where Jenkins is the default tool and
+13. In the **Select CI Tool** field, choose the necessary tool: Jenkins or GitLab CI, where Jenkins is the default tool and
     the GitLab CI tool can be additionally adjusted. For details, please refer to the [Adjust GitLab CI Tool](../documentation/ci-tool.md) page.
        >_**NOTE**: The GitLab CI tool is available only with the Import strategy and makes the **Jira integration** feature unavailable._   
-13. Select the **Integrate with Jira Server** checkbox in case it is required to connect Jira tickets with the commits and have a respective label in the Fix Version field.
+
+    ![add-app3_2](../readme-resource/add_lib3_ji2.png "add-app3_2")
+14. Select the **Integrate with Jira Server** checkbox in case it is required to connect Jira tickets with the commits and have a respective label in the Fix Version field.
        >_**NOTE**: To adjust the Jira integration functionality, first apply the necessary changes described on the [Adjust Integration With Jira Server](../documentation/jira-server.md) page, and setup the [VCS Integration With Jira Server](../documentation/jira_vcs_integration.md). Pay attention that the Jira integration feature is not available when using the GitLab CI tool._ 
-       
-       ![add-app3_2](../readme-resource/add_lib3_ji2.png "add-app3_2")
-14. As soon as the Jira server is set, select it in the **Select Jira Server** field.
-15. Indicate the pattern using any character, which is followed on the project, to validate a commit message.
-16. Indicate the pattern using any character, which is followed on the project, to find a Jira ticket number in a commit message.
-17. Click the Create button to create a library or click the Proceed button to be switched to the next VCS menu that can be predefined.
+  
+15. As soon as the Jira server is set, select it in the **Select Jira Server** field.
+16. Indicate the pattern using any character, which is followed on the project, to validate a commit message.
+17. Indicate the pattern using any character, which is followed on the project, to find a Jira ticket number in a commit message.
+     
+       ![add-app3_2](../readme-resource/add_lib_integrate_perf.png "add-app3_2")
+18. Select the **Integrate with Perf Server** checkbox in case it is required to connect to the [PERF Board](https://kb.epam.com/display/EPMDMO/Project+Performance+Board) (_Project Performance Board_). 
+    Such functionality allows monitoring the overall team performance and setting up necessary metrics. 
+       >_**NOTE**: To adjust the Perf Server integration functionality, first deploy Perf Operator. To get more information about the Perf Operator installation and architecture, please refer to the [PERF Operator](https://github.com/epam/edp-perf-operator#perf-operator) page._ 
+        
+19. In the **Select Perf Server** field, select the name of the Perf server with which the integration should be performed. 
+20. Click the Proceed button to be switched to the next menu.
+
+       ![add-app3_2](../readme-resource/add_lib_perf_integr.png "add-app3_2")
+21. Select the necessary DataSource (_Jenkins/GitLab, Sonar_) from which the data should be transferred to the Project Performance Board. 
+22. Click the Create button to create a library or click the Proceed button to be switched to the next VCS menu that can be predefined.
 
     ## The Version Control System Info Menu
 
     ![addlib4](../readme-resource/addlib4.png "addlib4")
 
-18. Enter the login credentials into the **VCS Login** field.
-19. Enter the password into the **VCS Password (or API Token)** field OR add the API Token.
-20. Click the Create button, check the CONFIRMATION summary, click Continue to add the library to the Libraries list.
+23. Enter the login credentials into the **VCS Login** field.
+24. Enter the password into the **VCS Password (or API Token)** field OR add the API Token.
+25. Click the Create button, check the CONFIRMATION summary, click Continue to add the library to the Libraries list.
 
 > _**NOTE**: After the complete adding of the library, inspect the [Inspect Library](../documentation/inspect_library.md) part._
 
