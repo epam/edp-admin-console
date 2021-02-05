@@ -56,11 +56,6 @@ func ValidCodebaseRequestData(codebase command.CreateCodebase) *ErrMsg {
 		resErr = err
 	}
 
-	if codebase.Database != nil {
-		_, err := valid.Valid(codebase.Database)
-		resErr = err
-	}
-
 	if !IsCodebaseTypeAcceptable(codebase.Type) {
 		err := &validation.Error{Key: "repository", Message: "codebase type should be: application, autotests  or library"}
 		valid.Errors = append(valid.Errors, err)
@@ -107,10 +102,6 @@ func CreateCodebaseLogRequestData(app command.CreateCodebase) strings.Builder {
 
 	if app.Route != nil {
 		result.WriteString(fmt.Sprintf(", routeSite=%s, routePath=%s", app.Route.Site, app.Route.Path))
-	}
-
-	if app.Database != nil {
-		result.WriteString(fmt.Sprintf(", dbKind=%s, dbМersion=%s, dbCapacity=%s, dbStorage=%s", app.Database.Kind, app.Database.Version, app.Database.Capacity, app.Database.Storage))
 	}
 	return result
 }

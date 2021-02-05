@@ -285,14 +285,6 @@ func convertData(codebase command.CreateCodebase) edpv1alpha1.CodebaseSpec {
 			cs.Route.Path = codebase.Route.Path
 		}
 	}
-	if codebase.Database != nil {
-		cs.Database = &edpv1alpha1.Database{
-			Kind:     codebase.Database.Kind,
-			Version:  codebase.Database.Version,
-			Capacity: codebase.Database.Capacity,
-			Storage:  codebase.Database.Storage,
-		}
-	}
 	if codebase.TestReportFramework != nil {
 		cs.TestReportFramework = codebase.TestReportFramework
 	}

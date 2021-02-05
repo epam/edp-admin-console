@@ -409,15 +409,11 @@ $(function () {
         }
     });
 
-    $('.route-submit').click(function (event) {
-        validateRouteInfo(event);
-    });
-
-    $('.db-submit').click(function (event) {
+    $('.create-codebase').click(function (event) {
         let canCreateApplication = validateCodebaseInfo(event) &
             validateMainInfo(event) & validateVCSInfo(event) &
-            validateRouteInfo(event) & validateDbInfo(event) &
-            validateAdvancedInfo(event) & validatePerfIntegrationBlock(event);
+            validateRouteInfo(event) & validateAdvancedInfo(event) &
+            validatePerfIntegrationBlock(event);
         if (canCreateApplication) {
             createConfirmTable('#createAppForm');
             $('#confirmationPopup').modal('show');
@@ -546,23 +542,6 @@ $(function () {
             return isValid;
         }
         blockIsValid($exposeServiceBlockEl);
-
-        return isValid;
-    }
-
-    function validateDbInfo(event) {
-        let $dbBlockEl = $('.db-block');
-
-        resetErrors($dbBlockEl);
-
-        let isValid = isDatabaseValid();
-
-        if (!isValid) {
-            event.stopPropagation();
-            blockIsNotValid($dbBlockEl);
-            return isValid;
-        }
-        blockIsValid($dbBlockEl);
 
         return isValid;
     }
@@ -813,22 +792,5 @@ $(function () {
         return true;
     }
 
-    function isDatabaseValid() {
-        let needDb = $('#needDb').is(':checked');
-
-        if (needDb) {
-            let $capacityInputEl = $('#dbCapacity'),
-                isCapacityValid = isFieldValid($capacityInputEl, REGEX.CAPACITY);
-
-            if (!isCapacityValid) {
-                $('.capacity-error.invalid-feedback').show();
-                $capacityInputEl.addClass('is-invalid');
-            }
-
-            return isCapacityValid;
-        }
-
-        return true;
-    }
 })
 ;

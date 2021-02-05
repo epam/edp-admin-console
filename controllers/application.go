@@ -341,15 +341,6 @@ func (c *ApplicationController) extractApplicationRequestData() (*command.Create
 		}
 	}
 
-	needDb, _ := c.GetBool("needDb", false)
-	if needDb {
-		codebase.Database = &command.Database{
-			Kind:     c.GetString("database"),
-			Version:  c.GetString("dbVersion"),
-			Capacity: c.GetString("dbCapacity") + c.GetString("capacityExt"),
-			Storage:  c.GetString("dbPersistentStorage"),
-		}
-	}
 	codebase.Username = c.Ctx.Input.Session("username").(string)
 
 	if s := c.GetString("perfServer"); len(s) > 0 {

@@ -12,7 +12,6 @@ type CreateCodebase struct {
 	Type                     string      `json:"type,omitempty" valid:"Required"`
 	Repository               *Repository `json:"repository,omitempty"`
 	Route                    *Route      `json:"route,omitempty"`
-	Database                 *Database   `json:"database,omitempty"`
 	Vcs                      *Vcs        `json:"vcs,omitempty"`
 	Description              *string     `json:"description,omitempty"`
 	Username                 string      `json:"username"`
@@ -49,13 +48,6 @@ type Vcs struct {
 type Route struct {
 	Site string `json:"site,omitempty" valid:"Match(/^$|^[a-z][a-z0-9-]*[a-z0-9]$/)"`
 	Path string `json:"path,omitempty" valid:"Match(/^\\/.*$/)"`
-}
-
-type Database struct {
-	Kind     string `json:"kind,omitempty" valid:"Required"`
-	Version  string `json:"version,omitempty" valid:"Required"`
-	Capacity string `json:"capacity,omitempty" valid:"Required"`
-	Storage  string `json:"storage,omitempty" valid:"Required"`
 }
 
 type DeleteCodebaseCommand struct {

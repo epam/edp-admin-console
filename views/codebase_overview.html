@@ -111,24 +111,6 @@
                                             <td>{{.Codebase.RoutePath}}</td>
                                         </tr>
                                     {{end}}
-                                    {{if and .Codebase.DbKind .Codebase.DbVersion .Codebase.DbCapacity .Codebase.DbStorage }}
-                                        <tr>
-                                            <th>Db Kind</th>
-                                            <td>{{.Codebase.DbKind}}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Db Version</th>
-                                            <td>{{.Codebase.DbVersion}}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Db Capacity</th>
-                                            <td>{{.Codebase.DbCapacity}}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Db Storage</th>
-                                            <td>{{.Codebase.DbStorage}}</td>
-                                        </tr>
-                                    {{end}}
                                     </tbody>
                                 </table>
                             </div>

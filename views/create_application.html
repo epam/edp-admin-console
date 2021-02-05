@@ -179,91 +179,11 @@
                                         Path must start with /
                                     </div>
                                 </div>
-                                <button type="button" class="route-submit edp-submit-form-btn btn btn-primary"
+                                <button type="button" class="create-codebase edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
                                         data-target="#collapseFive" aria-expanded="false"
-                                        aria-controls="collapseFour">
-                                    Proceed
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card db-block">
-                        <div class="card-header collapsed" id="headingFive" data-toggle="collapse"
-                             data-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link collapsed" type="button">
-                                    Database
-                                </button>
-                            </h5>
-                        </div>
-                        <div id="collapseFive" class="collapse dataBase" aria-labelledby="headingFive"
-                             data-parent="#accordionCreateCodebase">
-                            <div class="card-body">
-                                <div class="form-check form-group">
-                                    <input class="form-check-input" type="checkbox" value="true" id="needDb"
-                                           name="needDb">
-                                    <label class="form-check-label" for="needDb">
-                                        Need Database
-                                    </label>
-                                </div>
-                                <div class="form-group">
-                                    <label for="database">Database
-                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Select database you wish to use."></span>
-                                    </label>
-                                    <select class="form-control" id="database" name="database">
-                                        <option>PostgreSQL</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="dbVersion">Version
-                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Select database version."></span>
-                                    </label>
-                                    <select class="form-control" id="dbVersion" name="dbVersion">
-                                        <option>postgres:9.6</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="dbCapacity">Capacity
-                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Specify size of database."></span>
-                                    </label>
-                                    <div class="d-flex">
-                                        <input name="dbCapacity" type="number" min="1"
-                                               oninput="validity.valid||(value='');"
-                                               class="form-control storage-capacity"
-                                               id="dbCapacity" placeholder="Enter database size">
-                                        <select class="capacity-ext form-control storage-capacity-ext"
-                                                name="capacityExt">
-                                            <option value="Mi">Mi</option>
-                                            <option value="Gi">Gi</option>
-                                            <option value="Ti">Ti</option>
-                                        </select>
-                                    </div>
-                                    <div class="capacity-error invalid-feedback">
-                                        Please specify database capacity.
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="dbPersistentStorage">Persistent storage
-                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                              title="Specify one of the OpenShift's storages."></span>
-                                    </label>
-                                    <select class="form-control" id="dbPersistentStorage" name="dbPersistentStorage">
-                                    </select>
-                                    <div class="invalid-feedback">
-                                        Please specify persistent storage.
-                                    </div>
-                                </div>
-                                <button type="button"
-                                        class="db-submit edp-submit-form-btn btn btn-primary"
-                                        data-toggle="collapse"
-                                        aria-expanded="false"
                                         aria-controls="">
-                                    Create
+                                    Proceed
                                 </button>
                             </div>
                         </div>

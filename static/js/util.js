@@ -186,13 +186,6 @@ function createConfirmTable(formName) {
         'Autotest Report Framework': 'testReportFramework'
     }));
 
-    $(addBlock('needDb', 'DATABASE', {
-        'Database': 'database',
-        'Version': 'dbVersion',
-        'Capacity': 'dbCapacity',
-        'Persistent storage': 'dbPersistentStorage'
-    }));
-
 }
 
 function _sendGetRequest(async, url, successCallback, failCallback) {

@@ -10,10 +10,6 @@ type Codebase struct {
 	GitUrl                   string                 `json:"git_url" orm:"column(repository_url)"`
 	RouteSite                string                 `json:"route_site" orm:"column(route_site)"`
 	RoutePath                string                 `json:"route_path" orm:"column(route_path)"`
-	DbKind                   string                 `json:"db_kind" orm:"column(database_kind)"`
-	DbVersion                string                 `json:"db_version" orm:"column(database_version)"`
-	DbCapacity               string                 `json:"db_capacity" orm:"column(database_capacity)"`
-	DbStorage                string                 `json:"db_storage" orm:"column(database_storage)"`
 	Type                     CodebaseType           `json:"type" orm:"column(type)"`
 	Status                   Status                 `json:"status" orm:"column(status)"`
 	TestReportFramework      string                 `json:"testReportFramework" orm:"column(test_report_framework)"`
