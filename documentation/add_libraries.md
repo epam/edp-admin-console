@@ -49,6 +49,7 @@ _**NOTE**: The Version Control System Info menu is available in case this option
     - DotNet - selecting DotNet allows using the DotNet v.2.1 and DotNet v.3.1.
     - Groovy-pipeline - selecting Groovy-pipeline allows having the ability to customize a stages logic. For details, please refer to the [Customize CD Pipeline](https://github.com/epmd-edp/admin-console/blob/master/documentation/cicd_customization/customize-deploy-pipeline.md#customize-cd-pipeline) page.
     - Python - selecting Python allows using the Python v.3.8.
+    - Terraform - selecting Terraform allows using the Terraform different versions using tfenv.
     - Other - selecting Other allows extending the default code languages when creating a codebase with the clone/import strategy. To add another code language, inspect the ([Add Other Code Language](add_other_code_language.md) page.
 
     _**NOTE**: The Create strategy does not allow to customize the default code language set._
