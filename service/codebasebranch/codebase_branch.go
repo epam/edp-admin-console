@@ -64,11 +64,6 @@ func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCo
 		return nil, fmt.Errorf("CodebaseBranch %v already exists", cb)
 	}
 
-	c, err := util.GetCodebaseCR(s.Clients.EDPRestClient, appName)
-	if err != nil {
-		return nil, err
-	}
-
 	branch := &edpv1alpha1.CodebaseBranch{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v2.edp.epam.com/v1alpha1",
@@ -77,15 +72,6 @@ func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCo
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-%s", appName, cb),
 			Namespace: context.Namespace,
-			OwnerReferences: []metav1.OwnerReference{
-				{
-					APIVersion:         "v2.edp.epam.com/v1alpha1",
-					Kind:               consts.CodebaseKind,
-					Name:               c.Name,
-					UID:                c.UID,
-					BlockOwnerDeletion: newTrue(),
-				},
-			},
 		},
 		Spec: edpv1alpha1.CodebaseBranchSpec{
 			BranchName:   branchInfo.Name,
