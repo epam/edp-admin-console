@@ -167,3 +167,9 @@ func TestExtractApplicationRequestDataMethod_ReturnsDtoWithoutPerfField(t *testi
 	assert.NoError(t, err)
 	assert.Nil(t, c.Perf)
 }
+
+func TestExtractJsonJiraIssueMetadataPayload(t *testing.T) {
+	jsonPayload, err := extractJsonJiraIssueMetadataPayload([]string {"fake-payload1"}, []string {"fake-payload2"})
+	assert.NoError(t, err)
+	assert.Equal(t, "{\"fake-payload1\":\"fake-payload2\"}", *jsonPayload)
+}
