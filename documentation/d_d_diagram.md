@@ -19,4 +19,4 @@ Possible actions when using dashboard:
 
 ### Related Articles
 
-* [EDP Admin Console](https://github.com/epmd-edp/admin-console#edp-admin-console)
+* [EDP Admin Console](https://github.com/epam/edp-admin-console#edp-admin-console)

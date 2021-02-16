@@ -31,7 +31,7 @@ Follow the steps below to add an autotest using Admin Console and to configure i
 1. Open the Admin Console and add an autotest:
 
      ![add_autotest](../customization_resources/add_autotest.png) 
-     >_**NOTE**: To get more information on how to add autotests, please refer to the [Add Autotests](https://github.com/epmd-edp/admin-console/blob/master/documentation/add_autotests.md#add-autotests) instruction._
+     >_**NOTE**: To get more information on how to add autotests, please refer to the [Add Autotests](https://github.com/epam/edp-admin-console/blob/master/documentation/add_autotests.md#add-autotests) instruction._
 
 2. After the provisioning of the new autotest is successfully completed, implement the necessary configuration 
 for the added autotest. Open Gerrit via the Admin Console overview page → select the created autotest:
@@ -91,7 +91,7 @@ Add an additional CD pipeline and define two stages (SIT - System Integration Te
     ![add_autotest](../customization_resources/add_autotest6.png)
 4. Add the QA stage and define the **Manual** type in the Quality gate type field. 
 5. Select the RabbitMQ service in the Services menu (the selected service will be deployed on this new CD pipeline).
-    >_**NOTE**: To get more information on how to add the CD pipeline, please refer to the [Add CD Pipelines](https://github.com/epmd-edp/admin-console/blob/master/documentation/add_CD_pipelines.md#add-cd-pipelines) chapter._ 
+    >_**NOTE**: To get more information on how to add the CD pipeline, please refer to the [Add CD Pipelines](https://github.com/epam/edp-admin-console/blob/master/documentation/add_CD_pipelines.md#add-cd-pipelines) chapter._ 
 
 6. As soon as the CD pipeline is provisioned, the details page will display the added stages with the corresponding quality gate types. Click the CD pipeline name on the top of the details page:
      ![details_page](../customization_resources/details_page.png)

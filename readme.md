@@ -35,8 +35,8 @@ _**NOTE**: The Admin Console link is available on the OpenShift overview page fo
 ---
 * [Adjust Import Strategy](documentation/import-strategy.md)
 * [Adjust Integration With Jira Server](documentation/jira-server.md)
-* [Add Jenkins Slave](https://github.com/epmd-edp/jenkins-operator/blob/master/documentation/add-jenkins-slave.md#add-jenkins-slave)
-* [Add Job Provision](https://github.com/epmd-edp/jenkins-operator/blob/master/documentation/add-job-provision.md#add-job-provision)
+* [Add Jenkins Slave](https://github.com/epam/edp-jenkins-operator/blob/master/documentation/add-jenkins-slave.md#add-jenkins-slave)
+* [Add Job Provision](https://github.com/epam/edp-jenkins-operator/blob/master/documentation/add-job-provision.md#add-job-provision)
 * [Add Other Code Language](documentation/add_other_code_language.md)
 * [Adjust VCS Integration With Jira Server](documentation/jira_vcs_integration.md)
 * [Adjust GitLab CI Tool](documentation/ci-tool.md)
