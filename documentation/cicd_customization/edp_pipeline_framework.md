@@ -9,7 +9,7 @@ The general EDP Pipeline Framework consists of several parts:
 
 * **Jenkinsfile** - a text file that keeps the definition of a Jenkins Pipeline and is checked into source control. Every Job has its Jenkinsfile that is stored in the specific application repository and in Jenkins as the plain text. 
 
-* **Loading Shared Libraries** - a part where every job loads libraries with the help of the shared libraries mechanism for Jenkins that allows to create reproducible pipelines, write them uniformly, and manage the update process. There are two main libraries: [EDP Pipelines](https://github.com/epmd-edp/edp-library-pipelines/blob/master/README.md#edp-library-pipelines) with the common logic described for the main pipelines Code Review, Build, Deploy pipelines and [EDP Stages](https://github.com/epmd-edp/edp-library-stages#edp-library-stages) library that keeps the description of the stages for every pipeline.
+* **Loading Shared Libraries** - a part where every job loads libraries with the help of the shared libraries mechanism for Jenkins that allows to create reproducible pipelines, write them uniformly, and manage the update process. There are two main libraries: [EDP Pipelines](https://github.com/epam/edp-library-pipelines/blob/master/README.md#edp-library-pipelines) with the common logic described for the main pipelines Code Review, Build, Deploy pipelines and [EDP Stages](https://github.com/epam/edp-library-stages#edp-library-stages) library that keeps the description of the stages for every pipeline.
 
 * **Run Stages** - a part where the predefined default stages are launched. 
 

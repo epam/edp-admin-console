@@ -13,5 +13,5 @@ To clone the project/repository using Git Bash, follow the steps below:
 
 ### Related Articles
 
-* [EDP Admin Console](https://github.com/epmd-edp/admin-console/tree/master#edp-admin-console)
+* [EDP Admin Console](https://github.com/epam/edp-admin-console/tree/master#edp-admin-console)
 * [Creating a Change in Gerrit](https://charm.cs.illinois.edu/gerrit/Documentation/user-inline-edit.html#create-change)

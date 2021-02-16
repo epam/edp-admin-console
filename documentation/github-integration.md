@@ -389,5 +389,5 @@ As a result, the new custom job-provision will be available in the Advanced CI S
 
 ### Related Articles
 
-- [Adjust Import Strategy](https://github.com/epmd-edp/admin-console/blob/master/documentation/import-strategy.md#adjust-import-strategy)
-- [Adjust Integration With Jira Server](https://github.com/epmd-edp/admin-console/blob/release/2.4/documentation/jira-server.md#adjust-integration-with-jira-server)
+- [Adjust Import Strategy](https://github.com/epam/edp-admin-console/blob/master/documentation/import-strategy.md#adjust-import-strategy)
+- [Adjust Integration With Jira Server](https://github.com/epam/edp-admin-console/blob/release/2.4/documentation/jira-server.md#adjust-integration-with-jira-server)

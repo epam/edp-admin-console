@@ -17,7 +17,7 @@ To redefine any stage and add custom logic, perform the steps below:
     - Create a Groovy file with a meaningful name for a custom stage description, for instance: _CustomSonar.groovy_.
     
 2. Paste the copied skeleton from the reference stage and insert the necessary logic. 
->_**NOTE**: Pay attention to the appropriate annotation (EDP versions of all stages can be found on [GitHub](https://github.com/epmd-edp/edp-library-stages/tree/master/src/com/epam/edp/stages/impl/ci/impl))._
+>_**NOTE**: Pay attention to the appropriate annotation (EDP versions of all stages can be found on [GitHub](https://github.com/epam/edp-library-stages/tree/master/src/com/epam/edp/stages/impl/ci/impl))._
     
    - The stage logic structure is the following:
 
@@ -104,7 +104,7 @@ To redefine any stage and add custom logic using global pipeline libraries, perf
     * Create a Groovy file with a meaningful name for a custom stage description, for instance – CustomSonar.groovy.
 
 2. Paste the copied skeleton from the reference stage and insert the necessary logic.
->_**NOTE**: Pay attention to the appropriate annotation (EDP versions of all stages can be found on [GitHub](https://github.com/epmd-edp/edp-library-stages/tree/master/src/com/epam/edp/stages/impl/ci/impl))._
+>_**NOTE**: Pay attention to the appropriate annotation (EDP versions of all stages can be found on [GitHub](https://github.com/epam/edp-library-stages/tree/master/src/com/epam/edp/stages/impl/ci/impl))._
 
 The stage logic structure is the following:
 

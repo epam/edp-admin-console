@@ -59,7 +59,7 @@ When adding an autotest, the default branch is a **master** branch. In order to 
     
     f. Click the Proceed button and wait until the new branch will be added to the list.
 
->_**INFO**: Adding of a new branch is indicated in the context of the edp versioning type. To get more detailed information on how to add a branch using the default versioning type, please refer [here](https://github.com/epmd-edp/admin-console/blob/master/documentation/add_autotests.md#-check-autotest-availability)._
+>_**INFO**: Adding of a new branch is indicated in the context of the edp versioning type. To get more detailed information on how to add a branch using the default versioning type, please refer [here](https://github.com/epam/edp-admin-console/blob/master/documentation/add_autotests.md#-check-autotest-availability)._
 
 The default autotest repository is cloned and changed to the new indicated version before the build, i.e. the new indicated version will not be committed to the repository; thus, the existing repository will keep the default version.
 
