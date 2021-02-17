@@ -4,7 +4,7 @@ function deleteConfirmation() {
         confirmationName = $modal.find('#entity-name').val(),
         $errName = $modal.find('.invalid-feedback.different-name'),
         $errUsed = $modal.find('.server-error');
-    if (targetName !== confirmationName) {
+    if (targetName.toString() !== confirmationName.toString()) {
         $errName.show();
         return
     }
