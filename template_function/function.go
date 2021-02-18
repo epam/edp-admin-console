@@ -16,8 +16,8 @@ func init() {
 	if err := beego.AddFuncMap("params", params); err != nil {
 		panic("couldn't register 'params' function to go template")
 	}
-	if err := beego.AddFuncMap("getMasterBranchVersion", getMasterBranchVersion); err != nil {
-		panic("couldn't register 'getMasterBranchVersion' function to go template")
+	if err := beego.AddFuncMap("getDefaultBranchVersion", getDefaultBranchVersion); err != nil {
+		panic("couldn't register 'getDefaultBranchVersion' function to go template")
 	}
 	if err := beego.AddFuncMap("incrementVersion", incrementVersion); err != nil {
 		panic("couldn't register 'incrementVersion' function to go template")
@@ -27,10 +27,12 @@ func init() {
 	}
 }
 
-func getMasterBranchVersion(cb []*query.CodebaseBranch) string {
-	for _, g := range cb {
-		v := g.Version
-		return util.TrimSuffix(*v, "-SNAPSHOT")
+func getDefaultBranchVersion(cb []*query.CodebaseBranch, defaultBranch string) string {
+	for _, branch := range cb {
+		if branch.Name == defaultBranch {
+			v := branch.Version
+			return util.TrimSuffix(*v, "-SNAPSHOT")
+		}
 	}
 	return ""
 }

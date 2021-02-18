@@ -448,7 +448,7 @@
                                     <input type="text" class="form-control branch-version" id="branch-version"
                                            name="version"
                                            placeholder="Enter Version"
-                                           value={{ getMasterBranchVersion .Codebase.CodebaseBranch }}>
+                                           value={{ getDefaultBranchVersion .Codebase.CodebaseBranch .Codebase.DefaultBranch }}>
                                     <input name="versioningPostfix" type="text" class="form-control versioning-postfix"
                                            id="versioningPostfix" value="SNAPSHOT" readonly="readonly">
                                 </div>
@@ -466,7 +466,7 @@
                                     <input type="text" class="form-control" id="master-branch-version"
                                            name="masterVersion"
                                            placeholder="Enter Master Branch Version"
-                                           value={{ incrementVersion (getMasterBranchVersion .Codebase.CodebaseBranch) }}>
+                                           value={{ incrementVersion (getDefaultBranchVersion .Codebase.CodebaseBranch .Codebase.DefaultBranch) }}>
                                     <input name="snapshotStaticField" type="text"
                                            class="snapshot-static-field form-control pull-right"
                                            id="snapshotStaticField" value="SNAPSHOT" readonly="readonly">
