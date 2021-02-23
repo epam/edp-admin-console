@@ -1,0 +1,1 @@
+alter type trigger_type add value 'auto';
