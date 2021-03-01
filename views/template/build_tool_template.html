@@ -6,9 +6,7 @@
                   title="Select application build tool."></span>
         </label>
         <select class="form-control buildTool java-build-tools" name="buildTool">
-            {{if ne .Type "autotests" }}
-                <option data-build-tool="gradle">Gradle</option>
-            {{end}}
+            <option data-build-tool="gradle">Gradle</option>
             <option data-build-tool="maven">Maven</option>
         </select>
     </div>
