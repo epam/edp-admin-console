@@ -79,7 +79,7 @@ func (c *AutotestsController) CreateAutotests() {
 func (c *AutotestsController) checkError(err error, flash *beego.FlashData, name string, url *string) {
 	switch err.(type) {
 	case *edperror.CodebaseAlreadyExistsError:
-		flash.Error("Autotest %v already exists.", name)
+		flash.Error("Codebase %v already exists", name)
 		flash.Store(&c.Controller)
 		c.Redirect(fmt.Sprintf("%s/admin/edp/autotest/create", context.BasePath), 302)
 	case *edperror.CodebaseWithGitUrlPathAlreadyExistsError:
