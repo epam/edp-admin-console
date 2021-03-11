@@ -265,7 +265,7 @@
 
                     <div class="quality-gate-row">
                         <div class="d-flex justify-content-start">
-                            <div class="form-group w-20 mr-4 mb-2">
+                            <div class="form-group w-20 mr-4 ml-0 mb-2">
                                 <label for="qualityGateType"
                                        class="qualityGateTypeLabel">Quality gate type
                                     <span class="tooltip-icon" data-toggle="tooltip"
@@ -277,7 +277,7 @@
                                     <option value="autotests" {{if not .Autotests}}disabled{{end}}>Autotests</option>
                                 </select>
                             </div>
-                            <div class="form-group w-25 mr-4 mb-2">
+                            <div class="form-group w-25 mr-4 ml-6 mb-2">
                                 <label for="nameOfStep"
                                        class="nameOfStepLabel">Step name
                                     <span class="tooltip-icon" data-toggle="tooltip"
@@ -289,7 +289,7 @@
                             </div>
 
                             {{if .Autotests}}
-                                <div class="form-group w-25 mr-4 mb-2 autotest-block-el hide-element">
+                                <div class="form-group w-25 mr-4 ml-6 mb-2 autotest-block-el hide-element">
                                     <label class="autotestLabel">Autotests
                                         <span class="tooltip-icon" data-toggle="tooltip"
                                               data-placement="top" title=""
@@ -302,7 +302,7 @@
                                     </select>
                                 </div>
 
-                                <div class="form-group w-25 mr-4 mb-2 autotest-block-el hide-element">
+                                <div class="form-group w-25 mr-4 ml-6 mb-2 autotest-block-el hide-element">
                                     <label class="branchLabel">Branch
                                         <span class="tooltip-icon" data-toggle="tooltip"
                                               data-placement="top" title=""

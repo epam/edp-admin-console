@@ -8510,6 +8510,10 @@ button.bg-blue:focus {
     margin-left: 3rem !important;
 }
 
+.ml-6 {
+    margin-left: 1.7rem !important;
+}
+
 .p-0 {
     padding: 0 !important;
 }
