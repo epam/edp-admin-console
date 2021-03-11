@@ -19,5 +19,5 @@ Inspect the functions performed by the following stages:
 
 ### Related Articles
 
-* [Use Terraform Library in EDP](../documentation/cicd_customization/terraform_stages.md)
-* [EDP Pipeline Framework](../documentation/cicd_customization/edp_pipeline_framework.md)
+* [Use Terraform Library in EDP](../cicd_customization/terraform_stages.md)
+* [EDP Pipeline Framework](../cicd_customization/edp_pipeline_framework.md)

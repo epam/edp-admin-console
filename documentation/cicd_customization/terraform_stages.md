@@ -89,9 +89,11 @@ To use other existing credentials (e.g. from other accounts) instead of the expe
    1. Navigate to the Build pipeline and select the **Configure** tab.
  
    2. Click the **Add Parameter** button and select the **String Parameter** option.
+   
    ![add_custom_lib2](../customization_resources/tflib3.png)
    
    3. Fill in the respective fields with the variable name _AWS_CREDENTIALS_, description, and the default value (e.g., _aws.user_, used previously in pipelines).
+   
    ![add_custom_lib2](../customization_resources/tflib4.png)
     
 Now during the launch of the Build pipeline, it is possible to select the desired credentials, added in Jenkins, in the AWS_CREDENTIALS field of the Build pipeline settings.
@@ -103,6 +105,6 @@ Now during the launch of the Build pipeline, it is possible to select the desire
 
 ### Related Articles
 
-* [Use Lint Stages for Code Review](../documentation/cicd_customization/code_review_stages.md)
-* [EDP Pipeline Framework](../documentation/cicd_customization/edp_pipeline_framework.md)
-
+* [Use Lint Stages for Code Review](../cicd_customization/code_review_stages.md)
+* [EDP Pipeline Framework](../cicd_customization/edp_pipeline_framework.md)
+* [Associate IAM Roles With Service Accounts](../enable_irsa.md)
