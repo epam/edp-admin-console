@@ -66,7 +66,7 @@ const (
 func (c *CDPipelineController) GetContinuousDeliveryPage() {
 	applications, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
 		Status: query.Active,
-		Type:   query.App,
+		Type:   util.GetCodebaseTypeP(query.App),
 	})
 	if err != nil {
 		c.Abort("500")
@@ -118,7 +118,7 @@ func (c *CDPipelineController) GetCreateCDPipelinePage() {
 	apps, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
 		BranchStatus: query.Active,
 		Status:       query.Active,
-		Type:         query.App,
+		Type:         util.GetCodebaseTypeP(query.App),
 	})
 	if err != nil {
 		c.Abort("500")
@@ -128,7 +128,7 @@ func (c *CDPipelineController) GetCreateCDPipelinePage() {
 	groovyLibs, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
 		BranchStatus: query.Active,
 		Status:       query.Active,
-		Type:         query.Library,
+		Type:         util.GetCodebaseTypeP(query.Library),
 		Language:     "groovy-pipeline",
 	})
 	if err != nil {
@@ -149,7 +149,7 @@ func (c *CDPipelineController) GetCreateCDPipelinePage() {
 	autotests, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
 		BranchStatus: query.Active,
 		Status:       query.Active,
-		Type:         query.Autotests,
+		Type:         util.GetCodebaseTypeP(query.Autotests),
 	})
 	if err != nil {
 		c.Abort("500")
@@ -205,7 +205,7 @@ func (c *CDPipelineController) GetEditCDPipelinePage() {
 	applications, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
 		BranchStatus: query.Active,
 		Status:       query.Active,
-		Type:         query.App,
+		Type:         util.GetCodebaseTypeP(query.App),
 	})
 	if err != nil {
 		c.Abort("500")
@@ -215,7 +215,7 @@ func (c *CDPipelineController) GetEditCDPipelinePage() {
 	groovyLibs, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
 		BranchStatus: query.Active,
 		Status:       query.Active,
-		Type:         query.Library,
+		Type:         util.GetCodebaseTypeP(query.Library),
 		Language:     "groovy-pipeline",
 	})
 	if err != nil {
@@ -227,7 +227,7 @@ func (c *CDPipelineController) GetEditCDPipelinePage() {
 	autotests, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
 		BranchStatus: query.Active,
 		Status:       query.Active,
-		Type:         query.Autotests,
+		Type:         util.GetCodebaseTypeP(query.Autotests),
 	})
 	if err != nil {
 		log.Error("an error has occurred while getting autotests list", zap.Error(err))

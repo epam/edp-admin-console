@@ -48,7 +48,7 @@ type LibraryController struct {
 func (c *LibraryController) GetLibraryListPage() {
 	flash := beego.ReadFromRequest(&c.Controller)
 	codebases, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
-		Type: query.Library,
+		Type: util.GetCodebaseTypeP(query.Library),
 	})
 	codebases = addCodebaseInProgressIfAny(codebases, c.GetString(paramWaitingForCodebase))
 	if err != nil {

@@ -43,9 +43,14 @@ func (CodebaseRepository) GetCodebasesByCriteria(criteria query.CodebaseCriteria
 
 	qs := o.QueryTable(new(query.Codebase))
 
-	if criteria.Type != "" {
+	if *criteria.Type != "" {
 		qs = qs.Filter("type", criteria.Type)
 	}
+
+	if len(criteria.Codebases) != 0 {
+		qs = qs.Filter("name__in", criteria.Codebases)
+	}
+
 	if criteria.Status != "" {
 		qs = qs.Filter("status", criteria.Status)
 	}

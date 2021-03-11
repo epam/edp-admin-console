@@ -66,7 +66,7 @@ func TestGetEditCDPipelinePageMethod_ShouldBeExecutedSuccessfully(t *testing.T) 
 	mCodebase.On("GetCodebasesByCriteria", query.CodebaseCriteria{
 		BranchStatus: query.Active,
 		Status:       query.Active,
-		Type:         query.App,
+		Type:         util.GetCodebaseTypeP(query.App),
 	}).Return([]*query.Codebase{
 		{
 			Id:   1,
@@ -77,7 +77,7 @@ func TestGetEditCDPipelinePageMethod_ShouldBeExecutedSuccessfully(t *testing.T) 
 	mCodebase.On("GetCodebasesByCriteria", query.CodebaseCriteria{
 		BranchStatus: query.Active,
 		Status:       query.Active,
-		Type:         query.Library,
+		Type:         util.GetCodebaseTypeP(query.Library),
 		Language:     "groovy-pipeline",
 	}).Return([]*query.Codebase{
 		{
@@ -89,7 +89,7 @@ func TestGetEditCDPipelinePageMethod_ShouldBeExecutedSuccessfully(t *testing.T) 
 	mCodebase.On("GetCodebasesByCriteria", query.CodebaseCriteria{
 		BranchStatus: query.Active,
 		Status:       query.Active,
-		Type:         query.Autotests,
+		Type:         util.GetCodebaseTypeP(query.Autotests),
 	}).Return([]*query.Codebase{
 		{
 			Id:   1,

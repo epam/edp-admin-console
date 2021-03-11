@@ -329,7 +329,7 @@ func (c *AutotestsController) GetCreateAutotestsPage() {
 func (c *AutotestsController) GetAutotestsOverviewPage() {
 	flash := beego.ReadFromRequest(&c.Controller)
 	codebases, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
-		Type: query.Autotests,
+		Type: util.GetCodebaseTypeP(query.Autotests),
 	})
 	codebases = addCodebaseInProgressIfAny(codebases, c.GetString(paramWaitingForCodebase))
 	if err != nil {

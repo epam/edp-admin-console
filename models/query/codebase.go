@@ -50,12 +50,14 @@ func (c *Codebase) TableName() string {
 type CodebaseCriteria struct {
 	BranchStatus Status
 	Status       Status
-	Type         CodebaseType
+	Type         *CodebaseType
 	Language     CodebaseLanguage
+	Codebases    CodebaseName
 }
 
 type CodebaseType string
 type CodebaseLanguage string
+type CodebaseName []string
 
 const (
 	App       CodebaseType = "application"

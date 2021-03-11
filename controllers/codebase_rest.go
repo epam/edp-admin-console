@@ -24,13 +24,13 @@ import (
 	"edp-admin-console/service"
 	dberror "edp-admin-console/util/error/db-errors"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/satori/go.uuid"
 	"go.uber.org/zap"
 	"net/http"
 	"path"
+	"strings"
 )
 
 type CodebaseRestController struct {
@@ -43,11 +43,7 @@ func (c *CodebaseRestController) Prepare() {
 }
 
 func (c *CodebaseRestController) GetCodebases() {
-	criteria, err := getFilterCriteria(c)
-	if err != nil {
-		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusBadRequest)
-		return
-	}
+	criteria := c.getFilterCriteria()
 
 	codebases, err := c.CodebaseService.GetCodebasesByCriteria(*criteria)
 	if err != nil {
@@ -59,14 +55,28 @@ func (c *CodebaseRestController) GetCodebases() {
 	c.ServeJSON()
 }
 
-func getFilterCriteria(this *CodebaseRestController) (*query.CodebaseCriteria, error) {
-	codebaseType := this.GetString("type")
-	if codebaseType == "" || validation.IsCodebaseTypeAcceptable(codebaseType) {
-		return &query.CodebaseCriteria{
-			Type: query.CodebaseTypes[codebaseType],
-		}, nil
+func (c *CodebaseRestController) getFilterCriteria() *query.CodebaseCriteria {
+	return &query.CodebaseCriteria{
+		Type:      c.getType(),
+		Codebases: c.getCodebases(),
 	}
-	return nil, errors.New("type is not valid")
+}
+
+func (c *CodebaseRestController) getType() *query.CodebaseType {
+	codebaseType := c.GetString("type")
+	if codebaseType == "" || validation.IsCodebaseTypeAcceptable(codebaseType) {
+		cType := query.CodebaseTypes[codebaseType]
+		return &cType
+	}
+	return nil
+}
+
+func (c *CodebaseRestController) getCodebases() []string {
+	codebaseName := c.GetString("codebases")
+	if codebaseName != "" {
+		return strings.Split(codebaseName, ",")
+	}
+	return nil
 }
 
 func (c *CodebaseRestController) GetCodebase() {

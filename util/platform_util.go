@@ -2,6 +2,7 @@ package util
 
 import (
 	"bytes"
+	"edp-admin-console/models/query"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -56,5 +57,9 @@ func ProcessNameToKubernetesConvention(name string) string {
 }
 
 func GetStringP(val string) *string {
+	return &val
+}
+
+func GetCodebaseTypeP(val query.CodebaseType) *query.CodebaseType {
 	return &val
 }

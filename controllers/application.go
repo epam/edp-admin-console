@@ -68,7 +68,7 @@ const (
 func (c *ApplicationController) GetApplicationsOverviewPage() {
 	flash := beego.ReadFromRequest(&c.Controller)
 	applications, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
-		Type: query.App,
+		Type: util.GetCodebaseTypeP(query.App),
 	})
 	applications = addCodebaseInProgressIfAny(applications, c.GetString(paramWaitingForCodebase))
 	if err != nil {
