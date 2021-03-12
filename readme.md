@@ -50,3 +50,4 @@ _**NOTE**: The Admin Console link is available on the OpenShift overview page fo
 * [Use Terraform Library in EDP](documentation/cicd_customization/terraform_stages.md)
 * [Use Lint Stages for Code Review](documentation/cicd_customization/code_review_stages.md)
 * [Associate IAM Roles With Service Accounts](documentation/enable_irsa.md)
+* [Promote Docker Images from ECR to Docker Hub](documentation/cicd_customization/ecr_to_docker_stage.md)
