@@ -76,47 +76,7 @@ $(function () {
     }();
 
     $('#jiraServerToggle').change(function () {
-        let $jiraEl = $('.jiraServerBlock'),
-            $commitMessagePatternBlockEl = $('.commitMessagePatternBlock'),
-            $ticketNamePatternBlockEl = $('.ticketNamePatternBlock'),
-            $jiraIssueMetadata = $('.jiraIssueMetadata'),
-            $jiraIssueSelects = $('section .jiraIssueMetadata .jira-issue-metadata-row select.jiraIssueFields'),
-            $jiraPatternInputs = $('section .jiraIssueMetadata .jira-issue-metadata-row input.jiraPattern');
-        if ($(this).is(':checked')) {
-            $jiraEl.removeClass('hide-element')
-                .find('select[name="jiraServer"]')
-                .prop('disabled', false);
-
-            $commitMessagePatternBlockEl.removeClass('hide-element')
-                .find('input[id="commitMessagePattern"]')
-                .prop('disabled', false);
-
-            $ticketNamePatternBlockEl.removeClass('hide-element')
-                .find('input[id="ticketNamePattern"]')
-                .prop('disabled', false);
-
-            $jiraIssueSelects.prop('disabled', false);
-            $jiraPatternInputs.prop('disabled', false);
-
-            $jiraIssueMetadata.removeClass('hide-element');
-            return;
-        }
-        $jiraEl.addClass('hide-element')
-            .find('select[name="jiraServer"]')
-            .prop('disabled', true);
-
-        $commitMessagePatternBlockEl.addClass('hide-element')
-            .find('input[id="commitMessagePattern"]')
-            .prop('disabled', true);
-
-        $ticketNamePatternBlockEl.addClass('hide-element')
-            .find('input[id="ticketNamePattern"]')
-            .prop('disabled', true);
-
-        $jiraIssueSelects.prop('disabled', true);
-        $jiraPatternInputs.prop('disabled', true);
-
-        $jiraIssueMetadata.addClass('hide-element');
+        toggleJiraView.bind($(this))();
     });
 
     function activateCloneBlock() {

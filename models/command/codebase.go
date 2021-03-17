@@ -60,8 +60,9 @@ type Versioning struct {
 }
 
 type UpdateCodebaseCommand struct {
-	Name                     string  `valid:"Required;Match(/^[a-z][a-z0-9-]*[a-z0-9]$/)"`
-	CommitMessageRegex       string  `valid:"Required"`
-	TicketNameRegex          string  `valid:"Required"`
-	JiraIssueMetadataPayload *string `json:"jiraIssueMetadataPayload"`
+	Name                     string
+	CommitMessageRegex       string
+	TicketNameRegex          string
+	JiraIssueMetadataPayload *string
+	JiraServer               string
 }

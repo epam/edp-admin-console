@@ -243,6 +243,7 @@ func init() {
 		BranchService:    branchService,
 		GitServerService: gitServerService,
 		EDPComponent:     ecs,
+		JiraServer:       js,
 	}
 
 	cpc := cdPipeController.CDPipelineController{

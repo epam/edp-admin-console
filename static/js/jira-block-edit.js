@@ -7,6 +7,10 @@ $(function () {
         "fixVersions": "Fix Version/s"
     };
 
+    !function toggleJiraViewOnInit() {
+        toggleJiraView.bind($('#jiraServerToggle'))();
+    }();
+
     !function preloadJiraMetadataFields() {
         let $jiraMetadataBlock = $('div .jiraIssueMetadata'),
             jiraFields = $jiraMetadataBlock.attr('data-conf');
@@ -100,8 +104,8 @@ $(function () {
         $('.jiraIssueMetadata').on('change', `.${selectId}`, toggleSelectOption.bind($select));
 
         let selectedValues = $('section select.jiraIssueFields').map(function () {
-                return this.value
-            }).get();
+            return this.value
+        }).get();
         $.each(fields, function (i, v) {
             if ($.inArray(i, selectedValues) !== -1) {
                 return;
@@ -111,4 +115,10 @@ $(function () {
 
         tryToDisableButton();
     });
+
+
+    $('#jiraServerToggle').change(function () {
+        toggleJiraView.bind($(this))();
+    });
+
 });

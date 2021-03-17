@@ -37,7 +37,7 @@
                 <div class="accordion" id="updateCodebase">
 
                     <div class="card pattern">
-                        <div class="card-header" id="headingOne" aria-expanded="true" aria-controls="collapseOne">
+                        <div class="card-header jira-config" id="headingOne" aria-expanded="true" aria-controls="collapseOne">
                             <h5 class="mb-0">
                                 <button class="btn btn-link collapsed" type="button">
                                     Jira configuration
@@ -50,41 +50,59 @@
                              data-parent="#updateCodebase">
                             <div class="card-body">
 
-                                <div class="row">
-                                    <div class="form-group col-sm-4">
-                                        <label for="commitMessagePattern">Commit Message Pattern
-                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Specify Commit Message Pattern."></span>
-                                        </label>
-                                        <div class="d-flex">
-                                            <input name="commitMessagePattern"
-                                                   value="{{.Codebase.CommitMessagePattern}}"
-                                                   class="form-control"
-                                                   id="commitMessagePattern"
-                                                   placeholder="Commit Message Pattern">
-                                        </div>
-                                        <div class="invalid-feedback commitMessagePattern">
-                                            Commit Message Pattern cannot be empty.
-                                        </div>
+                                <div class="form-check jiraServerToggle">
+                                    <input type="checkbox" class="form-check-input" name="jiraServerToggle" id="jiraServerToggle"
+                                           {{if .Codebase.JiraServer}}checked{{end}}>
+                                    <label class="form-check-label" for="jiraServerToggle">Integrate with Jira server</label>
+                                </div>
+
+                                <div class="form-group jiraServerBlock" hide-element>
+                                    <label for="jiraServer">Select Jira Server
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Select Jira server that will be integrated with the codebase (application, library, autotest)."></span>
+                                    </label>
+                                    <select class="form-control jiraServer" name="jiraServer" disabled>
+                                        {{range .JiraServer}}
+                                            {{ if compareJiraServer $.Codebase.JiraServer .Name }}
+                                                <option selected>{{.Name}}</option>
+                                            {{else}}
+                                                <option>{{.Name}}</option>
+                                            {{end}}
+                                        {{end}}
+                                    </select>
+                                </div>
+
+                                <div class="form-group commitMessagePatternBlock hide-element">
+                                    <label for="commitMessagePattern">Specify the pattern to validate a commit message
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Specify the pattern to validate a commit message."></span>
+                                    </label>
+                                    <input name="commitMessagePattern"
+                                           value="{{.Codebase.CommitMessagePattern}}"
+                                           type="text"
+                                           class="form-control"
+                                           id="commitMessagePattern"
+                                           placeholder="^\[PROJECT_NAME-\d{4}\]:.*$"
+                                           disabled>
+                                    <div class="invalid-feedback commitMessagePattern">
+                                        The commit message pattern field cannot be empty.
                                     </div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="form-group col-sm-4">
-                                        <label for="ticketNamePattern">Ticket Name Pattern
-                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Specify Ticket Name Pattern."></span>
-                                        </label>
-                                        <div class="d-flex">
-                                            <input name="ticketNamePattern"
-                                                   value="{{.Codebase.TicketNamePattern}}"
-                                                   class="form-control"
-                                                   id="ticketNamePattern"
-                                                   placeholder="Ticket Name Pattern">
-                                        </div>
-                                        <div class="invalid-feedback ticketNamePattern">
-                                            Ticket Name Pattern cannot be empty.
-                                        </div>
+                                <div class="form-group ticketNamePatternBlock hide-element">
+                                    <label for="ticketNamePattern">Specify the pattern to find a Jira ticket number in a commit message
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Specify the pattern to find a Jira ticket number in a commit message."></span>
+                                    </label>
+                                    <input name="ticketNamePattern"
+                                           value="{{.Codebase.TicketNamePattern}}"
+                                           type="text"
+                                           class="form-control"
+                                           id="ticketNamePattern"
+                                           placeholder="PROJECT_NAME-\d{4}"
+                                           disabled>
+                                    <div class="invalid-feedback ticketNamePattern">
+                                        The ticket name pattern field cannot be empty.
                                     </div>
                                 </div>
 

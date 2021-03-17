@@ -56,6 +56,13 @@ func (c *LibraryController) GetLibraryListPage() {
 		return
 	}
 
+	jss, err := c.JiraServer.GetJiraServers()
+	if err != nil {
+		log.Error("couldn't list Jira servers", zap.Error(err))
+		c.Abort("500")
+		return
+	}
+
 	if flash.Data["success"] != "" {
 		c.Data["Success"] = true
 	}
@@ -70,6 +77,7 @@ func (c *LibraryController) GetLibraryListPage() {
 	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.Data["BasePath"] = context.BasePath
 	c.Data["DiagramPageEnabled"] = context.DiagramPageEnabled
+	c.Data["JiraEnabled"] = jss != nil
 	c.TplName = "codebase.html"
 }
 

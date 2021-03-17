@@ -428,19 +428,25 @@ func (s *CodebaseService) Update(command command.UpdateCodebaseCommand) (*edpv1a
 		return nil, errors.Wrapf(err, "couldn't get codebase from cluster %v", command.Name)
 	}
 
-	c.Spec.CommitMessagePattern = &command.CommitMessageRegex
-	c.Spec.TicketNamePattern = &command.TicketNameRegex
-	c.Spec.JiraIssueMetadataPayload = command.JiraIssueMetadataPayload
-	log.Debug("new values",
-		zap.String("commitMessagePattern", *c.Spec.CommitMessagePattern),
-		zap.String("ticketNamePattern", *c.Spec.TicketNamePattern),
-		zap.Any("jiraIssueMetadataPayload", c.Spec.JiraIssueMetadataPayload))
+	updateSpec(&c.Spec, command)
 
 	if err := s.executeUpdateRequest(c); err != nil {
 		return nil, err
 	}
 	log.Info("codebase has been updated", zap.String("name", c.Name))
 	return c, nil
+}
+
+func updateSpec(spec *edpv1alpha1.CodebaseSpec, command command.UpdateCodebaseCommand) {
+	spec.CommitMessagePattern = &command.CommitMessageRegex
+	spec.TicketNamePattern = &command.TicketNameRegex
+	spec.JiraIssueMetadataPayload = command.JiraIssueMetadataPayload
+	spec.JiraServer = util.GetStringP(command.JiraServer)
+	log.Debug("new values",
+		zap.String("commitMessagePattern", *spec.CommitMessagePattern),
+		zap.String("ticketNamePattern", *spec.TicketNamePattern),
+		zap.String("jiraServer", *spec.JiraServer),
+		zap.Any("jiraIssueMetadataPayload", spec.JiraIssueMetadataPayload))
 }
 
 func (s *CodebaseService) executeUpdateRequest(c *edpv1alpha1.Codebase) error {

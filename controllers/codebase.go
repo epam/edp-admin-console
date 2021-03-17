@@ -18,12 +18,12 @@ package controllers
 
 import (
 	"edp-admin-console/context"
-	"edp-admin-console/controllers/validation"
 	"edp-admin-console/models/command"
 	"edp-admin-console/models/query"
 	"edp-admin-console/service"
 	cbs "edp-admin-console/service/codebasebranch"
 	ec "edp-admin-console/service/edp-component"
+	jiraservice "edp-admin-console/service/jira-server"
 	"edp-admin-console/util"
 	"edp-admin-console/util/auth"
 	"edp-admin-console/util/consts"
@@ -43,6 +43,7 @@ type CodebaseController struct {
 	BranchService    cbs.CodebaseBranchService
 	GitServerService service.GitServerService
 	EDPComponent     ec.EDPComponentService
+	JiraServer       jiraservice.JiraServer
 }
 
 const (
@@ -73,6 +74,13 @@ func (c *CodebaseController) GetCodebaseOverviewPage() {
 
 	codebase.CodebaseBranch = addCodebaseBranchInProgressIfAny(codebase.CodebaseBranch, c.GetString(paramWaitingForBranch))
 
+	jss, err := c.JiraServer.GetJiraServers()
+	if err != nil {
+		log.Error("couldn't list Jira servers", zap.Error(err))
+		c.Abort("500")
+		return
+	}
+
 	flash := beego.ReadFromRequest(&c.Controller)
 	if flash.Data["error"] != "" {
 		c.Data["ErrorBranch"] = flash.Data["error"]
@@ -86,6 +94,7 @@ func (c *CodebaseController) GetCodebaseOverviewPage() {
 	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.Data["BasePath"] = context.BasePath
 	c.Data["DiagramPageEnabled"] = context.DiagramPageEnabled
+	c.Data["JiraEnabled"] = jss != nil
 	c.setCodebaseTypeCaptions(string(codebase.Type))
 	c.TplName = "codebase_overview.html"
 }
@@ -253,43 +262,31 @@ func (c *CodebaseController) GetEditCodebasePage() {
 		return
 	}
 
+	jss, err := c.JiraServer.GetJiraServers()
+	if err != nil {
+		log.Error("couldn't list Jira servers", zap.Error(err))
+		c.Abort("500")
+		return
+	}
+
 	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.Data["BasePath"] = context.BasePath
 	c.Data["Codebase"] = codebase
 	c.Data["Type"] = codebase.Type
 	c.Data["DiagramPageEnabled"] = context.DiagramPageEnabled
+	c.Data["JiraServer"] = jss
 	c.TplName = "edit_codebase.html"
 }
 
 func (c *CodebaseController) Update() {
-	flash := beego.NewFlash()
-	name := c.GetString("name")
-	log.Debug("start executing Update method", zap.String("name", name))
-
-	payload, err := extractJsonJiraIssueMetadataPayload(c.GetStrings("jiraFieldName"), c.GetStrings("jiraPattern"))
+	cc, err := c.buildUpdateCodebaseCommand()
 	if err != nil {
-		log.Error("couldn't update codebase", zap.Error(err))
+		log.Error("couldn't build update command dto", zap.Error(err))
 		c.Abort("500")
 		return
 	}
 
-	cc := command.UpdateCodebaseCommand{
-		Name:                     name,
-		CommitMessageRegex:       c.GetString("commitMessagePattern"),
-		TicketNameRegex:          c.GetString("ticketNamePattern"),
-		JiraIssueMetadataPayload: payload,
-	}
-
-	errMsg := validation.ValidateCodebaseUpdateRequestData(cc)
-	if errMsg != nil {
-		log.Error("Codebase update request data is invalid", zap.String("err", errMsg.Message))
-		flash.Error(errMsg.Message)
-		flash.Store(&c.Controller)
-		c.Redirect(fmt.Sprintf("%v/admin/edp/codebase/%v/update", context.BasePath, cc.Name), 302)
-		return
-	}
-
-	codebase, err := c.CodebaseService.Update(cc)
+	codebase, err := c.CodebaseService.Update(*cc)
 	if err != nil {
 		log.Error("couldn't update codebase", zap.Error(err))
 		c.Abort("500")
@@ -298,6 +295,26 @@ func (c *CodebaseController) Update() {
 
 	c.Redirect(fmt.Sprintf("%v/admin/edp/%v/overview#codebaseUpdateSuccessModal",
 		context.BasePath, getType(codebase.Spec.Type)), 302)
+}
+
+func (c *CodebaseController) buildUpdateCodebaseCommand() (*command.UpdateCodebaseCommand, error) {
+	if c.GetString("jiraServerToggle") == "on" {
+		payload, err := extractJsonJiraIssueMetadataPayload(c.GetStrings("jiraFieldName"), c.GetStrings("jiraPattern"))
+		if err != nil {
+			return nil, err
+		}
+
+		return &command.UpdateCodebaseCommand{
+			Name:                     c.GetString("name"),
+			CommitMessageRegex:       c.GetString("commitMessagePattern"),
+			TicketNameRegex:          c.GetString("ticketNamePattern"),
+			JiraIssueMetadataPayload: payload,
+			JiraServer:               c.GetString("jiraServer"),
+		}, nil
+	}
+	return &command.UpdateCodebaseCommand{
+		Name: c.GetString("name"),
+	}, nil
 }
 
 func getType(codebaseType string) string {

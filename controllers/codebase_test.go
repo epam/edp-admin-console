@@ -5,6 +5,7 @@ import (
 	"edp-admin-console/repository/mock"
 	"edp-admin-console/service"
 	edpComponent "edp-admin-console/service/edp-component"
+	jiraServer "edp-admin-console/service/jira-server"
 	"edp-admin-console/util/consts"
 	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/session"
@@ -18,6 +19,7 @@ func TestGetCodebaseOverviewPage_ShouldBeExecutedSuccessfully(t *testing.T) {
 	mCodebase := new(mock.MockCodebase)
 	mGitServer := new(mock.MockGitServer)
 	mEdpComponent := new(mock.MockEDPComponent)
+	mJiraServer := new(mock.MockJiraServer)
 	cc := CodebaseController{
 		CodebaseService: service.CodebaseService{
 			ICodebaseRepository: mCodebase,
@@ -27,6 +29,9 @@ func TestGetCodebaseOverviewPage_ShouldBeExecutedSuccessfully(t *testing.T) {
 		},
 		EDPComponent: edpComponent.EDPComponentService{
 			IEDPComponent: mEdpComponent,
+		},
+		JiraServer: jiraServer.JiraServer{
+			IJiraServer: mJiraServer,
 		},
 	}
 
@@ -77,7 +82,8 @@ func TestGetCodebaseOverviewPage_ShouldBeExecutedSuccessfully(t *testing.T) {
 			Icon:    "stub-icon",
 			Visible: false,
 		}, nil)
-
+	mJiraServer.On("GetJiraServers").Return(
+		[]*query.JiraServer{}, nil)
 	cc.GetCodebaseOverviewPage()
 }
 

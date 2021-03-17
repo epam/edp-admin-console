@@ -25,6 +25,9 @@ func init() {
 	if err := beego.AddFuncMap("getCurrentYear", getCurrentYear); err != nil {
 		panic("couldn't register 'getCurrentYear' function to go template")
 	}
+	if err := beego.AddFuncMap("compareJiraServer", compareJiraServer); err != nil {
+		panic("couldn't register 'compareJiraServer' function to go template")
+	}
 }
 
 func getDefaultBranchVersion(cb []*query.CodebaseBranch, defaultBranch string) string {
@@ -70,4 +73,11 @@ func params(values ...interface{}) (map[string]interface{}, error) {
 
 func getCurrentYear() int {
 	return time.Now().Year()
+}
+
+func compareJiraServer(codebaseJiraServer *string, jiraServer string) bool {
+	if codebaseJiraServer == nil {
+		return false
+	}
+	return *codebaseJiraServer == jiraServer
 }
