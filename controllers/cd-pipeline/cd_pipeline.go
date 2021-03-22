@@ -37,7 +37,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"regexp"
 	"sort"
 
 	"github.com/astaxie/beego"
@@ -397,7 +396,7 @@ func (c *CDPipelineController) GetCDPipelineOverviewPage() {
 		return
 	}
 
-	if err := c.createDockerImageLinks(cdPipeline.CodebaseDockerStream); err != nil {
+	if err := c.createDockerImageLinks(cdPipeline.CodebaseDockerStream, cdPipeline.CodebaseBranch); err != nil {
 		c.Abort("500")
 		return
 	}
@@ -537,14 +536,14 @@ func (c *CDPipelineController) createOneJenkinsLink(cdPipeline *query.CDPipeline
 	return nil
 }
 
-func (c *CDPipelineController) createDockerImageLinks(stream []*query.CodebaseDockerStream) error {
+func (c *CDPipelineController) createDockerImageLinks(stream []*query.CodebaseDockerStream, branch []*query.CodebaseBranch) error {
 	if platform.IsOpenshift() {
-		return c.createNativeDockerImageLinks(stream)
+		return c.createNativeDockerImageLinks(stream, branch)
 	}
-	return c.createNonNativeDockerImageLinks(stream)
+	return c.createNonNativeDockerImageLinks(stream, branch)
 }
 
-func (c *CDPipelineController) createNativeDockerImageLinks(s []*query.CodebaseDockerStream) error {
+func (c *CDPipelineController) createNativeDockerImageLinks(s []*query.CodebaseDockerStream, b []*query.CodebaseBranch) error {
 	co, err := c.EDPComponent.GetEDPComponent(consts.Openshift)
 	if err != nil {
 		return err
@@ -567,20 +566,13 @@ func (c *CDPipelineController) createNativeDockerImageLinks(s []*query.CodebaseD
 		s[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, v.CodebaseBranch.Codebase.Name,
 			util.ProcessNameToKubernetesConvention(v.CodebaseBranch.Name))
 		s[i].ImageLink = util.CreateNativeDockerStreamLink(co.Url, context.Namespace,
-			getImageStreamName(v.CodebaseBranch.Release, v.OcImageStreamName))
+			b[i].AppName)
 	}
 
 	return nil
 }
 
-func getImageStreamName(release bool, imageStream string) string {
-	if release {
-		return regexp.MustCompile(`\/([0-9]\d*)\.([0-9]\d*)`).ReplaceAllString(imageStream, "-$1-$2")
-	}
-	return imageStream
-}
-
-func (c *CDPipelineController) createNonNativeDockerImageLinks(s []*query.CodebaseDockerStream) error {
+func (c *CDPipelineController) createNonNativeDockerImageLinks(s []*query.CodebaseDockerStream, b []*query.CodebaseBranch) error {
 	cd, err := c.EDPComponent.GetEDPComponent(consts.DockerRegistry)
 	if err != nil {
 		return err
@@ -602,7 +594,7 @@ func (c *CDPipelineController) createNonNativeDockerImageLinks(s []*query.Codeba
 
 	for i, v := range s {
 		s[i].ImageLink = util.CreateNonNativeDockerStreamLink(cd.Url,
-			getImageStreamName(v.CodebaseBranch.Release, v.OcImageStreamName))
+			b[i].AppName)
 		s[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, v.CodebaseBranch.Codebase.Name,
 			util.ProcessNameToKubernetesConvention(v.CodebaseBranch.Name))
 	}
