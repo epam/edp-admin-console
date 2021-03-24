@@ -536,21 +536,15 @@ func (c *CDPipelineController) createOneJenkinsLink(cdPipeline *query.CDPipeline
 	return nil
 }
 
-func (c *CDPipelineController) createDockerImageLinks(stream []*query.CodebaseDockerStream, branch []*query.CodebaseBranch) error {
-	if platform.IsOpenshift() {
-		return c.createNativeDockerImageLinks(stream, branch)
-	}
-	return c.createNonNativeDockerImageLinks(stream, branch)
-}
-
-func (c *CDPipelineController) createNativeDockerImageLinks(s []*query.CodebaseDockerStream, b []*query.CodebaseBranch) error {
-	co, err := c.EDPComponent.GetEDPComponent(consts.Openshift)
+func (c *CDPipelineController) createDockerImageLinks(s []*query.CodebaseDockerStream, b []*query.CodebaseBranch) error {
+	registryType := getRegistryType()
+	registry, err := c.EDPComponent.GetEDPComponent(registryType)
 	if err != nil {
 		return err
 	}
 
-	if co == nil {
-		return fmt.Errorf("openshift link can't be created because of edp-component %v is absent in DB", consts.Openshift)
+	if registry == nil {
+		return fmt.Errorf("registry link can't be created because of edp-component %v is absent in DB", registryType)
 	}
 
 	cj, err := c.EDPComponent.GetEDPComponent(consts.Jenkins)
@@ -565,38 +559,8 @@ func (c *CDPipelineController) createNativeDockerImageLinks(s []*query.CodebaseD
 	for i, v := range s {
 		s[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, v.CodebaseBranch.Codebase.Name,
 			util.ProcessNameToKubernetesConvention(v.CodebaseBranch.Name))
-		s[i].ImageLink = util.CreateNativeDockerStreamLink(co.Url, context.Namespace,
+		s[i].ImageLink = util.CreateDockerStreamLink(registry.Url, context.Namespace,
 			b[i].AppName)
-	}
-
-	return nil
-}
-
-func (c *CDPipelineController) createNonNativeDockerImageLinks(s []*query.CodebaseDockerStream, b []*query.CodebaseBranch) error {
-	cd, err := c.EDPComponent.GetEDPComponent(consts.DockerRegistry)
-	if err != nil {
-		return err
-	}
-
-	if cd == nil {
-		return fmt.Errorf("docker registry link can't be created because of edp-component %v is absent in DB",
-			consts.DockerRegistry)
-	}
-
-	cj, err := c.EDPComponent.GetEDPComponent(consts.Jenkins)
-	if err != nil {
-		return err
-	}
-
-	if cj == nil {
-		return fmt.Errorf("jenkins link can't be created because of edp-component %v is absent in DB", consts.Jenkins)
-	}
-
-	for i, v := range s {
-		s[i].ImageLink = util.CreateNonNativeDockerStreamLink(cd.Url,
-			b[i].AppName)
-		s[i].CICDLink = util.CreateCICDApplicationLink(cj.Url, v.CodebaseBranch.Codebase.Name,
-			util.ProcessNameToKubernetesConvention(v.CodebaseBranch.Name))
 	}
 
 	return nil
@@ -757,4 +721,11 @@ func (c *CDPipelineController) getCDPipelineStageCount(pipelineName string) (*in
 		return nil, fmt.Errorf("an error has occurred while getting the number of stages of cd-pipeline")
 	}
 	return existedStageNumber, nil
+}
+
+func getRegistryType() string {
+	if platform.IsOpenshift() {
+		return consts.Openshift
+	}
+	return consts.DockerRegistry
 }

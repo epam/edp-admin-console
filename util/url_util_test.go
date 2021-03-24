@@ -12,16 +12,10 @@ func TestCreateNativeProjectLinkMethod_ShouldBeExecutedSuccessfully(t *testing.T
 	assert.Equal(t, "https://stub-domain/console/project/stub-project/overview", link)
 }
 
-func TestCreateNativeDockerStreamLinkMethod_ShouldBeExecutedSuccessfully(t *testing.T) {
+func TestCreateDockerStreamLinkMethod_ShouldBeExecutedSuccessfully(t *testing.T) {
 	beego.AppConfig.Set("imageStreamMaskUrl", "/console/project/{namespace}/browse/images/{stream}")
-	link := CreateNativeDockerStreamLink("https://stub-domain", "stub-project", "stub-stream")
+	link := CreateDockerStreamLink("https://stub-domain", "stub-project", "stub-stream")
 	assert.Equal(t, "https://stub-domain/console/project/stub-project/browse/images/stub-stream", link)
-}
-
-func TestCreateNonNativeDockerStreamLinkMethod_ShouldBeExecutedSuccessfully(t *testing.T) {
-	beego.AppConfig.Set("imageStreamMaskUrl", "/{stream}/")
-	link := CreateNonNativeDockerStreamLink("https://stub-domain", "stub-stream")
-	assert.Equal(t, "https://stub-domain/stub-stream/", link)
 }
 
 func TestCreateGitlabCILinkMethod_ShouldBeExecutedSuccessfully(t *testing.T) {
