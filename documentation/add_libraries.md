@@ -49,7 +49,7 @@ _**NOTE**: The Version Control System Info menu is available in case this option
     - DotNet - selecting DotNet allows using the DotNet v.2.1 and DotNet v.3.1.
     - Groovy-pipeline - selecting Groovy-pipeline allows having the ability to customize a stages logic. For details, please refer to the [Customize CD Pipeline](https://github.com/epam/edp-admin-console/blob/master/documentation/cicd_customization/customize-deploy-pipeline.md#customize-cd-pipeline) page.
     - Python - selecting Python allows using the Python v.3.8.
-    - Terraform - selecting Terraform allows using the Terraform different versions using tfenv.
+    - Terraform - selecting Terraform allows using the Terraform different versions via the **Terraform version manager** ([tfenv](https://github.com/tfutils/tfenv#usage)). EDP supports all actions available in Terraform, thus providing the ability to modify the virtual infrastructure and launch some checks with the help of linters. For details, please refer to the [Use Terraform Library in EDP](https://github.com/epam/edp-admin-console/blob/master/documentation/cicd_customization/terraform_stages.md#use-terraform-library-in-edp) page.
     - Other - selecting Other allows extending the default code languages when creating a codebase with the clone/import strategy. To add another code language, inspect the ([Add Other Code Language](add_other_code_language.md) page.
 
     _**NOTE**: The Create strategy does not allow to customize the default code language set._
@@ -90,14 +90,29 @@ _**NOTE**: The Version Control System Info menu is available in case this option
 15. As soon as the Jira server is set, select it in the **Select Jira Server** field.
 16. Indicate the pattern using any character, which is followed on the project, to validate a commit message.
 17. Indicate the pattern using any character, which is followed on the project, to find a Jira ticket number in a commit message.
-     
+18. In the **Advanced Mapping** section, specify the names of the Jira fields that should be filled in with attributes from EDP. Upon clicking the question mark icon, observe the tips on how to indicate and combine variables necessary for identifying the format of values to be displayed.
+    
+    ![add-app3_2](../readme-resource/adv_map_variables.png "add-app3_2")
+
+    a. Select the name of the field in a Jira ticket. The available fields are the following: **Fix Version/s**, **Component/s** and **Labels**.
+    
+    b. Select the pattern of predefined variables, based on which the value from EDP will be displayed in Jira. Combine several variables to obtain the desired value.
+    
+    - For the **Fix Version/s** field, select the **EDP_VERSION** variable that represents an EDP upgrade version, as in _2.7.0-SNAPSHOT_. Combine variables to make the value more informative. For example, the pattern **EDP_VERSION-EDP_COMPONENT** will be displayed as _2.7.0-SNAPSHOT-nexus-operator_ in Jira; 
+    - For the **Component/s** field select the **EDP_COMPONENT** variable that defines the name of the existing repository. For example, _nexus-operator_; 
+    - For the **Labels** field select the **EDP_GITTAG**variable that defines a tag assigned to the commit in Git Hub. For example, _build/2.7.0-SNAPSHOT.59_.  
+         
+    c. Click the plus icon to add more Jira field names.
+           
+    d. Click the delete icon to remove the Jira field name.
+
        ![add-app3_2](../readme-resource/add_lib_integrate_perf.png "add-app3_2")
-18. Select the **Integrate with Perf Server** checkbox in case it is required to connect to the [PERF Board](https://kb.epam.com/display/EPMDMO/Project+Performance+Board) (_Project Performance Board_). 
+       
+19. Select the **Integrate with Perf Server** checkbox in case it is required to connect to the [PERF Board](https://kb.epam.com/display/EPMDMO/Project+Performance+Board) (_Project Performance Board_). 
     Such functionality allows monitoring the overall team performance and setting up necessary metrics. 
        >_**NOTE**: To adjust the Perf Server integration functionality, first deploy Perf Operator. To get more information about the Perf Operator installation and architecture, please refer to the [PERF Operator](https://github.com/epam/edp-perf-operator#perf-operator) page._ 
         
-19. In the **Select Perf Server** field, select the name of the Perf server with which the integration should be performed. 
-20. Click the Proceed button to be switched to the next menu.
+20. In the **Select Perf Server** field, select the name of the Perf server with which the integration should be performed. Click the Proceed button to be switched to the next menu.
 
        ![add-app3_2](../readme-resource/add_lib_perf_integr.png "add-app3_2")
 21. Select the necessary DataSource (_Jenkins/GitLab, Sonar_) from which the data should be transferred to the Project Performance Board. 
@@ -121,3 +136,4 @@ _**NOTE**: The Version Control System Info menu is available in case this option
 * [Add CD Pipelines](../documentation/add_CD_pipelines.md)
 * [Adjust Integration With Jira Server](../documentation/jira-server.md)
 * [Adjust VCS Integration With Jira Server](../documentation/jira_vcs_integration.md)
+* [Use Terraform Library in EDP](https://github.com/epam/edp-admin-console/blob/master/documentation/cicd_customization/terraform_stages.md#use-terraform-library-in-edp)

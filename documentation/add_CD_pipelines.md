@@ -1,4 +1,4 @@
-# Add CD Pipelines
+# <a name="Add_CD_Pipeline"></a> Add CD Pipelines 
 
 Admin Console provides the ability to deploy an environment on your own and specify the essential components as well. 
 
@@ -14,7 +14,7 @@ The creation of the CD pipeline becomes available as soon as an application is c
 
 After the complete adding of the CD pipeline, inspect the [Check CD Pipeline Availability](#Check_CD_Pipeline_Availability) part.
 
-## The Pipeline Menu
+## The Pipeline Menu 
 
 ![addcdpipe1](../readme-resource/addcdpipe1.png "addcdpipe1")
 
@@ -33,7 +33,7 @@ After the complete adding of the CD pipeline, inspect the [Check CD Pipeline Ava
     
 6. Click the Proceed button to be switched to the next menu.
 
-    ## The Stages Menu
+    ## The Stages Menu 
 
     ![addcdpipe3](../readme-resource/addcdpipe3.png "addcdpipe3")
 
@@ -53,7 +53,7 @@ After the complete adding of the CD pipeline, inspect the [Check CD Pipeline Ava
 
     d. Type the step name, which will be displayed in Jenkins, for every quality gate type;
 
-    e. Select the trigger type that allows promoting images to the next environment. Now the default manual is available; 
+    e. Select the trigger type that allows promoting images to the next environment. The available trigger types are _manual_ and _auto_. By selecting the _auto_ trigger type, the CD pipeline will be launched automatically. 
 
     _**INFO**: Add an unlimited number of quality gates by clicking a corresponding plus sign icon and remove them as well by clicking the recycle bin icon._
 
@@ -78,12 +78,18 @@ After the complete adding of the CD pipeline, inspect the [Check CD Pipeline Ava
 ## <a name="Check_CD_Pipeline_Availability"></a> Check CD Pipeline Availability
 
 As soon as the CD pipeline is provisioned and added to the CD Pipelines list, there is an ability to:
+    
+   ![removepipe](../readme-resource/addcdpipeline0.png "removepipe")
 
-1. Remove the added CD pipeline:
+1. Create another application by clicking the Create button and performing the same steps as described in the [Add CD Pipeline](#Add_CD_Pipeline) section.
+2. Select a number of existing CD pipelines to be displayed on one page in the **Show entries** field. The filter allows to show 10, 25, 50 or 100 entries per page. 
+3. Sort the existing CD pipelines in a list by clicking the Name title. The CD pipelines will be displayed in alphabetical order. 
+4. Search the necessary CD pipeline by entering the corresponding name, language or the build tool into the **Search** field.
+5. Navigate between pages if the number of CD pipelines exceeds the capacity of a single page.
 
-    ![removepipe](../readme-resource/removecdpipe.png "removepipe")
+### Edit CD Pipeline
 
-2. Edit the CD pipeline by clicking the pen icon next to its name in the CD Pipelines list:
+-  Edit the CD pipeline by clicking the pen icon next to its name in the CD Pipelines list:
 
     ![addcdpip7](../readme-resource/addcdpipe7.png "addcdpipe7")
 
@@ -96,7 +102,7 @@ As soon as the CD pipeline is provisioned and added to the CD Pipelines list, th
      ![addcdpip8](../readme-resource/addcdpipe12.png "addcdpipe8") 
      
     _**NOTE**: The added stage will appear in the Stages menu allowing to review its details or delete._    
-3. Check the CD pipeline data and details by clicking the CD pipeline name in the CD Pipelines list:
+- Check the CD pipeline data and details by clicking the CD pipeline name in the CD Pipelines list:
 
     - the main link on the top of the details page refers to Jenkins;
 
@@ -119,6 +125,10 @@ As soon as the CD pipeline is provisioned and added to the CD Pipelines list, th
     - the Status Info menu displays all the actions that were performed during the deployment process:
     
     ![addcdpip11](../readme-resource/addcdpipe11.png "addcdpipe11")
+   
+-  Remove the added CD pipeline:
+
+    ![removepipe](../readme-resource/removecdpipe.png "removepipe")   
    
 >_**INFO**: If there is a necessity to create another CD pipeline, navigate to the Continuous Delivery section, click the Create button and perform the same steps as described above._    
 

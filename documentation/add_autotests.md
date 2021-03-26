@@ -51,7 +51,7 @@ There are two available strategies: clone and import. The Clone strategy flow is
 
 8. In the **Autotest Code Language** field, select the Java code language (specify Java 8 or Java 11 to be used) and get the default Maven build tool OR add another code language. Selecting **Other** allows extending the default code languages and get the necessary build tool, for details, inspect the [Add Other Code Language](add_other_code_language.md) section.
 
-9. The **Select Build Tool** field can dispose of the default Maven tool or can be changed in accordance with the selected code language.
+9. The **Select Build Tool** field can dispose of the default Maven tool, Gradle or other built tool in accordance with the selected code language.
 
 10. All the autotest reports will be created in the Allure framework that is available In the **Autotest Report Framework** field by default. Click the Proceed button to be switched to the next menu.
 
@@ -87,14 +87,28 @@ There are two available strategies: clone and import. The Clone strategy flow is
 16. As soon as the Jira server is set, select it in the **Select Jira Server** field.
 17. Indicate the pattern using any character, which is followed on the project, to validate a commit message.
 18. Indicate the pattern using any character, which is followed on the project, to find a Jira ticket number in a commit message.
+19. In the **Advanced Mapping** section, specify the names of the Jira fields that should be filled in with attributes from EDP. Upon clicking the question mark icon, observe the tips on how to indicate and combine variables necessary for identifying the format of values to be displayed.
+        
+    ![add-app3_2](../readme-resource/adv_map_variables.png "add-app3_2")
+    
+    a. Select the name of the field in a Jira ticket. The available fields are the following: **Fix Version/s**, **Component/s** and **Labels**.
+        
+    b. Select the pattern of predefined variables, based on which the value from EDP will be displayed in Jira. Combine several variables to obtain the desired value.
+        
+    - For the **Fix Version/s** field, select the **EDP_VERSION** variable that represents an EDP upgrade version, as in _2.7.0-SNAPSHOT_. Combine variables to make the value more informative. For example, the pattern **EDP_VERSION-EDP_COMPONENT** will be displayed as _2.7.0-SNAPSHOT-nexus-operator_ in Jira; 
+    - For the **Component/s** field, select the **EDP_COMPONENT** variable that defines the name of the existing repository. For example, _nexus-operator_; 
+    - For the **Labels** field, select the **EDP_GITTAG** variable that defines a tag assigned to the commit in GitHub. For example, _build/2.7.0-SNAPSHOT.59_.          
+         
+    c. Click the plus icon to add more Jira field names.
+        
+    d. Click the delete icon to remove the Jira field name.
 
     ![add-app3_2](../readme-resource/addtest_integrate_perf.png "add-app3_2")
-19. Select the **Integrate with Perf Server** checkbox in case it is required to connect to the [PERF Board](https://kb.epam.com/display/EPMDMO/Project+Performance+Board) (_Project Performance Board_). 
+20. Select the **Integrate with Perf Server** checkbox in case it is required to connect to the [PERF Board](https://kb.epam.com/display/EPMDMO/Project+Performance+Board) (_Project Performance Board_). 
     Such functionality allows monitoring the overall team performance and setting up necessary metrics. 
        >_**NOTE**: To adjust the Perf Server integration functionality, first deploy Perf Operator. To get more information about the Perf Operator installation and architecture, please refer to the [PERF Operator](https://github.com/epam/edp-perf-operator#perf-operator) page._ 
 
-20. In the **Select Perf Server** field, select the name of the Perf server with which the integration should be performed. 
-21. Click the Proceed button to be switched to the next menu.
+21. In the **Select Perf Server** field, select the name of the Perf server with which the integration should be performed and click the Proceed button to be switched to the next menu.
 
     ![add-app3_2](../readme-resource/addtest_perf_integr_menu.png "add-app3_2")
 22. Select the necessary DataSource (_Jenkins/GitLab, Sonar_) from which the data should be transferred to the Project Performance Board.     

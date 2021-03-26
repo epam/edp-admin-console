@@ -111,26 +111,42 @@ the GitLab CI tool can be additionally adjusted. For details, please refer to th
                                                                                                                                                                                     
 16. In the **Select Jira Server** field, select the Jira server.
 17. Indicate the pattern using any character, which is followed on the project, to validate a commit message.
-18. Indicate the pattern using any character, which is followed on the project, to find a Jira ticket number in a commit message. Click the Proceed button to be switched to the next menu.
- 
+18. Indicate the pattern using any character, which is followed on the project, to find a Jira ticket number in a commit message. 
+19. In the **Advanced Mapping** section, specify the names of the Jira fields that should be filled in with attributes from EDP. Upon clicking the question mark icon, observe the tips on how to indicate and combine variables necessary for identifying the format of values to be displayed. 
+     
+     ![add-app3](../readme-resource/adv_map_variables.png "add-app3_2")
+     
+    a. Select the name of the field in a Jira ticket. The available fields are the following: **Fix Version/s**, **Component/s** and **Labels**.
+    
+    b. Select the pattern of predefined variables, based on which the value from EDP will be displayed in Jira. Combine several variables to obtain the desired value.
+    
+    - For the **Fix Version/s** field, select the **EDP_VERSION** variable that represents an EDP upgrade version, as in _2.7.0-SNAPSHOT_. Combine variables to make the value more informative. For example, the pattern **EDP_VERSION-EDP_COMPONENT** will be displayed as _2.7.0-SNAPSHOT-nexus-operator_ in Jira; 
+    - For the **Component/s** field, select the **EDP_COMPONENT** variable that defines the name of the existing repository. For example, _nexus-operator_; 
+    - For the **Labels** field, select the **EDP_GITTAG** variable that defines a tag assigned to the commit in GitHub. For example, _build/2.7.0-SNAPSHOT.59_.  
+           
+    c. Click the plus icon to add more Jira field names.  
+    
+    d. Click the delete icon to remove the Jira field name.
+    
     ![add-app3](../readme-resource/integrate_perf.png "add-app3_2")
    
-19. Select the **Integrate with Perf Server** checkbox in case it is required to connect to the [PERF Board](https://kb.epam.com/display/EPMDMO/Project+Performance+Board) (_Project Performance Board_). 
+20. Select the **Integrate with Perf Server** checkbox in case it is required to connect to the [PERF Board](https://kb.epam.com/display/EPMDMO/Project+Performance+Board) (_Project Performance Board_). 
 Such functionality allows monitoring the overall team performance and setting up necessary metrics. 
     >_**NOTE**: To adjust the Perf Server integration functionality, first deploy Perf Operator. To get more information about the Perf Operator installation and architecture, please refer to the [PERF Operator](https://github.com/epam/edp-perf-operator#perf-operator) page._ 
     
-20. In the **Select Perf Server** field, select the name of the Perf server with which the integration should be performed. Click the Proceed button to be switched to the next menu.
+21. In the **Select Perf Server** field, select the name of the Perf server with which the integration should be performed. Click the Proceed button to be switched to the next menu.
 
     ![add-app3](../readme-resource/perf_integration_menu.png "add-app3_2")
 
-21. Select the necessary DataSource (_Jenkins/GitLab, Sonar_) from which the data should be transferred to the Project Performance Board. 
+22. Select the necessary DataSource (_Jenkins/GitLab, Sonar_) from which the data should be transferred to the Project Performance Board. 
+23. Click the Proceed button to be switched to the next menu.
 
     ## The Version Control System Info Menu
 
     ![add-app4](../readme-resource/addapp_4.png "add-app4")
     
-22. Enter the login credentials into the **VCS Login** field.
-23. Enter the password into the **VCS Password (or API Token)** field OR add the API Token. Click the Proceed button to be switched to the next menu.
+24. Enter the login credentials into the **VCS Login** field.
+25. Enter the password into the **VCS Password (or API Token)** field OR add the API Token. Click the Proceed button to be switched to the next menu.
     
     >_**NOTE**: The VCS Info step is skipped in case there is no need to integrate the version control for the application deployment. If the cloned application includes the VCS, this step should be completed as well._
 
@@ -138,25 +154,14 @@ Such functionality allows monitoring the overall team performance and setting up
 
     ![add-app5](../readme-resource/addapp_5.png "add-app5")
 
-24. Select the **Need Route** check box to create a route component in the OpenShift project for the externally reachable host name. As a result, the added application will be accessible in a browser.
+26. Select the **Need Route** check box to create a route component in the OpenShift project for the externally reachable host name. As a result, the added application will be accessible in a browser.
     
     Fill in the necessary fields and proceed to the final menu:
     
     - Name – type the name by entering at least two characters and by using the lower-case letters, numbers and inner dashes. The mentioned name will be as a prefix for the host name.
     - Path – specify the path starting with the **/api** characters. The mentioned path will be at the end of the URL path.
-    
-    ## The Database Menu
-
-    ![add-app6](../readme-resource/addapp_6.png "add-app6")
-
-25. Select the **Need Database** check box in case you need a database. Fill in the required fields:
-    
-    - Database – the PostgreSQL DB is available by default.
-    - Version – the latest version (postgres:9.6) of the PostgreSQL DB is available by default.
-    - Capacity – indicate the necessary size of the database and its unit of measurement (Mi – megabyte, Gi – gigabyte, Ti – terabyte). There is no limit for the database capacity.
-    - Persistent storage – select one of the available storage methods: efs or gp2.
-    
-26. Click the Create button. Once clicked, the CONFIRMATION summary will appear displaying all the specified options and settings, click Continue to complete the application addition.
+       
+27. Click the Proceed button. Once clicked, the CONFIRMATION summary will appear displaying all the specified options and settings, click Continue to complete the application addition.
     
 >_**NOTE**: After the complete adding of the application, please refer to the [Inspect Application](../documentation/inspect_application.md) page._
 

@@ -15,26 +15,62 @@ _**INFO:** To navigate quickly to OpenShift, Jenkins, Gerrit, SonarQube, Nexus, 
 
 The added autotest will be listed in the Autotests list allowing you to do the following:
 
-![inspect-autotest](../readme-resource/inspectautotest.png "inspect-autotest")
+![inspect-autotest](../readme-resource/inspectautotest1.png "inspect-autotest")
 
-1. Add another autotest by clicking the Create button and performing the same steps as described [here](../documentation/add_autotests.md);
-2. Remove autotest with the corresponding database and Jenkins pipelines:
-    - Click the delete icon next to the autotest name;
-    - Type the required autotest name;
-    - Confirm the deletion by clicking the Delete button.
+1. Add another autotest by clicking the Create button and performing the same steps as described [here](../documentation/add_autotests.md).
+2. Open autotest data by clicking its link name. Once clicked, the following blocks will be displayed:
     
-    _**NOTE**: The autotest that is used in a CD pipeline cannot be removed._
-
-3. Open autotest data by clicking its link name. Once clicked, the following blocks will be displayed:
- 
-    * **General Info** - displays common information about the cloned/imported autotest.
-    * **Advanced Settings** - displays the specified job provisioner, Jenkins slave, deployment script, and the versioning type with the start versioning from number (the latter two fields appear in case of edp versioning type).
-    * **Branches** - displays the status and name of the deployment branch, keeps the additional links to Jenkins and Gerrit. In case of edp versioning type, there are two additional fields:
-         
-         * **Build Number** - indicates the current build number; 
-         * **Last Successful Build** - indicates the last successful build number.
+   * **General Info** - displays common information about the cloned/imported autotest.
+   * **Advanced Settings** - displays the specified job provisioner, Jenkins slave, deployment script, and the versioning type with the start versioning from number (the latter two fields appear in case of edp versioning type).
+   * **Branches** - displays the status and name of the deployment branch, keeps the additional links to Jenkins and Gerrit. In case of edp versioning type, there are two additional fields:
+            
+        * **Build Number** - indicates the current build number; 
+        * **Last Successful Build** - indicates the last successful build number.
     * **Status Info** - displays all the actions that were performed during the cloning/importing process.
-    
+
+3. Edit the autotest codebase by clicking the pencil icon. For details see the [Edit Existing Codebase](#Edit_Existing_Codebase) section.
+4. Remove autotest with the corresponding database and Jenkins pipelines:
+       - Click the delete icon next to the autotest name;
+       - Type the required autotest name;
+       - Confirm the deletion by clicking the Delete button.
+       
+   _**NOTE**: The autotest that is used in a CD pipeline cannot be removed._
+       
+   ![inspect-autotest](../readme-resource/inspectautotest2.png "inspect-autotest")       
+
+5. Select a number of existing autotests to be displayed on one page in the **Show entries** field. The filter allows to show 10, 25, 50 or 100 entries per page. 
+6. Sort the existing autotests in a list by clicking the Name title. The autotests will be displayed in alphabetical order. 
+7. Search the necessary autotest by entering the corresponding name, language or the build tool into the **Search** field. The search can be performed by the autotest name, language or a build tool.
+8. Navigate between pages, if the number of autotests exceeds the capacity of a single page.
+
+## <a name="Edit_Existing_Codebase"></a> Edit Existing Codebase 
+
+The EDP Admin Console provides the ability to enable, disable or edit the Jira Integration functionality for autotests via the Edit Codebase page.
+
+1. Perform the editing from one of the following sections on the Admin Console interface:
+
+    ![editcodebase1](../readme-resource/edit_autot_codebase1.png "editcodebase1")
+
+   - Navigate to the codebase overview page and click the **pencil** icon, or
+   
+    ![editcodebase2](../readme-resource/edit_autot_codebase2.png "editcodebase2")
+   
+   - Navigate to the codebase list page and click the **pencil** icon.
+   
+    ![editcodebase3](../readme-resource/edit_codebase_3.png "editcodebase3")
+
+2. To enable Jira integration, on the **Edit Codebase** page do the following:
+   - mark the **Integrate with Jira server** checkbox and fill in the necessary fields; 
+   - click the **Proceed** button to apply the changes;
+   - navigate to Jenkins and add the _create-jira-issue-metadata_ stage in the Build pipeline. Also add the _commit-validate_ stage in the Code-Review pipeline.
+   
+3. To disable Jira integration, on the **Edit Codebase** page do the following:
+   - unmark the **Integrate with Jira server** checkbox;
+   - click the **Proceed** button to apply the changes;
+   - navigate to Jenkins and remove the _create-jira-issue-metadata_ stage in the Build pipeline. Also remove the _commit-validate_ stage in the Code-Review pipeline.
+
+As a result, the necessary changes will be applied.
+   
 ## Add a New Branch
 
 When adding an autotest, the default branch is a **master** branch. In order to add a new branch, follow the steps below:
