@@ -77,19 +77,19 @@ Discover the steps below to apply the GitLab integration correctly:
     def stages = [:]
     def jiraIntegrationEnabled = Boolean.parseBoolean("${JIRA_INTEGRATION_ENABLED}" as String)
     def commitValidateStage = jiraIntegrationEnabled ? ',{"name": "commit-validate"}' : ''
-    def createJFVStage = jiraIntegrationEnabled ? ',{"name": "create-jira-fix-version"}' : ''
+    def createJIMStage = jiraIntegrationEnabled ? ',{"name": "create-jira-issue-metadata"}' : ''
     def platformType = "${PLATFORM_TYPE}"
     def buildStage = platformType == "kubernetes" ? ',{"name": "build-image-kaniko"},' : ',{"name": "build-image-from-dockerfile"},'
 
-    stages['Code-review-application-maven'] = '[{"name": "checkout"},{"name": "compile"},' +
-        '{"name": "tests"}, {"name": "sonar"}]'
+    stages['Code-review-application-maven'] = '[{"name": "checkout"}' + "${commitValidateStage}" + ',{"name": "compile"}' +
+        ',{"name": "tests"}, {"name": "sonar"}]'
     stages['Code-review-application-npm'] = stages['Code-review-application-maven']
     stages['Code-review-application-gradle'] = stages['Code-review-application-maven']
     stages['Code-review-application-dotnet'] = stages['Code-review-application-maven']
     stages['Code-review-application-terraform'] = '[{"name": "checkout"},{"name": "tool-init"},{"name": "lint"}]'
     stages['Code-review-application-helm'] = '[{"name": "checkout"},{"name": "lint"}]'
     stages['Code-review-application-docker'] = '[{"name": "checkout"},{"name": "lint"}]'
-    stages['Code-review-application-go'] = '[{"name": "checkout"},{"name": "build"},' +
+    stages['Code-review-application-go'] = '[{"name": "checkout"}' + "${commitValidateStage}" + ',{"name": "build"},' +
                                            '{"name": "tests"}, {"name": "sonar"}]'
     stages['Code-review-application-python'] = '[{"name": "checkout"},{"name": "compile"},' +
                                            '{"name": "tests"}, {"name": "sonar"}]'
@@ -97,27 +97,27 @@ Discover the steps below to apply the GitLab integration correctly:
             '{"name": "sonar"}]'
     stages['Code-review-autotests-maven'] = '[{"name": "checkout"},{"name": "tests"},{"name": "sonar"}]'
     stages['Build-library-maven'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
-            '{"name": "tests"},{"name": "sonar"},{"name": "build"}' + "${createJFVStage}" + ',{"name": "git-tag"}]'
+            '{"name": "tests"},{"name": "sonar"},{"name": "build"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
     stages['Build-library-npm'] = stages['Build-library-maven']
     stages['Build-library-gradle'] = stages['Build-library-maven']
     stages['Build-library-dotnet'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
-            '{"name": "tests"},{"name": "sonar"},{"name": "push"}' + "${createJFVStage}" + ',{"name": "git-tag"}]'
+            '{"name": "tests"},{"name": "sonar"},{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
     stages['Build-application-maven'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
             '{"name": "tests"},{"name": "sonar"},{"name": "build"}' + "${buildStage}" +
-            '{"name": "push"}' + "${createJFVStage}" + ',{"name": "git-tag"}]'
+            '{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
     stages['Build-application-python'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},{"name": "tests"},{"name": "sonar"}' +
-    "${buildStage}" + '{"name":"push"}' + "${createJFVStage}" + ',{"name": "git-tag"}]'
+    "${buildStage}" + '{"name":"push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
     stages['Build-application-npm'] = stages['Build-application-maven']
     stages['Build-application-gradle'] = stages['Build-application-maven']
     stages['Build-application-dotnet'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
             '{"name": "tests"},{"name": "sonar"}' + "${buildStage}" +
-            '{"name": "push"}' + "${createJFVStage}" + ',{"name": "git-tag"}]'
+            '{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
     stages['Build-application-terraform'] = '[{"name": "checkout"},{"name": "tool-init"},' +
             '{"name": "lint"},{"name": "git-tag"}]'
     stages['Build-application-helm'] = '[{"name": "checkout"},{"name": "lint"}]'
     stages['Build-application-docker'] = '[{"name": "checkout"},{"name": "lint"}]'
     stages['Build-application-go'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "tests"},{"name": "sonar"},' +
-                                    '{"name": "build"}' + "${buildStage}" + "${createJFVStage}" + '{"name": "git-tag"}]'
+                                    '{"name": "build"}' + "${buildStage}" + "${createJIMStage}" + '{"name": "git-tag"}]'
     stages['Create-release'] = '[{"name": "checkout"},{"name": "create-branch"},{"name": "trigger-job"}]'
 
 

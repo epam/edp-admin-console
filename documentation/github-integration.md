@@ -68,7 +68,7 @@ Jenkins jenkins = Jenkins.instance
 def stages = [:]
 def jiraIntegrationEnabled = Boolean.parseBoolean("${JIRA_INTEGRATION_ENABLED}" as String)
 def commitValidateStage = jiraIntegrationEnabled ? ',{"name": "commit-validate"}' : ''
-def createJFVStage = jiraIntegrationEnabled ? ',{"name": "create-jira-fix-version"}' : ''
+def createJIMStage = jiraIntegrationEnabled ? ',{"name": "create-jira-issue-metadata"}' : ''
 def platformType = "${PLATFORM_TYPE}"
 def buildStage = platformType == "kubernetes" ? ',{"name": "build-image-kaniko"},' : ',{"name": "build-image-from-dockerfile"},'
 def buildTool = "${BUILD_TOOL}"
@@ -84,24 +84,24 @@ stages['Build-library-maven'] = '[{"name": "checkout"},{"name": "get-version"},{
 stages['Build-library-npm'] = stages['Build-library-maven']
 stages['Build-library-gradle'] = stages['Build-library-maven']
 stages['Build-library-dotnet'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
-        '{"name": "tests"},{"name": "sonar"},{"name": "push"}' + "${createJFVStage}" + ',{"name": "git-tag"}]'
+        '{"name": "tests"},{"name": "sonar"},{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
 
 stages['Build-application-maven'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
         '{"name": "tests"},{"name": "sonar"},{"name": "build"}' + "${buildStage}" +
-        '{"name": "push"}' + "${createJFVStage}" + ',{"name": "git-tag"}]'
+        '{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
 stages['Build-application-npm'] = stages['Build-application-maven']
 stages['Build-application-gradle'] = stages['Build-application-maven']
 stages['Build-application-dotnet'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
         '{"name": "tests"},{"name": "sonar"}' + "${buildStage}" +
-        '{"name": "push"}' + "${createJFVStage}" + ',{"name": "git-tag"}]'
+        '{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
 stages['Build-application-go'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "tests"},{"name": "sonar"},' +
-                                    '{"name": "build"}' + "${buildStage}" + "${createJFVStage}" + ',{"name": "git-tag"}]'
+                                    '{"name": "build"}' + "${buildStage}" + "${createJIMStage}" + ',{"name": "git-tag"}]'
 stages['Build-application-python'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},{"name": "tests"},{"name": "sonar"}' +
-                                    "${buildStage}" + '{"name":"push"}' + "${createJFVStage}" + ',{"name": "git-tag"}]'
+                                    "${buildStage}" + '{"name":"push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
 stages['Create-release'] = '[{"name": "checkout"},{"name": "create-branch"},{"name": "trigger-job"}]'
 
 def buildToolsOutOfTheBox = ["maven","npm","gradle","dotnet","none","go","python"]
-def defaultStages = '[{"name": "checkout"}]'
+def defaultStages = '[{"name": "checkout"}' + "${createJIMStage}" + ']'
 
 def codebaseName = "${NAME}"
 def gitServerCrName = "${GIT_SERVER_CR_NAME}"
