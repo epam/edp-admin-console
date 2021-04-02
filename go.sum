@@ -90,9 +90,15 @@ github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210112152817-7bdf8b631489
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210112152817-7bdf8b631489/go.mod h1:sZMj9NdnEygGeo9HwvqG1ZTndcmLrKoBVLKnKBVYMlc=
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210205072010-6734242b9ed9 h1:fPJ/zAqRzuhDARi32a/x7sIaF7qqmL/4aioo2sh5uDM=
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210205072010-6734242b9ed9/go.mod h1:/acNbcSLor5PwxDbO96AqodSxQjc8qtBe2kEBOItrt8=
+github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210402134040-488f8d819dd9 h1:TIZ3uGR+bYPfZSgnuttE88EDD6W9MduZSnD+YZf2HkQ=
+github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210402134040-488f8d819dd9/go.mod h1:VKcbN3Xdx9R09fOXS93nz39ITLvHhEMbg+6QC+KQJx4=
+github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20210225152826-bea603cbdb79 h1:mkXx7TMSlOhympWODQj0JD95gXORLNH9HQrAa4ewq7w=
+github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20210225152826-bea603cbdb79/go.mod h1:Qot8on9AIxZHtWrcPeXK7ItXQ9AFO7zUghTVicsTNo4=
 github.com/epmd-edp/cd-pipeline-operator/v2 v2.2.0-50/go.mod h1:ygALtMzvxjLfbXLfGqZ+eGjsARgBdyf6IvoTl5NF5Kk=
 github.com/epmd-edp/cd-pipeline-operator/v2 v2.3.0-58.0.20200520111933-aefa684da6d1 h1:op3DbSlD863CISAaF+TJwUxXyKygt71TbUdByyoOHV8=
 github.com/epmd-edp/cd-pipeline-operator/v2 v2.3.0-58.0.20200520111933-aefa684da6d1/go.mod h1:6gL6eKIwqaTBjub4CYmAuhDDQz2t6DKaYIjlcTIRA7k=
+github.com/epmd-edp/cd-pipeline-operator/v2 v2.3.0-58.0.20201217130859-a9d5aeca1889 h1:4TjBvLg33FCSdHNxWyFsxPc4GLsHltIHUWfQQgrAtR8=
+github.com/epmd-edp/cd-pipeline-operator/v2 v2.3.0-58.0.20201217130859-a9d5aeca1889/go.mod h1:7fskoSjLZmc4C5eLLNLpcgsbes7M5jgl/hsWPW/R/os=
 github.com/epmd-edp/codebase-operator/v2 v2.3.0-88/go.mod h1:MqnZsWXSdziAmOYznnMW+C3M160So5AMuJoCSL84t8M=
 github.com/epmd-edp/codebase-operator/v2 v2.3.0-95.0.20200514095748-92497054f7da h1:Xc380z6el5EJ7yfbYySIOajdzmqcHjUz+Yn82faub1o=
 github.com/epmd-edp/codebase-operator/v2 v2.3.0-95.0.20200514095748-92497054f7da/go.mod h1:2joXoCeTqQ1MjTHfp5yoMfnWy/3zuznNOxGioCvyVDY=

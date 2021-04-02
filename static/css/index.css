@@ -3105,6 +3105,10 @@ textarea.form-control {
     padding-left: 5px;
 }
 
+.empty-project{
+    margin-bottom: 0.25rem;
+}
+
 .form-check {
     position: relative;
     display: block;

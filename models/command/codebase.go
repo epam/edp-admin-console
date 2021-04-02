@@ -27,6 +27,7 @@ type CreateCodebase struct {
 	CiTool                   string      `json:"ciTool" valid:"Required"`
 	Perf                     *Perf       `json:"perf,omitempty"`
 	JiraIssueMetadataPayload *string     `json:"jiraIssueMetadataPayload"`
+	EmptyProject             bool        `json:"emptyProject" valid:"Required"`
 }
 
 type Perf struct {

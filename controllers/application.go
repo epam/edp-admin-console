@@ -358,6 +358,9 @@ func (c *ApplicationController) extractApplicationRequestData() (*command.Create
 		}
 	}
 
+	isEmpty, _ := c.GetBool("isEmpty", false)
+	codebase.EmptyProject = isEmpty
+
 	return codebase, nil
 }
 

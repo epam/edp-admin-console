@@ -93,6 +93,8 @@ $(function () {
         if ($('#isRepoPrivate').is(':checked')) {
             $('.repoLogin').add($('.repoPassword')).removeClass('hide-element');
         }
+
+        $('.empty-project').addClass('hide-element');
     }
 
     function activateCreateBlock() {
@@ -106,6 +108,8 @@ $(function () {
 
         $('.repo-url').add($('.private-repo')).addClass('hide-element');
         $('.repoLogin').add($('.repoPassword')).addClass('hide-element');
+
+        $('.empty-project').removeClass('hide-element');
     }
 
     function activateImportBlock() {
@@ -117,6 +121,8 @@ $(function () {
 
         $('.repo-url').add($('.private-repo')).addClass('hide-element');
         $('.repoLogin').add($('.repoPassword')).addClass('hide-element');
+
+        $('.empty-project').addClass('hide-element');
     }
 
     function toggleStrategy(strategy) {

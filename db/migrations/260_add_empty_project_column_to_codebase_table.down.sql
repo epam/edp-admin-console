@@ -1,0 +1,1 @@
+alter table codebase drop column if exists empty_project;

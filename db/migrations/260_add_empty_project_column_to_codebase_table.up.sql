@@ -1,0 +1,1 @@
+alter table if exists codebase add if not exists empty_project bool;
