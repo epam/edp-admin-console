@@ -36,7 +36,7 @@ type Codebase struct {
 	DefaultBranch            string                 `json:"defaultBranch" orm:"column(default_branch)"`
 	JiraIssueMetadataPayload *string                `json:"_" orm:"column(jira_issue_metadata_payload)"`
 	JiraIssueFields          map[string]interface{} `json:"jiraIssueFields" orm:"-"`
-	EmptyProject             bool                   `json:"emptyProject" orm:"column(empty_project)""`
+	EmptyProject             bool                   `json:"emptyProject" orm:"column(empty_project)"`
 }
 
 type Perf struct {

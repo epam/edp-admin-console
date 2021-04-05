@@ -288,6 +288,9 @@ func (c *LibraryController) extractLibraryRequestData() (*command.CreateCodebase
 		}
 	}
 
+	isEmpty, _ := c.GetBool("isEmpty", false)
+	library.EmptyProject = isEmpty
+
 	return library, nil
 }
 
