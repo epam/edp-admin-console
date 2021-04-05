@@ -10,21 +10,21 @@ In order to use the import strategy, it is required to add Secret with SSH key, 
 
    ```bash
    kubectl create secret generic gitlab -n edp --from-file=id_rsa=id_rsa --from-file id_rsa.pub=id_rsa.pub --from-literal=username=user@gitlab.com
-   ``` 
+   ```
 2. Create GitServer CR in the OpenShift/K8S namespace with the **gitHost**, **gitUser**, **httpsPort**, **sshPort**, **nameSshKeySecret**, and **createCodeReviewPipeline** fields:
 
     ![git-server](../readme-resource/add-git-server.png "git-server")
 
    As a sample, it is possible to use the following template:
-   
+
    ```yaml
    apiVersion: v2.edp.epam.com/v1alpha1
    kind: GitServer
    metadata:
-     name: git-epam
+     name: git-example
    spec:
      createCodeReviewPipeline: false
-     gitHost: git.epam.com
+     gitHost: git.example.com
      gitUser: git
      httpsPort: 443
      nameSshKeySecret: gitlab-sshkey
@@ -36,9 +36,9 @@ In order to use the import strategy, it is required to add Secret with SSH key, 
 3. Create a Credential in Jenkins with the same ID as in the **nameSshKeySecret** property, and with the private key. Navigate to **Jenkins -> Credentials -> System -> Global credentials -> Add Credentials**:
 
     ![credential](../readme-resource/add-credentials.png "credential")
-    
+
 4. Change the Deployment Config of the Admin Console by adding the **Import** strategy to the **INTEGRATION_STRATEGIES** variable:
 
     ![integration-strategy](../readme-resource/add-integretion-strategies.png "integration-strategy")
-    
+
 5. As soon as the Admin Console is redeployed, the **Import** strategy will be added to the Create Application page. For details, please refer to the [Add Applications](../documentation/add_applications.md) page.
