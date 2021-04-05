@@ -22,20 +22,19 @@ In order to adjust the Jira server integration, first add JiraServer CR by perfo
     metadata:
       name: epam-jira
     spec:
-      apiUrl: 'https://jiraeu-api.epam.com'
-      credentialName: epam-jira-user
-      rootUrl: 'https://jiraeu.epam.com'
+      apiUrl: 'https://jira-api.example.com'
+      credentialName: jira-user
+      rootUrl: 'https://jira.example.com'
     status:
       available: true
-      last_time_updated: '2020-08-14T11:51:07.045048633Z'
+      last_time_updated: '2021-04-05T10:51:07.042048633Z'
    ```
-   
+
     >_**NOTE**: The value of the **credentialName** property is the name of the Secret, which is indicated in the first point above._
-                                                                                                                                                                                                    
-3. Being in Admin Console, navigate to the Advanced Settings menu to check that the Integrate with Jira Server check box became available:  
+
+3. Being in Admin Console, navigate to the Advanced Settings menu to check that the Integrate with Jira Server check box became available:
 
     ![jira-server-integration](../readme-resource/jira_integration_ac.png "jira-server-integration")
-    
+
 ### Related Articles
 - [Adjust VCS Integration With Jira Server](../documentation/jira_vcs_integration.md)
-

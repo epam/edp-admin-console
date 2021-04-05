@@ -8,7 +8,7 @@ INSERT INTO third_party_service (id, name, description, version) VALUES (7, 'rab
 INSERT INTO third_party_service (id, name, description, version) VALUES (8, 'turbine', 'Openshift template for Turbine service', '1.2.0');
 INSERT INTO third_party_service (id, name, description, version) VALUES (9, 'zipkin-ephemeral', 'Openshift template for Zipkin service', '2.6.0');
 
-insert into git_server(id, name, available, hostname) values (1, 'gerrit', true, 'gerrit-mr-3013-2-edp-cicd.delivery.aws.main.edp.projects.epam.com');
+insert into git_server(id, name, available, hostname) values (1, 'gerrit', true, 'gerrit-example.com');
 
 INSERT INTO codebase (id, type, name, language, framework, build_tool, strategy, repository_url, route_site, route_path, database_kind, database_version, database_capacity, database_storage, status, test_report_framework, description, git_server_id) VALUES (2, 'application', 'bar-service', 'java', 'springboot', 'maven', 'clone', 'https://git.epam.com/epmd-edp/examples/basic/bar-service.git', '', '', '', '', '', '', 'active', '', '', 1);
 INSERT INTO codebase (id, type, name, language, framework, build_tool, strategy, repository_url, route_site, route_path, database_kind, database_version, database_capacity, database_storage, status, test_report_framework, description, git_server_id) VALUES (1, 'application', 'foo-service', 'java', 'springboot', 'maven', 'clone', 'https://git.epam.com/epmd-edp/examples/basic/foo-service.git', '', '', '', '', '', '', 'active', '', '', 1);
