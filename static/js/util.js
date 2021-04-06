@@ -112,6 +112,7 @@ function createConfirmTable(formName) {
         {
             'Name': 'appName',
             'Description': 'description',
+            'Empty project': !!isFound('isEmpty'),
             'Code language': 'appLang',
             'Framework': 'framework',
             'Build tool': 'buildTool',
