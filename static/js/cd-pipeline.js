@@ -36,29 +36,21 @@ $(function () {
 
     function validateApplicationInfo(event) {
         let $applicationBlockEl = $('.application-block');
+        let $applicationCheckboxErrorEl = $('.app-checkbox-error');
 
         resetErrors($applicationBlockEl);
 
-        let isValid = isApplicationInfoValid();
-
-        if (!isValid) {
+        if (!$('.app-name-checkbox').is(':checked')) {
             event.stopPropagation();
             blockIsNotValid($applicationBlockEl);
-            return isValid;
+            $applicationCheckboxErrorEl.show();
+            return false;
         }
+
         blockIsValid($applicationBlockEl);
+        $applicationCheckboxErrorEl.hide();
 
-        return isValid;
-    }
-
-    function isApplicationInfoValid() {
-        let isApplicationBlockValid = $('.app-checkbox').is(':checked');
-
-        if (!isApplicationBlockValid) {
-            $('.app-checkbox-error').show();
-        }
-
-        return isApplicationBlockValid;
+        return true;
     }
 
     function validateStageInfo() {

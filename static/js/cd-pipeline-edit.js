@@ -50,16 +50,17 @@ $(function () {
         }
     });
 
-    $('.update-cd-pipeline').click(function (e) {
-        e.preventDefault();
+    $('.update-cd-pipeline').click(function (event) {
+        event.preventDefault();
+        let $applicationBlockEl = $('.applications');
 
-        if (!$('.app-checkbox').is(':checked')) {
+        if (!$('.app-name-checkbox').is(':checked')) {
             $('.app-checkbox-error').show();
+            blockIsNotValid($applicationBlockEl);
         } else {
             $('.app-checkbox-error').hide();
+            blockIsValid($applicationBlockEl);
             $('#updateCDCR').submit();
         }
-
     });
-
 });
