@@ -21,7 +21,7 @@
 
             <form class="edp-form" id="updateCDCR" method="post" action="{{ .BasePath }}/admin/edp/cd-pipeline/{{.CDPipeline.Name}}/update">
                 <h1 class="edp-form-header">
-                    <a href="{{ .BasePath }}/admin/edp/cd-pipeline/overview" class="edp-back-link"></a>
+                    <a href="{{ .BasePath }}/admin/edp/cd-pipeline/{{.CDPipeline.Name}}/overview" class="edp-back-link"></a>
                     Edit CD Pipeline
                 </h1>
                 <p>Edit which applications within this pipeline user wants to deploy.</p>
