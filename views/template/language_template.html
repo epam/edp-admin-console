@@ -1,5 +1,5 @@
 <fieldset id="languageSelection" class="language">
-    <div class="d-flex">
+    <div class="d-flex flex-wrap">
 
         <div class="form__radio-btn-wrapper">
             <input name="appLang" type="radio" class="form__radio-btn"
@@ -87,6 +87,19 @@
                     <span class="form__radio-label-text">Python</span>
                 </label>
             </div>
+        {{end}}
+
+        {{if eq .Type "library" }}
+        <div class="form__radio-btn-wrapper">
+            <input name="appLang" type="radio" class="form__radio-btn"
+                   id="appLang-Rego" value="rego"
+                   data-target=".formSubsection-rego">
+            <label class="form__radio-label" for="appLang-Rego">
+                <img class="form__radio-label-icon"
+                     src="{{ .BasePath }}/static/img/opa-logo.png" alt="logo">
+                <span class="form__radio-label-text">Rego</span>
+            </label>
+        </div>
         {{end}}
 
         <div class="form__radio-btn-wrapper other-language">
