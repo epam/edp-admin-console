@@ -122,21 +122,16 @@
                                             <div class="collapse" id="jiraAdvanceMappingTooltip">
                                                 <div class="div-tooltip card card-body-tooltip">
                                                     <p>
-                                                        <b>Note</b>: There are three predefined variables which you can
-                                                        use
-                                                        - <b>EDP_COMPONENT</b>, <b>EDP_VERSION</b> and
-                                                        <b>EDP_GITTAG</b>. </br>
-                                                        Those variables will be replaced with values in the
-                                                        feature. </br>
-                                                        </br>
-                                                        So, you can vary combination of those variables to reach values
-                                                        you
-                                                        need. </br>
-                                                        </br>
-                                                        <b>Examples</b>: </br>
-                                                        - <b>EDP_COMPONENT</b>-hello-world-<b>EDP_VERSION</b> </br>
-                                                        - <b>EDP_GITTAG</b>-<b>EDP_VERSION</b> </br>
-                                                    </p>
+                                                        There are four predefined variables with the respective values that can be specified singly or as a combination: </br>
+                                                        <ul type="square">
+                                                            <li> <b>EDP_COMPONENT</b> – returns application-name </br>
+                                                            <li> <b>EDP_VERSION</b> – returns <b>0.0.0-SNAPSHOT</b> or <b>0.0.0-RC</b> </br>
+                                                            <li> <b>EDP_SEM_VERSION</b> – returns <b>0.0.0</b> </br>
+                                                            <li> <b>EDP_GITTAG</b> – returns <b>build/0.0.0-SNAPSHOT.2</b> or <b>build/0.0.0-RC.2</b> </br>
+                                                        </ul>
+                                                        <em>There are no character restrictions when combining the variables, combination samples:
+                                                            <b>EDP_SEM_VERSION-EDP_COMPONENT</b> or <b>EDP_COMPONENT-hello-world/EDP_VERSION</b>, etc.</em>
+                                                        </p>
                                                 </div>
                                             </div>
                                             <button type="button" class="add-jira-field circle plus"></button>
