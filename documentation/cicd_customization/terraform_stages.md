@@ -28,6 +28,8 @@ In the **Build** pipeline, the following stages are available:
 
   1. **checkout** stage is a standard step during which all files are checked out from a master branch of Git repository.
 
+        _**NOTE**: With the Default versioning, in the base directory of the project, create a file named 'VERSION' with a proper Terraform version (e.g.1.0.0)._
+
   2. **terraform-lint** stage containing a script that performs the same actions as in the Code-Review pipeline, namely:
 
      2.1. Checks whether the repository contains the _.terraform-version_ file, where the information about the Terraform version is stored. If there is no _.terraform-version_ file, the default Terraform version (0.14.5) will be used on this stage. In order to install different versions of Terraform, use the [Terraform version manager](https://github.com/tfutils/tfenv#tfenv).
@@ -52,7 +54,7 @@ In the **Build** pipeline, the following stages are available:
 
      3.4. Launches the _terraform-plan_ command saving the results in the _.tfplan_ file.  
   
-        _**NOTE**: EDP expects **AWS credentials** to be added in Jenkins under the name _aws.user_. To learn how to create credentials for the **terraform-plan** and **terraform-apply** stages, see the section [**Create AWS Credentials**](#create_aws_credentials).
+        _**NOTE**: EDP expects **AWS credentials** to be added in Jenkins under the name _aws.user_. To learn how to create credentials for the **terraform-plan** and **terraform-apply** stages, see the section [**Create AWS Credentials**](#create_aws_credentials)._
    
   4. **terraform-apply** stage containing a script that performs the following actions:
 
