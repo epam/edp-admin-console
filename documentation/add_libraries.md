@@ -137,3 +137,4 @@ _**NOTE**: The Version Control System Info menu is available in case this option
 * [Adjust Integration With Jira Server](../documentation/jira-server.md)
 * [Adjust VCS Integration With Jira Server](../documentation/jira_vcs_integration.md)
 * [Use Terraform Library in EDP](https://github.com/epam/edp-admin-console/blob/master/documentation/cicd_customization/terraform_stages.md#use-terraform-library-in-edp)
+* [Use Open Policy Agent Library in EDP](https://github.com/epam/edp-admin-console/blob/master/documentation/cicd_customization/opa_stages.md)
