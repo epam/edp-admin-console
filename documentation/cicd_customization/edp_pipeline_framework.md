@@ -676,6 +676,6 @@ pipeline {
 ```
 
 ### Related Articles
-
-* [Use Terraform Library in EDP](../documentation/cicd_customization/terraform_stages.md)
-* [Use Lint Stages for Code Review](../documentation/cicd_customization/code_review_stages.md)
+* [EDP Stages](../../documentation/edp-stages.md)
+* [Use Lint Stages for Code Review](../../documentation/cicd_customization/code_review_stages.md)
+* [Use Terraform Library in EDP](../../documentation/cicd_customization/terraform_stages.md)
