@@ -21,6 +21,7 @@ import (
 	"edp-admin-console/controllers"
 	"edp-admin-console/controllers/auth"
 	cdPipeController "edp-admin-console/controllers/cd-pipeline"
+	"edp-admin-console/controllers/stage"
 	"edp-admin-console/filters"
 	"edp-admin-console/k8s"
 	"edp-admin-console/repository"
@@ -270,6 +271,8 @@ func init() {
 		PipelineService: pipelineService,
 	}
 
+	csc := stage.InitStageController(pipelineService)
+
 	adminEdpNamespace := beego.NewNamespace(fmt.Sprintf("%s/admin/edp", context.BasePath),
 		beego.NSRouter("/overview", &ec, "get:GetEDPComponents"),
 		beego.NSRouter("/application/overview", &appc, "get:GetApplicationsOverviewPage"),
@@ -282,6 +285,7 @@ func init() {
 		beego.NSRouter("/cd-pipeline", &cpc, "post:CreateCDPipeline"),
 		beego.NSRouter("/cd-pipeline/:name/update", &cpc, "post:UpdateCDPipeline"),
 		beego.NSRouter("/cd-pipeline/:pipelineName/overview", &cpc, "get:GetCDPipelineOverviewPage"),
+		beego.NSRouter("/cd-pipeline/:pipelineName/cd-stage/edit", &csc, "post:UpdateCDStage"),
 		beego.NSRouter("/autotest/overview", &autc, "get:GetAutotestsOverviewPage"),
 		beego.NSRouter("/autotest/create", &autc, "get:GetCreateAutotestsPage"),
 		beego.NSRouter("/autotest", &autc, "post:CreateAutotests"),

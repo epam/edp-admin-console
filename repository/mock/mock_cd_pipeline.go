@@ -64,3 +64,6 @@ func (m MockCdPipeline) GetAllCodebaseDockerStreams() ([]string, error) {
 func (m MockCdPipeline) SelectCountStages(pipeName string) (*int, error) {
 	panic("implement me!!!")
 }
+func (m MockCdPipeline) SelectCDPipelineStages(pipeName string) ([]string, error) {
+	panic("implement me!!!")
+}

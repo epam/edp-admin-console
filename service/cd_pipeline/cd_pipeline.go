@@ -264,6 +264,37 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 	return nil
 }
 
+func (s *CDPipelineService) UpdatePipelineStage(stage command.CDStageCommand, pipelineName string) error {
+	log.Debug("start updating CD Pipeline stage", zap.String("name", stage.Name))
+	st, err := s.getCDPipelineStageCR(stage.Name, pipelineName)
+	if err != nil {
+		return err
+	}
+	if st == nil {
+		log.Info("CD Pipeline stage doesn't exist in cluster.", zap.String("name", stage.Name))
+		return edperror.NewCDPipelineStageDoesNotExistError(stage.Name)
+	}
+
+	st.Spec.TriggerType = stage.TriggerType
+
+	edpRestClient := s.Clients.EDPRestClient
+
+	err = edpRestClient.Put().
+		Namespace(context.Namespace).
+		Resource("stages").
+		Name(st.Name).
+		Body(st).
+		Do().
+		Into(st)
+
+	if err != nil {
+		return errors.Wrap(err, "an error has occurred while updating CD Pipeline Stage cluster")
+	}
+	st.Status.LastTimeUpdated = time.Now()
+	log.Info("CD Pipeline Stage has been updated", zap.String("name", stage.Name))
+	return nil
+}
+
 func sortStagesByOrder(stages []*query.Stage) {
 	sort.Slice(stages, func(i, j int) bool {
 		return stages[i].Order < stages[j].Order
@@ -431,6 +462,22 @@ func (s *CDPipelineService) getCDPipelineCR(pipelineName string) (*edppipelinesv
 		return nil, errors.Wrap(err, "an error has occurred while getting cd pipeline from cluster")
 	}
 	return cdPipeline, nil
+}
+
+func (s *CDPipelineService) getCDPipelineStageCR(stageName, pipelineName string) (*edppipelinesv1alpha1.Stage, error) {
+	edpRestClient := s.Clients.EDPRestClient
+	stagesCr := &edppipelinesv1alpha1.Stage{}
+	stagesCrName := fmt.Sprintf("%s-%s", pipelineName, stageName)
+
+	err := edpRestClient.Get().Namespace(context.Namespace).Resource("stages").Name(stagesCrName).Do().Into(stagesCr)
+	if k8serrors.IsNotFound(err) {
+		log.Debug("stage doesn't exist in cluster.", zap.String("name", stageName))
+		return nil, nil
+	}
+	if err != nil {
+		return nil, errors.Wrap(err, "an error has occurred while getting cd pipeline stage from cluster")
+	}
+	return stagesCr, nil
 }
 
 func createCr(cdPipelineName string, stage command.CDStageCommand) edppipelinesv1alpha1.Stage {
@@ -654,4 +701,14 @@ func (s CDPipelineService) GetStageCount(pipeName string) (*int, error) {
 	}
 	log.Info("stages of cd-pipeline were counted")
 	return count, nil
+}
+
+func (s CDPipelineService) GetCDPipelineStages(pipeName string) ([]string, error) {
+	log.Debug("start getting the stages of cd-pipeline")
+	stages, err := s.ICDPipelineRepository.SelectCDPipelineStages(pipeName)
+	if err != nil {
+		return nil, errors.Wrap(err, "an error has occurred while getting the stages of cd-pipeline")
+	}
+	log.Info("stages of cd-pipeline were got")
+	return stages, nil
 }

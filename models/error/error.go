@@ -1,5 +1,9 @@
 package error
 
+import (
+	"fmt"
+)
+
 type CDPipelineExistsError struct {
 }
 
@@ -53,4 +57,18 @@ func (e *CodebaseWithGitUrlPathAlreadyExistsError) Error() string {
 
 func NewCodebaseWithGitUrlPathAlreadyExistsError() error {
 	return &CodebaseWithGitUrlPathAlreadyExistsError{}
+}
+
+type CDPipelineStageDoesNotExistError struct {
+	name string
+}
+
+func (e *CDPipelineStageDoesNotExistError) Error() string {
+	return fmt.Sprintf("cd pipeline stage %s doesn't exist", e.name)
+}
+
+func NewCDPipelineStageDoesNotExistError(stage string) error {
+	return &CDPipelineStageDoesNotExistError{
+		name: stage,
+	}
 }

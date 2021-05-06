@@ -6,6 +6,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="{{ .BasePath }}/static/css/index.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/stages-edit.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/validation.css">
 </head>
 <body>
 <main>
@@ -89,132 +91,147 @@
                         </div>
 
                         {{if .CDPipeline.Stage}}
-                            <div class="card stages-info">
-                                <div class="card-header static" id="headingTwo"
-                                     aria-expanded="true" aria-controls="collapseTwo">
-                                    <h5 class="mb-0">
-                                        <button class="btn btn-link" type="button">
-                                            Stages
-                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Stages which are created for the pipeline."></span>
-                                        </button>
-                                    </h5>
-                                </div>
-                                <div id="collapseTwo" class="show" aria-labelledby="headingTwo">
-                                    <div class="card-body">
-                                        <div class="form-check">
-                                            <table class="table edp-table">
-                                                <thead>
-                                                <tr>
-                                                    <th scope="col"></th>
-                                                    <th scope="col">Name</th>
-                                                    <th scope="col">Trigger Type</th>
-                                                    <th scope="col">
-                                                        {{if .IsOpenshift}}
-                                                            OpenShift Project
-                                                        {{else}}
-                                                            Kubernetes Namespace
-                                                        {{end}}
-                                                    </th>
-                                                    <th scope="col">Type</th>
-                                                    <th scope="col">Library</th>
-                                                    <th scope="col">Branch</th>
-                                                    <th scope="col">Job provision</th>
-                                                    <th scope="col">Quality Gates</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                {{$len := (len .CDPipeline.Stage)}}
-                                                {{range $i, $e := .CDPipeline.Stage}}
-                                                    <tr valign="top">
-                                                        <td>
-                                                            {{if $.HasRights}}
-                                                                {{$notOne := ne $i 0}}
-                                                                {{$isLast := eq (add $i 1) $len}}
-                                                                {{if eq $len 1}}
-                                                                    <button class="delete delete-stage"
-                                                                            data-toggle="modal"
-                                                                            data-name="{{.Name}}"
-                                                                            data-order="{{.Order}}">
-                                                                        <i class="icon-trashcan"></i>
-                                                                    </button>
-                                                                {{else if and $notOne $isLast}}
-                                                                    <button class="delete delete-stage"
-                                                                            data-toggle="modal"
-                                                                            data-name="{{.Name}}"
-                                                                            data-order="{{.Order}}">
-                                                                        <i class="icon-trashcan"></i>
-                                                                    </button>
-                                                                {{end}}
+                            <form id="editCDStages" method="post" action="{{ .BasePath }}/admin/edp/cd-pipeline/{{.CDPipeline.Name}}/cd-stage/edit">
+                                <div class="card stages-info">
+                                    <div class="card-header static" id="headingTwo"
+                                         aria-expanded="true" aria-controls="collapseTwo">
+                                        <h5 class="mb-0">
+                                            <button class="btn btn-link" type="button">
+                                                Stages
+                                                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                      title="Stages which are created for the pipeline."></span>
+                                            </button>
+                                            <button class="delete ml-1" id="edit-stages" onclick="editStages()">
+                                                <i class="icon-pencil-white"></i>
+                                            </button>
+                                            <button class="delete ml-1 edit-cd-stages" id="save-stages" onclick="saveStages()" disabled="disabled">
+                                                <i class="icon-save"></i>
+                                            </button>
+                                        </h5>
+                                    </div>
+                                    <div id="collapseTwo" class="show" aria-labelledby="headingTwo">
+                                        <div class="card-body">
+                                            <div class="form-check">
+                                                <table class="table edp-table">
+                                                    <thead>
+                                                    <tr>
+                                                        <th scope="col"></th>
+                                                        <th scope="col">Name</th>
+                                                        <th scope="col">Trigger Type</th>
+                                                        <th scope="col">
+                                                            {{if .IsOpenshift}}
+                                                                OpenShift Project
+                                                            {{else}}
+                                                                Kubernetes Namespace
                                                             {{end}}
-                                                        </td>
-                                                        <td>
-                                                            {{.Name}}
-                                                            {{if .Description}}
-                                                                <span class="tooltip-icon" data-toggle="tooltip"
-                                                                      data-placement="top"
-                                                                      title="{{.Description}}"></span>
-                                                            {{end}}
-                                                        </td>
-                                                        <td>{{.TriggerType}}</td>
-                                                        <td class="platform-link">
-                                                            <a href="{{.PlatformProjectLink}}" target="_blank"
-                                                               class="edp-link"
-                                                               rel="noopener noreferrer">Link</a>
-                                                        </td>
-                                                        <td>{{.Source.Type}}</td>
-                                                        <td>
-                                                            {{if eq .Source.Type "library"}}
-                                                                {{.Source.Library.Name}}
-                                                            {{end}}
-                                                        </td>
-                                                        <td>
-                                                            {{if eq .Source.Type "library"}}
-                                                                {{.Source.Library.Branch}}
-                                                            {{end}}
-                                                        </td>
-                                                        <td>{{.JobProvisioning.Name}}</td>
-                                                        <td>
-                                                            {{if .QualityGates}}
-                                                                <table>
-                                                                    <thead>
-                                                                    <tr>
-                                                                        <th scope="col">Quality Gate Type</th>
-                                                                        <th scope="col">Jenkins Step Name</th>
-                                                                        <th scope="col">Autotest Name</th>
-                                                                        <th scope="col">Branch Name</th>
-                                                                    </tr>
-                                                                    </thead>
-                                                                    {{range .QualityGates}}
-                                                                        <tr>
-                                                                        <th>{{.QualityGateType}}</th>
-                                                                        <th>{{.StepName}}</th>
-
-                                                                            {{if eq "autotests" .QualityGateType}}
-                                                                                <th>
-                                                                                    <a href="{{ $.BasePath }}/admin/edp/codebase/{{.Autotest.Name}}/overview" class="edp-link">{{.Autotest.Name}}</a>
-                                                                                </th>
-                                                                                <th>
-                                                                                    {{.Branch.Name}}
-                                                                                </th>
-                                                                            {{end}}
-                                                                                <th></th>
-                                                                                <th></th>
-                                                                            {{else}}
-
-                                                                        </tr>
-                                                                    {{end}}
-                                                                </table>
-                                                            {{end}}
-                                                        </td>
+                                                        </th>
+                                                        <th scope="col">Type</th>
+                                                        <th scope="col">Library</th>
+                                                        <th scope="col">Branch</th>
+                                                        <th scope="col">Job provision</th>
+                                                        <th scope="col">Quality Gates</th>
                                                     </tr>
-                                                {{end}}
-                                                </tbody>
-                                            </table>
+                                                    </thead>
+                                                    <tbody>
+                                                    {{$len := (len .CDPipeline.Stage)}}
+                                                    {{range $i, $e := .CDPipeline.Stage}}
+                                                        <tr valign="top">
+                                                            <td>
+                                                                {{if $.HasRights}}
+                                                                    {{$notOne := ne $i 0}}
+                                                                    {{$isLast := eq (add $i 1) $len}}
+                                                                    {{if eq $len 1}}
+                                                                        <button class="delete delete-stage"
+                                                                                data-toggle="modal"
+                                                                                data-name="{{.Name}}"
+                                                                                data-order="{{.Order}}">
+                                                                            <i class="icon-trashcan"></i>
+                                                                        </button>
+                                                                    {{else if and $notOne $isLast}}
+                                                                        <button class="delete delete-stage"
+                                                                                data-toggle="modal"
+                                                                                data-name="{{.Name}}"
+                                                                                data-order="{{.Order}}">
+                                                                            <i class="icon-trashcan"></i>
+                                                                        </button>
+                                                                    {{end}}
+                                                                {{end}}
+                                                            </td>
+                                                            <td>
+                                                                {{.Name}}
+                                                                {{if .Description}}
+                                                                    <span class="tooltip-icon" data-toggle="tooltip"
+                                                                          data-placement="top"
+                                                                          title="{{.Description}}"></span>
+                                                                {{end}}
+                                                            </td>
+                                                            <td>
+                                                                <p class="trigger-type-view" id="triggerType">{{.TriggerType}}</p>
+                                                                <select class="form-control hide-element trigger-type-edit" id="triggerType" name="triggerType">
+                                                                    <option {{if eq .TriggerType "manual"}}selected="selected"{{end}}>Manual</option>
+                                                                    <option {{if eq .TriggerType "auto"}}selected="selected"{{end}}>Auto</option>
+                                                                </select>
+                                                            </td>
+                                                            <td class="platform-link">
+                                                                <a href="{{.PlatformProjectLink}}" target="_blank"
+                                                                   class="edp-link"
+                                                                   rel="noopener noreferrer">Link</a>
+                                                            </td>
+                                                            <td>{{.Source.Type}}</td>
+                                                            <td>
+                                                                {{if eq .Source.Type "library"}}
+                                                                    {{.Source.Library.Name}}
+                                                                {{end}}
+                                                            </td>
+                                                            <td>
+                                                                {{if eq .Source.Type "library"}}
+                                                                    {{.Source.Library.Branch}}
+                                                                {{end}}
+                                                            </td>
+                                                            <td>{{.JobProvisioning.Name}}</td>
+                                                            <td>
+                                                                {{if .QualityGates}}
+                                                                    <table>
+                                                                        <thead>
+                                                                        <tr>
+                                                                            <th scope="col">Quality Gate Type</th>
+                                                                            <th scope="col">Jenkins Step Name</th>
+                                                                            <th scope="col">Autotest Name</th>
+                                                                            <th scope="col">Branch Name</th>
+                                                                        </tr>
+                                                                        </thead>
+                                                                        {{range .QualityGates}}
+                                                                            <tr>
+                                                                            <th>{{.QualityGateType}}</th>
+                                                                            <th>{{.StepName}}</th>
+
+                                                                                {{if eq "autotests" .QualityGateType}}
+                                                                                    <th>
+                                                                                        <a href="{{ $.BasePath }}/admin/edp/codebase/{{.Autotest.Name}}/overview" class="edp-link">{{.Autotest.Name}}</a>
+                                                                                    </th>
+                                                                                    <th>
+                                                                                        {{.Branch.Name}}
+                                                                                    </th>
+                                                                                {{end}}
+                                                                                    <th></th>
+                                                                                    <th></th>
+                                                                                {{else}}
+
+                                                                            </tr>
+                                                                        {{end}}
+                                                                    </table>
+                                                                {{end}}
+                                                            </td>
+                                                        </tr>
+                                                    {{end}}
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                                {{ .xsrfdata }}
+                            </form>
                         {{end}}
 
                         {{if .CDPipeline.ThirdPartyService}}
@@ -368,5 +385,7 @@
 <script src="{{ .BasePath }}/static/js/confirmation-popup.js"></script>
 <script src="{{ .BasePath }}/static/js/pipeline-overview.js"></script>
 <script src="{{ .BasePath }}/static/js/bootstrap-notify.js"></script>
+<script src="{{ .BasePath }}/static/js/stages-edit.js"></script>
+<script src="{{ .BasePath }}/static/js/codebase-branch-validation.js"></script>
 </body>
 </html>

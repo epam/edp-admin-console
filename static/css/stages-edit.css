@@ -1,0 +1,43 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('./assets/iconic-save/icomoon.eot?9cxtu2');
+  src:  url('./assets/iconic-save/icomoon.eot?9cxtu2#iefix') format('embedded-opentype'),
+    url('./assets/iconic-save/icomoon.ttf?9cxtu2') format('truetype'),
+    url('./assets/iconic-save/icomoon.woff?9cxtu2') format('woff'),
+    url('./assets/iconic-save/icomoon.svg?9cxtu2#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+.icon-save:before {
+  content: "\e962";
+  color: #ffffff;
+}
+
+#save-stages:disabled i:before {
+  content: "\e962";
+  color: #ffffff;
+}
+
+.icon-save:hover:before,
+.icon-save:hover:active {
+  content: "\e962";
+  color: #f15c43;
+}
+
+.icon-pencil-white:before {
+  content: "\e905";
+  color: #ffffff;
+}
+
+#edit-stages:disabled i:before {
+  content: "\e905";
+  color: #ffffff;
+}
+
+.icon-pencil-white:hover:before,
+.icon-pencil-white:hover:active {
+  content: "\e905";
+  color: #f15c43;
+}
