@@ -13,7 +13,7 @@ _**NOTE**: Please refer to the [EDP Pipeline Framework](https://github.com/epam/
 
 The diagram below shows the commit path through these pipelines and the respective stages.
 
-![stages](https://raw.githubusercontent.com/epam/admin-console/master/documentation/puml/stages.puml)
+![stages](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/epam/edp-admin-console/master/documentation/puml/stages.puml)
 
 ## Stages Description
 
