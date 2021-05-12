@@ -38,10 +38,41 @@
                 </p>
 
                 <div class="accordion" id="accordionCreateApplication">
+
                     <div class="card">
-                        <div class="card applications-info">
+                        <div class="card general-info">
                             <div class="card-header static" id="headingOne"
                                  aria-expanded="true" aria-controls="collapseOne">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link" type="button">
+                                        General Information
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="General information about CD Pipeline below."></span>
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseOne" class="show" aria-labelledby="headingOne">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <table class="edp-card-table">
+                                            <tbody>
+                                            <tr>
+                                                <th style="width: 50%">Name</th>
+                                                <td>{{.CDPipeline.Name}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Deployment Type</th>
+                                                <td>{{.CDPipeline.DeploymentType}}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card applications-info">
+                            <div class="card-header static" id="headingTwo"
+                                 aria-expanded="true" aria-controls="collapseTwo">
                                 <h5 class="mb-0">
                                     <button class="btn btn-link" type="button">
                                         Applications
@@ -50,7 +81,7 @@
                                     </button>
                                 </h5>
                             </div>
-                            <div id="collapseOne" class="show" aria-labelledby="headingOne">
+                            <div id="collapseTwo" class="show" aria-labelledby="headingTwo">
                                 <div class="card-body">
                                     <div class="form-check">
                                         <table class="table edp-table">
@@ -93,8 +124,8 @@
                         {{if .CDPipeline.Stage}}
                             <form id="editCDStages" method="post" action="{{ .BasePath }}/admin/edp/cd-pipeline/{{.CDPipeline.Name}}/cd-stage/edit">
                                 <div class="card stages-info">
-                                    <div class="card-header static" id="headingTwo"
-                                         aria-expanded="true" aria-controls="collapseTwo">
+                                    <div class="card-header static" id="headingThree"
+                                         aria-expanded="true" aria-controls="collapseThree">
                                         <h5 class="mb-0">
                                             <button class="btn btn-link" type="button">
                                                 Stages
@@ -109,7 +140,7 @@
                                             </button>
                                         </h5>
                                     </div>
-                                    <div id="collapseTwo" class="show" aria-labelledby="headingTwo">
+                                    <div id="collapseThree" class="show" aria-labelledby="headingThree">
                                         <div class="card-body">
                                             <div class="form-check">
                                                 <table class="table edp-table">
@@ -236,8 +267,8 @@
 
                         {{if .CDPipeline.ThirdPartyService}}
                             <div class="card third-party-service-info">
-                                <div class="card-header static" id="headingThree"
-                                     aria-expanded="true" aria-controls="collapseThree">
+                                <div class="card-header static" id="headingFour"
+                                     aria-expanded="true" aria-controls="collapseFour">
                                     <h5 class="mb-0">
                                         <button class="btn btn-link" type="button">
                                             Third Party Services
@@ -246,7 +277,7 @@
                                         </button>
                                     </h5>
                                 </div>
-                                <div id="collapseThree" class="show" aria-labelledby="headingThree">
+                                <div id="collapseFour" class="show" aria-labelledby="headingFour">
                                     <div class="card-body">
                                         <div class="form-check">
                                             <table class="table edp-table">
@@ -280,8 +311,8 @@
 
                         {{if .CDPipeline.CodebaseStageMatrix}}
                             <div class="card stages-info">
-                                <div class="card-header static" id="headingTwo"
-                                     aria-expanded="true" aria-controls="collapseTwo">
+                                <div class="card-header static" id="headingFive"
+                                     aria-expanded="true" aria-controls="collapseFive">
                                     <h5 class="mb-0">
                                         <button class="btn btn-link" type="button">
                                             Deployed versions
@@ -290,7 +321,7 @@
                                         </button>
                                     </h5>
                                 </div>
-                                <div id="collapseTwo" class="show" aria-labelledby="headingTwo">
+                                <div id="collapseFive" class="show" aria-labelledby="headingFive">
                                     <div class="card-body">
                                         <div class="form-check">
                                             <table class="table edp-table">
@@ -323,15 +354,15 @@
 
                         {{if .CDPipeline.ActionLog}}
                             <div class="card status-info">
-                                <div class="card-header collapsed" id="headingFour" data-toggle="collapse"
-                                     data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                <div class="card-header collapsed" id="headingSix" data-toggle="collapse"
+                                     data-target="#collapseSix" aria-expanded="true" aria-controls="collapseSix">
                                     <h5 class="mb-0">
                                         <button class="btn btn-link" type="button">
                                             Status Info
                                         </button>
                                     </h5>
                                 </div>
-                                <div id="collapseFour" class="collapse status" aria-labelledby="headingFour">
+                                <div id="collapseSix" class="collapse status" aria-labelledby="headingSix">
                                     <div class="card-body">
                                         <table class="action-log-table edp-card-table">
                                             <tbody>

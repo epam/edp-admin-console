@@ -12,6 +12,7 @@ type CDPipeline struct {
 	ApplicationsToPromote []string                                                `json:"applicationsToPromote" orm:"-"`
 	CodebaseDockerStream  []*CodebaseDockerStream                                 `json:"image_stream" orm:"rel(m2m);rel_table(cd_pipeline_docker_stream)"`
 	ActionLog             []*ActionLog                                            `json:"-" orm:"rel(m2m);rel_table(cd_pipeline_action_log)"`
+	DeploymentType        string                                                  `json:"deploymentType" orm:"column(deployment_type)"`
 }
 
 type CDCodebaseStageMatrixKey struct {
