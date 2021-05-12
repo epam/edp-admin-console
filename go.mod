@@ -2,38 +2,41 @@ module edp-admin-console
 
 go 1.14
 
-replace github.com/openshift/api => github.com/openshift/api v0.0.0-20180801171038-322a19404e37
+replace (
+	github.com/kubernetes-incubator/reference-docs => github.com/kubernetes-sigs/reference-docs v0.0.0-20170929004150-fcf65347b256
+	github.com/markbates/inflect => github.com/markbates/inflect v1.0.4
+	k8s.io/api => k8s.io/api v0.20.2
+	k8s.io/apimachinery => k8s.io/apimachinery v0.20.2
+)
 
 require (
-	github.com/Microsoft/go-winio v0.4.14 // indirect
-	github.com/andygrunwald/go-jira v1.12.0
 	github.com/astaxie/beego v1.12.0
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/coreos/go-oidc v2.0.0+incompatible
+	github.com/coreos/go-oidc v2.1.0+incompatible
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v1.13.1 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
-	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210402134040-488f8d819dd9
-	github.com/epmd-edp/cd-pipeline-operator/v2 v2.3.0-58.0.20201217130859-a9d5aeca1889
+	github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210512085930-1e8d00147a91
+	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210426125026-571bd859bdf0
+	github.com/epmd-edp/perf-operator/v2 v2.0.0-20201130105408-ffc11d6fdd20 // indirect
 	github.com/golang-migrate/migrate v3.5.4+incompatible
-	github.com/lib/pq v1.0.0
+	github.com/lib/pq v1.8.0
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/openshift/api v3.9.0+incompatible
 	github.com/openshift/client-go v3.9.0+incompatible
-	github.com/pkg/errors v0.8.1
+	github.com/pkg/errors v0.9.1
 	github.com/pquerna/cachecontrol v0.0.0-20180517163645-1555304b9b35 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.6.1
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
-	go.uber.org/zap v1.14.1
-	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
+	go.uber.org/zap v1.15.0
+	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	gopkg.in/square/go-jose.v2 v2.3.0 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.0 // indirect
 	gopkg.in/src-d/go-git.v4 v4.10.0
-	k8s.io/api v0.0.0-20190222213804-5cb15d344471
-	k8s.io/apimachinery v0.0.0-20190221213512-86fb29eff628
-	k8s.io/client-go v0.0.0-20190228174230-b40b2a5939e4
+	k8s.io/api v0.21.0-rc.0
+	k8s.io/apimachinery v0.21.0-rc.0
+	k8s.io/client-go v0.20.2
 )

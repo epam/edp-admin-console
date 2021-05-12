@@ -17,6 +17,7 @@
 package service
 
 import (
+	ctx "context"
 	"edp-admin-console/context"
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
@@ -96,11 +97,11 @@ func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*edpv1
 		Status: edpv1alpha1.CodebaseStatus{
 			Available:       false,
 			LastTimeUpdated: time.Now(),
-			Status:          "initialized",
+			Status:          consts.InitializedStatus,
 			Username:        codebase.Username,
 			Action:          "codebase_registration",
-			Result:          "success",
-			Value:           "inactive",
+			Result:          consts.SuccessResult,
+			Value:           consts.InactiveValue,
 		},
 	}
 	clog.Debug("CR was generated. Waiting to save ...", zap.String("name", c.Name))
@@ -110,7 +111,7 @@ func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*edpv1
 	}
 
 	result := &edpv1alpha1.Codebase{}
-	err = edpClient.Post().Namespace(context.Namespace).Resource(consts.CodebasePlural).Body(c).Do().Into(result)
+	err = edpClient.Post().Namespace(context.Namespace).Resource(consts.CodebasePlural).Body(c).Do(ctx.TODO()).Into(result)
 	if err != nil {
 		clog.Error("an error has occurred while creating codebase resource in cluster", zap.Error(err))
 		return &edpv1alpha1.Codebase{}, err
@@ -203,7 +204,7 @@ func (s CodebaseService) ExistCodebaseAndBranch(cbName, brName string) bool {
 }
 
 func createSecret(namespace string, secret *v1.Secret, coreClient *coreV1Client.CoreV1Client) (*v1.Secret, error) {
-	createdSecret, err := coreClient.Secrets(namespace).Create(secret)
+	createdSecret, err := coreClient.Secrets(namespace).Create(ctx.TODO(), secret, metav1.CreateOptions{})
 	if err != nil {
 		clog.Error("an error has occurred while saving secret", zap.Error(err))
 		return &v1.Secret{}, err
@@ -397,7 +398,7 @@ func (s CodebaseService) deleteCodebase(name string) error {
 		Namespace(context.Namespace).
 		Resource(consts.CodebasePlural).
 		Name(name).
-		Do().Into(r)
+		Do(ctx.TODO()).Into(r)
 	if err != nil {
 		return errors.Wrapf(err, "couldn't delete codebase %v from cluster", name)
 	}
@@ -456,7 +457,7 @@ func (s *CodebaseService) executeUpdateRequest(c *edpv1alpha1.Codebase) error {
 		Resource("codebases").
 		Name(c.Name).
 		Body(c).
-		Do().
+		Do(ctx.TODO()).
 		Into(c)
 	if err != nil {
 		return errors.Wrap(err, "an error has occurred while updating Codebase CR in cluster")

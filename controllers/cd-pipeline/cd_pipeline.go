@@ -40,7 +40,7 @@ import (
 	"sort"
 
 	"github.com/astaxie/beego"
-	edppipelinesv1alpha1 "github.com/epmd-edp/cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	edppipelinesv1alpha1 "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	"go.uber.org/zap"
 )
 
@@ -328,17 +328,17 @@ func (c *CDPipelineController) CreateCDPipeline() {
 	}
 	stages := retrieveStagesFromRequest(c, *stageCount)
 
-	cdPipelineCreateCommand := command.CDPipelineCommand{
+	createCommand := command.CDPipelineCommand{
 		Name:                 pipelineName,
 		Applications:         c.convertApplicationWithBranchesData(appNameCheckboxes),
 		ThirdPartyServices:   serviceCheckboxes,
 		Stages:               stages,
 		ApplicationToApprove: c.getApplicationsToPromoteFromRequest(appNameCheckboxes),
 		Username:             c.Ctx.Input.Session("username").(string),
+		DeploymentType:       c.GetString("deploymentType"),
 	}
 
-	errMsg := validation.ValidateCDPipelineRequest(cdPipelineCreateCommand)
-	if errMsg != nil {
+	if errMsg := validation.ValidateCDPipelineRequest(createCommand); errMsg != nil {
 		log.Error("Request data is not valid", zap.String("err", errMsg.Message))
 		flash.Error(errMsg.Message)
 		flash.Store(&c.Controller)
@@ -347,21 +347,21 @@ func (c *CDPipelineController) CreateCDPipeline() {
 	}
 	log.Debug("Request data is received to create CD pipeline",
 		zap.String("pipeline", pipelineName),
-		zap.Any("applications", cdPipelineCreateCommand.Applications),
-		zap.Any("stages", cdPipelineCreateCommand.Stages),
-		zap.Any("services", cdPipelineCreateCommand.ThirdPartyServices))
+		zap.Any("applications", createCommand.Applications),
+		zap.Any("stages", createCommand.Stages),
+		zap.Any("services", createCommand.ThirdPartyServices))
 
-	_, pipelineErr := c.PipelineService.CreatePipeline(cdPipelineCreateCommand)
+	_, pipelineErr := c.PipelineService.CreatePipeline(createCommand)
 	if pipelineErr != nil {
 
 		switch pipelineErr.(type) {
 		case *edperror.CDPipelineExistsError:
-			flash.Error(fmt.Sprintf("cd pipeline %v is already exists", cdPipelineCreateCommand.Name))
+			flash.Error(fmt.Sprintf("cd pipeline %v is already exists", createCommand.Name))
 			flash.Store(&c.Controller)
 			c.Redirect(fmt.Sprintf("%s/admin/edp/cd-pipeline/create", context.BasePath), http.StatusFound)
 			return
 		case *edperror.NonValidRelatedBranchError:
-			flash.Error(fmt.Sprintf("one or more applications have non valid branches: %v", cdPipelineCreateCommand.Applications))
+			flash.Error(fmt.Sprintf("one or more applications have non valid branches: %v", createCommand.Applications))
 			flash.Store(&c.Controller)
 			c.Redirect(fmt.Sprintf("%s/admin/edp/cd-pipeline/create", context.BasePath), http.StatusBadRequest)
 			return
@@ -502,7 +502,7 @@ func addCdPipelineInProgressIfAny(cdPipelines []*query.CDPipeline, pipelineInPro
 			zap.String("name", pipelineInProgress))
 		pipeline := query.CDPipeline{
 			Name:   pipelineInProgress,
-			Status: "inactive",
+			Status: consts.InactiveValue,
 		}
 		cdPipelines = append(cdPipelines, &pipeline)
 	}

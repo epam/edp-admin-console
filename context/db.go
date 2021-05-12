@@ -42,7 +42,7 @@ func InitDb() {
 	pgHost := beego.AppConfig.String("pgHost")
 	pgDatabase := beego.AppConfig.String("pgDatabase")
 	pgPort := beego.AppConfig.String("pgPort")
-	pgSchema := Tenant
+	pgSchema := Namespace
 
 	params := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s search_path=%s sslmode=disable",
 		pgUser, pgPassword, pgHost, pgPort, pgDatabase, pgSchema)

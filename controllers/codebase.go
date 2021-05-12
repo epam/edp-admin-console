@@ -66,7 +66,7 @@ func (c *CodebaseController) GetCodebaseOverviewPage() {
 		return
 	}
 
-	if err := c.createBranchLinks(*codebase, context.Tenant); err != nil {
+	if err := c.createBranchLinks(*codebase, context.Namespace); err != nil {
 		log.Error("an error has occurred while creating link to Git provider", zap.Error(err))
 		c.Abort("500")
 		return
@@ -131,7 +131,7 @@ func addCodebaseBranchInProgressIfAny(branches []*query.CodebaseBranch, branchIn
 			zap.String("name", branchInProgress))
 		branch := query.CodebaseBranch{
 			Name:   branchInProgress,
-			Status: "inactive",
+			Status: consts.InactiveValue,
 		}
 		branches = append(branches, &branch)
 	}

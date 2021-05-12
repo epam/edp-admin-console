@@ -9,6 +9,7 @@ type CDPipelineCommand struct {
 	Stages               []CDStageCommand                      `json:"stages"`
 	ApplicationToApprove []string                              `json:"-"`
 	Username             string                                `json:"username"`
+	DeploymentType       string                                `json:"deploymentType" valid:"Required"`
 }
 
 type DeleteStageCommand struct {

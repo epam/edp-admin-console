@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 EPAM Systems.
+ * Copyright 2021 EPAM Systems.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package cd_pipeline
 
 import (
+	ctx "context"
 	"edp-admin-console/context"
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
@@ -32,19 +33,19 @@ import (
 	"edp-admin-console/util/consts"
 	dberror "edp-admin-console/util/error/db-errors"
 	"fmt"
+	"github.com/astaxie/beego/orm"
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	openshiftAPi "github.com/openshift/api/apps/v1"
+	"github.com/pkg/errors"
+	"go.uber.org/zap"
 	v1 "k8s.io/api/apps/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
 	"sort"
 	"strings"
 	"time"
-
-	"github.com/astaxie/beego/orm"
-	edppipelinesv1alpha1 "github.com/epmd-edp/cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/pkg/errors"
-	"go.uber.org/zap"
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/rest"
 )
 
 type CDPipelineService struct {
@@ -60,11 +61,17 @@ type ErrMsg struct {
 	StatusCode int
 }
 
+const (
+	deploymentConfigsKind = "deploymentconfigs"
+	cdPipelineApiVersion  = "v2.edp.epam.com/v1alpha1"
+	cdPipelineKind        = "CDPipeline"
+)
+
 var log = logger.GetLogger()
 
-func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand) (*edppipelinesv1alpha1.CDPipeline, error) {
-	log.Debug("start creating CD Pipeline", zap.String("name", cdPipeline.Name))
-	exist, err := s.CodebaseService.CheckBranch(cdPipeline.Applications)
+func (s *CDPipelineService) CreatePipeline(createCommand command.CDPipelineCommand) (*cdPipeApi.CDPipeline, error) {
+	log.Debug("start creating CD Pipeline", zap.String("name", createCommand.Name))
+	exist, err := s.CodebaseService.CheckBranch(createCommand.Applications)
 	if err != nil {
 		return nil, err
 	}
@@ -73,66 +80,56 @@ func (s *CDPipelineService) CreatePipeline(cdPipeline command.CDPipelineCommand)
 		return nil, edperror.NewNonValidRelatedBranchError()
 	}
 
-	cdPipelineReadModel, err := s.GetCDPipelineByName(cdPipeline.Name)
+	pipeRes, err := s.createCdPipelineIfNotExists(createCommand)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "unable to create %v cd pipeline in cluster", createCommand.Name)
 	}
 
-	if cdPipelineReadModel != nil {
-		log.Debug("CD Pipeline already exists in DB.", zap.String("name", cdPipeline.Name))
-		return nil, edperror.NewCDPipelineExistsError()
-	}
-
-	edpRestClient := s.Clients.EDPRestClient
-	pipelineCR, err := s.getCDPipelineCR(cdPipeline.Name)
-	if err != nil {
-		return nil, err
-	}
-
-	if pipelineCR != nil {
-		log.Debug("CD Pipeline already exists in cluster.", zap.String("name", cdPipeline.Name))
-		return nil, edperror.NewCDPipelineExistsError()
-	}
-
-	crd := &edppipelinesv1alpha1.CDPipeline{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: "v2.edp.epam.com/v1alpha1",
-			Kind:       "CDPipeline",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      cdPipeline.Name,
-			Namespace: context.Namespace,
-		},
-		Spec: convertPipelineData(cdPipeline),
-		Status: edppipelinesv1alpha1.CDPipelineStatus{
-			Available:       false,
-			LastTimeUpdated: time.Now(),
-			Status:          "initialized",
-			Username:        cdPipeline.Username,
-			Action:          "cd_pipeline_registration",
-			Result:          "success",
-			Value:           "inactive",
-		},
-	}
-
-	cdPipelineCr := &edppipelinesv1alpha1.CDPipeline{}
-	err = edpRestClient.Post().
-		Namespace(context.Namespace).
-		Resource("cdpipelines").
-		Body(crd).
-		Do().Into(cdPipelineCr)
-	if err != nil {
-		return nil, errors.Wrap(err, "an error has occurred while creating CD Pipeline object in cluster")
-	}
-	log.Info("CD Pipeline has been saved to cluster", zap.String("name", cdPipeline.Name))
-
-	if _, err = s.CreateStages(edpRestClient, cdPipeline); err != nil {
+	if _, err = s.CreateStages(s.Clients.EDPRestClient, createCommand); err != nil {
 		return nil, errors.Wrap(err, "an error has occurred while creating Stages in cluster")
 	}
 	log.Info("Stages for CD Pipeline have been created in cluster",
-		zap.String("pipe", cdPipeline.Name),
-		zap.Any("stages", cdPipeline.Stages))
-	return cdPipelineCr, nil
+		zap.String("pipe", createCommand.Name),
+		zap.Any("stages", createCommand.Stages))
+	return pipeRes, nil
+}
+
+func (s *CDPipelineService) createCdPipelineIfNotExists(command command.CDPipelineCommand) (*cdPipeApi.CDPipeline, error) {
+	pipe, err := s.getCDPipelineCR(command.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	if pipe != nil {
+		log.Debug("CD Pipeline already exists in cluster.", zap.String("name", command.Name))
+		return nil, edperror.NewCDPipelineExistsError()
+	}
+
+	pipeReq := &cdPipeApi.CDPipeline{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: cdPipelineApiVersion,
+			Kind:       cdPipelineKind,
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      command.Name,
+			Namespace: context.Namespace,
+		},
+		Spec:   convertPipelineData(command),
+		Status: getStatusCreateState(command.Username),
+	}
+
+	pipeRes := &cdPipeApi.CDPipeline{}
+	err = s.Clients.EDPRestClient.Post().
+		Namespace(context.Namespace).
+		Resource("cdpipelines").
+		Body(pipeReq).
+		Do(ctx.TODO()).
+		Into(pipeRes)
+	if err != nil {
+		return nil, err
+	}
+	log.Info("CD Pipeline has been saved to cluster", zap.String("name", command.Name))
+	return pipeRes, nil
 }
 
 func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDPipeline, error) {
@@ -171,7 +168,7 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 	return cdPipeline, nil
 }
 
-func (s *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPipeline command.CDPipelineCommand) ([]edppipelinesv1alpha1.Stage, error) {
+func (s *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPipeline command.CDPipelineCommand) ([]cdPipeApi.Stage, error) {
 	log.Debug("start creating stages", zap.Any("stages", cdPipeline.Stages))
 	if err := checkStagesInK8s(edpRestClient, cdPipeline.Name, cdPipeline.Stages); err != nil {
 		return nil, errors.Wrap(err, "couldn't check stages in cluster")
@@ -247,7 +244,7 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 		Resource("cdpipelines").
 		Name(pipelineCR.Spec.Name).
 		Body(pipelineCR).
-		Do().
+		Do(ctx.TODO()).
 		Into(pipelineCR)
 
 	if _, err = s.CreateStages(edpRestClient, pipeline); err != nil {
@@ -284,7 +281,7 @@ func (s *CDPipelineService) UpdatePipelineStage(stage command.CDStageCommand, pi
 		Resource("stages").
 		Name(st.Name).
 		Body(st).
-		Do().
+		Do(ctx.TODO()).
 		Into(st)
 
 	if err != nil {
@@ -327,7 +324,7 @@ func (s *CDPipelineService) GetStage(cdPipelineName, stageName string) (*models.
 
 func createPlatformNames(stages []*query.Stage, cdPipelineName string) {
 	for i, v := range stages {
-		stages[i].PlatformProjectName = fmt.Sprintf("%s-%s-%s", context.Tenant, cdPipelineName, v.Name)
+		stages[i].PlatformProjectName = fmt.Sprintf("%s-%s-%s", context.Namespace, cdPipelineName, v.Name)
 	}
 }
 
@@ -338,13 +335,21 @@ func fillCodebaseStageMatrix(ocClient *k8s.ClientSet, cdPipeline *query.CDPipeli
 	var matrix = make(map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, len(cdPipeline.CodebaseBranch)*len(cdPipeline.Stage))
 
 	for _, stage := range cdPipeline.Stage {
-
-		dcs, err := ocClient.AppsV1Client.DeploymentConfigs(stage.PlatformProjectName).List(metav1.ListOptions{})
+		dcs := &openshiftAPi.DeploymentConfigList{}
+		err := ocClient.RestClient.
+			Get().
+			Namespace(stage.PlatformProjectName).
+			Resource(deploymentConfigsKind).
+			VersionedParams(&metav1.ListOptions{}, scheme.ParameterCodec).
+			Do(ctx.TODO()).
+			Into(dcs)
 		if err != nil {
 			return nil, errors.Wrap(err, "an error has occurred while getting deployment configs from cluster")
 		}
 
-		ds, err := ocClient.K8sAppV1Client.Deployments(stage.PlatformProjectName).List(metav1.ListOptions{})
+		ds, err := ocClient.K8sAppV1Client.
+			Deployments(stage.PlatformProjectName).
+			List(ctx.TODO(), metav1.ListOptions{})
 		if err != nil {
 			return nil, errors.Wrap(err, "an error has occurred while getting deployment from cluster")
 		}
@@ -405,7 +410,7 @@ func fillCodebaseStageMatrixK8s(ocClient *k8s.ClientSet, cdPipeline *query.CDPip
 	var matrix = make(map[query.CDCodebaseStageMatrixKey]query.CDCodebaseStageMatrixValue, len(cdPipeline.CodebaseBranch)*len(cdPipeline.Stage))
 	for _, stage := range cdPipeline.Stage {
 
-		dcs, err := ocClient.K8sAppV1Client.Deployments(stage.PlatformProjectName).List(metav1.ListOptions{})
+		dcs, err := ocClient.K8sAppV1Client.Deployments(stage.PlatformProjectName).List(ctx.TODO(), metav1.ListOptions{})
 		if err != nil {
 			return nil, errors.Wrap(err, "an error has occurred while getting project from cluster")
 		}
@@ -436,24 +441,37 @@ func fillCodebaseStageMatrixK8s(ocClient *k8s.ClientSet, cdPipeline *query.CDPip
 	return matrix, nil
 }
 
-func convertPipelineData(cdPipeline command.CDPipelineCommand) edppipelinesv1alpha1.CDPipelineSpec {
+func convertPipelineData(cdPipeline command.CDPipelineCommand) cdPipeApi.CDPipelineSpec {
 	var dockerStreams []string
 	for _, app := range cdPipeline.Applications {
 		dockerStreams = append(dockerStreams, app.InputDockerStream)
 	}
-	return edppipelinesv1alpha1.CDPipelineSpec{
+	return cdPipeApi.CDPipelineSpec{
 		Name:                  cdPipeline.Name,
 		InputDockerStreams:    dockerStreams,
 		ThirdPartyServices:    cdPipeline.ThirdPartyServices,
 		ApplicationsToPromote: cdPipeline.ApplicationToApprove,
+		DeploymentType:        cdPipeline.DeploymentType,
 	}
 }
 
-func (s *CDPipelineService) getCDPipelineCR(pipelineName string) (*edppipelinesv1alpha1.CDPipeline, error) {
-	edpRestClient := s.Clients.EDPRestClient
-	cdPipeline := &edppipelinesv1alpha1.CDPipeline{}
+func getStatusCreateState(username string) cdPipeApi.CDPipelineStatus {
+	return cdPipeApi.CDPipelineStatus{
+		Available:       false,
+		LastTimeUpdated: time.Now(),
+		Status:          consts.InitializedStatus,
+		Username:        username,
+		Action:          consts.CdPipelineRegistrationAction,
+		Result:          consts.SuccessResult,
+		Value:           consts.InactiveValue,
+	}
+}
 
-	err := edpRestClient.Get().Namespace(context.Namespace).Resource("cdpipelines").Name(pipelineName).Do().Into(cdPipeline)
+func (s *CDPipelineService) getCDPipelineCR(pipelineName string) (*cdPipeApi.CDPipeline, error) {
+	edpRestClient := s.Clients.EDPRestClient
+	cdPipeline := &cdPipeApi.CDPipeline{}
+
+	err := edpRestClient.Get().Namespace(context.Namespace).Resource("cdpipelines").Name(pipelineName).Do(ctx.TODO()).Into(cdPipeline)
 	if k8serrors.IsNotFound(err) {
 		log.Debug("pipeline doesn't exist in cluster.", zap.String("name", pipelineName))
 		return nil, nil
@@ -464,12 +482,12 @@ func (s *CDPipelineService) getCDPipelineCR(pipelineName string) (*edppipelinesv
 	return cdPipeline, nil
 }
 
-func (s *CDPipelineService) getCDPipelineStageCR(stageName, pipelineName string) (*edppipelinesv1alpha1.Stage, error) {
+func (s *CDPipelineService) getCDPipelineStageCR(stageName, pipelineName string) (*cdPipeApi.Stage, error) {
 	edpRestClient := s.Clients.EDPRestClient
-	stagesCr := &edppipelinesv1alpha1.Stage{}
+	stagesCr := &cdPipeApi.Stage{}
 	stagesCrName := fmt.Sprintf("%s-%s", pipelineName, stageName)
 
-	err := edpRestClient.Get().Namespace(context.Namespace).Resource("stages").Name(stagesCrName).Do().Into(stagesCr)
+	err := edpRestClient.Get().Namespace(context.Namespace).Resource("stages").Name(stagesCrName).Do(ctx.TODO()).Into(stagesCr)
 	if k8serrors.IsNotFound(err) {
 		log.Debug("stage doesn't exist in cluster.", zap.String("name", stageName))
 		return nil, nil
@@ -480,8 +498,8 @@ func (s *CDPipelineService) getCDPipelineStageCR(stageName, pipelineName string)
 	return stagesCr, nil
 }
 
-func createCr(cdPipelineName string, stage command.CDStageCommand) edppipelinesv1alpha1.Stage {
-	return edppipelinesv1alpha1.Stage{
+func createCr(cdPipelineName string, stage command.CDStageCommand) cdPipeApi.Stage {
+	return cdPipeApi.Stage{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v2.edp.epam.com/v1alpha1",
 			Kind:       "Stage",
@@ -490,7 +508,7 @@ func createCr(cdPipelineName string, stage command.CDStageCommand) edppipelinesv
 			Name:      fmt.Sprintf("%s-%s", cdPipelineName, stage.Name),
 			Namespace: context.Namespace,
 		},
-		Spec: edppipelinesv1alpha1.StageSpec{
+		Spec: cdPipeApi.StageSpec{
 			Name:            stage.Name,
 			Description:     stage.Description,
 			TriggerType:     stage.TriggerType,
@@ -500,29 +518,29 @@ func createCr(cdPipelineName string, stage command.CDStageCommand) edppipelinesv
 			Source:          stage.Source,
 			JobProvisioning: stage.JobProvisioning,
 		},
-		Status: edppipelinesv1alpha1.StageStatus{
+		Status: cdPipeApi.StageStatus{
 			Available:       false,
 			LastTimeUpdated: time.Now(),
-			Status:          "initialized",
+			Status:          consts.InitializedStatus,
 			Username:        stage.Username,
 			Action:          "cd_stage_registration",
-			Result:          "success",
-			Value:           "inactive",
+			Result:          consts.SuccessResult,
+			Value:           consts.InactiveValue,
 		},
 	}
 }
 
-func saveStagesIntoK8s(edpRestClient *rest.RESTClient, cdPipelineName string, stages []command.CDStageCommand, username string) ([]edppipelinesv1alpha1.Stage, error) {
-	var stagesCr []edppipelinesv1alpha1.Stage
+func saveStagesIntoK8s(edpRestClient *rest.RESTClient, cdPipelineName string, stages []command.CDStageCommand, username string) ([]cdPipeApi.Stage, error) {
+	var stagesCr []cdPipeApi.Stage
 	for _, stage := range stages {
 		stage.Username = username
 		crd := createCr(cdPipelineName, stage)
-		stageCr := edppipelinesv1alpha1.Stage{}
+		stageCr := cdPipeApi.Stage{}
 		err := edpRestClient.Post().
 			Namespace(context.Namespace).
 			Resource("stages").
 			Body(&crd).
-			Do().Into(&stageCr)
+			Do(ctx.TODO()).Into(&stageCr)
 		if err != nil {
 			return nil, errors.Wrap(err, "an error has occurred while creating Stage in cluster")
 		}
@@ -534,9 +552,9 @@ func saveStagesIntoK8s(edpRestClient *rest.RESTClient, cdPipelineName string, st
 
 func checkStagesInK8s(edpRestClient *rest.RESTClient, cdPipelineName string, stages []command.CDStageCommand) error {
 	for _, stage := range stages {
-		stagesCr := &edppipelinesv1alpha1.Stage{}
+		stagesCr := &cdPipeApi.Stage{}
 		stageName := fmt.Sprintf("%s-%s", cdPipelineName, stage.Name)
-		err := edpRestClient.Get().Namespace(context.Namespace).Resource("stages").Name(stageName).Do().Into(stagesCr)
+		err := edpRestClient.Get().Namespace(context.Namespace).Resource("stages").Name(stageName).Do(ctx.TODO()).Into(stagesCr)
 
 		if k8serrors.IsNotFound(err) {
 			log.Debug("stage doesn't exist", zap.String("name", stage.Name))
@@ -608,12 +626,12 @@ func (s CDPipelineService) canStageBeDeleted(pipelineName, stageName string) err
 
 func (s CDPipelineService) deleteStage(name string) error {
 	log.Debug("start executing stage delete request", zap.String("stage", name))
-	i := &edppipelinesv1alpha1.Stage{}
+	i := &cdPipeApi.Stage{}
 	err := s.Clients.EDPRestClient.Delete().
 		Namespace(context.Namespace).
 		Resource(consts.StagePlural).
 		Name(name).
-		Do().Into(i)
+		Do(ctx.TODO()).Into(i)
 	if err != nil {
 		return errors.Wrapf(err, "couldn't delete stage %v from cluster", name)
 	}
@@ -670,12 +688,12 @@ func checkStageErr(err error) error {
 
 func (s CDPipelineService) deleteCDPipeline(name string) error {
 	log.Debug("start executing cd pipeline delete request", zap.String("name", name))
-	cp := &edppipelinesv1alpha1.CDPipeline{}
+	cp := &cdPipeApi.CDPipeline{}
 	err := s.Clients.EDPRestClient.Delete().
 		Namespace(context.Namespace).
 		Resource(consts.CDPipelinePlural).
 		Name(name).
-		Do().Into(cp)
+		Do(ctx.TODO()).Into(cp)
 	if err != nil {
 		return errors.Wrapf(err, "couldn't delete cd pipeline %v from cluster", name)
 	}

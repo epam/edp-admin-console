@@ -39,8 +39,8 @@ func (c *EDPTenantController) GetEDPComponents() {
 	}
 
 	c.Data["Username"] = c.Ctx.Input.Session("username")
-	c.Data["InputURL"] = strings.TrimSuffix(c.Ctx.Input.URL(), "/"+context.Tenant)
-	c.Data["EDPTenantName"] = context.Tenant
+	c.Data["InputURL"] = strings.TrimSuffix(c.Ctx.Input.URL(), "/"+context.Namespace)
+	c.Data["EDPTenantName"] = context.Namespace
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["EDPComponents"] = comp
 	c.Data["Type"] = "overview"

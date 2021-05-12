@@ -8,23 +8,26 @@ const (
 	DockerRegistry = "docker-registry"
 	Gerrit         = "gerrit"
 
+	//Codebase types
 	Application = "application"
 	Autotest    = "autotests"
-	Library     = "library"
 
+	//Kinds
 	CodebasePlural       = "codebases"
 	CodebaseBranchPlural = "codebasebranches"
 	StagePlural          = "stages"
 	CDPipelinePlural     = "cdpipelines"
 	CodebaseKind         = "Codebase"
-	JiraServerPlural     = "jiraservers"
 
-	ImportStrategy = "import"
-	LanguageJava   = "Java"
-
+	ImportStrategy        = "import"
+	LanguageJava          = "Java"
 	DefaultVersioningType = "default"
+	JenkinsCITool         = "Jenkins"
 
-	JenkinsCITool = "Jenkins"
+	InitializedStatus            = "initialized"
+	CdPipelineRegistrationAction = "cd_pipeline_registration"
+	SuccessResult                = "success"
+	InactiveValue                = "inactive"
 )
 
 var DefaultBuildNumber = "0"

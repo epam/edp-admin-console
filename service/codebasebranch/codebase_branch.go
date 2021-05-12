@@ -17,6 +17,7 @@
 package codebasebranch
 
 import (
+	ctx "context"
 	"edp-admin-console/context"
 	"edp-admin-console/k8s"
 	"edp-admin-console/models/command"
@@ -82,18 +83,23 @@ func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCo
 		},
 		Status: edpv1alpha1.CodebaseBranchStatus{
 			Build:               branchInfo.Build,
-			Status:              "initialized",
+			Status:              consts.InitializedStatus,
 			LastTimeUpdated:     time.Now(),
 			LastSuccessfulBuild: nil,
 			Username:            branchInfo.Username,
 			Action:              "codebase_branch_registration",
-			Result:              "success",
-			Value:               "inactive",
+			Result:              consts.SuccessResult,
+			Value:               consts.InactiveValue,
 		},
 	}
 
 	result := &edpv1alpha1.CodebaseBranch{}
-	err = edpRestClient.Post().Namespace(context.Namespace).Resource("codebasebranches").Body(branch).Do().Into(result)
+	err = edpRestClient.Post().
+		Namespace(context.Namespace).
+		Resource("codebasebranches").
+		Body(branch).
+		Do(ctx.TODO()).
+		Into(result)
 	if err != nil {
 		return &edpv1alpha1.CodebaseBranch{}, errors.Wrap(err, "an error has occurred while creating CodebaseBranch CR in cluster")
 	}
@@ -126,7 +132,8 @@ func (s *CodebaseBranchService) UpdateCodebaseBranch(appName, branchName string,
 		Resource(consts.CodebaseBranchPlural).
 		Name(fmt.Sprintf("%v-%v", appName, branchName)).
 		Body(bytes).
-		Do().Error()
+		Do(ctx.TODO()).
+		Error()
 	if err != nil {
 		return errors.Wrapf(err, "couldn't update codebase branch %v from cluster", branchName)
 	}
@@ -147,7 +154,12 @@ func (s *CodebaseBranchService) GetCodebaseBranchesByCriteria(criteria query.Cod
 
 func getReleaseBranchCR(edpRestClient *rest.RESTClient, branchName string, appName string, namespace string) (*edpv1alpha1.CodebaseBranch, error) {
 	result := &edpv1alpha1.CodebaseBranch{}
-	err := edpRestClient.Get().Namespace(namespace).Resource("codebasebranches").Name(fmt.Sprintf("%s-%s", appName, branchName)).Do().Into(result)
+	err := edpRestClient.Get().
+		Namespace(namespace).
+		Resource("codebasebranches").
+		Name(fmt.Sprintf("%s-%s", appName, branchName)).
+		Do(ctx.TODO()).
+		Into(result)
 
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
@@ -203,7 +215,8 @@ func (s *CodebaseBranchService) deleteCodebaseBranch(name string) error {
 		Namespace(context.Namespace).
 		Resource(consts.CodebaseBranchPlural).
 		Name(name).
-		Do().Into(cb)
+		Do(ctx.TODO()).
+		Into(cb)
 	if err != nil {
 		return errors.Wrapf(err, "couldn't delete codebase branch %v from cluster", name)
 	}

@@ -18,9 +18,8 @@ package k8s
 
 import (
 	"edp-admin-console/service/logger"
+	edppipelinesv1alpha1 "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	edpv1alpha1 "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
-	edppipelinesv1alpha1 "github.com/epmd-edp/cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
-	appsV1Client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	"go.uber.org/zap"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -42,7 +41,7 @@ type ClientSet struct {
 	CoreClient     *coreV1Client.CoreV1Client
 	StorageClient  *storageV1Client.StorageV1Client
 	EDPRestClient  *rest.RESTClient
-	AppsV1Client   *appsV1Client.AppsV1Client
+	RestClient     rest.Interface
 	K8sAppV1Client v1.AppsV1Interface
 }
 
@@ -72,12 +71,6 @@ func CreateOpenShiftClients() ClientSet {
 		panic(err)
 	}
 
-	openshiftAppClient, err := getOpenshiftApplicationClient()
-	if err != nil {
-		log.Error("An error has occurred while getting oenshift application resource client", zap.Error(err))
-		panic(err)
-	}
-
 	k8sAppClient, err := getK8sAppsV1Client()
 	if err != nil {
 		log.Error("An error has occurred while getting k8s extension client", zap.Error(err))
@@ -88,7 +81,7 @@ func CreateOpenShiftClients() ClientSet {
 		CoreClient:     coreClient,
 		StorageClient:  storageClient,
 		EDPRestClient:  crClient,
-		AppsV1Client:   openshiftAppClient,
+		RestClient:     k8sAppClient.RESTClient(),
 		K8sAppV1Client: k8sAppClient,
 	}
 }
@@ -146,23 +139,6 @@ func getApplicationClient() (*rest.RESTClient, error) {
 	return clientset, nil
 }
 
-func getOpenshiftApplicationClient() (*appsV1Client.AppsV1Client, error) {
-	var config *rest.Config
-	var err error
-
-	config, err = k8sConfig.ClientConfig()
-
-	if err != nil {
-		return nil, err
-	}
-
-	clientset, err := appsV1Client.NewForConfig(config)
-	if err != nil {
-		return nil, err
-	}
-	return clientset, nil
-}
-
 func createCrdClient(cfg *rest.Config) (*rest.RESTClient, error) {
 	scheme := runtime.NewScheme()
 	SchemeBuilder := runtime.NewSchemeBuilder(addKnownTypes)
@@ -173,7 +149,7 @@ func createCrdClient(cfg *rest.Config) (*rest.RESTClient, error) {
 	config.GroupVersion = &SchemeGroupVersion
 	config.APIPath = "/apis"
 	config.ContentType = runtime.ContentTypeJSON
-	config.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: serializer.NewCodecFactory(scheme)}
+	config.NegotiatedSerializer = serializer.NewCodecFactory(scheme)
 	client, err := rest.RESTClientFor(&config)
 	if err != nil {
 		return nil, err

@@ -58,6 +58,18 @@
                                         and end with dash and dot. Minimum 2 characters.
                                     </div>
                                 </div>
+
+                                <div class="form-group deploymentType">
+                                    <label for="deploymentType">Deployment Type:</label>
+                                    <select title="Deployment Type"
+                                            class="deploymentType selectpicker form-control"
+                                            name="deploymentType"
+                                            id="deploymentType">
+                                        <option value="container">Container</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                </div>
+
                                 <button type="button" class="pipeline-info-button edp-submit-form-btn btn btn-primary"
                                         data-toggle="collapse"
                                         data-target="#collapseTwo" aria-expanded="false"
