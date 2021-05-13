@@ -95,7 +95,7 @@ func (s *CDPipelineService) CreatePipeline(createCommand command.CDPipelineComma
 }
 
 func (s *CDPipelineService) createCdPipelineIfNotExists(command command.CDPipelineCommand) (*cdPipeApi.CDPipeline, error) {
-	pipe, err := s.getCDPipelineCR(command.Name)
+	pipe, err := s.GetCDPipelineCR(command.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +214,7 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 		return edperror.NewCDPipelineDoesNotExistError()
 	}
 
-	pipelineCR, err := s.getCDPipelineCR(pipeline.Name)
+	pipelineCR, err := s.GetCDPipelineCR(pipeline.Name)
 	if err != nil {
 		return err
 	}
@@ -467,19 +467,23 @@ func getStatusCreateState(username string) cdPipeApi.CDPipelineStatus {
 	}
 }
 
-func (s *CDPipelineService) getCDPipelineCR(pipelineName string) (*cdPipeApi.CDPipeline, error) {
-	edpRestClient := s.Clients.EDPRestClient
-	cdPipeline := &cdPipeApi.CDPipeline{}
-
-	err := edpRestClient.Get().Namespace(context.Namespace).Resource("cdpipelines").Name(pipelineName).Do(ctx.TODO()).Into(cdPipeline)
-	if k8serrors.IsNotFound(err) {
-		log.Debug("pipeline doesn't exist in cluster.", zap.String("name", pipelineName))
-		return nil, nil
-	}
+func (s *CDPipelineService) GetCDPipelineCR(name string) (*cdPipeApi.CDPipeline, error) {
+	pipe := &cdPipeApi.CDPipeline{}
+	err := s.Clients.EDPRestClient.
+		Get().
+		Namespace(context.Namespace).
+		Resource("cdpipelines").
+		Name(name).
+		Do(ctx.TODO()).
+		Into(pipe)
 	if err != nil {
+		if k8serrors.IsNotFound(err) {
+			log.Debug("pipeline doesn't exist in cluster.", zap.String("name", name))
+			return nil, nil
+		}
 		return nil, errors.Wrap(err, "an error has occurred while getting cd pipeline from cluster")
 	}
-	return cdPipeline, nil
+	return pipe, nil
 }
 
 func (s *CDPipelineService) getCDPipelineStageCR(stageName, pipelineName string) (*cdPipeApi.Stage, error) {

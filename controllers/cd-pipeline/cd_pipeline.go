@@ -259,50 +259,55 @@ func (c *CDPipelineController) GetEditCDPipelinePage() {
 
 func (c *CDPipelineController) UpdateCDPipeline() {
 	flash := beego.NewFlash()
-	appNameCheckboxes := c.GetStrings("app")
-	pipelineName := c.GetString(":name")
-	var stageCount, err = c.getCDPipelineStageCount(pipelineName)
+	pipeName := c.GetString(":name")
+	stageCount, err := c.getCDPipelineStageCount(pipeName)
 	if err != nil {
 		log.Error("an error has occurred while getting stage count", zap.Error(err))
 		c.Abort("500")
 		return
 	}
-	stages := retrieveStagesFromRequest(c, *stageCount)
 
-	pipelineUpdateCommand := command.CDPipelineCommand{
-		Name:                 pipelineName,
-		Applications:         c.convertApplicationWithBranchesData(appNameCheckboxes),
-		ApplicationToApprove: c.getApplicationsToPromoteFromRequest(appNameCheckboxes),
-		Stages:               stages,
+	apps := c.GetStrings("app")
+	dt, err := c.getDeploymentType(pipeName)
+	if err != nil {
+		log.Error("an error has occurred while getting deployment type of cd pipeline",
+			zap.String("pipe", pipeName), zap.Error(err))
+		c.Abort("500")
+		return
 	}
 
-	errMsg := validation.ValidateCDPipelineUpdateRequestData(pipelineUpdateCommand)
-	if errMsg != nil {
+	updateCommand := command.CDPipelineCommand{
+		Name:                 pipeName,
+		Applications:         c.convertApplicationWithBranchesData(apps),
+		ApplicationToApprove: c.getApplicationsToPromoteFromRequest(apps),
+		Stages:               c.retrieveStagesFromRequest(*stageCount),
+		DeploymentType:       *dt,
+	}
+
+	if errMsg := validation.ValidateCDPipelineUpdateRequestData(updateCommand); errMsg != nil {
 		log.Info("Request data is not valid", zap.String("err", errMsg.Message))
 		flash.Error(errMsg.Message)
 		flash.Store(&c.Controller)
-		c.Redirect(fmt.Sprintf("%s/admin/edp/cd-pipeline/%s/update", context.BasePath, pipelineName), 302)
+		c.Redirect(fmt.Sprintf("%s/admin/edp/cd-pipeline/%s/update", context.BasePath, pipeName), 302)
 		return
 	}
 	log.Debug("Request data is received to update CD pipeline",
-		zap.String("pipeline", pipelineName),
-		zap.Any("applications", pipelineUpdateCommand.Applications),
-		zap.Any("stages", pipelineUpdateCommand.Stages),
-		zap.Any("services", pipelineUpdateCommand.ThirdPartyServices))
+		zap.String("pipeline", pipeName),
+		zap.Any("applications", updateCommand.Applications),
+		zap.Any("stages", updateCommand.Stages),
+		zap.Any("services", updateCommand.ThirdPartyServices))
 
-	err = c.PipelineService.UpdatePipeline(pipelineUpdateCommand)
-	if err != nil {
-
+	if err := c.PipelineService.UpdatePipeline(updateCommand); err != nil {
 		switch err.(type) {
 		case *edperror.CDPipelineDoesNotExistError:
-			flash.Error(fmt.Sprintf("cd pipeline %v doesn't exist", pipelineName))
+			flash.Error(fmt.Sprintf("cd pipeline %v doesn't exist", pipeName))
 			flash.Store(&c.Controller)
-			c.Redirect(fmt.Sprintf("%s/admin/edp/cd-pipeline/%s/update", context.BasePath, pipelineName), http.StatusFound)
+			c.Redirect(fmt.Sprintf("%s/admin/edp/cd-pipeline/%s/update", context.BasePath, pipeName), http.StatusFound)
 			return
 		case *edperror.NonValidRelatedBranchError:
-			flash.Error(fmt.Sprintf("one or more applications have non valid branches: %v", pipelineUpdateCommand.Applications))
+			flash.Error(fmt.Sprintf("one or more applications have non valid branches: %v", updateCommand.Applications))
 			flash.Store(&c.Controller)
-			c.Redirect(fmt.Sprintf("%s/admin/edp/cd-pipeline/%s/update", context.BasePath, pipelineName), http.StatusBadRequest)
+			c.Redirect(fmt.Sprintf("%s/admin/edp/cd-pipeline/%s/update", context.BasePath, pipeName), http.StatusBadRequest)
 			return
 		default:
 			c.Abort("500")
@@ -313,6 +318,14 @@ func (c *CDPipelineController) UpdateCDPipeline() {
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Redirect(fmt.Sprintf("%s/admin/edp/cd-pipeline/overview#cdPipelineEditSuccessModal", context.BasePath), 302)
+}
+
+func (c *CDPipelineController) getDeploymentType(pipeName string) (*string, error) {
+	pipe, err := c.PipelineService.GetCDPipelineCR(pipeName)
+	if err != nil {
+		return nil, err
+	}
+	return util.GetStringP(pipe.Spec.DeploymentType), nil
 }
 
 func (c *CDPipelineController) CreateCDPipeline() {
@@ -326,7 +339,7 @@ func (c *CDPipelineController) CreateCDPipeline() {
 		c.Abort("500")
 		return
 	}
-	stages := retrieveStagesFromRequest(c, *stageCount)
+	stages := c.retrieveStagesFromRequest(*stageCount)
 
 	createCommand := command.CDPipelineCommand{
 		Name:                 pipelineName,
@@ -427,41 +440,41 @@ func (c *CDPipelineController) GetCDPipelineOverviewPage() {
 	c.TplName = "cd_pipeline_overview.html"
 }
 
-func retrieveStagesFromRequest(this *CDPipelineController, stageCount int) []command.CDStageCommand {
+func (c *CDPipelineController) retrieveStagesFromRequest(stageCount int) []command.CDStageCommand {
 	var stages []command.CDStageCommand
 
-	for index, stageName := range this.GetStrings("stageName") {
+	for index, stageName := range c.GetStrings("stageName") {
 		stgSrc := edppipelinesv1alpha1.Source{}
-		name := this.GetString(stageName + "-pipelineLibraryName")
+		name := c.GetString(stageName + "-pipelineLibraryName")
 		if name == "default" {
 			stgSrc.Type = "default"
 		} else {
 			stgSrc.Type = "library"
 			stgSrc.Library = edppipelinesv1alpha1.Library{
 				Name:   name,
-				Branch: this.GetString(stageName + "-pipelineLibraryBranch"),
+				Branch: c.GetString(stageName + "-pipelineLibraryBranch"),
 			}
 		}
 
 		stageRequest := command.CDStageCommand{
 			Name:            stageName,
-			Description:     this.GetString(stageName + "-stageDesc"),
-			TriggerType:     this.GetString(stageName + "-triggerType"),
+			Description:     c.GetString(stageName + "-stageDesc"),
+			TriggerType:     c.GetString(stageName + "-triggerType"),
 			Source:          stgSrc,
 			Order:           index + stageCount,
-			JobProvisioning: this.GetString(stageName + "-jobProvisioning"),
+			JobProvisioning: c.GetString(stageName + "-jobProvisioning"),
 		}
 
-		for _, stepName := range this.GetStrings(stageName + "-stageStepName") {
+		for _, stepName := range c.GetStrings(stageName + "-stageStepName") {
 			qualityGateRequest := edppipelinesv1alpha1.QualityGate{
-				QualityGateType: this.GetString(stageName + "-" + stepName + "-stageQualityGateType"),
+				QualityGateType: c.GetString(stageName + "-" + stepName + "-stageQualityGateType"),
 				StepName:        stepName,
 			}
 
 			if qualityGateRequest.QualityGateType == "autotests" {
-				autotestName := this.GetString(stageName + "-" + stepName + "-stageAutotests")
+				autotestName := c.GetString(stageName + "-" + stepName + "-stageAutotests")
 				qualityGateRequest.AutotestName = &autotestName
-				stageName := this.GetString(stageName + "-" + stepName + "-stageBranch")
+				stageName := c.GetString(stageName + "-" + stepName + "-stageBranch")
 				qualityGateRequest.BranchName = &stageName
 			}
 
