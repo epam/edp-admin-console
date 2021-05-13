@@ -103,6 +103,10 @@ $(function () {
         $('.main-block').data('import-strategy', false);
         $('.app-name').removeClass('hide-element');
 
+        $('#gitRepoUrl').val(function () {
+            return this.defaultValue;
+        });
+        
         $('.gitServerEl').addClass('hide-element');
         $('.gitRelativePathEl').addClass('hide-element');
 
