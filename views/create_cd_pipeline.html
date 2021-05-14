@@ -95,40 +95,42 @@
                              data-parent="#accordionCreatePipeline">
                             <div class="card-body">
                                 {{range .Apps}}
-                                    <div class="row">
-                                        <div class="form-group col-sm-4">
-                                            <div class="custom-control custom-checkbox application-checkbox">
-                                                <input type="checkbox" class="custom-control-input app-name-checkbox"
-                                                       id="{{.Name}}"
-                                                       name="app" value="{{.Name}}">
-                                                <label class="custom-control-label"
-                                                       for="{{.Name}}">{{.Name}}</label>
+                                    {{if ne (len .CodebaseBranch) 0}}
+                                        <div class="row">
+                                            <div class="form-group col-sm-4">
+                                                <div class="custom-control custom-checkbox application-checkbox">
+                                                    <input type="checkbox" class="custom-control-input app-name-checkbox"
+                                                           id="{{.Name}}"
+                                                           name="app" value="{{.Name}}">
+                                                    <label class="custom-control-label"
+                                                           for="{{.Name}}">{{.Name}}</label>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <div class="form-group col-sm-4">
-                                            <select title="Input Docker Streams"
-                                                    class="release-branch selectpicker select-{{.Name}} form-control"
-                                                    name="{{.Name}}" disabled>
-                                                {{range $i, $rb := .CodebaseBranch}}
-                                                    {{range $rb.CodebaseDockerStream}}
-                                                        <option value="{{.OcImageStreamName}}">{{.OcImageStreamName}}</option>
+                                            <div class="form-group col-sm-4">
+                                                <select title="Input Docker Streams"
+                                                        class="release-branch selectpicker select-{{.Name}} form-control"
+                                                        name="{{.Name}}" disabled>
+                                                    {{range $i, $rb := .CodebaseBranch}}
+                                                        {{range $rb.CodebaseDockerStream}}
+                                                            <option value="{{.OcImageStreamName}}">{{.OcImageStreamName}}</option>
+                                                        {{end}}
                                                     {{end}}
-                                                {{end}}
-                                            </select>
-                                        </div>
+                                                </select>
+                                            </div>
 
-                                        <div class="form-group col-sm-4">
-                                            <div class="custom-control custom-checkbox application-checkbox">
-                                                <input type="checkbox"
-                                                       class="custom-control-input app-checkbox checkbox-{{.Name}}"
-                                                       id="{{.Name}}-promote"
-                                                       name="{{.Name}}-promote" value="true" checked disabled>
-                                                <label class="custom-control-label"
-                                                       for="{{.Name}}-promote">Promote in pipeline</label>
+                                            <div class="form-group col-sm-4">
+                                                <div class="custom-control custom-checkbox application-checkbox">
+                                                    <input type="checkbox"
+                                                           class="custom-control-input app-checkbox checkbox-{{.Name}}"
+                                                           id="{{.Name}}-promote"
+                                                           name="{{.Name}}-promote" value="true" checked disabled>
+                                                    <label class="custom-control-label"
+                                                           for="{{.Name}}-promote">Promote in pipeline</label>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    {{end}}
                                 {{end}}
                                 <div class="invalid-feedback app-checkbox-error">
                                     At least one checkbox must be checked.
