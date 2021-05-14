@@ -23,19 +23,23 @@ type RepoData struct {
 
 func (this *RepositoryRestController) IsGitRepoAvailable() {
 	var repo RepoData
-	err := json.NewDecoder(this.Ctx.Request.Body).Decode(&repo)
+	if err := json.NewDecoder(this.Ctx.Request.Body).Decode(&repo); err != nil {
+		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := validRepoRequestData(repo); err != nil {
+		http.Error(this.Ctx.ResponseWriter, err.Message, err.StatusCode)
+		return
+	}
+
+	resp, err := getResponseJSON(util.IsGitRepoAvailable(repo.Url, repo.Login, repo.Password))
 	if err != nil {
 		http.Error(this.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	errMsg := validRepoRequestData(repo)
-	if errMsg != nil {
-		http.Error(this.Ctx.ResponseWriter, errMsg.Message, errMsg.StatusCode)
-		return
-	}
-
-	this.Data["json"] = util.IsGitRepoAvailable(repo.Url, repo.Login, repo.Password)
+	this.Data["json"] = resp
 	this.ServeJSON()
 }
 
@@ -52,4 +56,18 @@ func validRepoRequestData(repo RepoData) *validation2.ErrMsg {
 	}
 
 	return &validation2.ErrMsg{string(validation2.CreateErrorResponseBody(valid)), http.StatusBadRequest}
+}
+
+func getResponseJSON(available bool, err error) (*string, error) {
+	buf, err := json.Marshal(struct {
+		Available bool   `json:"available"`
+		Msg       string `json:"msg"`
+	}{
+		Available: available,
+		Msg:       err.Error(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return util.GetStringP(string(buf)), nil
 }

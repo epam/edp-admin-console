@@ -562,19 +562,25 @@ $(function () {
                 }
 
                 _sendPostRequest.bind(this)(false, `${$('input[id="basepath"]').val()}/api/v1/repository/available`, creds, $('input[name="_xsrf"]').val(),
-                    function (isAvailable) {
+                    function (resp) {
+                        let data = JSON.parse(resp)
                         if (isRepoPrivate) {
-                            if (isAvailable) {
+                            if (data.available) {
                                 isValid = true;
                             } else {
-                                $('.git-creds').show();
+                                if (data.msg === "repository not found") {
+                                    $('.git-url').show();
+                                } else if (data.msg === "authentication required"){
+                                    $('.git-creds').show();
+                                }
+
                                 $repoUrl.addClass('is-invalid');
                                 $repoLogin.addClass('is-invalid');
                                 $repoPassword.addClass('is-invalid');
                                 isValid = false;
                             }
                         } else {
-                            if (isAvailable) {
+                            if (data.available) {
                                 isValid = true;
                             } else {
                                 $gitRepoMsg.show();

@@ -17,30 +17,25 @@
 package util
 
 import (
-	"edp-admin-console/service/logger"
-	"go.uber.org/zap"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/config"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
 	"gopkg.in/src-d/go-git.v4/storage/memory"
 )
 
-var log = logger.GetLogger()
-
-func IsGitRepoAvailable(repo string, user string, pass string) bool {
+func IsGitRepoAvailable(url, usr, pwd string) (bool, error) {
 	r, _ := git.Init(memory.NewStorage(), nil)
 	remote, _ := r.CreateRemote(&config.RemoteConfig{
 		Name: "origin",
-		URLs: []string{repo},
+		URLs: []string{url},
 	})
 	rfs, err := remote.List(&git.ListOptions{
 		Auth: &http.BasicAuth{
-			Username: user,
-			Password: pass,
+			Username: usr,
+			Password: pwd,
 		}})
 	if err != nil {
-		log.Error("an error has occurred during authentication to repository", zap.Error(err))
-		return false
+		return false, err
 	}
-	return len(rfs) != 0
+	return len(rfs) != 0, nil
 }

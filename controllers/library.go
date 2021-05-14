@@ -306,11 +306,12 @@ func validateLibraryRequestData(library command.CreateCodebase) *validation2.Err
 	if library.Strategy == "clone" && library.Repository != nil {
 		_, err = valid.Valid(library.Repository)
 
-		isAvailable := util.IsGitRepoAvailable(library.Repository.Url, library.Repository.Login, library.Repository.Password)
-
-		if !isAvailable {
-			err := &validation.Error{Key: "repository", Message: "Repository doesn't exist or invalid login and password."}
-			valid.Errors = append(valid.Errors, err)
+		_, err := util.IsGitRepoAvailable(library.Repository.Url, library.Repository.Login, library.Repository.Password)
+		if err != nil {
+			valid.Errors = append(valid.Errors, &validation.Error{
+				Key:     "repository",
+				Message: err.Error(),
+			})
 		}
 	}
 

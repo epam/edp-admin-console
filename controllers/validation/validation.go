@@ -31,15 +31,15 @@ func ValidCodebaseRequestData(codebase command.CreateCodebase) *ErrMsg {
 
 	if codebase.Repository != nil {
 		_, err := valid.Valid(codebase.Repository)
-
-		isAvailable := util.IsGitRepoAvailable(codebase.Repository.Url, codebase.Repository.Login, codebase.Repository.Password)
-
-		if !isAvailable {
-			err := &validation.Error{Key: "repository", Message: "Repository doesn't exist or invalid login and password."}
-			valid.Errors = append(valid.Errors, err)
-		}
-
 		resErr = err
+
+		_, err = util.IsGitRepoAvailable(codebase.Repository.Url, codebase.Repository.Login, codebase.Repository.Password)
+		if err != nil {
+			valid.Errors = append(valid.Errors, &validation.Error{
+				Key:     "repository",
+				Message: err.Error(),
+			})
+		}
 	}
 
 	if codebase.Route != nil {

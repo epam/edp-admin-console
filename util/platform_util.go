@@ -3,6 +3,7 @@ package util
 import (
 	"bytes"
 	"edp-admin-console/models/query"
+	"edp-admin-console/service/logger"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -10,6 +11,8 @@ import (
 	"github.com/astaxie/beego"
 	"go.uber.org/zap"
 )
+
+var log = logger.GetLogger()
 
 func GetValuesFromConfig(name string) []string {
 	values := beego.AppConfig.String(name)

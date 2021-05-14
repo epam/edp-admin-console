@@ -218,11 +218,12 @@ func validateAutotestsRequestData(autotests command.CreateCodebase) *validation2
 	if autotests.Repository != nil {
 		_, err = valid.Valid(autotests.Repository)
 
-		isAvailable := util.IsGitRepoAvailable(autotests.Repository.Url, autotests.Repository.Login, autotests.Repository.Password)
-
-		if !isAvailable {
-			err := &validation.Error{Key: "repository", Message: "Repository doesn't exist or invalid login and password."}
-			valid.Errors = append(valid.Errors, err)
+		_, err = util.IsGitRepoAvailable(autotests.Repository.Url, autotests.Repository.Login, autotests.Repository.Password)
+		if err != nil {
+			valid.Errors = append(valid.Errors, &validation.Error{
+				Key:     "repository",
+				Message: err.Error(),
+			})
 		}
 	}
 
