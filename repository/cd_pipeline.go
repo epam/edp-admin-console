@@ -160,7 +160,7 @@ const (
 	selectCountStages = "select count(*) from cd_stage cs " +
 		"left join cd_pipeline cp on cs.cd_pipeline_id = cp.id where cp.name = ?;"
 	selectCDPipelineStages = "select cs.name from cd_stage cs " +
-		"left join cd_pipeline cp on cs.cd_pipeline_id = cp.id where cp.name = ?;"
+		"left join cd_pipeline cp on cs.cd_pipeline_id = cp.id where cp.name = ? order by cs.order;"
 )
 
 type CDPipelineRepository struct {
