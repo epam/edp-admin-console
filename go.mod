@@ -22,6 +22,7 @@ require (
 	github.com/epmd-edp/perf-operator/v2 v2.0.0-20201130105408-ffc11d6fdd20 // indirect
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/lib/pq v1.8.0
+	github.com/microcosm-cc/bluemonday v1.0.9
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/openshift/api v3.9.0+incompatible
 	github.com/openshift/client-go v3.9.0+incompatible
