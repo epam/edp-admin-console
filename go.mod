@@ -33,6 +33,7 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	go.uber.org/zap v1.15.0
+	golang.org/x/net v0.0.0-20210421230115-4e50805a0758 // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	gopkg.in/square/go-jose.v2 v2.3.0 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.0 // indirect

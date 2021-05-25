@@ -29,6 +29,7 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/satori/go.uuid"
 	"go.uber.org/zap"
+	"golang.org/x/net/html"
 	"net/http"
 	"path"
 	"strings"
@@ -94,7 +95,7 @@ func (c *CodebaseRestController) GetCodebase() {
 
 	if codebase == nil {
 		nonAppMsg := fmt.Sprintf("Please check codebase name. It seems there're not %s codebase.", codebaseName)
-		http.Error(c.Ctx.ResponseWriter, nonAppMsg, http.StatusNotFound)
+		http.Error(c.Ctx.ResponseWriter, html.EscapeString(nonAppMsg), http.StatusNotFound)
 		return
 	}
 
@@ -144,10 +145,10 @@ func (c *CodebaseRestController) checkError(err error, name string, url *string)
 	switch err.(type) {
 	case *edperror.CodebaseAlreadyExistsError:
 		errMsg := fmt.Sprintf("Codebase %v already exists.", name)
-		http.Error(c.Ctx.ResponseWriter, errMsg, http.StatusBadRequest)
+		http.Error(c.Ctx.ResponseWriter, html.EscapeString(errMsg), http.StatusBadRequest)
 	case *edperror.CodebaseWithGitUrlPathAlreadyExistsError:
 		errMsg := fmt.Sprintf("Codebase %v with %v project path already exists.", name, *url)
-		http.Error(c.Ctx.ResponseWriter, errMsg, http.StatusBadRequest)
+		http.Error(c.Ctx.ResponseWriter, html.EscapeString(errMsg), http.StatusBadRequest)
 	default:
 		log.Error("couldn't create codebase", zap.Error(err))
 		errMsg := fmt.Sprintf("Failed to create codebase: %v", err.Error())
@@ -172,7 +173,7 @@ func (c *CodebaseRestController) Delete() {
 
 	if cdb == nil {
 		msg := fmt.Sprintf("Please check codebase name. It seems there's no %s codebase.", cr.Name)
-		http.Error(c.Ctx.ResponseWriter, msg, http.StatusNotFound)
+		http.Error(c.Ctx.ResponseWriter, html.EscapeString(msg), http.StatusNotFound)
 		return
 	}
 
@@ -180,7 +181,7 @@ func (c *CodebaseRestController) Delete() {
 		if dberror.CodebaseIsUsed(err) {
 			cerr := err.(dberror.CodebaseIsUsedByCDPipeline)
 			log.Error(cerr.Message, zap.Error(err))
-			http.Error(c.Ctx.ResponseWriter, cerr.Message, http.StatusConflict)
+			http.Error(c.Ctx.ResponseWriter, html.EscapeString(cerr.Message), http.StatusConflict)
 			return
 		}
 		log.Error("delete process is failed", zap.Error(err))

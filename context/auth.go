@@ -47,8 +47,7 @@ func InitAuth() {
 		zap.String("url", parameters.KeycloakURL),
 		zap.String("client id", parameters.ClientId),
 		zap.String("host", parameters.Host),
-		zap.String("call back endpoint", parameters.CallBackEndpoint),
-		zap.String("state auth key", parameters.StateAuthKey))
+		zap.String("call back endpoint", parameters.CallBackEndpoint))
 
 	provider, err := oidc.NewProvider(context.Background(), parameters.KeycloakURL)
 	if err != nil {

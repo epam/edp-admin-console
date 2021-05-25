@@ -28,6 +28,7 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 	uuid "github.com/satori/go.uuid"
 	"go.uber.org/zap"
+	"golang.org/x/net/html"
 	"net/http"
 )
 
@@ -54,7 +55,7 @@ func (c *CDPipelineRestController) GetCDPipelineByName() {
 
 	if cdPipeline == nil {
 		nonAppMsg := fmt.Sprintf("Please check CD Pipeline name. It seems there's not %s pipeline.", pipelineName)
-		http.Error(c.Ctx.ResponseWriter, nonAppMsg, http.StatusNotFound)
+		http.Error(c.Ctx.ResponseWriter, html.EscapeString(nonAppMsg), http.StatusNotFound)
 		return
 	}
 
@@ -105,10 +106,10 @@ func (c *CDPipelineRestController) CreateCDPipeline() {
 
 		switch pipelineErr.(type) {
 		case *edperror.CDPipelineExistsError:
-			http.Error(c.Ctx.ResponseWriter, fmt.Sprintf("cd pipeline %v is already exists", cdPipelineCreateCommand.Name), http.StatusFound)
+			http.Error(c.Ctx.ResponseWriter, fmt.Sprintf("cd pipeline %v is already exists", html.EscapeString(cdPipelineCreateCommand.Name)), http.StatusFound)
 			return
 		case *edperror.NonValidRelatedBranchError:
-			http.Error(c.Ctx.ResponseWriter, fmt.Sprintf("one or more applications have non valid branches: %v", cdPipelineCreateCommand.Applications), http.StatusBadRequest)
+			http.Error(c.Ctx.ResponseWriter, html.EscapeString(fmt.Sprintf("one or more applications have non valid branches: %v", cdPipelineCreateCommand.Applications)), http.StatusBadRequest)
 			return
 		default:
 			http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
@@ -146,10 +147,10 @@ func (c *CDPipelineRestController) UpdateCDPipeline() {
 
 		switch err.(type) {
 		case *edperror.CDPipelineDoesNotExistError:
-			http.Error(c.Ctx.ResponseWriter, fmt.Sprintf("cd pipeline %v doesn't exist", pipelineUpdateCommand.Name), http.StatusNotFound)
+			http.Error(c.Ctx.ResponseWriter, fmt.Sprintf("cd pipeline %v doesn't exist", html.EscapeString(pipelineUpdateCommand.Name)), http.StatusNotFound)
 			return
 		case *edperror.NonValidRelatedBranchError:
-			http.Error(c.Ctx.ResponseWriter, fmt.Sprintf("one or more applications have non valid branches: %v", pipelineUpdateCommand.Name), http.StatusNotFound)
+			http.Error(c.Ctx.ResponseWriter, fmt.Sprintf("one or more applications have non valid branches: %v", html.EscapeString(pipelineUpdateCommand.Name)), http.StatusNotFound)
 			return
 		default:
 			http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
@@ -174,7 +175,7 @@ func (c *CDPipelineRestController) DeleteCDStage() {
 		if dberror.StageErrorOccurred(err) {
 			serr := err.(dberror.RemoveStageRestriction)
 			log.Error(serr.Message, zap.Error(err))
-			http.Error(c.Ctx.ResponseWriter, serr.Message, http.StatusConflict)
+			http.Error(c.Ctx.ResponseWriter, html.EscapeString(serr.Message), http.StatusConflict)
 			return
 		}
 		log.Error("delete process is failed", zap.Error(err))
