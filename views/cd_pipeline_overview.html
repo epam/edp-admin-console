@@ -122,80 +122,80 @@
                         </div>
 
                         {{if .CDPipeline.Stage}}
-                            <form id="editCDStages" method="post" action="{{ .BasePath }}/admin/edp/cd-pipeline/{{.CDPipeline.Name}}/cd-stage/edit">
-                                <div class="card stages-info">
-                                    <div class="card-header static" id="headingThree"
-                                         aria-expanded="true" aria-controls="collapseThree">
-                                        <h5 class="mb-0">
-                                            <button class="btn btn-link" type="button">
-                                                Stages
-                                                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                      title="Stages which are created for the pipeline."></span>
-                                            </button>
-                                            <button class="delete ml-1" id="edit-stages" onclick="editStages()">
-                                                <i class="icon-pencil-white"></i>
-                                            </button>
-                                            <button class="delete ml-1 edit-cd-stages" id="save-stages" onclick="saveStages()" disabled="disabled">
-                                                <i class="icon-save"></i>
-                                            </button>
-                                        </h5>
-                                    </div>
-                                    <div id="collapseThree" class="show" aria-labelledby="headingThree">
-                                        <div class="card-body">
-                                            <div class="form-check">
-                                                <table class="table edp-table">
-                                                    <thead>
-                                                    <tr>
-                                                        <th scope="col"></th>
-                                                        <th scope="col">Name</th>
-                                                        <th scope="col">Trigger Type</th>
-                                                        <th scope="col">
-                                                            {{if .IsOpenshift}}
-                                                                OpenShift Project
-                                                            {{else}}
-                                                                Kubernetes Namespace
+                            <div class="card stages-info">
+                                <div class="card-header static" id="headingThree"
+                                     aria-expanded="true" aria-controls="collapseThree">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" type="button">
+                                            Stages
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Stages which are created for the pipeline."></span>
+                                        </button>
+                                        <button class="delete ml-1" id="edit-stages" onclick="editStages()">
+                                            <i class="icon-pencil-white"></i>
+                                        </button>
+                                        <button class="delete ml-1 edit-cd-stages" id="save-stages" onclick="saveStages()" disabled="disabled">
+                                            <i class="icon-save"></i>
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseThree" class="show" aria-labelledby="headingThree">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <table class="table edp-table">
+                                                <thead>
+                                                <tr>
+                                                    <th scope="col"></th>
+                                                    <th scope="col">Name</th>
+                                                    <th scope="col">Trigger Type</th>
+                                                    <th scope="col">
+                                                        {{if .IsOpenshift}}
+                                                            OpenShift Project
+                                                        {{else}}
+                                                            Kubernetes Namespace
+                                                        {{end}}
+                                                    </th>
+                                                    <th scope="col">Type</th>
+                                                    <th scope="col">Library</th>
+                                                    <th scope="col">Branch</th>
+                                                    <th scope="col">Job provision</th>
+                                                    <th scope="col">Quality Gates</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {{$len := (len .CDPipeline.Stage)}}
+                                                {{range $i, $e := .CDPipeline.Stage}}
+                                                    <tr valign="top">
+                                                        <td>
+                                                            {{if $.HasRights}}
+                                                                {{$notOne := ne $i 0}}
+                                                                {{$isLast := eq (add $i 1) $len}}
+                                                                {{if eq $len 1}}
+                                                                    <button class="delete delete-stage"
+                                                                            data-toggle="modal"
+                                                                            data-name="{{.Name}}"
+                                                                            data-order="{{.Order}}">
+                                                                        <i class="icon-trashcan"></i>
+                                                                    </button>
+                                                                {{else if and $notOne $isLast}}
+                                                                    <button class="delete delete-stage"
+                                                                            data-toggle="modal"
+                                                                            data-name="{{.Name}}"
+                                                                            data-order="{{.Order}}">
+                                                                        <i class="icon-trashcan"></i>
+                                                                    </button>
+                                                                {{end}}
                                                             {{end}}
-                                                        </th>
-                                                        <th scope="col">Type</th>
-                                                        <th scope="col">Library</th>
-                                                        <th scope="col">Branch</th>
-                                                        <th scope="col">Job provision</th>
-                                                        <th scope="col">Quality Gates</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    {{$len := (len .CDPipeline.Stage)}}
-                                                    {{range $i, $e := .CDPipeline.Stage}}
-                                                        <tr valign="top">
-                                                            <td>
-                                                                {{if $.HasRights}}
-                                                                    {{$notOne := ne $i 0}}
-                                                                    {{$isLast := eq (add $i 1) $len}}
-                                                                    {{if eq $len 1}}
-                                                                        <button class="delete delete-stage"
-                                                                                data-toggle="modal"
-                                                                                data-name="{{.Name}}"
-                                                                                data-order="{{.Order}}">
-                                                                            <i class="icon-trashcan"></i>
-                                                                        </button>
-                                                                    {{else if and $notOne $isLast}}
-                                                                        <button class="delete delete-stage"
-                                                                                data-toggle="modal"
-                                                                                data-name="{{.Name}}"
-                                                                                data-order="{{.Order}}">
-                                                                            <i class="icon-trashcan"></i>
-                                                                        </button>
-                                                                    {{end}}
-                                                                {{end}}
-                                                            </td>
-                                                            <td>
-                                                                {{.Name}}
-                                                                {{if .Description}}
-                                                                    <span class="tooltip-icon" data-toggle="tooltip"
-                                                                          data-placement="top"
-                                                                          title="{{.Description}}"></span>
-                                                                {{end}}
-                                                            </td>
+                                                        </td>
+                                                        <td>
+                                                            {{.Name}}
+                                                            {{if .Description}}
+                                                                <span class="tooltip-icon" data-toggle="tooltip"
+                                                                      data-placement="top"
+                                                                      title="{{.Description}}"></span>
+                                                            {{end}}
+                                                        </td>
+                                                        <form id="editCDStages" method="post" action="{{ $.BasePath }}/admin/edp/cd-pipeline/{{$.CDPipeline.Name}}/cd-stage/edit">
                                                             <td>
                                                                 <p class="trigger-type-view" id="triggerType">{{.TriggerType}}</p>
                                                                 <select class="form-control hide-element trigger-type-edit" id="triggerType" name="triggerType">
@@ -253,16 +253,16 @@
                                                                     </table>
                                                                 {{end}}
                                                             </td>
-                                                        </tr>
-                                                    {{end}}
-                                                    </tbody>
-                                                </table>
-                                            </div>
+                                                            {{ $.xsrfdata }}
+                                                        </form>
+                                                    </tr>
+                                                {{end}}
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
-                                {{ .xsrfdata }}
-                            </form>
+                            </div>
                         {{end}}
 
                         {{if .CDPipeline.ThirdPartyService}}
