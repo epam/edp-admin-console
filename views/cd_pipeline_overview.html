@@ -122,6 +122,7 @@
                         </div>
 
                         {{if .CDPipeline.Stage}}
+                        <form id="editCDStages" method="post" action="{{ $.BasePath }}/admin/edp/cd-pipeline/{{$.CDPipeline.Name}}/cd-stage/edit">
                             <div class="card stages-info">
                                 <div class="card-header static" id="headingThree"
                                      aria-expanded="true" aria-controls="collapseThree">
@@ -174,14 +175,16 @@
                                                                     <button class="delete delete-stage"
                                                                             data-toggle="modal"
                                                                             data-name="{{.Name}}"
-                                                                            data-order="{{.Order}}">
+                                                                            data-order="{{.Order}}"
+                                                                            type="button">
                                                                         <i class="icon-trashcan"></i>
                                                                     </button>
                                                                 {{else if and $notOne $isLast}}
                                                                     <button class="delete delete-stage"
                                                                             data-toggle="modal"
                                                                             data-name="{{.Name}}"
-                                                                            data-order="{{.Order}}">
+                                                                            data-order="{{.Order}}"
+                                                                            type="button">
                                                                         <i class="icon-trashcan"></i>
                                                                     </button>
                                                                 {{end}}
@@ -195,66 +198,63 @@
                                                                       title="{{.Description}}"></span>
                                                             {{end}}
                                                         </td>
-                                                        <form id="editCDStages" method="post" action="{{ $.BasePath }}/admin/edp/cd-pipeline/{{$.CDPipeline.Name}}/cd-stage/edit">
-                                                            <td>
-                                                                <p class="trigger-type-view" id="triggerType">{{.TriggerType}}</p>
-                                                                <select class="form-control hide-element trigger-type-edit" id="triggerType" name="triggerType">
-                                                                    <option {{if eq .TriggerType "manual"}}selected="selected"{{end}}>Manual</option>
-                                                                    <option {{if eq .TriggerType "auto"}}selected="selected"{{end}}>Auto</option>
-                                                                </select>
-                                                            </td>
-                                                            <td class="platform-link">
-                                                                <a href="{{.PlatformProjectLink}}" target="_blank"
-                                                                   class="edp-link"
-                                                                   rel="noopener noreferrer">Link</a>
-                                                            </td>
-                                                            <td>{{.Source.Type}}</td>
-                                                            <td>
-                                                                {{if eq .Source.Type "library"}}
-                                                                    {{.Source.Library.Name}}
-                                                                {{end}}
-                                                            </td>
-                                                            <td>
-                                                                {{if eq .Source.Type "library"}}
-                                                                    {{.Source.Library.Branch}}
-                                                                {{end}}
-                                                            </td>
-                                                            <td>{{.JobProvisioning.Name}}</td>
-                                                            <td>
-                                                                {{if .QualityGates}}
-                                                                    <table>
-                                                                        <thead>
+                                                        <td>
+                                                            <p class="trigger-type-view" id="triggerType">{{.TriggerType}}</p>
+                                                            <select class="form-control hide-element trigger-type-edit" id="triggerType" name="triggerType">
+                                                                <option {{if eq .TriggerType "manual"}}selected="selected"{{end}}>Manual</option>
+                                                                <option {{if eq .TriggerType "auto"}}selected="selected"{{end}}>Auto</option>
+                                                            </select>
+                                                        </td>
+                                                        <td class="platform-link">
+                                                            <a href="{{.PlatformProjectLink}}" target="_blank"
+                                                               class="edp-link"
+                                                               rel="noopener noreferrer">Link</a>
+                                                        </td>
+                                                        <td>{{.Source.Type}}</td>
+                                                        <td>
+                                                            {{if eq .Source.Type "library"}}
+                                                                {{.Source.Library.Name}}
+                                                            {{end}}
+                                                        </td>
+                                                        <td>
+                                                            {{if eq .Source.Type "library"}}
+                                                                {{.Source.Library.Branch}}
+                                                            {{end}}
+                                                        </td>
+                                                        <td>{{.JobProvisioning.Name}}</td>
+                                                        <td>
+                                                            {{if .QualityGates}}
+                                                                <table>
+                                                                    <thead>
+                                                                    <tr>
+                                                                        <th scope="col">Quality Gate Type</th>
+                                                                        <th scope="col">Jenkins Step Name</th>
+                                                                        <th scope="col">Autotest Name</th>
+                                                                        <th scope="col">Branch Name</th>
+                                                                    </tr>
+                                                                    </thead>
+                                                                    {{range .QualityGates}}
                                                                         <tr>
-                                                                            <th scope="col">Quality Gate Type</th>
-                                                                            <th scope="col">Jenkins Step Name</th>
-                                                                            <th scope="col">Autotest Name</th>
-                                                                            <th scope="col">Branch Name</th>
+                                                                        <th>{{.QualityGateType}}</th>
+                                                                        <th>{{.StepName}}</th>
+
+                                                                            {{if eq "autotests" .QualityGateType}}
+                                                                                <th>
+                                                                                    <a href="{{ $.BasePath }}/admin/edp/codebase/{{.Autotest.Name}}/overview" class="edp-link">{{.Autotest.Name}}</a>
+                                                                                </th>
+                                                                                <th>
+                                                                                    {{.Branch.Name}}
+                                                                                </th>
+                                                                            {{end}}
+                                                                                <th></th>
+                                                                                <th></th>
+                                                                            {{else}}
+
                                                                         </tr>
-                                                                        </thead>
-                                                                        {{range .QualityGates}}
-                                                                            <tr>
-                                                                            <th>{{.QualityGateType}}</th>
-                                                                            <th>{{.StepName}}</th>
-
-                                                                                {{if eq "autotests" .QualityGateType}}
-                                                                                    <th>
-                                                                                        <a href="{{ $.BasePath }}/admin/edp/codebase/{{.Autotest.Name}}/overview" class="edp-link">{{.Autotest.Name}}</a>
-                                                                                    </th>
-                                                                                    <th>
-                                                                                        {{.Branch.Name}}
-                                                                                    </th>
-                                                                                {{end}}
-                                                                                    <th></th>
-                                                                                    <th></th>
-                                                                                {{else}}
-
-                                                                            </tr>
-                                                                        {{end}}
-                                                                    </table>
-                                                                {{end}}
-                                                            </td>
-                                                            {{ $.xsrfdata }}
-                                                        </form>
+                                                                    {{end}}
+                                                                </table>
+                                                            {{end}}
+                                                        </td>
                                                     </tr>
                                                 {{end}}
                                                 </tbody>
@@ -263,6 +263,8 @@
                                     </div>
                                 </div>
                             </div>
+                        {{ $.xsrfdata }}
+                        </form>
                         {{end}}
 
                         {{if .CDPipeline.ThirdPartyService}}
