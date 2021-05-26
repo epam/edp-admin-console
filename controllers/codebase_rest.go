@@ -26,7 +26,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
-	"github.com/microcosm-cc/bluemonday"
 	"github.com/satori/go.uuid"
 	"go.uber.org/zap"
 	"golang.org/x/net/html"
@@ -83,11 +82,7 @@ func (c *CodebaseRestController) getCodebases() []string {
 
 func (c *CodebaseRestController) GetCodebase() {
 	codebaseName := c.GetString(":codebaseName")
-	if !bluemonday.UserSelectHandler(codebaseName) {
-		http.Error(c.Ctx.ResponseWriter, "Incorrect CodebaseName", http.StatusInternalServerError)
-		return
-	}
-	codebase, err := c.CodebaseService.GetCodebaseByName(codebaseName)
+	codebase, err := c.CodebaseService.GetCodebaseByName(html.EscapeString(codebaseName))
 	if err != nil {
 		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return

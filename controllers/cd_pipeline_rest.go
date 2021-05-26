@@ -25,7 +25,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
-	"github.com/microcosm-cc/bluemonday"
 	uuid "github.com/satori/go.uuid"
 	"go.uber.org/zap"
 	"golang.org/x/net/html"
@@ -43,11 +42,7 @@ func (c *CDPipelineRestController) Prepare() {
 
 func (c *CDPipelineRestController) GetCDPipelineByName() {
 	pipelineName := c.GetString(":name")
-	if !bluemonday.UserSelectHandler(pipelineName) {
-		http.Error(c.Ctx.ResponseWriter, "Incorrect PipelineName", http.StatusInternalServerError)
-		return
-	}
-	cdPipeline, err := c.CDPipelineService.GetCDPipelineByName(pipelineName)
+	cdPipeline, err := c.CDPipelineService.GetCDPipelineByName(html.EscapeString(pipelineName))
 	if err != nil {
 		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
