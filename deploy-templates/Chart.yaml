@@ -1,7 +1,11 @@
-apiVersion: v1
-description: Helm chart for Golang application/service deploying
+apiVersion: v2
+description: A Helm chart for EDP Admin Console
+home: https://solutionshub.epam.com/solution/epam-delivery-platform
 name: edp-admin-console
-version: 2.7.3
-keywords:
-  - Golang
-home: https://www.epam.com
+type: application
+version: 0.0.0
+appVersion: v0.0.0
+maintainers:
+  - name: EPAM EDP Team
+sources:
+  - https://github.com/epam/edp-admin-console
