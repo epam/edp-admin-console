@@ -14,7 +14,7 @@ $(function () {
         VCS_PASSWORD: /\w/,
         DESCRIPTION: /^[a-zA-Z0-9]/,
         CODEBASE_NAME: /^[a-z][a-z0-9-]*[a-z0-9]$/,
-        CODEBASE_DEFAULT_BRANCH: /^[a-z0-9][a-z0-9]*[\/-]?[a-z0-9]*[a-z0-9]$/,
+        CODEBASE_DEFAULT_BRANCH: /^[a-z0-9][a-z0-9\/\-\.]*[a-z0-9]$/,
         REPO_LOGIN: /\w/,
         REPO_PASSWORD: /\w/,
         REPO_URL: /(?:^git|^ssh|^https?|^git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/,
