@@ -227,11 +227,6 @@ func (r CDPipelineRepository) GetCDPipelineByName(pipelineName string) (*query.C
 		}
 	}
 
-	_, err = o.LoadRelated(&cdPipeline, "ThirdPartyService", false, 100, 0, "Name")
-	if err != nil {
-		return nil, err
-	}
-
 	err = loadRelatedActionLogForCDPipeline(&cdPipeline)
 	if err != nil {
 		return nil, err

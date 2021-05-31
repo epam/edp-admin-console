@@ -267,50 +267,6 @@
                         </form>
                         {{end}}
 
-                        {{if .CDPipeline.ThirdPartyService}}
-                            <div class="card third-party-service-info">
-                                <div class="card-header static" id="headingFour"
-                                     aria-expanded="true" aria-controls="collapseFour">
-                                    <h5 class="mb-0">
-                                        <button class="btn btn-link" type="button">
-                                            Third Party Services
-                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                                                  title="Third Party Services which are deployed on the stages."></span>
-                                        </button>
-                                    </h5>
-                                </div>
-                                <div id="collapseFour" class="show" aria-labelledby="headingFour">
-                                    <div class="card-body">
-                                        <div class="form-check">
-                                            <table class="table edp-table">
-                                                <thead>
-                                                <tr>
-                                                    <th scope="col">Name</th>
-                                                    <th scope="col">Version</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                {{range .CDPipeline.ThirdPartyService}}
-                                                    <tr>
-                                                        <td>
-                                                            {{.Name}}
-                                                            {{if .Description}}
-                                                                <span class="tooltip-icon" data-toggle="tooltip"
-                                                                      data-placement="top"
-                                                                      title="{{.Description}}"></span>
-                                                            {{end}}
-                                                        </td>
-                                                        <td>{{.Version}}</td>
-                                                    </tr>
-                                                {{end}}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {{end}}
-
                         {{if .CDPipeline.CodebaseStageMatrix}}
                             <div class="card stages-info">
                                 <div class="card-header static" id="headingFive"
