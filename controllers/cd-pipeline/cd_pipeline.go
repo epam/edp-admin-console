@@ -48,13 +48,12 @@ var log = logger.GetLogger()
 
 type CDPipelineController struct {
 	beego.Controller
-	CodebaseService   service.CodebaseService
-	PipelineService   cd_pipeline.CDPipelineService
-	EDPTenantService  service.EDPTenantService
-	BranchService     cbs.CodebaseBranchService
-	ThirdPartyService service.ThirdPartyService
-	EDPComponent      ec.EDPComponentService
-	JobProvisioning   service.JobProvisioning
+	CodebaseService  service.CodebaseService
+	PipelineService  cd_pipeline.CDPipelineService
+	EDPTenantService service.EDPTenantService
+	BranchService    cbs.CodebaseBranchService
+	EDPComponent     ec.EDPComponentService
+	JobProvisioning  service.JobProvisioning
 }
 
 const (
@@ -139,12 +138,6 @@ func (c *CDPipelineController) GetCreateCDPipelinePage() {
 		c.Data["Error"] = flash.Data["error"]
 	}
 
-	services, err := c.ThirdPartyService.GetAllServices()
-	if err != nil {
-		c.Abort("500")
-		return
-	}
-
 	autotests, err := c.CodebaseService.GetCodebasesByCriteria(query.CodebaseCriteria{
 		BranchStatus: query.Active,
 		Status:       query.Active,
@@ -163,7 +156,6 @@ func (c *CDPipelineController) GetCreateCDPipelinePage() {
 
 	autotests = filterAutotestsWithActiveBranches(autotests)
 
-	c.Data["Services"] = services
 	c.Data["Apps"] = apps
 	c.Data["GroovyLibs"] = groovyLibs
 	c.Data["EDPVersion"] = context.EDPVersion
@@ -294,8 +286,7 @@ func (c *CDPipelineController) UpdateCDPipeline() {
 	log.Debug("Request data is received to update CD pipeline",
 		zap.String("pipeline", pipeName),
 		zap.Any("applications", updateCommand.Applications),
-		zap.Any("stages", updateCommand.Stages),
-		zap.Any("services", updateCommand.ThirdPartyServices))
+		zap.Any("stages", updateCommand.Stages))
 
 	if err := c.PipelineService.UpdatePipeline(updateCommand); err != nil {
 		switch err.(type) {
@@ -332,7 +323,6 @@ func (c *CDPipelineController) CreateCDPipeline() {
 	flash := beego.NewFlash()
 	appNameCheckboxes := c.GetStrings("app")
 	pipelineName := c.GetString("pipelineName")
-	serviceCheckboxes := c.GetStrings("service")
 	var stageCount, err = c.getCDPipelineStageCount(pipelineName)
 	if err != nil {
 		log.Error("an error has occurred while getting stage count", zap.Error(err))
@@ -344,7 +334,6 @@ func (c *CDPipelineController) CreateCDPipeline() {
 	createCommand := command.CDPipelineCommand{
 		Name:                 pipelineName,
 		Applications:         c.convertApplicationWithBranchesData(appNameCheckboxes),
-		ThirdPartyServices:   serviceCheckboxes,
 		Stages:               stages,
 		ApplicationToApprove: c.getApplicationsToPromoteFromRequest(appNameCheckboxes),
 		Username:             c.Ctx.Input.Session("username").(string),
@@ -361,8 +350,7 @@ func (c *CDPipelineController) CreateCDPipeline() {
 	log.Debug("Request data is received to create CD pipeline",
 		zap.String("pipeline", pipelineName),
 		zap.Any("applications", createCommand.Applications),
-		zap.Any("stages", createCommand.Stages),
-		zap.Any("services", createCommand.ThirdPartyServices))
+		zap.Any("stages", createCommand.Stages))
 
 	_, pipelineErr := c.PipelineService.CreatePipeline(createCommand)
 	if pipelineErr != nil {

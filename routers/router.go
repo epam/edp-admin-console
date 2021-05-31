@@ -91,7 +91,6 @@ func init() {
 	codebaseRepository := repository.CodebaseRepository{}
 	branchRepository := repository.CodebaseBranchRepository{}
 	pipelineRepository := repository.CDPipelineRepository{}
-	serviceRepository := repository.ServiceCatalogRepository{}
 	gitServerRepository := repository.GitServerRepository{}
 	sr := repository.SlaveRepository{}
 	pr := repository.JobProvisioning{}
@@ -99,7 +98,6 @@ func init() {
 	jsr := jirarepo.JiraServer{}
 	psr := perfRepo.PerfServer{}
 
-	thirdPartyService := service.ThirdPartyService{IServiceCatalogRepository: serviceRepository}
 	gitServerService := service.GitServerService{IGitServerRepository: gitServerRepository}
 	ss := service.SlaveService{ISlaveRepository: sr}
 	ps := service.JobProvisioning{IJobProvisioningRepository: pr}
@@ -248,22 +246,17 @@ func init() {
 	}
 
 	cpc := cdPipeController.CDPipelineController{
-		CodebaseService:   codebaseService,
-		PipelineService:   pipelineService,
-		EDPTenantService:  edpService,
-		BranchService:     branchService,
-		ThirdPartyService: thirdPartyService,
-		EDPComponent:      ecs,
-		JobProvisioning:   ps,
+		CodebaseService:  codebaseService,
+		PipelineService:  pipelineService,
+		EDPTenantService: edpService,
+		BranchService:    branchService,
+		EDPComponent:     ecs,
+		JobProvisioning:  ps,
 	}
 
 	cbc := controllers.BranchController{
 		BranchService:   branchService,
 		CodebaseService: codebaseService,
-	}
-
-	tpsc := controllers.ThirdPartyServiceController{
-		ThirdPartyService: thirdPartyService,
 	}
 
 	dc := controllers.DiagramController{
@@ -302,8 +295,6 @@ func init() {
 		beego.NSRouter("/library/overview", &lc, "get:GetLibraryListPage"),
 		beego.NSRouter("/library/create", &lc, "get:GetCreatePage"),
 		beego.NSRouter("/library", &lc, "post:Create"),
-
-		beego.NSRouter("/service/overview", &tpsc, "get:GetServicePage"),
 
 		beego.NSRouter("/diagram/overview", &dc, "get:GetDiagramPage"),
 	)

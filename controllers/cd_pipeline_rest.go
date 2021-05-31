@@ -93,8 +93,7 @@ func (c *CDPipelineRestController) CreateCDPipeline() {
 	log.Info("Request data is receieved to create CD pipeline",
 		zap.String("pipeline", cdPipelineCreateCommand.Name),
 		zap.Any("applications", cdPipelineCreateCommand.Applications),
-		zap.Any("stages", cdPipelineCreateCommand.Stages),
-		zap.Any("services", cdPipelineCreateCommand.ThirdPartyServices))
+		zap.Any("stages", cdPipelineCreateCommand.Stages))
 
 	_, pipelineErr := c.CDPipelineService.CreatePipeline(cdPipelineCreateCommand)
 	if pipelineErr != nil {

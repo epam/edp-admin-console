@@ -449,7 +449,6 @@ func convertPipelineData(cdPipeline command.CDPipelineCommand) cdPipeApi.CDPipel
 	return cdPipeApi.CDPipelineSpec{
 		Name:                  cdPipeline.Name,
 		InputDockerStreams:    dockerStreams,
-		ThirdPartyServices:    cdPipeline.ThirdPartyServices,
 		ApplicationsToPromote: cdPipeline.ApplicationToApprove,
 		DeploymentType:        cdPipeline.DeploymentType,
 	}
