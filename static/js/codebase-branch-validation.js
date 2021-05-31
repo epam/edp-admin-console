@@ -188,7 +188,7 @@ function isHashCommitValid() {
 }
 
 function checkBranchName(branchName) {
-    return /^[a-z0-9][a-z0-9-.]*[a-z0-9]$/.test(branchName);
+    return /^[a-z0-9][a-z0-9\/\-\.]*[a-z0-9]$/.test(branchName);
 }
 
 function handleBranchNameValidation() {
