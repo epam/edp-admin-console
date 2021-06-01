@@ -31,17 +31,6 @@
                 <option data-build-tool="dotnet">dotnet</option>
             </select>
         </div>
-
-        <div class="js-form-subsection form-subsection formSubsection-groovy-pipeline">
-            <label for="buildTool">Select Build Tool
-                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                      title="Select application build tool."></span>
-            </label>
-            <select class="form-control buildTool groovy-pipeline-build-tools" name="buildTool">
-                <option data-build-tool="groovy-pipeline">none</option>
-            </select>
-        </div>
-
     {{end}}
 
     <div class="js-form-subsection form-subsection formSubsection-other">
@@ -98,6 +87,18 @@
         </label>
         <select class="form-control buildTool opa-build-tools" name="buildTool">
             <option data-build-tool="opa">OPA</option>
+        </select>
+    </div>
+    {{end}}
+
+    {{if eq .Type "library" }}
+    <div class="js-form-subsection form-subsection formSubsection-groovy-pipeline  hide-element">
+        <label for="buildTool">Select Build Tool
+            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                  title="Select application build tool."></span>
+        </label>
+        <select class="form-control buildTool groovy-pipeline-build-tools" name="buildTool">
+            <option data-build-tool="gradle">Gradle</option>
         </select>
     </div>
     {{end}}
