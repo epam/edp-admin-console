@@ -62,9 +62,11 @@ type ErrMsg struct {
 }
 
 const (
-	deploymentConfigsKind = "deploymentconfigs"
-	cdPipelineApiVersion  = "v2.edp.epam.com/v1alpha1"
-	cdPipelineKind        = "CDPipeline"
+	deploymentConfigsKind                  = "deploymentconfigs"
+	cdPipelineApiVersion                   = "v2.edp.epam.com/v1alpha1"
+	cdPipelineKind                         = "CDPipeline"
+	dockerStreamsBeforeUpdateAnnotationKey = "deploy.edp.epam.com/docker-streams-before-update"
+	stagesKind                             = "stages"
 )
 
 var log = logger.GetLogger()
@@ -231,6 +233,9 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 		for _, v := range pipeline.Applications {
 			dockerStreams = append(dockerStreams, v.InputDockerStream)
 		}
+
+		setAnnotations(&pipelineCR.ObjectMeta, pipelineCR.Spec.InputDockerStreams)
+
 		pipelineCR.Spec.InputDockerStreams = dockerStreams
 	}
 
@@ -247,6 +252,10 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 		Do(ctx.TODO()).
 		Into(pipelineCR)
 
+	if err := s.updateStagesRelatedToCdPipeline(pipelineCR.Spec.Name, context.Namespace); err != nil {
+		return err
+	}
+
 	if _, err = s.CreateStages(edpRestClient, pipeline); err != nil {
 		return errors.Wrap(err, "an error has occurred while creating Stages in cluster")
 	}
@@ -259,6 +268,64 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 	}
 	log.Info("CD Pipeline has been updated", zap.String("name", pipeline.Name))
 	return nil
+}
+
+func (s *CDPipelineService) updateStagesRelatedToCdPipeline(pipeName, namespace string) error {
+	stages, err := s.findStagesRelatedToPipeline(pipeName, namespace)
+	if err != nil {
+		return err
+	}
+
+	for _, stage := range stages {
+		if err := s.updateStage(&stage); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *CDPipelineService) updateStage(stage *cdPipeApi.Stage) error {
+	stage.Status.ShouldBeHandled = true
+	return s.Clients.EDPRestClient.
+		Put().
+		Namespace(context.Namespace).
+		Resource(stagesKind).
+		Name(stage.Name).
+		Body(stage).
+		Do(ctx.TODO()).
+		Into(stage)
+}
+
+func (s *CDPipelineService) findStagesRelatedToPipeline(cdPipeName, namespace string) ([]cdPipeApi.Stage, error) {
+	var stages cdPipeApi.StageList
+	if err := s.Clients.EDPRestClient.
+		Get().
+		Namespace(namespace).
+		Resource(stagesKind).
+		Do(ctx.TODO()).
+		Into(&stages); err != nil {
+		return nil, errors.Wrap(err, "couldn't list cd stages")
+	}
+
+	var res []cdPipeApi.Stage
+	for _, v := range stages.Items {
+		if v.Spec.CdPipeline == cdPipeName {
+			res = append(res, v)
+		}
+	}
+
+	if res == nil {
+		return nil, fmt.Errorf("no one stage were found by cd pipeline name %v", cdPipeName)
+	}
+
+	return res, nil
+}
+
+func setAnnotations(meta *metav1.ObjectMeta, vals []string) {
+	if meta.Annotations == nil {
+		meta.SetAnnotations(map[string]string{})
+	}
+	meta.Annotations[dockerStreamsBeforeUpdateAnnotationKey] = strings.Join(vals, ",")
 }
 
 func (s *CDPipelineService) UpdatePipelineStage(stage command.CDStageCommand, pipelineName string) error {

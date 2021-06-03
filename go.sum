@@ -276,10 +276,10 @@ github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1m
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210420131932-c2003069fbbd/go.mod h1:BXHlU8R1nC8N+ndxri9wYnPxhal3bfsRlSr+uUj4Pro=
 github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210427081757-d4e86349ad18/go.mod h1:OTGGFuUA2fH/nO0qTdG1OKAdqA+mUXqwVzesT1TIGOE=
-github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210512085930-1e8d00147a91 h1:NUzrLSK7GzA8ml1e9uozkA8JYP3DWxoChuJ1vkBVXX4=
-github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210512085930-1e8d00147a91/go.mod h1:dzVhXZnwff/NRcFZOI4Me5serzE7zruZyLdXYOAnihQ=
 github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210531114116-985018377ff6 h1:QtpIH68PqShPUoiV8x6EJT1Y0kcaRH1UxDtt5qJM/zU=
 github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210531114116-985018377ff6/go.mod h1:oOE75tfjoRosJeepTiCcJcCRq7RMhkQZm1IP02oESZM=
+github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210603104955-7b2bc4604c1d h1:BCkFqAGNeZx+KPVymZ6bscN69w0a6G2HOWlGgNzwH0Y=
+github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210603104955-7b2bc4604c1d/go.mod h1:oOE75tfjoRosJeepTiCcJcCRq7RMhkQZm1IP02oESZM=
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210420131411-dbb514cb011d/go.mod h1:Ozq8Z94gk9nvhgxp+IKXPo9czWK2q30o0FTq6wz+apk=
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210420131738-685e2b4e0def/go.mod h1:edif/4FJioi9L2sod/ZX32XsoAxWR6EndX3amHKZGx0=
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210420132318-496bccd39817/go.mod h1:fvwn3ewURl1kV9ipzlC4G2nHWAnzIFROla6USJMfdYk=
