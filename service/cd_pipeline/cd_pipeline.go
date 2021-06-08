@@ -67,6 +67,7 @@ const (
 	cdPipelineKind                         = "CDPipeline"
 	dockerStreamsBeforeUpdateAnnotationKey = "deploy.edp.epam.com/docker-streams-before-update"
 	stagesKind                             = "stages"
+	previousStageNameAnnotationKey         = "deploy.edp.epam.com/previous-stage-name"
 )
 
 var log = logger.GetLogger()
@@ -87,7 +88,7 @@ func (s *CDPipelineService) CreatePipeline(createCommand command.CDPipelineComma
 		return nil, errors.Wrapf(err, "unable to create %v cd pipeline in cluster", createCommand.Name)
 	}
 
-	if _, err = s.CreateStages(s.Clients.EDPRestClient, createCommand); err != nil {
+	if _, err = s.CreateStages(s.Clients.EDPRestClient, createCommand, buildStageCr); err != nil {
 		return nil, errors.Wrap(err, "an error has occurred while creating Stages in cluster")
 	}
 	log.Info("Stages for CD Pipeline have been created in cluster",
@@ -170,13 +171,14 @@ func (s *CDPipelineService) GetCDPipelineByName(pipelineName string) (*query.CDP
 	return cdPipeline, nil
 }
 
-func (s *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPipeline command.CDPipelineCommand) ([]cdPipeApi.Stage, error) {
+func (s *CDPipelineService) CreateStages(edpRestClient *rest.RESTClient, cdPipeline command.CDPipelineCommand,
+	buildStageCr func(stage command.CDStageCommand, cdPipelineName string, stages []command.CDStageCommand) (cdPipeApi.Stage, error)) ([]cdPipeApi.Stage, error) {
 	log.Debug("start creating stages", zap.Any("stages", cdPipeline.Stages))
 	if err := checkStagesInK8s(edpRestClient, cdPipeline.Name, cdPipeline.Stages); err != nil {
 		return nil, errors.Wrap(err, "couldn't check stages in cluster")
 	}
 
-	stagesCr, err := saveStagesIntoK8s(edpRestClient, cdPipeline.Name, cdPipeline.Stages, cdPipeline.Username)
+	stagesCr, err := saveStagesIntoK8s(edpRestClient, cdPipeline.Name, cdPipeline.Stages, cdPipeline.Username, buildStageCr)
 	if err != nil {
 		return nil, err
 	}
@@ -256,7 +258,7 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 		return err
 	}
 
-	if _, err = s.CreateStages(edpRestClient, pipeline); err != nil {
+	if _, err = s.CreateStages(edpRestClient, pipeline, s.buildStageCrDuringUpdate); err != nil {
 		return errors.Wrap(err, "an error has occurred while creating Stages in cluster")
 	}
 	log.Info("Stages for CD Pipeline have been created in cluster",
@@ -268,6 +270,22 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 	}
 	log.Info("CD Pipeline has been updated", zap.String("name", pipeline.Name))
 	return nil
+}
+
+func (s *CDPipelineService) buildStageCrDuringUpdate(stage command.CDStageCommand, cdPipelineName string, commands []command.CDStageCommand) (cdPipeApi.Stage, error) {
+	if stage.Order != 0 {
+		stages, err := s.findStagesRelatedToPipeline(cdPipelineName, context.Namespace)
+		if err != nil {
+			return cdPipeApi.Stage{}, err
+		}
+
+		sort.Slice(stages, func(i, j int) bool {
+			return stages[i].Spec.Order < stages[j].Spec.Order
+		})
+
+		return createCr(cdPipelineName, stage, stages[len(stages)-1].Spec.Name), nil
+	}
+	return createCr(cdPipelineName, stage, ""), nil
 }
 
 func (s *CDPipelineService) updateStagesRelatedToCdPipeline(pipeName, namespace string) error {
@@ -568,7 +586,7 @@ func (s *CDPipelineService) getCDPipelineStageCR(stageName, pipelineName string)
 	return stagesCr, nil
 }
 
-func createCr(cdPipelineName string, stage command.CDStageCommand) cdPipeApi.Stage {
+func createCr(cdPipelineName string, stage command.CDStageCommand, previousStageName string) cdPipeApi.Stage {
 	return cdPipeApi.Stage{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v2.edp.epam.com/v1alpha1",
@@ -577,6 +595,9 @@ func createCr(cdPipelineName string, stage command.CDStageCommand) cdPipeApi.Sta
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-%s", cdPipelineName, stage.Name),
 			Namespace: context.Namespace,
+			Annotations: map[string]string{
+				previousStageNameAnnotationKey: previousStageName,
+			},
 		},
 		Spec: cdPipeApi.StageSpec{
 			Name:            stage.Name,
@@ -600,16 +621,26 @@ func createCr(cdPipelineName string, stage command.CDStageCommand) cdPipeApi.Sta
 	}
 }
 
-func saveStagesIntoK8s(edpRestClient *rest.RESTClient, cdPipelineName string, stages []command.CDStageCommand, username string) ([]cdPipeApi.Stage, error) {
+func saveStagesIntoK8s(edpRestClient *rest.RESTClient, cdPipelineName string, stages []command.CDStageCommand, username string,
+	buildStageCr func(stage command.CDStageCommand, cdPipelineName string, stages []command.CDStageCommand) (cdPipeApi.Stage, error)) ([]cdPipeApi.Stage, error) {
+	sort.Slice(stages, func(i, j int) bool {
+		return stages[i].Order < stages[j].Order
+	})
+
 	var stagesCr []cdPipeApi.Stage
 	for _, stage := range stages {
 		stage.Username = username
-		crd := createCr(cdPipelineName, stage)
+
+		cr, err := buildStageCr(stage, cdPipelineName, stages)
+		if err != nil {
+			return nil, err
+		}
+
 		stageCr := cdPipeApi.Stage{}
-		err := edpRestClient.Post().
+		err = edpRestClient.Post().
 			Namespace(context.Namespace).
 			Resource("stages").
-			Body(&crd).
+			Body(&cr).
 			Do(ctx.TODO()).Into(&stageCr)
 		if err != nil {
 			return nil, errors.Wrap(err, "an error has occurred while creating Stage in cluster")
@@ -618,6 +649,13 @@ func saveStagesIntoK8s(edpRestClient *rest.RESTClient, cdPipelineName string, st
 		stagesCr = append(stagesCr, stageCr)
 	}
 	return stagesCr, nil
+}
+
+func buildStageCr(stage command.CDStageCommand, cdPipelineName string, stages []command.CDStageCommand) (cdPipeApi.Stage, error) {
+	if stage.Order != 0 {
+		return createCr(cdPipelineName, stage, stages[stage.Order-1].Name), nil
+	}
+	return createCr(cdPipelineName, stage, ""), nil
 }
 
 func checkStagesInK8s(edpRestClient *rest.RESTClient, cdPipelineName string, stages []command.CDStageCommand) error {
