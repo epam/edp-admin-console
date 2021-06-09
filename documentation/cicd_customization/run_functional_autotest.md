@@ -89,27 +89,24 @@ Add an additional CD pipeline and define two stages (SIT - System Integration Te
     ![add_autotest](../customization_resources/add_autotest5.png)  
 3. Add SIT stage by defining the **Autotests** type in the Quality gate type field, and select the respective check box as well:
     ![add_autotest](../customization_resources/add_autotest6.png)
-4. Add the QA stage and define the **Manual** type in the Quality gate type field. 
-5. Select the RabbitMQ service in the Services menu (the selected service will be deployed on this new CD pipeline).
-    >_**NOTE**: To get more information on how to add the CD pipeline, please refer to the [Add CD Pipelines](https://github.com/epam/edp-admin-console/blob/master/documentation/add_CD_pipelines.md#add-cd-pipelines) chapter._ 
-
-6. As soon as the CD pipeline is provisioned, the details page will display the added stages with the corresponding quality gate types. Click the CD pipeline name on the top of the details page:
+4. Add the QA stage and define the **Manual** type in the Quality gate type field.
+5. As soon as the CD pipeline is provisioned, the details page will display the added stages with the corresponding quality gate types. Click the CD pipeline name on the top of the details page:
      ![details_page](../customization_resources/details_page.png)
-7. Being navigated to Jenkins, select the SIT stage and trigger it by clicking the Build Now option from the left-side panel, and define the necessary version on the Initialization stage:
+6. Being navigated to Jenkins, select the SIT stage and trigger it by clicking the Build Now option from the left-side panel, and define the necessary version on the Initialization stage:
      ![jenkins_sit](../customization_resources/jenkins_sit_stage.png)
     >**INFO**: To trigger the CD pipeline, first, be confident that all applications have passed the Build pipelines and autotests have passed the single Code Review pipelines.   
-8. The SIT stage will not be passed successfully as the mentioned endpoint doesn`t exist. 
+7. The SIT stage will not be passed successfully as the mentioned endpoint doesn`t exist. 
 To resolve the issue, apply the configuration using IntelliJIDEA (_see above the additional information on how to make changes locally: [Local Launch of Autotests](#local_launch_autotest)_;
-9. Being in IntelliJIDEA, click Edit Configuration → Maven → type the name - ms-release-sit → click OK:  
+8. Being in IntelliJIDEA, click Edit Configuration → Maven → type the name - ms-release-sit → click OK:  
      ![intellij_idea](../customization_resources/i_idea.png)
-10. Find the **run.json** file to copy out the necessary command value for SIT stage, then click the Edit Configuration button → go to Maven ms-release-sit and paste the copied command value into the Command line field→ click Apply and OK:
+9. Find the **run.json** file to copy out the necessary command value for SIT stage, then click the Edit Configuration button → go to Maven ms-release-sit and paste the copied command value into the Command line field→ click Apply and OK:
      ![intellij_idea](../customization_resources/i_idea2.png)
-11. Push the changes to send them for review to Gerrit and submit the changes.
-12. After the changes are added, the SIT stage should be triggered one more time. Open Jenkins and click the Build Now option from the left-side panel, then select the latest version in the appeared notification during the Initialization stage. 
+10. Push the changes to send them for review to Gerrit and submit the changes.
+11. After the changes are added, the SIT stage should be triggered one more time. Open Jenkins and click the Build Now option from the left-side panel, then select the latest version in the appeared notification during the Initialization stage. 
 As a result, the triggered pipeline won`t be passed. Click the Allure link to get more information about the issues:
      
     ![jenkins_sit](../customization_resources/failed_build.png)
-13. The Allure report displays the failed tests and explains the failure reason. In the current case, the expected string doesn`t match the initial one: 
+12. The Allure report displays the failed tests and explains the failure reason. In the current case, the expected string doesn`t match the initial one: 
     ![allure_report](../customization_resources/allure_report3.png) 
 
 ## Deploy SIT Stage <a name="deploy_sit_stage"></a>

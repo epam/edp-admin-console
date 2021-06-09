@@ -8,7 +8,6 @@ Once clicked, the four-step menu will appear:
 * The Pipeline Menu
 * The Applications Menu
 * The Stages Menu
-* The Services Menu
 
 The creation of the CD pipeline becomes available as soon as an application is created including its provisioning in a branch and the necessary entities for the environment.
 
@@ -66,14 +65,7 @@ After the complete adding of the CD pipeline, inspect the [Check CD Pipeline Ava
     ![addcdpipe5](../readme-resource/addcdpipe5.png "addcdpipe5")
 
 9. Edit the stage by clicking its name and applying changes, and remove the added stage by clicking the recycle bin icon next to its name.
-
-    ## The Services Menu
-    
-    ![addcdpip6](../readme-resource/addcdpipe6.png "addcdpipe6")
-
-10. Choose the necessary services by selecting the related check box(ex).
-
-11. Click the Create button to start the provisioning of the pipeline. After the CD pipeline is added, the new project with the stage name will be created in OpenShift.
+10. Click the Create button to start the provisioning of the pipeline. After the CD pipeline is added, the new project with the stage name will be created in OpenShift.
 
 ## <a name="Check_CD_Pipeline_Availability"></a> Check CD Pipeline Availability
 
@@ -115,8 +107,6 @@ As soon as the CD pipeline is provisioned and added to the CD Pipelines list, th
       _**NOTE**: The deletion of stages is performed sequentially, starting from the latest created stage. In order to **remove a stage**, click the corresponding delete icon, type the CD pipeline name and confirm the deletion by clicking the Delete button. If you remove the last stage, the whole CD pipeline will be removed as the CD pipeline does not exist without stages._
       
     ![addcdpip9](../readme-resource/addcdpipe9.png "addcdpipe9")
-
-    - the Third-Party Services menu displays the name, description, and version of the added service;
 
     - the Deployed Version menu indicates the applications and stages with the appropriate status. The status will be changed after stage deployment. 
 
