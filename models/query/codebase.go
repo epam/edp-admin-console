@@ -8,8 +8,6 @@ type Codebase struct {
 	Framework                string                 `json:"framework" orm:"column(framework)"`
 	Strategy                 string                 `json:"strategy" orm:"column(strategy)"`
 	GitUrl                   string                 `json:"git_url" orm:"column(repository_url)"`
-	RouteSite                string                 `json:"route_site" orm:"column(route_site)"`
-	RoutePath                string                 `json:"route_path" orm:"column(route_path)"`
 	Type                     CodebaseType           `json:"type" orm:"column(type)"`
 	Status                   Status                 `json:"status" orm:"column(status)"`
 	TestReportFramework      string                 `json:"testReportFramework" orm:"column(test_report_framework)"`

@@ -10,8 +10,6 @@ Once clicked, the six-step menu will appear:
 * The Application Info Menu
 * The Advanced Settings Menu
 * The Version Control System Info Menu
-* The Exposing Service Info Menu
-* The Database Menu
 
 _**NOTE**: The Version Control System Info menu is available in case this option is predefined._
 
@@ -149,19 +147,8 @@ Such functionality allows monitoring the overall team performance and setting up
 25. Enter the password into the **VCS Password (or API Token)** field OR add the API Token. Click the Proceed button to be switched to the next menu.
     
     >_**NOTE**: The VCS Info step is skipped in case there is no need to integrate the version control for the application deployment. If the cloned application includes the VCS, this step should be completed as well._
-
-    ## The Exposing Service Info Menu
-
-    ![add-app5](../readme-resource/addapp_5.png "add-app5")
-
-26. Select the **Need Route** check box to create a route component in the OpenShift project for the externally reachable host name. As a result, the added application will be accessible in a browser.
-    
-    Fill in the necessary fields and proceed to the final menu:
-    
-    - Name – type the name by entering at least two characters and by using the lower-case letters, numbers and inner dashes. The mentioned name will be as a prefix for the host name.
-    - Path – specify the path starting with the **/api** characters. The mentioned path will be at the end of the URL path.
        
-27. Click the Proceed button. Once clicked, the CONFIRMATION summary will appear displaying all the specified options and settings, click Continue to complete the application addition.
+26. Click the Proceed button. Once clicked, the CONFIRMATION summary will appear displaying all the specified options and settings, click Continue to complete the application addition.
     
 >_**NOTE**: After the complete adding of the application, please refer to the [Inspect Application](../documentation/inspect_application.md) page._
 

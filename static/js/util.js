@@ -178,11 +178,6 @@ function createConfirmTable(formName) {
     addBlock($('.vcs-block').length !== 0, null,
         {'VCS Login': 'vcsLogin'});
 
-    $(addBlock('needRoute', 'EXPOSING SERVICE INFO', {
-        'Exposing service name': 'routeSite',
-        'Exposing service path': 'routePath'
-    }));
-
     $(addBlock('testReportFramework', 'REPORT FRAMEWORK', {
         'Autotest Report Framework': 'testReportFramework'
     }));

@@ -382,7 +382,7 @@ $(function () {
     $('.create-codebase').click(function (event) {
         let canCreateApplication = validateCodebaseInfo(event) &
             validateMainInfo(event) & validateVCSInfo(event) &
-            validateRouteInfo(event) & validateAdvancedInfo(event) &
+            validateAdvancedInfo(event) &
             validatePerfIntegrationBlock(event);
         if (canCreateApplication) {
             createConfirmTable('#createAppForm');
@@ -495,23 +495,6 @@ $(function () {
             return isValid;
         }
         blockIsValid($vcsBlockEl);
-
-        return isValid;
-    }
-
-    function validateRouteInfo(event) {
-        let $exposeServiceBlockEl = $('.route-block');
-
-        resetErrors($exposeServiceBlockEl);
-
-        let isValid = isExposingServiceInfoValid();
-
-        if (!isValid) {
-            event.stopPropagation();
-            blockIsNotValid($exposeServiceBlockEl);
-            return isValid;
-        }
-        blockIsValid($exposeServiceBlockEl);
 
         return isValid;
     }
@@ -740,32 +723,6 @@ $(function () {
         }
 
         return isVcsLoginValid && isVcsPasswordValid;
-    }
-
-    function isExposingServiceInfoValid() {
-        let needRoute = $('#needRoute').is(':checked');
-
-        if (needRoute) {
-            let $serviceNameInputEl = $('#routeSite'),
-                isServiceNameValid = isCodebaseSiteFieldValid($serviceNameInputEl, REGEX.SERVICE_NAME);
-
-            if (!isServiceNameValid) {
-                $('.route-site.invalid-feedback').show();
-                $serviceNameInputEl.addClass('is-invalid');
-            }
-
-            let $servicePathInputEl = $('#routePath'),
-                isServicePathValid = isFieldValid($servicePathInputEl, REGEX.SERVICE_PATH);
-
-            if (!isServicePathValid) {
-                $('.route-path.invalid-feedback').show();
-                $servicePathInputEl.addClass('is-invalid');
-            }
-
-            return isServiceNameValid && isServicePathValid;
-        }
-
-        return true;
     }
 
 })

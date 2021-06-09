@@ -11,7 +11,6 @@ type CreateCodebase struct {
 	MultiModule              bool        `json:"multiModule,omitempty"`
 	Type                     string      `json:"type,omitempty" valid:"Required"`
 	Repository               *Repository `json:"repository,omitempty"`
-	Route                    *Route      `json:"route,omitempty"`
 	Vcs                      *Vcs        `json:"vcs,omitempty"`
 	Description              *string     `json:"description,omitempty"`
 	Username                 string      `json:"username"`
@@ -44,11 +43,6 @@ type Repository struct {
 type Vcs struct {
 	Login    string `json:"login,omitempty" valid:"Required"`
 	Password string `json:"password,omitempty" valid:"Required"`
-}
-
-type Route struct {
-	Site string `json:"site,omitempty" valid:"Match(/^$|^[a-z][a-z0-9-]*[a-z0-9]$/)"`
-	Path string `json:"path,omitempty" valid:"Match(/^\\/.*$/)"`
 }
 
 type DeleteCodebaseCommand struct {

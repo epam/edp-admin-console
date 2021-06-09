@@ -42,15 +42,6 @@ func ValidCodebaseRequestData(codebase command.CreateCodebase) *ErrMsg {
 		}
 	}
 
-	if codebase.Route != nil {
-		if len(codebase.Route.Path) > 0 {
-			_, err := valid.Valid(codebase.Route)
-			resErr = err
-		} else {
-			valid.Match(codebase.Route.Site, regexp.MustCompile("^$|^[a-z][a-z0-9-]*[a-z0-9]$"), "Route.Site.Match")
-		}
-	}
-
 	if codebase.Vcs != nil {
 		_, err := valid.Valid(codebase.Vcs)
 		resErr = err
@@ -100,9 +91,6 @@ func CreateCodebaseLogRequestData(app command.CreateCodebase) strings.Builder {
 		result.WriteString(fmt.Sprintf(", vcsLogin=%s", app.Vcs.Login))
 	}
 
-	if app.Route != nil {
-		result.WriteString(fmt.Sprintf(", routeSite=%s, routePath=%s", app.Route.Site, app.Route.Path))
-	}
 	return result
 }
 

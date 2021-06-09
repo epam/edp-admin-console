@@ -193,12 +193,12 @@
             {{template "../template/perf_template.html" .}}
 
             {{if eq .Type "application" }}
-                <button type="button" class="advanced-settings-submit edp-submit-form-btn btn btn-primary"
+                <button type="button" class="create-codebase advanced-settings-submit edp-submit-form-btn btn btn-primary"
                         data-toggle="collapse"
                         data-target="{{if .IsVcsEnabled}}#collapseVCS{{else}}#collapseFour{{end}}"
                         aria-expanded="false"
                         aria-controls="collapseThree">
-                    Proceed
+                    Create
                 </button>
             {{end}}
 

@@ -339,16 +339,6 @@ func (c *ApplicationController) extractApplicationRequestData() (*command.Create
 		}
 	}
 
-	needRoute, _ := c.GetBool("needRoute", false)
-	if needRoute {
-		codebase.Route = &command.Route{
-			Site: c.GetString("routeSite"),
-		}
-		if len(c.GetString("routePath")) > 0 {
-			codebase.Route.Path = c.GetString("routePath")
-		}
-	}
-
 	codebase.Username = c.Ctx.Input.Session("username").(string)
 
 	if s := c.GetString("perfServer"); len(s) > 0 {
