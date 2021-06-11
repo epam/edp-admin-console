@@ -89,9 +89,8 @@ func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*edpv1
 			Kind:       consts.CodebaseKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:       codebase.Name,
-			Namespace:  context.Namespace,
-			Finalizers: []string{"foregroundDeletion"},
+			Name:      codebase.Name,
+			Namespace: context.Namespace,
 		},
 		Spec: convertData(codebase),
 		Status: edpv1alpha1.CodebaseStatus{
