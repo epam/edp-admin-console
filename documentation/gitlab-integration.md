@@ -55,6 +55,8 @@ Discover the steps below to apply the GitLab integration correctly:
         * GIT_CREDENTIALS_ID;
         * REPOSITORY_PATH;
         * JIRA_INTEGRATION_ENABLED;
+        * PLATFORM_TYPE;
+        * DEFAULT_BRANCH;
 
     * Check the *Execute concurrent builds if necessary* option;
     * Check the *Restrict where this project can be run* option;
@@ -79,34 +81,45 @@ Discover the steps below to apply the GitLab integration correctly:
     def commitValidateStage = jiraIntegrationEnabled ? ',{"name": "commit-validate"}' : ''
     def createJIMStage = jiraIntegrationEnabled ? ',{"name": "create-jira-issue-metadata"}' : ''
     def platformType = "${PLATFORM_TYPE}"
+    def buildTool = "${BUILD_TOOL}"
     def buildStage = platformType == "kubernetes" ? ',{"name": "build-image-kaniko"},' : ',{"name": "build-image-from-dockerfile"},'
-
-    stages['Code-review-application-maven'] = '[{"name": "checkout"}' + "${commitValidateStage}" + ',{"name": "compile"}' +
-        ',{"name": "tests"}, {"name": "sonar"}]'
-    stages['Code-review-application-npm'] = stages['Code-review-application-maven']
-    stages['Code-review-application-gradle'] = stages['Code-review-application-maven']
-    stages['Code-review-application-dotnet'] = stages['Code-review-application-maven']
-    stages['Code-review-application-terraform'] = '[{"name": "checkout"},{"name": "tool-init"},{"name": "lint"}]'
-    stages['Code-review-application-helm'] = '[{"name": "checkout"},{"name": "lint"}]'
-    stages['Code-review-application-docker'] = '[{"name": "checkout"},{"name": "lint"}]'
-    stages['Code-review-application-go'] = '[{"name": "checkout"}' + "${commitValidateStage}" + ',{"name": "build"},' +
-                                           '{"name": "tests"}, {"name": "sonar"}]'
-    stages['Code-review-application-python'] = '[{"name": "checkout"},{"name": "compile"},' +
-                                           '{"name": "tests"}, {"name": "sonar"}]'
-    stages['Code-review-library'] = '[{"name": "checkout"},{"name": "compile"},{"name": "tests"},' +
+    def goBuildStage = buildTool.toString() == "go" ? ',{"name": "build"}' : ',{"name": "compile"}'
+    
+    stages['Code-review-application'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" + goBuildStage +
+            ',{"name": "tests"},[{"name": "sonar"},{"name": "dockerfile-lint"},{"name": "helm-lint"}]]'
+    stages['Code-review-library'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" +
+            ',{"name": "compile"},{"name": "tests"},' +
             '{"name": "sonar"}]'
-    stages['Code-review-autotests-maven'] = '[{"name": "checkout"},{"name": "tests"},{"name": "sonar"}]'
+    stages['Code-review-autotests'] = '[{"name": "gerrit-checkout"},{"name": "get-version"}' + "${commitValidateStage}" +
+            ',{"name": "tests"},{"name": "sonar"}' + "${createJIMStage}" + ']'
+    stages['Code-review-default'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" + ']'
+    stages['Code-review-library-terraform'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" +
+            ',{"name": "terraform-lint"}]'
+    stages['Code-review-library-opa'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" +
+            ',{"name": "tests"}]'
+    stages['Code-review-library-codenarc'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" +
+            ',{"name": "sonar"},{"name": "build"}]'
+
     stages['Build-library-maven'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
-            '{"name": "tests"},{"name": "sonar"},{"name": "build"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
+            '{"name": "tests"},{"name": "sonar"},{"name": "build"},{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
     stages['Build-library-npm'] = stages['Build-library-maven']
     stages['Build-library-gradle'] = stages['Build-library-maven']
     stages['Build-library-dotnet'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
             '{"name": "tests"},{"name": "sonar"},{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
-    stages['Build-application-maven'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
+    stages['Build-library-python'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
+            '{"name": "tests"},{"name": "sonar"},{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
+    stages['Build-library-terraform'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "terraform-lint"}' +
+            ',{"name": "terraform-plan"},{"name": "terraform-apply"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
+    stages['Build-library-opa'] = '[{"name": "checkout"},{"name": "get-version"}' +
+            ',{"name": "tests"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
+    stages['Build-library-codenarc'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "sonar"},{"name": "build"}' +
+            "${createJIMStage}" + ',{"name": "git-tag"}]'
+    
+   stages['Build-application-maven'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
             '{"name": "tests"},{"name": "sonar"},{"name": "build"}' + "${buildStage}" +
             '{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
     stages['Build-application-python'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},{"name": "tests"},{"name": "sonar"}' +
-    "${buildStage}" + '{"name":"push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
+            "${buildStage}" + '{"name":"push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
     stages['Build-application-npm'] = stages['Build-application-maven']
     stages['Build-application-gradle'] = stages['Build-application-maven']
     stages['Build-application-dotnet'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
@@ -122,7 +135,6 @@ Discover the steps below to apply the GitLab integration correctly:
 
 
     def codebaseName = "${NAME}"
-    def buildTool = "${BUILD_TOOL}"
     def gitServerCrName = "${GIT_SERVER_CR_NAME}"
     def gitServerCrVersion = "${GIT_SERVER_CR_VERSION}"
     def gitServer = "${GIT_SERVER ? GIT_SERVER : 'gerrit'}"
@@ -131,6 +143,7 @@ Discover the steps below to apply the GitLab integration correctly:
     def gitCredentialsId = "${GIT_CREDENTIALS_ID ? GIT_CREDENTIALS_ID : 'gerrit-ciuser-sshkey'}"
     def defaultRepoPath = "ssh://${gitUsername}@${gitServer}:${gitSshPort}/${codebaseName}"
     def repositoryPath = "${REPOSITORY_PATH ? REPOSITORY_PATH : defaultRepoPath}"
+    def defaultBranch = "${DEFAULT_BRANCH}"
 
     def codebaseFolder = jenkins.getItem(codebaseName)
     if (codebaseFolder == null) {
@@ -139,7 +152,7 @@ Discover the steps below to apply the GitLab integration correctly:
 
     createListView(codebaseName, "Releases")
     createReleasePipeline("Create-release-${codebaseName}", codebaseName, stages["Create-release"], "create-release.groovy",
-            repositoryPath, gitCredentialsId, gitServerCrName, gitServerCrVersion, jiraIntegrationEnabled, platformType)
+            repositoryPath, gitCredentialsId, gitServerCrName, gitServerCrVersion, jiraIntegrationEnabled, platformType, defaultBranch)
 
     if (BRANCH) {
         def branch = "${BRANCH}"
@@ -205,10 +218,7 @@ Discover the steps below to apply the GitLab integration correctly:
                     stringParam("GIT_SERVER_CR_VERSION", "${gitServerCrVersion}", "Version of GitServer CR Resource")
                     stringParam("STAGES", "${codebaseStages}", "Consequence of stages in JSON format to be run during execution")
                     stringParam("GERRIT_PROJECT_NAME", "${codebaseName}", "Gerrit project name(Codebase name) to be build")
-                    if (pipelineName.contains("Build"))
-                        stringParam("BRANCH", "${watchBranch}", "Branch to build artifact from")
-                    else
-                        stringParam("BRANCH", "\${gitlabMergeRequestLastCommit}", "Branch to build artifact from")
+                    stringParam("BRANCH", "${watchBranch}", "Branch to build artifact from")
                 }
             }
         }
@@ -235,7 +245,7 @@ Discover the steps below to apply the GitLab integration correctly:
 
 
     def createReleasePipeline(pipelineName, codebaseName, codebaseStages, pipelineScript, repository, credId,
-    gitServerCrName, gitServerCrVersion, jiraIntegrationEnabled, platformType) {
+    gitServerCrName, gitServerCrVersion, jiraIntegrationEnabled, platformType, defaultBranch) {
         pipelineJob("${codebaseName}/${pipelineName}") {
             logRotator {
                 numToKeep(14)
@@ -249,7 +259,7 @@ Discover the steps below to apply the GitLab integration correctly:
                                 url(repository)
                                 credentials(credId)
                             }
-                            branches("master")
+                            branches("${defaultBranch}")
                             scriptPath("${pipelineScript}")
                         }
                     }
@@ -264,6 +274,7 @@ Discover the steps below to apply the GitLab integration correctly:
                             stringParam("GIT_SERVER_CR_NAME", "${gitServerCrName}", "Name of Git Server CR to generate link to Git server")
                             stringParam("GIT_SERVER_CR_VERSION", "${gitServerCrVersion}", "Version of GitServer CR Resource")
                             stringParam("REPOSITORY_PATH", "${repository}", "Full repository path")
+                            stringParam("DEFAULT_BRANCH", "${defaultBranch}", "Default repository branch")
                         }
                     }
                 }
