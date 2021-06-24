@@ -191,13 +191,32 @@
             {{template "../template/perf_template.html" .}}
 
             {{if eq .Type "application" }}
-                <button type="button" class="create-codebase advanced-settings-submit edp-submit-form-btn btn btn-primary"
-                        data-toggle="collapse"
-                        data-target="{{if .IsVcsEnabled}}#collapseVCS{{else}}#collapseFour{{end}}"
-                        aria-expanded="false"
-                        aria-controls="collapseThree">
-                    Create
-                </button>
+
+                {{if .IsVcsEnabled}}
+                    <button type="button"
+                            class="adv-setting-application-submit advanced-settings-submit edp-submit-form-btn btn btn-primary"
+                            data-toggle="collapse"
+                            data-target="#collapseVCS"
+                            aria-expanded="false"
+                            aria-controls="collapseThree">
+                        Proceed
+                    </button>
+                {{else}}
+                    <button disabled type="button"
+                            class="adv-setting-application-submit advanced-settings-submit edp-submit-form-btn btn btn-primary hide-element"
+                            data-toggle="collapse"
+                            data-target="#collapseVCS"
+                            aria-expanded="false"
+                            aria-controls="collapseThree">
+                        Proceed
+                    </button>
+
+                    <button type="button"
+                            class="adv-setting-create-application create-codebase edp-submit-form-btn btn btn-primary">
+                        Create
+                    </button>
+                {{end}}
+
             {{end}}
 
             {{if eq .Type "autotests" }}

@@ -18,10 +18,15 @@ $('#perfServerToggle').change(function () {
 
 function displayButtonWhenPerfIsSelected() {
     let $advBlockEl = $('div.card.advanced-settings-block'),
-        $codebaseType = $advBlockEl.data('codebase-type'),
-        $advancedButtonEl = $('button.advanced-settings-submit');
+        $codebaseType = $advBlockEl.data('codebase-type');
     if ($codebaseType === 'application') {
-        $advancedButtonEl.attr('data-target', '#collapseDataSource');
+        $('button.adv-setting-application-submit')
+            .attr('disabled', false)
+            .removeClass('hide-element')
+            .attr('data-target', '#collapseDataSource');
+        $('button.adv-setting-create-application')
+            .attr('disabled', true)
+            .addClass('hide-element');
     } else if ($codebaseType === 'autotests') {
         $('button.adv-setting-autotest-submit')
             .attr('disabled', false)
@@ -44,10 +49,18 @@ function displayButtonWhenPerfIsSelected() {
 function displayButtonWhenPerfIsNotSelected() {
     let $advBlockEl = $('div.card.advanced-settings-block'),
         vcsEnabled = $advBlockEl.data('vcs-enabled') === true,
-        $codebaseType = $advBlockEl.data('codebase-type'),
-        $advancedButtonEl = $('button.advanced-settings-submit');
+        $codebaseType = $advBlockEl.data('codebase-type');
     if ($codebaseType === 'application') {
-        $advancedButtonEl.attr('data-target', vcsEnabled ? '#collapseVCS' : '#collapseFour');
+        if (vcsEnabled) {
+            $('button.adv-setting-application-submit').attr('data-target', '#collapseVCS');
+        } else {
+            $('button.adv-setting-application-submit')
+                .attr('disabled', true)
+                .addClass('hide-element');
+            $('button.adv-setting-create-application')
+                .attr('disabled', false)
+                .removeClass('hide-element');
+        }
     } else if ($codebaseType === 'autotests') {
         if (vcsEnabled) {
             $('button.adv-setting-autotest-submit').attr('data-target', '#collapseVCS');
