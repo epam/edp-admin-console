@@ -85,19 +85,19 @@ Discover the steps below to apply the GitLab integration correctly:
     def buildStage = platformType == "kubernetes" ? ',{"name": "build-image-kaniko"},' : ',{"name": "build-image-from-dockerfile"},'
     def goBuildStage = buildTool.toString() == "go" ? ',{"name": "build"}' : ',{"name": "compile"}'
     
-    stages['Code-review-application'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" + goBuildStage +
+    stages['Code-review-application'] = '[{"name": "checkout"}' + "${commitValidateStage}" + goBuildStage +
             ',{"name": "tests"},[{"name": "sonar"},{"name": "dockerfile-lint"},{"name": "helm-lint"}]]'
-    stages['Code-review-library'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" +
+    stages['Code-review-library'] = '[{"name": "checkout"}' + "${commitValidateStage}" +
             ',{"name": "compile"},{"name": "tests"},' +
             '{"name": "sonar"}]'
-    stages['Code-review-autotests'] = '[{"name": "gerrit-checkout"},{"name": "get-version"}' + "${commitValidateStage}" +
+    stages['Code-review-autotests'] = '[{"name": "checkout"},{"name": "get-version"}' + "${commitValidateStage}" +
             ',{"name": "tests"},{"name": "sonar"}' + "${createJIMStage}" + ']'
-    stages['Code-review-default'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" + ']'
-    stages['Code-review-library-terraform'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" +
+    stages['Code-review-default'] = '[{"name": "checkout"}' + "${commitValidateStage}" + ']'
+    stages['Code-review-library-terraform'] = '[{"name": "checkout"}' + "${commitValidateStage}" +
             ',{"name": "terraform-lint"}]'
-    stages['Code-review-library-opa'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" +
+    stages['Code-review-library-opa'] = '[{"name": "checkout"}' + "${commitValidateStage}" +
             ',{"name": "tests"}]'
-    stages['Code-review-library-codenarc'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" +
+    stages['Code-review-library-codenarc'] = '[{"name": "checkout"}' + "${commitValidateStage}" +
             ',{"name": "sonar"},{"name": "build"}]'
 
     stages['Build-library-maven'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
@@ -132,6 +132,8 @@ Discover the steps below to apply the GitLab integration correctly:
     stages['Build-application-go'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "tests"},{"name": "sonar"},' +
                                     '{"name": "build"}' + "${buildStage}" + "${createJIMStage}" + '{"name": "git-tag"}]'
     stages['Create-release'] = '[{"name": "checkout"},{"name": "create-branch"},{"name": "trigger-job"}]'
+   
+   def defaultStages = '[{"name": "checkout"}' + "${createJIMStage}" + ']'
 
 
     def codebaseName = "${NAME}"
@@ -160,15 +162,18 @@ Discover the steps below to apply the GitLab integration correctly:
         createListView(codebaseName, formattedBranch)
 
         def type = "${TYPE}"
-        createCiPipeline("Code-review-${codebaseName}", codebaseName, stages["Code-review-${type}-${buildTool.toLowerCase()}"], "code-review.groovy",
-                repositoryPath, gitCredentialsId, branch, gitServerCrName, gitServerCrVersion)
+        def crKey = "Code-review-${type}".toString()
+        createCiPipeline("Code-review-${codebaseName}", codebaseName, stages.get(crKey, defaultStages), "code-review.groovy",
+            repositoryPath, gitCredentialsId, branch, gitServerCrName, gitServerCrVersion)
 
+        def buildKey = "Build-${type}-${buildTool.toLowerCase()}".toString()
+   
         if (type.equalsIgnoreCase('application') || type.equalsIgnoreCase('library')) {
             def jobExists = false
             if("${formattedBranch}-Build-${codebaseName}".toString() in Jenkins.instance.getAllItems().collect{it.name}) {
                jobExists = true
             }
-            createCiPipeline("Build-${codebaseName}", codebaseName, stages["Build-${type}-${buildTool.toLowerCase()}"], "build.groovy",
+            createCiPipeline("Build-${codebaseName}", codebaseName, stages.get(buildKey, defaultStages), "build.groovy",
                     repositoryPath, gitCredentialsId, branch, gitServerCrName, gitServerCrVersion)
            if(!jobExists) {
              queue("${codebaseName}/${formattedBranch}-Build-${codebaseName}")
@@ -177,8 +182,8 @@ Discover the steps below to apply the GitLab integration correctly:
     }
 
 
-    def createCiPipeline(pipelineName, codebaseName, codebaseStages, pipelineScript, repository, credId, watchBranch = "master", gitServerCrName, gitServerCrVersion) {
-    def jobName = "${watchBranch.toUpperCase().replaceAll(/\\//, "-")}-${pipelineName}"
+    def createCiPipeline(pipelineName, codebaseName, codebaseStages, pipelineScript, repository, credId, defaultBranch, gitServerCrName, gitServerCrVersion) {
+    def jobName = "${defaultBranch.toUpperCase().replaceAll(/\\//, "-")}-${pipelineName}"
     def existingJob = Jenkins.getInstance().getItemByFullName("${codebaseName}/${jobName}")
     def webhookToken = null
     if (existingJob) {
@@ -209,7 +214,7 @@ Discover the steps below to apply the GitLab integration correctly:
                             url(repository)
                             credentials(credId)
                         }
-                        branches(pipelineName.contains("Build") ? "${watchBranch}" : "\${gitlabMergeRequestLastCommit}")
+                        branches(pipelineName.contains("Build") ? "${defaultBranch}" : "\${gitlabMergeRequestLastCommit}")
                         scriptPath("${pipelineScript}")
                     }
                 }
@@ -218,7 +223,7 @@ Discover the steps below to apply the GitLab integration correctly:
                     stringParam("GIT_SERVER_CR_VERSION", "${gitServerCrVersion}", "Version of GitServer CR Resource")
                     stringParam("STAGES", "${codebaseStages}", "Consequence of stages in JSON format to be run during execution")
                     stringParam("GERRIT_PROJECT_NAME", "${codebaseName}", "Gerrit project name(Codebase name) to be build")
-                    stringParam("BRANCH", "${watchBranch}", "Branch to build artifact from")
+                    stringParam("BRANCH", "${defaultBranch}", "Branch to build artifact from")
                 }
             }
         }
@@ -231,7 +236,7 @@ Discover the steps below to apply the GitLab integration correctly:
                 rebuildOpenMergeRequest(pipelineName.contains("Build") ? 'never' : 'source')
                 commentTrigger("Build it please")
                 skipWorkInProgressMergeRequest(true)
-                targetBranchRegex("${watchBranch}")
+                targetBranchRegex("${defaultBranch}")
             }
         }
         configure {

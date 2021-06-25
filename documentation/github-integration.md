@@ -76,19 +76,19 @@ def buildStage = platformType == "kubernetes" ? ',{"name": "build-image-kaniko"}
 def buildTool = "${BUILD_TOOL}"
 def goBuildStage = buildTool.toString() == "go" ? ',{"name": "build"}' : ',{"name": "compile"}'
 
-stages['Code-review-application'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" + goBuildStage +
+stages['Code-review-application'] = '[{"name": "checkout"}' + "${commitValidateStage}" + goBuildStage +
         ',{"name": "tests"},[{"name": "sonar"},{"name": "dockerfile-lint"},{"name": "helm-lint"}]]'
-stages['Code-review-library'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" +
+stages['Code-review-library'] = '[{"name": "checkout"}' + "${commitValidateStage}" +
         ',{"name": "compile"},{"name": "tests"},' +
         '{"name": "sonar"}]'
-stages['Code-review-autotests'] = '[{"name": "gerrit-checkout"},{"name": "get-version"}' + "${commitValidateStage}" +
+stages['Code-review-autotests'] = '[{"name": "checkout"},{"name": "get-version"}' + "${commitValidateStage}" +
         ',{"name": "tests"},{"name": "sonar"}' + "${createJIMStage}" + ']'
-stages['Code-review-default'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" + ']'
-stages['Code-review-library-terraform'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" +
+stages['Code-review-default'] = '[{"name": "checkout"}' + "${commitValidateStage}" + ']'
+stages['Code-review-library-terraform'] = '[{"name": "checkout"}' + "${commitValidateStage}" +
         ',{"name": "terraform-lint"}]'
-stages['Code-review-library-opa'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" +
+stages['Code-review-library-opa'] = '[{"name": "checkout"}' + "${commitValidateStage}" +
         ',{"name": "tests"}]'
-stages['Code-review-library-codenarc'] = '[{"name": "gerrit-checkout"}' + "${commitValidateStage}" +
+stages['Code-review-library-codenarc'] = '[{"name": "checkout"}' + "${commitValidateStage}" +
         ',{"name": "sonar"},{"name": "build"}]'
 
 stages['Build-library-maven'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
@@ -173,8 +173,8 @@ if (BRANCH) {
     }
 }
 
-def createCodeReviewPipeline(pipelineName, codebaseName, codebaseStages, pipelineScript, repository, credId, watchBranch = "master", gitServerCrName, gitServerCrVersion, githubRepository) {
-    pipelineJob("${codebaseName}/${watchBranch.toUpperCase().replaceAll(/\\//, "-")}-${pipelineName}") {
+def createCodeReviewPipeline(pipelineName, codebaseName, codebaseStages, pipelineScript, repository, credId, defaultBranch, gitServerCrName, gitServerCrVersion, githubRepository) {
+    pipelineJob("${codebaseName}/${defaultBranch.toUpperCase().replaceAll(/\\//, "-")}-${pipelineName}") {
         logRotator {
             numToKeep(10)
             daysToKeep(7)
@@ -197,7 +197,7 @@ def createCodeReviewPipeline(pipelineName, codebaseName, codebaseStages, pipelin
                     stringParam("GIT_SERVER_CR_VERSION", "${gitServerCrVersion}", "Version of GitServer CR Resource")
                     stringParam("STAGES", "${codebaseStages}", "Consequence of stages in JSON format to be run during execution")
                     stringParam("GERRIT_PROJECT_NAME", "${codebaseName}", "Gerrit project name(Codebase name) to be build")
-                    stringParam("BRANCH", "${watchBranch}", "Branch to build artifact from")
+                    stringParam("BRANCH", "${defaultBranch}", "Branch to build artifact from")
                 }
             }
         }
@@ -209,7 +209,7 @@ def createCodeReviewPipeline(pipelineName, codebaseName, codebaseStages, pipelin
                 permitAll(true)
                 autoCloseFailedPullRequests(false)
                 displayBuildErrorsOnDownstreamBuilds(false)
-                whiteListTargetBranches([watchBranch.toString()])
+                whiteListTargetBranches([defaultBranch.toString()])
                 extensions {
                     commitStatus {
                         context('Jenkins Code-Review')
@@ -232,8 +232,8 @@ def createCodeReviewPipeline(pipelineName, codebaseName, codebaseStages, pipelin
     }
 }
 
-def createBuildPipeline(pipelineName, codebaseName, codebaseStages, pipelineScript, repository, credId, watchBranch = "master", gitServerCrName, gitServerCrVersion, githubRepository) {
-    pipelineJob("${codebaseName}/${watchBranch.toUpperCase().replaceAll(/\\//, "-")}-${pipelineName}") {
+def createBuildPipeline(pipelineName, codebaseName, codebaseStages, pipelineScript, repository, credId, defaultBranch, gitServerCrName, gitServerCrVersion, githubRepository) {
+    pipelineJob("${codebaseName}/${defaultBranch.toUpperCase().replaceAll(/\\//, "-")}-${pipelineName}") {
         logRotator {
             numToKeep(10)
             daysToKeep(7)
@@ -246,7 +246,7 @@ def createBuildPipeline(pipelineName, codebaseName, codebaseStages, pipelineScri
                             url(repository)
                             credentials(credId)
                         }
-                        branches("${watchBranch}")
+                        branches("${defaultBranch}")
                         scriptPath("${pipelineScript}")
                     }
                 }
@@ -255,7 +255,7 @@ def createBuildPipeline(pipelineName, codebaseName, codebaseStages, pipelineScri
                     stringParam("GIT_SERVER_CR_VERSION", "${gitServerCrVersion}", "Version of GitServer CR Resource")
                     stringParam("STAGES", "${codebaseStages}", "Consequence of stages in JSON format to be run during execution")
                     stringParam("GERRIT_PROJECT_NAME", "${codebaseName}", "Gerrit project name(Codebase name) to be build")
-                    stringParam("BRANCH", "${watchBranch}", "Branch to run from")
+                    stringParam("BRANCH", "${defaultBranch}", "Branch to run from")
                 }
             }
         }
