@@ -5,7 +5,7 @@ branches, and image streams that are elements with the specific icon.
 To open the current project diagram, navigate to the **Delivery Dashboard Diagram** section on the navigation 
 bar:
 
-![dashboard](../readme-resource/dashboard.png "dashboard") 
+![dashboard](../readme-resource/dashboard.png "dashboard")
 
 >**INFO**: All the requested changes (deletion, creation, adding) are displayed immediately on the Delivery Dashboard Diagram. 
 

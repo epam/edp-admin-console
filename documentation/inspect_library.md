@@ -15,7 +15,7 @@ _**INFO:** To navigate quickly to OpenShift, Jenkins, Gerrit, SonarQube, Nexus, 
 
 The added library will be listed in the Libraries list allowing you to do the following:
 
-![inspect-lib](../readme-resource/inspectlib1.png "inspect-lib")
+![library_page](../readme-resource/library_page.png "library_page")
 
 1. Create another library by clicking the Create button and performing the same steps as described [here](../documentation/add_libraries.md);
 2. Open library data by clicking its link name. Once clicked, the following blocks will be displayed:
@@ -33,9 +33,9 @@ The added library will be listed in the Libraries list allowing you to do the fo
        - Type the required library name;
        - Confirm the deletion by clicking the Delete button.
        
-       _**NOTE**: The library that is used in a CD pipeline cannot be removed._
+     >_**NOTE**: The library that is used in a CD pipeline cannot be removed._
 
-   ![inspect-lib](../readme-resource/inspectlib2.png "inspect-lib")
+   ![library_page2](../readme-resource/library_page2.png "library_page2")
 
 5. Select a number of existing libraries to be displayed on one page in the **Show entries** field. The filter allows to show 10, 25, 50 or 100 entries per page. 
 6. Sort the existing libraries in a list by clicking the Name title. The libraries will be displayed in an alphabetical order. 
@@ -48,15 +48,15 @@ The EDP Admin Console provides the ability to enable, disable or edit the Jira I
 
 1. Perform the editing from one of the following sections on the Admin Console interface:
 
-    ![editcodebase1](../readme-resource/edit_lib_codebase1.png "editcodebase1")
+    ![edit_codebase](../readme-resource/edit_library_codebase.png "edit_codebase")
 
-   - Navigate to the codebase overview page and click the **pencil** icon, or
+   - Navigate to the library page and click the **pencil** icon, or
    
-    ![editcodebase2](../readme-resource/edit_lib_codebase2.png "editcodebase2")
+    ![pencil_icon](../readme-resource/library_pen_icon.png "pencil_icon")
    
-   - Navigate to the codebase list page and click the **pencil** icon.
+   - Navigate to the Libraries list page and click the **pencil** icon.
    
-    ![editcodebase3](../readme-resource/edit_codebase_3.png "editcodebase3")
+    ![edit_codebase](../readme-resource/edit_codebase_library.png "edit_codebase")
     
 2. To enable Jira integration, on the **Edit Codebase** page do the following:
    - mark the **Integrate with Jira server** checkbox and fill in the necessary fields; 
@@ -80,7 +80,7 @@ When adding a library, the default branch is a **master** branch. In order to ad
     
 2. Fill in the required fields:
     
-    ![addbranch2](../readme-resource/addbranch2.png "addbranch2")
+    ![new_branch](../readme-resource/create_new_branch_library.png "new_branch")
     
     a. Release Branch - select the Release Branch check box if you need to create a release branch;
     
