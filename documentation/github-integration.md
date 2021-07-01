@@ -72,7 +72,7 @@ def jiraIntegrationEnabled = Boolean.parseBoolean("${JIRA_INTEGRATION_ENABLED}" 
 def commitValidateStage = jiraIntegrationEnabled ? ',{"name": "commit-validate"}' : ''
 def createJIMStage = jiraIntegrationEnabled ? ',{"name": "create-jira-issue-metadata"}' : ''
 def platformType = "${PLATFORM_TYPE}"
-def buildStage = platformType == "kubernetes" ? ',{"name": "build-image-kaniko"},' : ',{"name": "build-image-from-dockerfile"},'
+def buildStage = platformType == "kubernetes" ? ',{"name": "build-image-kaniko"}' : ',{"name": "build-image-from-dockerfile"}'
 def buildTool = "${BUILD_TOOL}"
 def goBuildStage = buildTool.toString() == "go" ? ',{"name": "build"}' : ',{"name": "compile"}'
 
