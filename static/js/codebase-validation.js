@@ -87,6 +87,7 @@ $(function () {
 
         $('.gitServerEl').addClass('hide-element');
         $('.gitRelativePathEl').addClass('hide-element');
+        $('#gitRepoUrl').attr("disabled", false);
 
         $('.repo-url').add($('.private-repo')).removeClass('hide-element');
 
@@ -94,6 +95,11 @@ $(function () {
             $('.repoLogin').add($('.repoPassword')).removeClass('hide-element');
         }
 
+        $('#gitRelativePath').addClass('hide-element');
+        $('#gitRelativePath').attr("disabled", true);
+
+        $('#repoLogin').attr("disabled", false);
+        $('#gitRepoUrl').removeClass('hide-element');
         $('.empty-project').addClass('hide-element');
     }
 
@@ -125,7 +131,11 @@ $(function () {
 
         $('.repo-url').add($('.private-repo')).addClass('hide-element');
         $('.repoLogin').add($('.repoPassword')).addClass('hide-element');
-
+        $('#gitRelativePath').removeClass('hide-element');
+        $('#gitRelativePath').attr("disabled", false);
+        $('#repoLogin').attr("disabled", true);
+        $('#gitRepoUrl').addClass('hide-element');
+        $('#gitRepoUrl').attr("disabled", true);
         $('.empty-project').addClass('hide-element');
     }
 

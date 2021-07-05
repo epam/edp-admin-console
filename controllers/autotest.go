@@ -168,16 +168,18 @@ func (c *AutotestsController) extractAutotestsRequestData() (*command.CreateCode
 		codebase.TestReportFramework = &testReportFramework
 	}
 
-	repoUrl := c.GetString("gitRepoUrl")
-	if repoUrl != "" {
-		codebase.Repository = &command.Repository{
-			Url: repoUrl,
-		}
+	if codebase.Strategy == consts.CloneStrategy {
+		repoUrl := c.GetString("gitRepoUrl")
+		if repoUrl != "" {
+			codebase.Repository = &command.Repository{
+				Url: repoUrl,
+			}
 
-		isRepoPrivate, _ := c.GetBool("isRepoPrivate", false)
-		if isRepoPrivate {
-			codebase.Repository.Login = c.GetString("repoLogin")
-			codebase.Repository.Password = c.GetString("repoPassword")
+			isRepoPrivate, _ := c.GetBool("isRepoPrivate", false)
+			if isRepoPrivate {
+				codebase.Repository.Login = c.GetString("repoLogin")
+				codebase.Repository.Password = c.GetString("repoPassword")
+			}
 		}
 	}
 

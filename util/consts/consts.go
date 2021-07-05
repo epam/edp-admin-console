@@ -20,6 +20,7 @@ const (
 	CodebaseKind         = "Codebase"
 
 	ImportStrategy        = "import"
+	CloneStrategy         = "clone"
 	LanguageJava          = "Java"
 	DefaultVersioningType = "default"
 	JenkinsCITool         = "Jenkins"

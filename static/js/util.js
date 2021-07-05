@@ -134,7 +134,8 @@ function createConfirmTable(formName) {
         'Commit Message Pattern': 'commitMessagePattern',
         'Ticket Name Pattern': 'ticketNamePattern',
         'CI tool': 'ciTool',
-        'Perf server': 'perfServer'
+        'Perf server': 'perfServer',
+        'Relative Path': 'gitRelativePath'
     };
 
     if ($('#versioningType').val() === 'edp') {
