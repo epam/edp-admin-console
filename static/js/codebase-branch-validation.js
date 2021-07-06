@@ -162,8 +162,6 @@ $(function () {
     $('#branch-version').on('input', function () {
         if ($('#releaseBranch').is(":checked")) {
             $('#branchName').val("release/" + trimMinorVersionComponent($(this).val()));
-        } else {
-            $('#branchName').val($(this).val());
         }
     });
 
