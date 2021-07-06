@@ -87,7 +87,6 @@ $(function () {
 
         $('.gitServerEl').addClass('hide-element');
         $('.gitRelativePathEl').addClass('hide-element');
-        $('#gitRepoUrl').attr("disabled", false);
 
         $('.repo-url').add($('.private-repo')).removeClass('hide-element');
 
@@ -95,11 +94,10 @@ $(function () {
             $('.repoLogin').add($('.repoPassword')).removeClass('hide-element');
         }
 
-        $('#gitRelativePath').addClass('hide-element');
-        $('#gitRelativePath').attr("disabled", true);
+        $('#gitRelativePath').addClass('hide-element').attr("disabled", true);
 
         $('#repoLogin').attr("disabled", false);
-        $('#gitRepoUrl').removeClass('hide-element');
+        $('#gitRepoUrl').removeClass('hide-element').attr("disabled", false);
         $('.empty-project').addClass('hide-element');
     }
 
@@ -112,10 +110,11 @@ $(function () {
         $('#gitRepoUrl').val(function () {
             return this.defaultValue;
         });
-        
-        $('.gitServerEl').addClass('hide-element');
-        $('.gitRelativePathEl').addClass('hide-element');
 
+        $('.gitServerEl').addClass('hide-element');
+        $('.gitRelativePathEl').addClass('hide-element').attr("disabled", true);
+        $('#gitRelativePath').addClass('hide-element').attr("disabled", true);
+        $('#gitRepoUrl').addClass('hide-element').attr("disabled", true);
         $('.repo-url').add($('.private-repo')).addClass('hide-element');
         $('.repoLogin').add($('.repoPassword')).addClass('hide-element');
 
@@ -131,11 +130,9 @@ $(function () {
 
         $('.repo-url').add($('.private-repo')).addClass('hide-element');
         $('.repoLogin').add($('.repoPassword')).addClass('hide-element');
-        $('#gitRelativePath').removeClass('hide-element');
-        $('#gitRelativePath').attr("disabled", false);
+        $('#gitRelativePath').removeClass('hide-element').attr("disabled", false);
         $('#repoLogin').attr("disabled", true);
-        $('#gitRepoUrl').addClass('hide-element');
-        $('#gitRepoUrl').attr("disabled", true);
+        $('#gitRepoUrl').addClass('hide-element').attr("disabled", true);
         $('.empty-project').addClass('hide-element');
     }
 
@@ -563,7 +560,7 @@ $(function () {
                             } else {
                                 if (data.msg === "repository not found") {
                                     $('.git-url').show();
-                                } else if (data.msg === "authentication required"){
+                                } else if (data.msg === "authentication required") {
                                     $('.git-creds').show();
                                 }
 
