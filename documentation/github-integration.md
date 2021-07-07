@@ -108,16 +108,16 @@ stages['Build-library-codenarc'] = '[{"name": "checkout"},{"name": "get-version"
 
 stages['Build-application-maven'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
         '{"name": "tests"},{"name": "sonar"},{"name": "build"}' + "${buildStage}" +
-        '{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
+        ',{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
 stages['Build-application-npm'] = stages['Build-application-maven']
 stages['Build-application-gradle'] = stages['Build-application-maven']
 stages['Build-application-dotnet'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
         '{"name": "tests"},{"name": "sonar"}' + "${buildStage}" +
-        '{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
+        ',{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
 stages['Build-application-go'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "tests"},{"name": "sonar"},' +
                                     '{"name": "build"}' + "${buildStage}" + "${createJIMStage}" + ',{"name": "git-tag"}]'
 stages['Build-application-python'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},{"name": "tests"},{"name": "sonar"}' +
-                                    "${buildStage}" + '{"name":"push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
+                                    "${buildStage}" + ',{"name":"push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
 
 stages['Create-release'] = '[{"name": "checkout"},{"name": "create-branch"},{"name": "trigger-job"}]'
 
@@ -154,7 +154,7 @@ if (BRANCH) {
 	def supBuildTool = buildToolsOutOfTheBox.contains(buildTool.toString())
     def crKey = "Code-review-${type}".toString()
     createCodeReviewPipeline("Code-review-${codebaseName}", codebaseName, stages.get(crKey, defaultStages), "code-review.groovy",
-            repositoryPath, gitCredentialsId, branch, gitServerCrName, gitServerCrVersion, githubRepository)
+            repositoryPath, gitCredentialsId, defaultBranch, gitServerCrName, gitServerCrVersion, githubRepository)
     registerWebHook(repositoryPath)
 
 
@@ -197,7 +197,10 @@ def createCodeReviewPipeline(pipelineName, codebaseName, codebaseStages, pipelin
                     stringParam("GIT_SERVER_CR_VERSION", "${gitServerCrVersion}", "Version of GitServer CR Resource")
                     stringParam("STAGES", "${codebaseStages}", "Consequence of stages in JSON format to be run during execution")
                     stringParam("GERRIT_PROJECT_NAME", "${codebaseName}", "Gerrit project name(Codebase name) to be build")
-                    stringParam("BRANCH", "${defaultBranch}", "Branch to build artifact from")
+                    if (pipelineName.contains("Build"))
+                        stringParam("BRANCH", "${defaultBranch}", "Branch to build artifact from")
+                    else
+                        stringParam("BRANCH", "\${ghprbActualCommit}", "Branch to build artifact from")
                 }
             }
         }

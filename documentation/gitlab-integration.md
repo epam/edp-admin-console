@@ -223,7 +223,10 @@ Discover the steps below to apply the GitLab integration correctly:
                     stringParam("GIT_SERVER_CR_VERSION", "${gitServerCrVersion}", "Version of GitServer CR Resource")
                     stringParam("STAGES", "${codebaseStages}", "Consequence of stages in JSON format to be run during execution")
                     stringParam("GERRIT_PROJECT_NAME", "${codebaseName}", "Gerrit project name(Codebase name) to be build")
-                    stringParam("BRANCH", "${defaultBranch}", "Branch to build artifact from")
+                    if (pipelineName.contains("Build"))
+                        stringParam("BRANCH", "${defaultBranch}", "Branch to build artifact from")
+                    else
+                        stringParam("BRANCH", "\${gitlabMergeRequestLastCommit}", "Branch to build artifact from")
                 }
             }
         }
