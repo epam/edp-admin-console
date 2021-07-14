@@ -32,3 +32,11 @@ func (m MockPerfBoard) GetCodebaseDataSources(codebaseId int) ([]string, error) 
 	}
 	return args.Get(0).([]string), args.Error(1)
 }
+
+func (m MockPerfBoard) IsPerfEnabled(namespace string) (bool, error) {
+	args := m.Called(namespace)
+	if args.Get(0) == nil {
+		return false, args.Error(1)
+	}
+	return args.Get(0).(bool), args.Error(1)
+}

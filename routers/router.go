@@ -102,7 +102,10 @@ func init() {
 	ss := service.SlaveService{ISlaveRepository: sr}
 	ps := service.JobProvisioning{IJobProvisioningRepository: pr}
 	js := jiraservice.JiraServer{IJiraServer: jsr}
-	pbs := perfboard.PerfBoard{PerfRepo: psr}
+	pbs := perfboard.PerfBoard{
+		PerfRepo: psr,
+		CoreClient: clients.CoreClient,
+	}
 	ecs := edpComponentService.EDPComponentService{IEDPComponent: ecr}
 	edpService := service.EDPTenantService{Clients: clients}
 	clusterService := service.ClusterService{Clients: clients}

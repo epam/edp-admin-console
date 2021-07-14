@@ -307,6 +307,14 @@ func (c *AutotestsController) GetCreateAutotestsPage() {
 
 	log.Info("Create strategy is removed from list due to Autotest")
 
+	pe, err := c.PerfService.IsPerfEnabled(context.Namespace)
+	if err != nil {
+		log.Error(err.Error())
+		c.Abort("500")
+		return
+	}
+
+	c.Data["IsPerfEnabled"] = pe
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["HasRights"] = auth.IsAdmin(c.GetSession("realm_roles").([]string))

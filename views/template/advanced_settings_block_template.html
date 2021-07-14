@@ -188,7 +188,9 @@
 
             </div>
 
-            {{template "../template/perf_template.html" .}}
+            {{if .IsPerfEnabled}}
+                {{template "../template/perf_template.html" .}}
+            {{end}}
 
             {{if eq .Type "application" }}
 
