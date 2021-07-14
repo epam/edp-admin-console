@@ -12,6 +12,9 @@ import (
 	"github.com/epam/edp-codebase-operator/v2/pkg/util"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/fake"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -22,13 +25,23 @@ func TestGetCreatePageMethod_ShouldBeExecutedSuccessfully(t *testing.T) {
 	mjp := new(mock.MockJobProvision)
 	mjs := new(mock.MockJiraServer)
 	mpb := new(mock.MockPerfBoard)
+	fkc := fake.NewSimpleClientset(&v1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: "",
+			Name: "edp-config",
+		},
+		Data: map[string]string{
+			"perf_integration_enabled": "false",
+		},
+	},
+	)
 
 	lc := LibraryController{
 		EDPTenantService: service.EDPTenantService{},
 		SlaveService:     service.SlaveService{ISlaveRepository: sm},
 		JobProvisioning:  service.JobProvisioning{IJobProvisioningRepository: mjp},
 		JiraServer:       jiraservice.JiraServer{IJiraServer: mjs},
-		PerfService:      perfboard.PerfBoard{PerfRepo: mpb},
+		PerfService:      perfboard.PerfBoard{PerfRepo: mpb, CoreClient: fkc.CoreV1()},
 	}
 
 	beego.AppConfig.Set("vcsIntegrationEnabled", "false")

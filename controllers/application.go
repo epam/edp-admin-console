@@ -170,6 +170,14 @@ func (c *ApplicationController) GetCreateApplicationPage() {
 		return
 	}
 
+	pe, err := c.PerfService.IsPerfEnabled(context.Namespace)
+	if err != nil {
+		log.Error(err.Error())
+		c.Abort("500")
+		return
+	}
+
+	c.Data["IsPerfEnabled"] = pe
 	c.Data["EDPVersion"] = context.EDPVersion
 	c.Data["Username"] = c.Ctx.Input.Session("username")
 	c.Data["IsVcsEnabled"] = isVcsEnabled
