@@ -7,7 +7,7 @@ Using Admin Console enables to manage business entities:
 
 _**NOTE**: To interact with Admin Console via REST API, explore the [Create Codebase Entity](documentation/rest-api.md) page._
 
-![overview-page](readme-resource/ac_overview_page.png "overview-page") 
+![overview_page](readme-resource/ac_overview_page.png "overview_page")
 
 - <strong>Navigation bar </strong>– consists of seven sections: Overview, Continuous Delivery, Applications, Autotests, Libraries, and Delivery Dashboard Diagram. 
 Click the necessary section to add an entity, open a home page or check the diagram.
