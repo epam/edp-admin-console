@@ -82,7 +82,8 @@ Discover the steps below to apply the GitLab integration correctly:
     def createJIMStage = jiraIntegrationEnabled ? ',{"name": "create-jira-issue-metadata"}' : ''
     def platformType = "${PLATFORM_TYPE}"
     def buildTool = "${BUILD_TOOL}"
-    def buildStage = platformType == "kubernetes" ? ',{"name": "build-image-kaniko"},' : ',{"name": "build-image-from-dockerfile"},'
+    def buildImageStage = platformType == "kubernetes" ? ',{"name": "build-image-kaniko"},' : ',{"name": "build-image-from-dockerfile"},'
+    def goBuildImageStage = platformType == "kubernetes" ? ',{"name": "build-image-kaniko"}' : ',{"name": "build-image-from-dockerfile"}'
     def goBuildStage = buildTool.toString() == "go" ? ',{"name": "build"}' : ',{"name": "compile"}'
     
     stages['Code-review-application'] = '[{"name": "checkout"}' + "${commitValidateStage}" + goBuildStage +
@@ -116,21 +117,21 @@ Discover the steps below to apply the GitLab integration correctly:
             "${createJIMStage}" + ',{"name": "git-tag"}]'
     
    stages['Build-application-maven'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
-            '{"name": "tests"},{"name": "sonar"},{"name": "build"}' + "${buildStage}" +
+            '{"name": "tests"},{"name": "sonar"},{"name": "build"}' + "${buildImageStage}" +
             '{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
     stages['Build-application-python'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},{"name": "tests"},{"name": "sonar"}' +
-            "${buildStage}" + '{"name":"push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
+            "${buildImageStage}" + '{"name":"push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
     stages['Build-application-npm'] = stages['Build-application-maven']
     stages['Build-application-gradle'] = stages['Build-application-maven']
     stages['Build-application-dotnet'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "compile"},' +
-            '{"name": "tests"},{"name": "sonar"}' + "${buildStage}" +
+            '{"name": "tests"},{"name": "sonar"}' + "${buildImageStage}" +
             '{"name": "push"}' + "${createJIMStage}" + ',{"name": "git-tag"}]'
     stages['Build-application-terraform'] = '[{"name": "checkout"},{"name": "tool-init"},' +
             '{"name": "lint"},{"name": "git-tag"}]'
     stages['Build-application-helm'] = '[{"name": "checkout"},{"name": "lint"}]'
     stages['Build-application-docker'] = '[{"name": "checkout"},{"name": "lint"}]'
     stages['Build-application-go'] = '[{"name": "checkout"},{"name": "get-version"},{"name": "tests"},{"name": "sonar"},' +
-                                    '{"name": "build"}' + "${buildStage}" + "${createJIMStage}" + '{"name": "git-tag"}]'
+                                    '{"name": "build"}' + "${goBuildImageStage}" + "${createJIMStage}" + ',{"name": "git-tag"}]'
     stages['Create-release'] = '[{"name": "checkout"},{"name": "create-branch"},{"name": "trigger-job"}]'
    
    def defaultStages = '[{"name": "checkout"}' + "${createJIMStage}" + ']'
