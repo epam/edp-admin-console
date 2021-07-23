@@ -14,7 +14,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/coreos/go-oidc v2.1.0+incompatible
 	github.com/docker/docker v1.13.1 // indirect
-	github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210719102353-5b2c321433a2
+	github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210723121127-8ebba1c38950
 	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210719114732-5f764bacb870
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/lib/pq v1.8.0
