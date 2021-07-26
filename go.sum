@@ -275,6 +275,8 @@ github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7
 github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210719102353-5b2c321433a2/go.mod h1:Pf+GV1xiGM3o3HY2kxhRvKQJaS3WZ+l1b/FbwAzeyV8=
 github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210723121127-8ebba1c38950 h1:EUDAmBZIKGUQbN1HOhbcnsKy5ZQVKi5Tei3JbQn5VYc=
 github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210723121127-8ebba1c38950/go.mod h1:Pf+GV1xiGM3o3HY2kxhRvKQJaS3WZ+l1b/FbwAzeyV8=
+github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210726142624-e26cea43163f h1:flOnL7xfuhmz5d1fE7OWUXfX1HxGuASBynI/geS5YVU=
+github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210726142624-e26cea43163f/go.mod h1:Pf+GV1xiGM3o3HY2kxhRvKQJaS3WZ+l1b/FbwAzeyV8=
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210719094151-e8e2f2e673ee/go.mod h1:RrlWmvSGjklimKquYTmaZ5RZbqTp77Y6aRzMKrH1oLU=
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210719101613-f5c6cff5e79e/go.mod h1:wvrxou1GI0jSEHAn4W35sqeWdNrFAcTxpR84BzKeiZs=
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210719112602-046af47ad1c0/go.mod h1:6lrvH9ratDh1CxYZRQu5XoESAPAZXvhNO3gTkNv9ihA=
