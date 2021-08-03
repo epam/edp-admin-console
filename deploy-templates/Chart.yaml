@@ -1,5 +1,5 @@
 apiVersion: v2
-description: A Helm chart for EDP Jenkins Operator
+description: A Helm chart for EDP Admin Console
 home: https://solutionshub.epam.com/solution/epam-delivery-platform
 name: edp-admin-console
 type: application
