@@ -18,4 +18,4 @@ COPY db db
 
 USER ${USER_UID}
 
-ENTRYPOINT ["edp-admin-console"]
+ENTRYPOINT ["go-binary"]
