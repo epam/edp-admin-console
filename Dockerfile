@@ -10,7 +10,7 @@ RUN addgroup --gid ${USER_UID} ${USER_NAME} \
 
 WORKDIR /go/bin
 
-COPY edp-admin-console .
+COPY go-binary .
 COPY static static
 COPY views views
 COPY conf conf
