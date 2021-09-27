@@ -33,8 +33,11 @@ In order to run the operator, follow the steps below:
     3.2. In the Working directory field, indicate the path to the operator;
 
     3.3. In the Environment field, specify the platform name (OpenShift/Kubernetes);
-    ![build-config](readme-resource/build_config.png "build-config")
-4. Create the PostgreSQL database, schema, and a user for the EDP Admin Console operator:
+```
+WATCH_NAMESPACE=test-okd-7178;PLATFORM_TYPE=openshift
+```
+![build-config](readme-resource/build_config.png "build-config")
+5. Create the PostgreSQL database, schema, and a user for the EDP Admin Console operator:
      * Create database with a user:
    ```yaml
    CREATE DATABASE edp-db WITH ENCODING 'UTF8';
@@ -58,8 +61,8 @@ In order to run the operator, follow the steps below:
     pgPassword=password
     edpName=develop
    ```
-5. Run 'go build main.go' (Shift+F10);
-6. After the successful setup, follow the [http://localhost:8080](http://localhost:8080) URL address to check the result:
+6. Run 'go build main.go' (Shift+F10);
+7. After the successful setup, follow the [http://localhost:8080](http://localhost:8080) URL address to check the result:
 
 ![check-deploy](readme-resource/check_deploy.png "check-deploy")
 

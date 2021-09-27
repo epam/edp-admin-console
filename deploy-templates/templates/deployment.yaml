@@ -89,7 +89,7 @@ spec:
               value: maven
             - name: DEPLOYMENT_SCRIPT
 {{ if eq .Values.platform "openshift" }}
-              value: 'helm-chart,openshift-template'
+              value: 'helm-chart'
 {{ else }}
               value: 'helm-chart'
 {{ end }}
