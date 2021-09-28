@@ -22,7 +22,7 @@ $(function () {
     };
 
     let DEPLOYMENT_SCRIPT = {
-        OPENSHIFT_TEMPLATE: "openshift-template",
+        //OPENSHIFT_TEMPLATE: "openshift-template",
         HELM_CHART: "helm-chart"
     };
 
@@ -36,10 +36,10 @@ $(function () {
 
     !function () {
         let $deployScriptEl = $('.deploymentScript');
-        if ($('.advanced-settings-block').data('openshift')) {
-            $deployScriptEl.val(DEPLOYMENT_SCRIPT.OPENSHIFT_TEMPLATE);
-            return;
-        }
+        // if ($('.advanced-settings-block').data('openshift')) {
+        //     $deployScriptEl.val(DEPLOYMENT_SCRIPT.OPENSHIFT_TEMPLATE);
+        //     return;
+        // }
         $deployScriptEl.val(DEPLOYMENT_SCRIPT.HELM_CHART);
     }();
 
