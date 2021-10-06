@@ -1,1 +1,1 @@
-update codebase set deployment_script = 'openshift-template';
+update codebase set deployment_script = 'helm-chart';
