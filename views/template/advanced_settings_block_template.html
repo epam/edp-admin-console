@@ -74,7 +74,7 @@
                               title="Select Deployment Script which will be used for deploy"></span>
                     </label>
                     <select class="form-control deploymentScript" name="deploymentScript">
-                        {{range .DeploymentScripts}}
+                        {{range $ds := .DeploymentScripts}}
                             <option>{{$ds}}</option>
                         {{end}}
                     </select>
