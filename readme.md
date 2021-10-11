@@ -32,7 +32,10 @@ In order to run the operator, follow the steps below:
 
     3.2. In the Working directory field, indicate the path to the operator;
 
-    3.3. In the Environment field, specify the platform name (OpenShift/Kubernetes);
+    3.3. In the Environment field, specify the platform name (OpenShift/Kubernetes) and NameSpace;
+   ```
+   WATCH_NAMESPACE=test-go-env;PLATFORM_TYPE=openshift
+   ```
     ![build-config](readme-resource/build_config.png "build-config")
 4. Create the PostgreSQL database, schema, and a user for the EDP Admin Console operator:
      * Create database with a user:
