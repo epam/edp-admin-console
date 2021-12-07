@@ -20,13 +20,6 @@ type CDCodebaseStageMatrixValue struct {
 	DockerVersion string `json:"dockerVersion"`
 }
 
-func (c *CDPipelineDTO) getCDCodebaseStageMatrixValue(codebase dto.CodebaseBranchDTO, stage CDPipelineStageView) CDCodebaseStageMatrixValue {
-	return c.CodebaseStageMatrix[CDCodebaseStageMatrixKey{
-		CodebaseBranch: codebase,
-		Stage:          stage,
-	}]
-}
-
 type CDPipelineView struct {
 	Name        string `json:"name"`
 	Status      string `json:"status"`

@@ -253,8 +253,11 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 		Body(pipelineCR).
 		Do(ctx.TODO()).
 		Into(pipelineCR)
+	if err != nil {
+		return err
+	}
 
-	if err := s.updateStagesRelatedToCdPipeline(pipelineCR.Spec.Name, context.Namespace); err != nil {
+	if err = s.updateStagesRelatedToCdPipeline(pipelineCR.Spec.Name, context.Namespace); err != nil {
 		return err
 	}
 
@@ -514,7 +517,7 @@ func fillCodebaseStageMatrixK8s(ocClient *k8s.ClientSet, cdPipeline *query.CDPip
 						var containerImage = container.Image
 						var delimeter = strings.LastIndex(containerImage, ":")
 						if delimeter > 0 {
-							value.DockerVersion = string(containerImage[(delimeter + 1):len(containerImage)])
+							value.DockerVersion = containerImage[(delimeter + 1):]
 						}
 					}
 				}

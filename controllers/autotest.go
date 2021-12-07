@@ -214,11 +214,17 @@ func validateAutotestsRequestData(autotests command.CreateCodebase) *validation2
 	_, err := valid.Valid(autotests)
 
 	if autotests.Strategy == consts.ImportStrategy {
-		valid.Match(autotests.GitUrlPath, regexp.MustCompile("^\\/.*$"), "Spec.GitUrlPath")
+		valid.Match(autotests.GitUrlPath, regexp.MustCompile(`^/.*$`), "Spec.GitUrlPath")
 	}
 
 	if autotests.Repository != nil {
 		_, err = valid.Valid(autotests.Repository)
+		if err != nil {
+			valid.Errors = append(valid.Errors, &validation.Error{
+				Key:     "repository",
+				Message: err.Error(),
+			})
+		}
 
 		_, err = util.IsGitRepoAvailable(autotests.Repository.Url, autotests.Repository.Login, autotests.Repository.Password)
 		if err != nil {

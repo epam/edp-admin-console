@@ -99,7 +99,7 @@ func validCodebaseBranchRequestData(requestData command.CreateCodebaseBranch) *v
 	_, err := valid.Valid(requestData)
 
 	if len(requestData.Commit) != 0 {
-		valid.Match(requestData.Commit, regexp.MustCompile("\\b([a-f0-9]{40})\\b"), "Commit.Match")
+		valid.Match(requestData.Commit, regexp.MustCompile(`\b([a-f0-9]{40})\b`), "Commit.Match")
 	}
 
 	if err != nil {

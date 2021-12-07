@@ -304,7 +304,7 @@ func validateLibraryRequestData(library command.CreateCodebase) *validation2.Err
 	_, err := valid.Valid(library)
 
 	if library.Strategy == consts.ImportStrategy {
-		valid.Match(library.GitUrlPath, regexp.MustCompile("^\\/.*$"), "Spec.GitUrlPath")
+		valid.Match(library.GitUrlPath, regexp.MustCompile(`^/.*$`), "Spec.GitUrlPath")
 	}
 
 	if library.Strategy == "clone" && library.Repository != nil {

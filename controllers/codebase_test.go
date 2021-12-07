@@ -47,9 +47,9 @@ func TestGetCodebaseOverviewPage_ShouldBeExecutedSuccessfully(t *testing.T) {
 	cc.Ctx = input.Context
 	cc.Ctx.Input.Context.Input = input
 	cc.Ctx.Input.CruSession = &session.CookieSessionStore{}
-	cc.Ctx.Input.CruSession.Flush()
-	cc.Ctx.Input.CruSession.Set("username", "stub-value")
-	cc.Ctx.Input.CruSession.Set("realm_roles", []string{"stub-value"})
+	assert.NoError(t, cc.Ctx.Input.CruSession.Flush())
+	assert.NoError(t, cc.Ctx.Input.CruSession.Set("username", "stub-value"))
+	assert.NoError(t, cc.Ctx.Input.CruSession.Set("realm_roles", []string{"stub-value"}))
 	cc.Data = map[interface{}]interface{}{}
 
 	gs := "stub-name"

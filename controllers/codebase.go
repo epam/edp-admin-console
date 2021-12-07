@@ -28,7 +28,6 @@ import (
 	"edp-admin-console/util/auth"
 	"edp-admin-console/util/consts"
 	dberror "edp-admin-console/util/error/db-errors"
-	"errors"
 	"fmt"
 	"html/template"
 
@@ -151,7 +150,7 @@ func (c CodebaseController) createLinksForGitProvider(codebase query.Codebase, t
 		return err
 	}
 	if g == nil {
-		return errors.New(fmt.Sprintf("unexpected behaviour. couldn't find %v GitServer in DB", *codebase.GitServer))
+		return fmt.Errorf("unexpected behaviour. couldn't find %v GitServer in DB", *codebase.GitServer)
 	}
 
 	jc, err := c.EDPComponent.GetEDPComponent(consts.Jenkins)

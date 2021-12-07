@@ -44,7 +44,7 @@ func TestGetCreateAutotestsPageMethod_ShouldBeExecutedSuccessfully(t *testing.T)
 		PerfService:      perfboard.PerfBoard{PerfRepo: mpb, CoreClient: fkc.CoreV1()},
 	}
 
-	beego.AppConfig.Set("vcsIntegrationEnabled", "false")
+	assert.NoError(t, beego.AppConfig.Set("vcsIntegrationEnabled", "false"))
 	input := context.NewInput()
 	input.Context = context.NewContext()
 	r, _ := http.NewRequest("GET", "stub-request", nil)
@@ -53,8 +53,8 @@ func TestGetCreateAutotestsPageMethod_ShouldBeExecutedSuccessfully(t *testing.T)
 	autc.Ctx = input.Context
 	autc.Ctx.Input.Context.Input = input
 	autc.Ctx.Input.CruSession = &session.CookieSessionStore{}
-	autc.Ctx.Input.CruSession.Flush()
-	autc.Ctx.Input.CruSession.Set("realm_roles", []string{"stub-value"})
+	assert.NoError(t, autc.Ctx.Input.CruSession.Flush())
+	assert.NoError(t, autc.Ctx.Input.CruSession.Set("realm_roles", []string{"stub-value"}))
 	autc.Data = map[interface{}]interface{}{}
 
 	sm.On("GetAllSlaves").Return(
@@ -106,7 +106,7 @@ func TestGetCreateAutotestsPageMethod_ShouldReturnError(t *testing.T) {
 		PerfService:      perfboard.PerfBoard{PerfRepo: mpb},
 	}
 
-	beego.AppConfig.Set("vcsIntegrationEnabled", "false")
+	assert.NoError(t, beego.AppConfig.Set("vcsIntegrationEnabled", "false"))
 	input := context.NewInput()
 	input.Context = context.NewContext()
 	r, _ := http.NewRequest("GET", "stub-request", nil)
@@ -115,8 +115,8 @@ func TestGetCreateAutotestsPageMethod_ShouldReturnError(t *testing.T) {
 	autc.Ctx = input.Context
 	autc.Ctx.Input.Context.Input = input
 	autc.Ctx.Input.CruSession = &session.CookieSessionStore{}
-	autc.Ctx.Input.CruSession.Flush()
-	autc.Ctx.Input.CruSession.Set("realm_roles", []string{"stub-value"})
+	assert.NoError(t, autc.Ctx.Input.CruSession.Flush())
+	assert.NoError(t, autc.Ctx.Input.CruSession.Set("realm_roles", []string{"stub-value"}))
 	autc.Data = map[interface{}]interface{}{}
 
 	sm.On("GetAllSlaves").Return(
@@ -158,8 +158,8 @@ func TestExtractAutotestsRequestDataMethod_ReturnsDtoWithPerfField(t *testing.T)
 	autc.Ctx = input.Context
 	autc.Ctx.Input.Context.Input = input
 	autc.Ctx.Input.CruSession = &session.CookieSessionStore{}
-	autc.Ctx.Input.CruSession.Flush()
-	autc.Ctx.Input.CruSession.Set("username", "stub-value")
+	assert.NoError(t, autc.Ctx.Input.CruSession.Flush())
+	assert.NoError(t, autc.Ctx.Input.CruSession.Set("username", "stub-value"))
 
 	c, err := autc.extractAutotestsRequestData()
 	assert.NoError(t, err)
@@ -175,8 +175,8 @@ func TestExtractAutotestsRequestDataMethod_ReturnsDtoWithoutPerfField(t *testing
 	autc.Ctx = input.Context
 	autc.Ctx.Input.Context.Input = input
 	autc.Ctx.Input.CruSession = &session.CookieSessionStore{}
-	autc.Ctx.Input.CruSession.Flush()
-	autc.Ctx.Input.CruSession.Set("username", "stub-value")
+	assert.NoError(t, autc.Ctx.Input.CruSession.Flush())
+	assert.NoError(t, autc.Ctx.Input.CruSession.Set("username", "stub-value"))
 
 	c, err := autc.extractAutotestsRequestData()
 	assert.NoError(t, err)

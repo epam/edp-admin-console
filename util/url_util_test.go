@@ -7,13 +7,13 @@ import (
 )
 
 func TestCreateNativeProjectLinkMethod_ShouldBeExecutedSuccessfully(t *testing.T) {
-	beego.AppConfig.Set("projectMaskUrl", "/console/project/{namespace}/overview")
+	assert.NoError(t, beego.AppConfig.Set("projectMaskUrl", "/console/project/{namespace}/overview"))
 	link := CreateNativeProjectLink("https://stub-domain", "stub-project")
 	assert.Equal(t, "https://stub-domain/console/project/stub-project/overview", link)
 }
 
 func TestCreateDockerStreamLinkMethod_ShouldBeExecutedSuccessfully(t *testing.T) {
-	beego.AppConfig.Set("imageStreamMaskUrl", "/console/project/{namespace}/browse/images/{stream}")
+	assert.NoError(t, beego.AppConfig.Set("imageStreamMaskUrl", "/console/project/{namespace}/browse/images/{stream}"))
 	link := CreateDockerStreamLink("https://stub-domain", "stub-project", "stub-stream")
 	assert.Equal(t, "https://stub-domain/console/project/stub-project/browse/images/stub-stream", link)
 }

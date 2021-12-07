@@ -44,7 +44,7 @@ func TestGetCreatePageMethod_ShouldBeExecutedSuccessfully(t *testing.T) {
 		PerfService:      perfboard.PerfBoard{PerfRepo: mpb, CoreClient: fkc.CoreV1()},
 	}
 
-	beego.AppConfig.Set("vcsIntegrationEnabled", "false")
+	assert.NoError(t, beego.AppConfig.Set("vcsIntegrationEnabled", "false"))
 	input := context.NewInput()
 	input.Context = context.NewContext()
 	r, _ := http.NewRequest("GET", "stub-request", nil)
@@ -53,8 +53,9 @@ func TestGetCreatePageMethod_ShouldBeExecutedSuccessfully(t *testing.T) {
 	lc.Ctx = input.Context
 	lc.Ctx.Input.Context.Input = input
 	lc.Ctx.Input.CruSession = &session.CookieSessionStore{}
-	lc.Ctx.Input.CruSession.Flush()
-	lc.Ctx.Input.CruSession.Set("realm_roles", []string{"stub-value"})
+	assert.NoError(t, lc.Ctx.Input.CruSession.Flush())
+	assert.NoError(t, lc.Ctx.Input.CruSession.Set("realm_roles", []string{"stub-value"}))
+
 	lc.Data = map[interface{}]interface{}{}
 
 	sm.On("GetAllSlaves").Return(
@@ -106,7 +107,7 @@ func TestGetCreatePageMethod_ShouldReturnError(t *testing.T) {
 		PerfService:      perfboard.PerfBoard{PerfRepo: mpb},
 	}
 
-	beego.AppConfig.Set("vcsIntegrationEnabled", "false")
+	assert.NoError(t, beego.AppConfig.Set("vcsIntegrationEnabled", "false"))
 	input := context.NewInput()
 	input.Context = context.NewContext()
 	r, _ := http.NewRequest("GET", "stub-request", nil)
@@ -115,8 +116,8 @@ func TestGetCreatePageMethod_ShouldReturnError(t *testing.T) {
 	lc.Ctx = input.Context
 	lc.Ctx.Input.Context.Input = input
 	lc.Ctx.Input.CruSession = &session.CookieSessionStore{}
-	lc.Ctx.Input.CruSession.Flush()
-	lc.Ctx.Input.CruSession.Set("realm_roles", []string{"stub-value"})
+	assert.NoError(t, lc.Ctx.Input.CruSession.Flush())
+	assert.NoError(t, lc.Ctx.Input.CruSession.Set("realm_roles", []string{"stub-value"}))
 	lc.Data = map[interface{}]interface{}{}
 
 	sm.On("GetAllSlaves").Return(
@@ -158,8 +159,8 @@ func TestExtractLibraryRequestData_ReturnsDtoWithPerfField(t *testing.T) {
 	lc.Ctx = input.Context
 	lc.Ctx.Input.Context.Input = input
 	lc.Ctx.Input.CruSession = &session.CookieSessionStore{}
-	lc.Ctx.Input.CruSession.Flush()
-	lc.Ctx.Input.CruSession.Set("username", "stub-value")
+	assert.NoError(t, lc.Ctx.Input.CruSession.Flush())
+	assert.NoError(t, lc.Ctx.Input.CruSession.Set("username", "stub-value"))
 
 	c, err := lc.extractLibraryRequestData()
 	assert.NoError(t, err)
@@ -175,8 +176,8 @@ func TestExtractLibraryRequestData_ReturnsDtoWithoutPerfField(t *testing.T) {
 	lc.Ctx = input.Context
 	lc.Ctx.Input.Context.Input = input
 	lc.Ctx.Input.CruSession = &session.CookieSessionStore{}
-	lc.Ctx.Input.CruSession.Flush()
-	lc.Ctx.Input.CruSession.Set("username", "stub-value")
+	assert.NoError(t, lc.Ctx.Input.CruSession.Flush())
+	assert.NoError(t, lc.Ctx.Input.CruSession.Set("username", "stub-value"))
 
 	c, err := lc.extractLibraryRequestData()
 	assert.NoError(t, err)

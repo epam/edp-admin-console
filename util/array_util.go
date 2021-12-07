@@ -29,7 +29,7 @@ func Contains(array []string, e string) bool {
 
 func RemoveElByValue(array []string, val string) []string {
 	for i, v := range array {
-		if strings.ToLower(v) == strings.ToLower(val) {
+		if strings.EqualFold(v, val) {
 			return append(array[:i], array[i+1:]...)
 		}
 	}

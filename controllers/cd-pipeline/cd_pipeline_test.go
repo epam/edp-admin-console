@@ -24,6 +24,7 @@ import (
 	"edp-admin-console/util"
 	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/session"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -57,8 +58,8 @@ func TestGetEditCDPipelinePageMethod_ShouldBeExecutedSuccessfully(t *testing.T) 
 	c.Ctx = input.Context
 	c.Ctx.Input.Context.Input = input
 	c.Ctx.Input.CruSession = &session.CookieSessionStore{}
-	c.Ctx.Input.CruSession.Flush()
-	c.Ctx.Input.CruSession.Set("realm_roles", []string{"stub-value"})
+	assert.NoError(t, c.Ctx.Input.CruSession.Flush())
+	assert.NoError(t, c.Ctx.Input.CruSession.Set("realm_roles", []string{"stub-value"}))
 	c.Data = map[interface{}]interface{}{}
 
 	cdpm.On("GetCDPipelineByName", "stub-name").Return(nil, nil)

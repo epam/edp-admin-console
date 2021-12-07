@@ -44,7 +44,7 @@ func TestGetCreateApplicationPageMethod_ShouldBeExecutedSuccessfully(t *testing.
 		PerfService:      perfboard.PerfBoard{PerfRepo: mpb, CoreClient: fkc.CoreV1()},
 	}
 
-	beego.AppConfig.Set("vcsIntegrationEnabled", "false")
+	assert.NoError(t, beego.AppConfig.Set("vcsIntegrationEnabled", "false"))
 	input := context.NewInput()
 	input.Context = context.NewContext()
 	r, _ := http.NewRequest("GET", "stub-request", nil)
@@ -53,7 +53,7 @@ func TestGetCreateApplicationPageMethod_ShouldBeExecutedSuccessfully(t *testing.
 	apc.Ctx = input.Context
 	apc.Ctx.Input.Context.Input = input
 	apc.Ctx.Input.CruSession = &session.CookieSessionStore{}
-	apc.Ctx.Input.CruSession.Flush()
+	assert.NoError(t, apc.Ctx.Input.CruSession.Flush())
 	apc.Data = map[interface{}]interface{}{}
 
 	sm.On("GetAllSlaves").Return(
@@ -105,7 +105,7 @@ func TestGetCreateApplicationPageMethod_GetPerfServersShouldReturnError(t *testi
 		PerfService:      perfboard.PerfBoard{PerfRepo: mpb},
 	}
 
-	beego.AppConfig.Set("vcsIntegrationEnabled", "false")
+	assert.NoError(t, beego.AppConfig.Set("vcsIntegrationEnabled", "false"))
 	input := context.NewInput()
 	input.Context = context.NewContext()
 	r, _ := http.NewRequest("GET", "stub-request", nil)
@@ -114,7 +114,7 @@ func TestGetCreateApplicationPageMethod_GetPerfServersShouldReturnError(t *testi
 	apc.Ctx = input.Context
 	apc.Ctx.Input.Context.Input = input
 	apc.Ctx.Input.CruSession = &session.CookieSessionStore{}
-	apc.Ctx.Input.CruSession.Flush()
+	assert.NoError(t, apc.Ctx.Input.CruSession.Flush())
 	apc.Data = map[interface{}]interface{}{}
 
 	sm.On("GetAllSlaves").Return(
@@ -156,9 +156,8 @@ func TestExtractApplicationRequestDataMethod_ReturnsDtoWithPerfField(t *testing.
 	apc.Ctx = input.Context
 	apc.Ctx.Input.Context.Input = input
 	apc.Ctx.Input.CruSession = &session.CookieSessionStore{}
-	apc.Ctx.Input.CruSession.Flush()
-	apc.Ctx.Input.CruSession.Set("username", "stub-value")
-
+	assert.NoError(t, apc.Ctx.Input.CruSession.Flush())
+	assert.NoError(t, apc.Ctx.Input.CruSession.Set("username", "stub-value"))
 	c, err := apc.extractApplicationRequestData()
 	assert.NoError(t, err)
 	assert.Equal(t, "stub-name", c.Perf.Name)
@@ -173,8 +172,8 @@ func TestExtractApplicationRequestDataMethod_ReturnsDtoWithoutPerfField(t *testi
 	apc.Ctx = input.Context
 	apc.Ctx.Input.Context.Input = input
 	apc.Ctx.Input.CruSession = &session.CookieSessionStore{}
-	apc.Ctx.Input.CruSession.Flush()
-	apc.Ctx.Input.CruSession.Set("username", "stub-value")
+	assert.NoError(t, apc.Ctx.Input.CruSession.Flush())
+	assert.NoError(t, apc.Ctx.Input.CruSession.Set("username", "stub-value"))
 
 	c, err := apc.extractApplicationRequestData()
 	assert.NoError(t, err)

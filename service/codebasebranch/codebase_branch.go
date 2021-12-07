@@ -106,11 +106,6 @@ func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCo
 	return result, nil
 }
 
-func newTrue() *bool {
-	b := true
-	return &b
-}
-
 func (s *CodebaseBranchService) UpdateCodebaseBranch(appName, branchName string, version *string) error {
 	log.Debug("start updating CodebaseBranch CR",
 		zap.String("version", *version),
