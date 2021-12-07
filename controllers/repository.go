@@ -49,14 +49,14 @@ func validRepoRequestData(repo RepoData) *validation2.ErrMsg {
 
 	_, err := valid.Valid(repo)
 	if err != nil {
-		return &validation2.ErrMsg{"An error has occurred while validating application's form fields.", http.StatusInternalServerError}
+		return &validation2.ErrMsg{Message: "An error has occurred while validating application's form fields.", StatusCode: http.StatusInternalServerError}
 	}
 
 	if valid.Errors == nil {
 		return nil
 	}
 
-	return &validation2.ErrMsg{string(validation2.CreateErrorResponseBody(valid)), http.StatusBadRequest}
+	return &validation2.ErrMsg{Message: string(validation2.CreateErrorResponseBody(valid)), StatusCode: http.StatusBadRequest}
 }
 
 func getResponseJSON(available bool, err error) (*string, error) {

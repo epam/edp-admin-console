@@ -328,14 +328,14 @@ func validateLibraryRequestData(library command.CreateCodebase) *validation2.Err
 	}
 
 	if err != nil {
-		return &validation2.ErrMsg{"An internal error has occurred on server while validating autotest's form fields.", http.StatusInternalServerError}
+		return &validation2.ErrMsg{Message: "An internal error has occurred on server while validating autotest's form fields.", StatusCode: http.StatusInternalServerError}
 	}
 
 	if valid.Errors == nil {
 		return nil
 	}
 
-	return &validation2.ErrMsg{string(validation2.CreateErrorResponseBody(valid)), http.StatusBadRequest}
+	return &validation2.ErrMsg{Message: string(validation2.CreateErrorResponseBody(valid)), StatusCode: http.StatusBadRequest}
 }
 
 func logLibraryRequestData(library command.CreateCodebase) {
