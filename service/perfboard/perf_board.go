@@ -16,7 +16,7 @@ import (
 var log = logger.GetLogger()
 
 type PerfBoard struct {
-	PerfRepo perfboard.IPerfServer
+	PerfRepo   perfboard.IPerfServer
 	CoreClient coreV1Client.CoreV1Interface
 }
 
@@ -47,15 +47,14 @@ func (s PerfBoard) GetCodebaseDataSources(codebaseId int) ([]string, error) {
 	return ds, nil
 }
 
-
 func (s PerfBoard) IsPerfEnabled(namespace string) (bool, error) {
-	cm,err:=s.CoreClient.ConfigMaps(namespace).Get(ctx.TODO(),"edp-config", metav1.GetOptions{} )
+	cm, err := s.CoreClient.ConfigMaps(namespace).Get(ctx.TODO(), "edp-config", metav1.GetOptions{})
 	if err != nil {
 		return false, err
 	}
 	r := cm.Data["perf_integration_enabled"]
 	if len(r) == 0 {
-		return false, fmt.Errorf("there is no key perf_integration_enabled in cm edp-config" )
+		return false, fmt.Errorf("there is no key perf_integration_enabled in cm edp-config")
 	}
 	pe, err := strconv.ParseBool(r)
 	if err != nil {

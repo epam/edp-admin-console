@@ -2,6 +2,7 @@ package mock
 
 import (
 	"edp-admin-console/models/query"
+
 	"github.com/stretchr/testify/mock"
 )
 
@@ -9,20 +10,20 @@ type MockCodebase struct {
 	mock.Mock
 }
 
-func (m MockCodebase) GetCodebasesByCriteria(criteria query.CodebaseCriteria) ([]*query.Codebase, error) {
+func (m *MockCodebase) GetCodebasesByCriteria(criteria query.CodebaseCriteria) ([]*query.Codebase, error) {
 	args := m.Called(criteria)
 	return args.Get(0).([]*query.Codebase), args.Error(1)
 }
 
-func (m MockCodebase) FindCodebaseByName(name string) bool {
+func (m *MockCodebase) FindCodebaseByName(name string) bool {
 	panic("implement me")
 }
 
-func (m MockCodebase) FindCodebaseByProjectPath(gitProjectPath *string) bool {
+func (m *MockCodebase) FindCodebaseByProjectPath(gitProjectPath *string) bool {
 	panic("implement me")
 }
 
-func (m MockCodebase) GetCodebaseByName(name string) (*query.Codebase, error) {
+func (m *MockCodebase) GetCodebaseByName(name string) (*query.Codebase, error) {
 	args := m.Called(name)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -31,18 +32,18 @@ func (m MockCodebase) GetCodebaseByName(name string) (*query.Codebase, error) {
 	return &c, args.Error(1)
 }
 
-func (m MockCodebase) GetCodebaseById(id int) (*query.Codebase, error) {
+func (m *MockCodebase) GetCodebaseById(id int) (*query.Codebase, error) {
 	panic("implement me")
 }
 
-func (m MockCodebase) ExistActiveBranch(dockerStreamName string) (bool, error) {
+func (m *MockCodebase) ExistActiveBranch(dockerStreamName string) (bool, error) {
 	panic("implement me")
 }
 
-func (m MockCodebase) ExistCodebaseAndBranch(cbName, brName string) bool {
+func (m *MockCodebase) ExistCodebaseAndBranch(cbName, brName string) bool {
 	panic("implement me")
 }
 
-func (m MockCodebase) SelectApplicationToPromote(cdPipelineId int) ([]*query.ApplicationsToPromote, error) {
+func (m *MockCodebase) SelectApplicationToPromote(cdPipelineId int) ([]*query.ApplicationsToPromote, error) {
 	panic("implement me")
 }

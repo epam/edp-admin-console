@@ -19,8 +19,9 @@ package auth
 import (
 	"context"
 	ctx "edp-admin-console/context"
-	"fmt"
 	"edp-admin-console/service/logger"
+	"fmt"
+
 	"github.com/astaxie/beego"
 	"go.uber.org/zap"
 )

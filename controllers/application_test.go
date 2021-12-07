@@ -28,7 +28,7 @@ func TestGetCreateApplicationPageMethod_ShouldBeExecutedSuccessfully(t *testing.
 	fkc := fake.NewSimpleClientset(&v1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: "",
-			Name: "edp-config",
+			Name:      "edp-config",
 		},
 		Data: map[string]string{
 			"perf_integration_enabled": "false",
@@ -182,7 +182,7 @@ func TestExtractApplicationRequestDataMethod_ReturnsDtoWithoutPerfField(t *testi
 }
 
 func TestExtractJsonJiraIssueMetadataPayload(t *testing.T) {
-	jsonPayload, err := extractJsonJiraIssueMetadataPayload([]string {"fake-payload1"}, []string {"fake-payload2"})
+	jsonPayload, err := extractJsonJiraIssueMetadataPayload([]string{"fake-payload1"}, []string{"fake-payload2"})
 	assert.NoError(t, err)
 	assert.Equal(t, "{\"fake-payload1\":\"fake-payload2\"}", *jsonPayload)
 }

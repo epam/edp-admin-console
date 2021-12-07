@@ -54,7 +54,7 @@ func (c stageController) UpdateCDStage() {
 
 	for i, name := range stages {
 		sc := command.CDStageCommand{
-			Name: name,
+			Name:        name,
 			TriggerType: tType[i],
 		}
 		log.Debug("Request data is received to edit CD pipeline stage",

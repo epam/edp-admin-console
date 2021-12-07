@@ -52,7 +52,7 @@ func (s EDPComponentService) GetEDPComponents() ([]*query.EDPComponent, error) {
 }
 
 func modifyPlatformLinks(url, componentType string, c *query.EDPComponent) {
-	if componentType == consts.Openshift || componentType == consts.Kubernetes  {
+	if componentType == consts.Openshift || componentType == consts.Kubernetes {
 		c.Url = util.CreateNativeProjectLink(url, context.Namespace)
 	}
 }

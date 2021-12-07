@@ -28,7 +28,7 @@ func TestGetCreateAutotestsPageMethod_ShouldBeExecutedSuccessfully(t *testing.T)
 	fkc := fake.NewSimpleClientset(&v1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: "",
-			Name: "edp-config",
+			Name:      "edp-config",
 		},
 		Data: map[string]string{
 			"perf_integration_enabled": "false",

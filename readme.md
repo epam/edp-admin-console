@@ -1,27 +1,32 @@
+[![codecov](https://codecov.io/gh/epam/edp-admin-console/branch/master/graph/badge.svg?token=U5VZEPF6VI)](https://codecov.io/gh/epam/edp-admin-console)
+
 # EDP Admin Console
 
 | :heavy_exclamation_mark: Please refer to [Admin Console user guide](https://epam.github.io/edp-install/user-guide/) to get the notion of the main concepts and guidelines. |
 | ---|
 
 ## Overview
+
 Admin Console is a central management tool in the EDP ecosystem that provides the ability to deploy infrastructure, project resources and new technologies in a simple way.
 
 ## Local Development
 
 ### Requirements
-* GoLang version higher than 1.13;
+
+* GoLang version higher than 1.17;
 
 >_**NOTE**: The GOPATH and GOROOT environment variables should be added in PATH._
->```
+>```bash
 >export GOPATH=C:\Users\<<username>>\go
 >export GOROOT=C:\Go
->``
+>```
 
 * PostgreSQL client version higher than 9.5;
-* Configured access to the VCS, for details, refer to the [Gerrit Setup for Developer](https://kb.epam.com/display/EPMDEDP/Gerrit+Setup+for+Developer) page;
+* Configured access to the VCS;
 * GoLand Intellij IDEA or another IDE.
 
 ## Operator Launch
+
 In order to run the operator, follow the steps below:
 
 1. Clone repository;
@@ -34,24 +39,31 @@ In order to run the operator, follow the steps below:
     3.2. In the Working directory field, indicate the path to the operator;
 
     3.3. In the Environment field, specify the platform name (OpenShift/Kubernetes) and NameSpace;
-   ```
+
+   ```bash
    WATCH_NAMESPACE=test-go-env;PLATFORM_TYPE=openshift
    ```
+
     ![build-config](readme-resource/build_config.png "build-config")
 4. Create the PostgreSQL database, schema, and a user for the EDP Admin Console operator:
      * Create database with a user:
+
    ```yaml
    CREATE DATABASE edp-db WITH ENCODING 'UTF8';
    CREATE USER postgres WITH PASSWORD 'password';
    GRANT ALL PRIVILEGES ON DATABASE 'edp-db' to postgres;
    ```
+
      * Create a schema:
+
    ```yaml
     CREATE SCHEMA [IF NOT EXISTS] 'develop';
    ```
+
    EDP Admin Console operator supports two modes for running: local and prod.
    For local deploy, modify ```<strong>edp-admin-console/conf/app.conf</strong>``` and set the following parameters:
-   ```
+
+   ```bash
     runmode=local
     [local]
     dbEnabled=true
@@ -62,14 +74,17 @@ In order to run the operator, follow the steps below:
     pgPassword=password
     edpName=develop
    ```
+
 5. Run 'go build main.go' (Shift+F10);
 6. After the successful setup, follow the [http://localhost:8080](http://localhost:8080) URL address to check the result:
 
 ![check-deploy](readme-resource/check_deploy.png "check-deploy")
 
 ## Exceptional Cases
+
 After starting the Go build process, the following error will appear:
-```
+
+```bash
 go: finding github.com/openshift/api v3.9.0
 go: finding github.com/openshift/client-go v3.9.0
 go: errors parsing go.mod:
@@ -77,8 +92,9 @@ C:\Users\<<username>>\Desktop\EDP\edp-admin-console\go.mod:36: require github.co
 
 Compilation finished with exit code 1
 ```
+
 To resolve the issue, update the go dependency by applying the Golang command:
 
-```
+```bash
 go get github.com/openshift/api@v3.9.0
 ```

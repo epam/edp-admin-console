@@ -27,7 +27,7 @@ type ICodebaseBranchRepository interface {
 }
 
 const (
-	SelectDefaultBranchName      = "select default_branch from codebase where name = ?;"
+	SelectDefaultBranchName = "select default_branch from codebase where name = ?;"
 )
 
 type CodebaseBranchRepository struct {

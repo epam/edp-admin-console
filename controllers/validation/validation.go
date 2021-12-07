@@ -6,11 +6,12 @@ import (
 	"edp-admin-console/util"
 	"encoding/json"
 	"fmt"
-	"github.com/astaxie/beego/validation"
-	gateV1alpha1 "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	"net/http"
 	"regexp"
 	"strings"
+
+	"github.com/astaxie/beego/validation"
+	gateV1alpha1 "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 )
 
 type ErrMsg struct {
@@ -26,7 +27,7 @@ func ValidCodebaseRequestData(codebase command.CreateCodebase) *ErrMsg {
 	resErr = err
 
 	if codebase.Strategy == "import" {
-		valid.Match(codebase.GitUrlPath, regexp.MustCompile("^\\/.*$"), "Spec.GitUrlPath")
+		valid.Match(codebase.GitUrlPath, regexp.MustCompile(`^\/.*$`), "Spec.GitUrlPath")
 	}
 
 	if codebase.Repository != nil {
@@ -166,7 +167,6 @@ func validateQualityGates(valid validation.Validation, qualityGates []gateV1alph
 
 func ValidateCDPipelineUpdateRequestData(cdPipeline command.CDPipelineCommand) *ErrMsg {
 	isApplicationsValid := true
-	isCDPipelineValid := true
 	isStagesValid := true
 	isQualityGatesValid := true
 	errMsg := &ErrMsg{"An internal error has occurred on server while validating CD Pipeline's request body.", http.StatusInternalServerError}

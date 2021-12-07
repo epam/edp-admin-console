@@ -24,8 +24,6 @@ import (
 	"go.uber.org/zap"
 )
 
-const otherLanguage = "other"
-
 type LibraryController struct {
 	beego.Controller
 	EDPTenantService service.EDPTenantService
