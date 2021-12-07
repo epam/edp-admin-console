@@ -1,10 +1,22 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="v2.10.0"></a>
+## [v2.10.0] - 2021-12-07
 ### Bug Fixes
 
+- Fix CI Pipelines [EPMDEDP-7847](https://jiraeu.epam.com/browse/EPMDEDP-7847)
 - Use Default branch for branch creation [EPMDEDP-7552](https://jiraeu.epam.com/browse/EPMDEDP-7552)
 - Empty 'Deployment Script' field in Admin Console by default [EPMDEDP-7280](https://jiraeu.epam.com/browse/EPMDEDP-7280)
+
+### Code Refactoring
+
+- Set ormDebug to false by default [EPMDEDP-7847](https://jiraeu.epam.com/browse/EPMDEDP-7847)
+
+### Formatting
+
+- add explicit names [EPMDEDP-7847](https://jiraeu.epam.com/browse/EPMDEDP-7847)
 
 ### Routine
 
@@ -42,7 +54,8 @@
 - [EPMDEDP-3929] Add new action type to display in Action Log table
 
 
-[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.9.0...HEAD
+[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.10.0...HEAD
+[v2.10.0]: https://github.com/epam/edp-admin-console/compare/v2.9.0...v2.10.0
 [v2.9.0]: https://github.com/epam/edp-admin-console/compare/v2.8.1...v2.9.0
 [v2.8.1]: https://github.com/epam/edp-admin-console/compare/v2.8.0...v2.8.1
 [v2.8.0]: https://github.com/epam/edp-admin-console/compare/v2.7.3...v2.8.0
