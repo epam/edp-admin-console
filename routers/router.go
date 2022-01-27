@@ -17,6 +17,8 @@
 package routers
 
 import (
+	"fmt"
+
 	"edp-admin-console/context"
 	"edp-admin-console/controllers"
 	"edp-admin-console/controllers/auth"
@@ -36,7 +38,6 @@ import (
 	"edp-admin-console/service/logger"
 	"edp-admin-console/service/perfboard"
 	"edp-admin-console/util"
-	"fmt"
 
 	"github.com/astaxie/beego"
 	"go.uber.org/zap"
@@ -56,7 +57,7 @@ const (
 	CreateStrategy = "Create"
 )
 
-func init() {
+func SetupRouter() {
 	log.Info("Start application...",
 		zap.String("mode", beego.AppConfig.String("runmode")),
 		zap.String("edp version", context.EDPVersion))
@@ -66,13 +67,18 @@ func init() {
 		authEnabled = false
 	}
 
+	permissions := filters.PermissionsMap()
+	accessHandlerEnv := &filters.AccessControlEnv{
+		Permissions: permissions,
+	}
+
 	if authEnabled {
 		context.InitAuth()
 		beego.Router(fmt.Sprintf("%s/auth/callback", context.BasePath), &auth.AuthController{}, "get:Callback")
 		beego.InsertFilter(fmt.Sprintf("%s/admin/*", context.BasePath), beego.BeforeRouter, filters.AuthFilter)
 		beego.InsertFilter(fmt.Sprintf("%s/api/v1/edp/*", context.BasePath), beego.BeforeRouter, filters.AuthRestFilter)
-		beego.InsertFilter(fmt.Sprintf("%s/admin/edp/*", context.BasePath), beego.BeforeRouter, filters.RoleAccessControlFilter)
-		beego.InsertFilter(fmt.Sprintf("%s/api/v1/edp/*", context.BasePath), beego.BeforeRouter, filters.RoleAccessControlRestFilter)
+		beego.InsertFilter(fmt.Sprintf("%s/admin/edp/*", context.BasePath), beego.BeforeRouter, accessHandlerEnv.RoleAccessControlFilter)
+		beego.InsertFilter(fmt.Sprintf("%s/api/v1/edp/*", context.BasePath), beego.BeforeRouter, accessHandlerEnv.RoleAccessControlRestFilter)
 	} else {
 		beego.InsertFilter(fmt.Sprintf("%s/*", context.BasePath), beego.BeforeRouter, filters.StubAuthFilter)
 	}
@@ -87,7 +93,8 @@ func init() {
 		context.InitDb()
 	}
 
-	clients := k8s.CreateOpenShiftClients()
+	k8sClientConf := k8s.ClientConfig()
+	clients := k8s.CreateOpenShiftClients(k8sClientConf)
 	codebaseRepository := repository.CodebaseRepository{}
 	branchRepository := repository.CodebaseBranchRepository{}
 	pipelineRepository := repository.CDPipelineRepository{}

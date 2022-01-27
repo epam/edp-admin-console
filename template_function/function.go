@@ -1,15 +1,17 @@
 package template_function
 
 import (
+	"time"
+
 	"edp-admin-console/models/query"
 	"edp-admin-console/util"
+
 	"github.com/astaxie/beego"
 	"github.com/blang/semver"
 	"github.com/pkg/errors"
-	"time"
 )
 
-func init() {
+func RegisterTemplateFuncs() {
 	if err := beego.AddFuncMap("add", add); err != nil {
 		panic("couldn't register 'add' function to go template")
 	}

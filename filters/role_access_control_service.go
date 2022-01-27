@@ -1,16 +1,15 @@
 package filters
 
 import (
-	"github.com/astaxie/beego"
 	"regexp"
+
+	"github.com/astaxie/beego"
 )
 
-var roles map[string][]string
-
-func init() {
+func PermissionsMap() map[string][]string {
 	administrator := beego.AppConfig.String("adminRole")
 	developer := beego.AppConfig.String("developerRole")
-	roles = map[string][]string{
+	return map[string][]string{
 		"GET /admin/edp/overview$":                          {administrator, developer},
 		"GET /admin/edp/application/overview":               {administrator, developer},
 		"GET /admin/edp/application/create$":                {administrator},
@@ -48,26 +47,32 @@ func init() {
 	}
 }
 
-func IsPageAvailable(key string, contextRoles []string) bool {
-	pageRoles := getValue(key)
+func IsPageAvailable(permissions map[string][]string, key string, contextRoles []string) (bool, error) {
+	pageRoles, err := getValue(permissions, key)
+	if err != nil {
+		return false, err
+	}
 	if pageRoles == nil {
-		return true
+		return true, nil
 	}
 
 	if getIntersectionOfRoles(contextRoles, pageRoles) == nil {
-		return false
+		return false, nil
 	}
-	return true
+	return true, nil
 }
 
-func getValue(key string) []string {
-	for k, v := range roles {
-		match, _ := regexp.MatchString(k, key)
+func getValue(permissions map[string][]string, key string) ([]string, error) {
+	for k, v := range permissions {
+		match, err := regexp.MatchString(k, key)
+		if err != nil {
+			return nil, err
+		}
 		if match {
-			return v
+			return v, nil
 		}
 	}
-	return nil
+	return nil, nil
 }
 
 func getIntersectionOfRoles(a, b []string) (c []string) {

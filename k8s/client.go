@@ -18,6 +18,7 @@ package k8s
 
 import (
 	"edp-admin-console/service/logger"
+
 	edppipelinesv1alpha1 "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	edpv1alpha1 "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	"go.uber.org/zap"
@@ -34,7 +35,6 @@ import (
 )
 
 var log = logger.GetLogger()
-var k8sConfig clientcmd.ClientConfig
 var SchemeGroupVersion = schema.GroupVersion{Group: "v2.edp.epam.com", Version: "v1alpha1"}
 
 type ClientSet struct {
@@ -45,33 +45,33 @@ type ClientSet struct {
 	K8sAppV1Client v1.AppsV1Interface
 }
 
-func init() {
-	k8sConfig = clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+func ClientConfig() clientcmd.ClientConfig {
+	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		clientcmd.NewDefaultClientConfigLoadingRules(),
 		&clientcmd.ConfigOverrides{},
 	)
 }
 
-func CreateOpenShiftClients() ClientSet {
-	coreClient, err := getCoreClient()
+func CreateOpenShiftClients(k8sConfig clientcmd.ClientConfig) ClientSet {
+	coreClient, err := getCoreClient(k8sConfig)
 	if err != nil {
 		log.Error("An error has occurred while getting core client", zap.Error(err))
 		panic(err)
 	}
 
-	crClient, err := getApplicationClient()
+	crClient, err := getApplicationClient(k8sConfig)
 	if err != nil {
 		log.Error("An error has occurred while getting custom resource client", zap.Error(err))
 		panic(err)
 	}
 
-	storageClient, err := getStorageClient()
+	storageClient, err := getStorageClient(k8sConfig)
 	if err != nil {
 		log.Error("An error has occurred while getting custom resource client", zap.Error(err))
 		panic(err)
 	}
 
-	k8sAppClient, err := getK8sAppsV1Client()
+	k8sAppClient, err := getK8sAppsV1Client(k8sConfig)
 	if err != nil {
 		log.Error("An error has occurred while getting k8s extension client", zap.Error(err))
 		panic(err)
@@ -86,7 +86,7 @@ func CreateOpenShiftClients() ClientSet {
 	}
 }
 
-func getCoreClient() (*coreV1Client.CoreV1Client, error) {
+func getCoreClient(k8sConfig clientcmd.ClientConfig) (*coreV1Client.CoreV1Client, error) {
 	restConfig, err := k8sConfig.ClientConfig()
 	if err != nil {
 		return nil, err
@@ -98,7 +98,7 @@ func getCoreClient() (*coreV1Client.CoreV1Client, error) {
 	return coreClient, nil
 }
 
-func getK8sAppsV1Client() (v1.AppsV1Interface, error) {
+func getK8sAppsV1Client(k8sConfig clientcmd.ClientConfig) (v1.AppsV1Interface, error) {
 	restConfig, err := k8sConfig.ClientConfig()
 	if err != nil {
 		return nil, err
@@ -110,7 +110,7 @@ func getK8sAppsV1Client() (v1.AppsV1Interface, error) {
 	return cs.AppsV1(), nil
 }
 
-func getStorageClient() (*storageV1Client.StorageV1Client, error) {
+func getStorageClient(k8sConfig clientcmd.ClientConfig) (*storageV1Client.StorageV1Client, error) {
 	restConfig, err := k8sConfig.ClientConfig()
 	if err != nil {
 		return nil, err
@@ -122,7 +122,7 @@ func getStorageClient() (*storageV1Client.StorageV1Client, error) {
 	return coreClient, nil
 }
 
-func getApplicationClient() (*rest.RESTClient, error) {
+func getApplicationClient(k8sConfig clientcmd.ClientConfig) (*rest.RESTClient, error) {
 	var config *rest.Config
 	var err error
 
