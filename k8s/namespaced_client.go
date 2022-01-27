@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -40,63 +42,97 @@ func NewNamespacedClient(client runtimeClient.Client, namespace string) *Namespa
 	}
 }
 
-// GetCBBranch retrieves an CodebaseBranch structure for the given custom resource name from the Kubernetes Cluster CR.
-func (c *NamespacedClient) GetCBBranch(ctx context.Context, nameCR string) (codeBaseApi.CodebaseBranch, error) {
+// GetCBBranch retrieves an CodebaseBranch structure ptr for the given custom resource name from the Kubernetes Cluster CR.
+func (c *NamespacedClient) GetCBBranch(ctx context.Context, crName string) (*codeBaseApi.CodebaseBranch, error) {
 	if c.Namespace == "" {
-		return codeBaseApi.CodebaseBranch{}, NemEmptyNamespaceErr("client namespace is not set")
+		return nil, NemEmptyNamespaceErr("client namespace is not set")
 	}
-	instanceCB := codeBaseApi.CodebaseBranch{}
+	codebaseBranch := &codeBaseApi.CodebaseBranch{}
 	nsn := types.NamespacedName{
-		Name:      nameCR,
+		Name:      crName,
 		Namespace: c.Namespace,
 	}
-	err := c.Get(ctx, nsn, &instanceCB)
+	err := c.Get(ctx, nsn, codebaseBranch)
 	if err != nil {
-		return codeBaseApi.CodebaseBranch{}, fmt.Errorf("%w. failed to get CodebaseBranch CR with nameCR: %s", err, nameCR)
+		return nil, fmt.Errorf("%w. failed to get CodebaseBranch CR with crName: %s", err, crName)
 	}
-	return instanceCB, nil
+	return codebaseBranch, nil
 }
 
 // UpdateCBBranchByCustomFields updates only the custom fields of the CodebaseBranch CR.
-func (c *NamespacedClient) UpdateCBBranchByCustomFields(ctx context.Context, nameCR string, spec codeBaseApi.CodebaseBranchSpec, status codeBaseApi.CodebaseBranchStatus) error {
-	instance, err := c.GetCBBranch(ctx, nameCR)
+func (c *NamespacedClient) UpdateCBBranchByCustomFields(ctx context.Context, crName string, spec codeBaseApi.CodebaseBranchSpec, status codeBaseApi.CodebaseBranchStatus) error {
+	codebaseBranch, err := c.GetCBBranch(ctx, crName)
 	if err != nil {
 		return err
 	}
-	instance.Status = status
-	instance.Spec = spec
-	err = c.Update(ctx, &instance)
+	codebaseBranch.Status = status
+	codebaseBranch.Spec = spec
+	err = c.Update(ctx, codebaseBranch)
 	return err
 }
 
 // CreateCBBranchByCustomFields creates CodebaseBranch CR by custom fields and name
-func (c *NamespacedClient) CreateCBBranchByCustomFields(ctx context.Context, nameCR string, spec codeBaseApi.CodebaseBranchSpec, status codeBaseApi.CodebaseBranchStatus) error {
+func (c *NamespacedClient) CreateCBBranchByCustomFields(ctx context.Context, crName string, spec codeBaseApi.CodebaseBranchSpec, status codeBaseApi.CodebaseBranchStatus) error {
 	if c.Namespace == "" {
 		return NemEmptyNamespaceErr("client namespace is not set")
 	}
-	instance := &codeBaseApi.CodebaseBranch{
+	codebaseBranch := &codeBaseApi.CodebaseBranch{
 		ObjectMeta: v1.ObjectMeta{
-			Name:      nameCR,
+			Name:      crName,
 			Namespace: c.Namespace,
 		},
 		Spec:   spec,
 		Status: status,
 	}
-	err := c.Create(ctx, instance)
+	err := c.Create(ctx, codebaseBranch)
 	return err
 }
 
 // DeleteCBBranch deletes CodebaseBranch CR from the Kubernetes Cluster by name.
-func (c *NamespacedClient) DeleteCBBranch(ctx context.Context, nameCR string) error {
+func (c *NamespacedClient) DeleteCBBranch(ctx context.Context, crName string) error {
 	if c.Namespace == "" {
 		return NemEmptyNamespaceErr("client namespace is not set")
 	}
-	instanceCB := codeBaseApi.CodebaseBranch{
+	codebaseBranch := codeBaseApi.CodebaseBranch{
 		ObjectMeta: v1.ObjectMeta{
-			Name:      nameCR,
+			Name:      crName,
 			Namespace: c.Namespace,
 		},
 	}
-	err := c.Delete(ctx, &instanceCB)
+	err := c.Delete(ctx, &codebaseBranch)
 	return err
+}
+
+// GetCDStage retrieves a Stage structure ptr for the given custom resource name from the Kubernetes Cluster CR.
+func (c *NamespacedClient) GetCDStage(ctx context.Context, crName string) (*cdPipeApi.Stage, error) {
+	if c.Namespace == "" {
+		return nil, NemEmptyNamespaceErr("client namespace is not set")
+	}
+	stage := &cdPipeApi.Stage{}
+	nsn := types.NamespacedName{
+		Name:      crName,
+		Namespace: c.Namespace,
+	}
+	err := c.Get(ctx, nsn, stage)
+	if err != nil {
+		return nil, err
+	}
+	return stage, err
+}
+
+// GetCDPipeline retrieves a CDPipeline structure ptr for the given custom resource name from the Kubernetes Cluster CR.
+func (c *NamespacedClient) GetCDPipeline(ctx context.Context, crName string) (*cdPipeApi.CDPipeline, error) {
+	if c.Namespace == "" {
+		return nil, NemEmptyNamespaceErr("client namespace is not set")
+	}
+	cdPipeline := &cdPipeApi.CDPipeline{}
+	nsn := types.NamespacedName{
+		Name:      crName,
+		Namespace: c.Namespace,
+	}
+	err := c.Get(ctx, nsn, cdPipeline)
+	if err != nil {
+		return nil, err
+	}
+	return cdPipeline, err
 }
