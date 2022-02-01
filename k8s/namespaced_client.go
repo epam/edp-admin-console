@@ -157,3 +157,20 @@ func (c *RuntimeNamespacedClient) GetCDPipeline(ctx context.Context, crName stri
 	}
 	return cdPipeline, err
 }
+
+// GetCodebaseImageStream retrieves a CodebaseImageStream structure ptr for the given custom resource name from the Kubernetes Cluster CR.
+func (c *RuntimeNamespacedClient) GetCodebaseImageStream(ctx context.Context, crName string) (*codeBaseApi.CodebaseImageStream, error) {
+	if c.Namespace == "" {
+		return nil, NemEmptyNamespaceErr("client namespace is not set")
+	}
+	codebaseImageStream := &codeBaseApi.CodebaseImageStream{}
+	nsn := types.NamespacedName{
+		Name:      crName,
+		Namespace: c.Namespace,
+	}
+	err := c.Get(ctx, nsn, codebaseImageStream)
+	if err != nil {
+		return nil, err
+	}
+	return codebaseImageStream, err
+}

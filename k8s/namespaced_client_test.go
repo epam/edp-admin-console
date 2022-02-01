@@ -57,6 +57,16 @@ func createCDPipelineCR(ns string) *cdPipeApi.CDPipeline {
 	}
 }
 
+func createCodebaseImageStreamCR(t *testing.T, ns string) *codeBaseApi.CodebaseImageStream {
+	t.Helper()
+	return &codeBaseApi.CodebaseImageStream{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: ns,
+		},
+	}
+}
+
 func TestK8SClient_GetCBBranch(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
@@ -325,4 +335,40 @@ func TestSetupNamespacedClient_NewClientErr(t *testing.T) {
 	if err != nil {
 		t.Fatal()
 	}
+}
+
+func TestK8SClient_GetCodebaseImageStream_BadClient(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects().Build()
+	k8sClient := RuntimeNamespacedClient{Client: client}
+	codebaseImageStream, err := k8sClient.GetCodebaseImageStream(ctx, name)
+	var emptyNamespaceErr *EmptyNamespaceErr
+	assert.ErrorAs(t, err, &emptyNamespaceErr)
+	assert.Nil(t, codebaseImageStream)
+}
+
+func TestK8SClient_GetCodebaseImageStream_NotExist(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseImageStream{})
+	codebaseImageStreamCR := createCodebaseImageStreamCR(t, ns2)
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(codebaseImageStreamCR).Build()
+	k8sClient := NewRuntimeNamespacedClient(client, ns)
+	codebaseImageStream, err := k8sClient.GetCodebaseImageStream(ctx, name)
+	assert.True(t, k8serrors.IsNotFound(err))
+	assert.Nil(t, codebaseImageStream)
+}
+
+func TestK8SClient_GetCodebaseImageStream_Success(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(codeBaseApi.SchemeGroupVersion, &codeBaseApi.CodebaseImageStream{})
+	codebaseImageStreamCR := createCodebaseImageStreamCR(t, ns)
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(codebaseImageStreamCR).Build()
+	k8sClient := NewRuntimeNamespacedClient(client, ns)
+	codebaseImageStream, err := k8sClient.GetCodebaseImageStream(ctx, name)
+	assert.NoError(t, err)
+	assert.Equal(t, name, codebaseImageStream.Name)
+	assert.Equal(t, ns, codebaseImageStream.Namespace)
 }
