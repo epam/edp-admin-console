@@ -1,14 +1,14 @@
 package main
 
 import (
-	"edp-admin-console/routers"
 	"edp-admin-console/template_function"
+	"edp-admin-console/webapi"
 
 	"github.com/astaxie/beego"
 )
 
 func main() {
-	routers.SetupRouter()
+	webapi.SetupRouter()
 	template_function.RegisterTemplateFuncs()
 	beego.Run()
 }

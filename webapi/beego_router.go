@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package routers
+package webapi
 
 import (
 	"fmt"
+	"path"
+
+	"github.com/astaxie/beego"
+	"github.com/go-chi/chi/v5"
+	"go.uber.org/zap"
 
 	"edp-admin-console/context"
 	"edp-admin-console/controllers"
@@ -38,12 +43,9 @@ import (
 	"edp-admin-console/service/logger"
 	"edp-admin-console/service/perfboard"
 	"edp-admin-console/util"
-
-	"github.com/astaxie/beego"
-	"go.uber.org/zap"
 )
 
-var log = logger.GetLogger()
+var zaplog = logger.GetLogger()
 
 const (
 	integrationStrategies = "integrationStrategies"
@@ -55,15 +57,17 @@ const (
 	perfDataSources       = "perfDataSources"
 
 	CreateStrategy = "Create"
+	apiV2Scope     = "/api/v2"
+	edpScope       = "/edp"
 )
 
 func SetupRouter() {
-	log.Info("Start application...",
+	zaplog.Info("Start application...",
 		zap.String("mode", beego.AppConfig.String("runmode")),
 		zap.String("edp version", context.EDPVersion))
 	authEnabled, err := beego.AppConfig.Bool("keycloakAuthEnabled")
 	if err != nil {
-		log.Error("Cannot read property keycloakAuthEnabled. Set default: false", zap.Error(err))
+		zaplog.Error("Cannot read property keycloakAuthEnabled. Set default: false", zap.Error(err))
 		authEnabled = false
 	}
 
@@ -85,7 +89,7 @@ func SetupRouter() {
 
 	dbEnable, err := beego.AppConfig.Bool("dbEnabled")
 	if err != nil {
-		log.Error("Cannot read property dbEnabled. Set default: true", zap.Error(err))
+		zaplog.Error("Cannot read property dbEnabled. Set default: true", zap.Error(err))
 		dbEnable = true
 	}
 
@@ -148,37 +152,37 @@ func SetupRouter() {
 
 	integrationStrategies := util.GetValuesFromConfig(integrationStrategies)
 	if integrationStrategies == nil {
-		log.Fatal("integrationStrategies config variable is empty.")
+		zaplog.Fatal("integrationStrategies config variable is empty.")
 	}
 
 	buildTools := util.GetValuesFromConfig(buildTools)
 	if buildTools == nil {
-		log.Fatal("buildTools config variable is empty.")
+		zaplog.Fatal("buildTools config variable is empty.")
 	}
 
 	vt := util.GetValuesFromConfig(versioningTypes)
 	if vt == nil {
-		log.Fatal("versioningTypes config variable is empty.")
+		zaplog.Fatal("versioningTypes config variable is empty.")
 	}
 
 	testReportTools := util.GetValuesFromConfig(testReportTools)
 	if testReportTools == nil {
-		log.Fatal("testReportTools config variable is empty.")
+		zaplog.Fatal("testReportTools config variable is empty.")
 	}
 
 	ds := util.GetValuesFromConfig(deploymentScript)
 	if ds == nil {
-		log.Fatal("deploymentScript config variable is empty.")
+		zaplog.Fatal("deploymentScript config variable is empty.")
 	}
 
 	ciTools := util.GetValuesFromConfig(ciTools)
 	if ciTools == nil {
-		log.Fatal("ciTools config variable is empty.")
+		zaplog.Fatal("ciTools config variable is empty.")
 	}
 
 	perfDataSources := util.GetValuesFromConfig(perfDataSources)
 	if perfDataSources == nil {
-		log.Fatal("perfDataSources config variable is empty.")
+		zaplog.Fatal("perfDataSources config variable is empty.")
 	}
 
 	is := make([]string, len(integrationStrategies))
@@ -329,4 +333,24 @@ func SetupRouter() {
 		beego.NSRouter("/repository/available", &controllers.RepositoryRestController{}, "post:IsGitRepoAvailable"),
 	)
 	beego.AddNamespace(apiV1Namespace)
+
+	v2APIHandler := &HandlerEnv{}
+	v2APIRouter := V2APIRouter(v2APIHandler, zaplog)
+	// see https://github.com/beego/beedoc/blob/master/en-US/mvc/controller/router.md#handler-register
+	// and isPrefix parameter
+	beego.Handler(path.Join(context.BasePath, apiV2Scope, edpScope), v2APIRouter, true)
+}
+
+func V2APIRouter(h *HandlerEnv, logger *zap.Logger) *chi.Mux {
+	router := chi.NewRouter()
+	router.Use(WithLoggerMw(logger))
+
+	V2RoutePrefix := path.Join(context.BasePath, apiV2Scope)
+	router.Route(V2RoutePrefix, func(v2APIRouter chi.Router) {
+		v2APIRouter.Route(edpScope, func(edpScope chi.Router) {
+			edpScope.Get("/cd-pipeline/{pipelineName}/stage/{stageName}", h.GetStagePipeline)
+		})
+	})
+
+	return router
 }

@@ -15,6 +15,7 @@ require (
 	github.com/coreos/go-oidc v2.1.0+incompatible
 	github.com/epam/edp-cd-pipeline-operator/v2 v2.10.0
 	github.com/epam/edp-codebase-operator/v2 v2.10.0
+	github.com/go-chi/chi/v5 v5.0.7
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/lib/pq v1.8.0
 	github.com/openshift/api v3.9.0+incompatible
@@ -28,6 +29,7 @@ require (
 	k8s.io/api v0.21.0-rc.0
 	k8s.io/apimachinery v0.21.0-rc.0
 	k8s.io/client-go v0.20.2
+	sigs.k8s.io/controller-runtime v0.8.3
 )
 
 require (
@@ -108,7 +110,6 @@ require (
 	k8s.io/klog/v2 v2.8.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20210305001622-591a79e4bda7 // indirect
 	k8s.io/utils v0.0.0-20210111153108-fddb29f9d009 // indirect
-	sigs.k8s.io/controller-runtime v0.8.3 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.1 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
