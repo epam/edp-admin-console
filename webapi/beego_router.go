@@ -61,7 +61,7 @@ const (
 	edpScope       = "/edp"
 )
 
-func SetupRouter() {
+func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient) {
 	zaplog.Info("Start application...",
 		zap.String("mode", beego.AppConfig.String("runmode")),
 		zap.String("edp version", context.EDPVersion))
@@ -334,7 +334,7 @@ func SetupRouter() {
 	)
 	beego.AddNamespace(apiV1Namespace)
 
-	v2APIHandler := &HandlerEnv{}
+	v2APIHandler := NewHandlerEnv(namespacedClient)
 	v2APIRouter := V2APIRouter(v2APIHandler, zaplog)
 	// see https://github.com/beego/beedoc/blob/master/en-US/mvc/controller/router.md#handler-register
 	// and isPrefix parameter

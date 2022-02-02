@@ -4,15 +4,36 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 
 	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	utilRuntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/client-go/kubernetes/scheme"
 	runtimeClient "sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/config"
 )
 
-type NamespacedClient struct {
+const NamespaceEnv = "NAMESPACE"
+
+func SetupNamespacedClient() (*RuntimeNamespacedClient, error) {
+	utilRuntime.Must(codeBaseApi.AddToScheme(scheme.Scheme))
+	utilRuntime.Must(cdPipeApi.AddToScheme(scheme.Scheme))
+
+	namespace, ok := os.LookupEnv(NamespaceEnv)
+	if !ok {
+		return nil, errors.New("cant find NAMESPACE env")
+	}
+	client, err := runtimeClient.New(config.GetConfigOrDie(), runtimeClient.Options{})
+	if err != nil {
+		return nil, fmt.Errorf("%w cant setup client", err)
+	}
+	return NewRuntimeNamespacedClient(client, namespace), nil
+}
+
+type RuntimeNamespacedClient struct {
 	runtimeClient.Client
 	Namespace string
 }
@@ -34,16 +55,16 @@ func AsEmptyNamespaceErr(err error) bool {
 	return errors.As(err, &emptyNamespaceErr)
 }
 
-// NewNamespacedClient wraps an existing client enforcing the namespace value.
-func NewNamespacedClient(client runtimeClient.Client, namespace string) *NamespacedClient {
-	return &NamespacedClient{
+// NewRuntimeNamespacedClient wraps an existing client enforcing the namespace value.
+func NewRuntimeNamespacedClient(client runtimeClient.Client, namespace string) *RuntimeNamespacedClient {
+	return &RuntimeNamespacedClient{
 		Client:    client,
 		Namespace: namespace,
 	}
 }
 
 // GetCBBranch retrieves an CodebaseBranch structure ptr for the given custom resource name from the Kubernetes Cluster CR.
-func (c *NamespacedClient) GetCBBranch(ctx context.Context, crName string) (*codeBaseApi.CodebaseBranch, error) {
+func (c *RuntimeNamespacedClient) GetCBBranch(ctx context.Context, crName string) (*codeBaseApi.CodebaseBranch, error) {
 	if c.Namespace == "" {
 		return nil, NemEmptyNamespaceErr("client namespace is not set")
 	}
@@ -60,7 +81,7 @@ func (c *NamespacedClient) GetCBBranch(ctx context.Context, crName string) (*cod
 }
 
 // UpdateCBBranchByCustomFields updates only the custom fields of the CodebaseBranch CR.
-func (c *NamespacedClient) UpdateCBBranchByCustomFields(ctx context.Context, crName string, spec codeBaseApi.CodebaseBranchSpec, status codeBaseApi.CodebaseBranchStatus) error {
+func (c *RuntimeNamespacedClient) UpdateCBBranchByCustomFields(ctx context.Context, crName string, spec codeBaseApi.CodebaseBranchSpec, status codeBaseApi.CodebaseBranchStatus) error {
 	codebaseBranch, err := c.GetCBBranch(ctx, crName)
 	if err != nil {
 		return err
@@ -72,7 +93,7 @@ func (c *NamespacedClient) UpdateCBBranchByCustomFields(ctx context.Context, crN
 }
 
 // CreateCBBranchByCustomFields creates CodebaseBranch CR by custom fields and name
-func (c *NamespacedClient) CreateCBBranchByCustomFields(ctx context.Context, crName string, spec codeBaseApi.CodebaseBranchSpec, status codeBaseApi.CodebaseBranchStatus) error {
+func (c *RuntimeNamespacedClient) CreateCBBranchByCustomFields(ctx context.Context, crName string, spec codeBaseApi.CodebaseBranchSpec, status codeBaseApi.CodebaseBranchStatus) error {
 	if c.Namespace == "" {
 		return NemEmptyNamespaceErr("client namespace is not set")
 	}
@@ -89,7 +110,7 @@ func (c *NamespacedClient) CreateCBBranchByCustomFields(ctx context.Context, crN
 }
 
 // DeleteCBBranch deletes CodebaseBranch CR from the Kubernetes Cluster by name.
-func (c *NamespacedClient) DeleteCBBranch(ctx context.Context, crName string) error {
+func (c *RuntimeNamespacedClient) DeleteCBBranch(ctx context.Context, crName string) error {
 	if c.Namespace == "" {
 		return NemEmptyNamespaceErr("client namespace is not set")
 	}
@@ -104,7 +125,7 @@ func (c *NamespacedClient) DeleteCBBranch(ctx context.Context, crName string) er
 }
 
 // GetCDStage retrieves a Stage structure ptr for the given custom resource name from the Kubernetes Cluster CR.
-func (c *NamespacedClient) GetCDStage(ctx context.Context, crName string) (*cdPipeApi.Stage, error) {
+func (c *RuntimeNamespacedClient) GetCDStage(ctx context.Context, crName string) (*cdPipeApi.Stage, error) {
 	if c.Namespace == "" {
 		return nil, NemEmptyNamespaceErr("client namespace is not set")
 	}
@@ -121,7 +142,7 @@ func (c *NamespacedClient) GetCDStage(ctx context.Context, crName string) (*cdPi
 }
 
 // GetCDPipeline retrieves a CDPipeline structure ptr for the given custom resource name from the Kubernetes Cluster CR.
-func (c *NamespacedClient) GetCDPipeline(ctx context.Context, crName string) (*cdPipeApi.CDPipeline, error) {
+func (c *RuntimeNamespacedClient) GetCDPipeline(ctx context.Context, crName string) (*cdPipeApi.CDPipeline, error) {
 	if c.Namespace == "" {
 		return nil, NemEmptyNamespaceErr("client namespace is not set")
 	}

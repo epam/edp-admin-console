@@ -26,7 +26,7 @@ func AsEmptyImageStreamErr(err error) bool {
 }
 
 // GetInputISForStage gets InputDockerStream list by CR Stage name
-func GetInputISForStage(ctx context.Context, client *k8s.NamespacedClient, crName string) ([]string, error) {
+func GetInputISForStage(ctx context.Context, client *k8s.RuntimeNamespacedClient, crName string) ([]string, error) {
 	stageCR, err := client.GetCDStage(ctx, crName)
 	if err != nil {
 		return nil, err

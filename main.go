@@ -1,14 +1,21 @@
 package main
 
 import (
-	"edp-admin-console/template_function"
-	"edp-admin-console/webapi"
+	"log"
 
 	"github.com/astaxie/beego"
+
+	"edp-admin-console/k8s"
+	"edp-admin-console/template_function"
+	"edp-admin-console/webapi"
 )
 
 func main() {
-	webapi.SetupRouter()
+	namespacedClient, err := k8s.SetupNamespacedClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	webapi.SetupRouter(namespacedClient)
 	template_function.RegisterTemplateFuncs()
 	beego.Run()
 }

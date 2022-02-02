@@ -61,7 +61,7 @@ func TestK8SClient_GetCBBranch(t *testing.T) {
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
 	cbBranchCR := createcbBranchCRByNamespace(ns)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(cbBranchCR).Build()
-	k8sClient := NewNamespacedClient(client, "ns")
+	k8sClient := NewRuntimeNamespacedClient(client, "ns")
 	branch, err := k8sClient.GetCBBranch(ctx, "name")
 	assert.NoError(t, err)
 	assert.Equal(t, name, branch.Name)
@@ -74,7 +74,7 @@ func TestK8SClient_GetCBBranch_NotExist(t *testing.T) {
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
 	cbBranchCR := createcbBranchCRByNamespace(ns2)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(cbBranchCR).Build()
-	k8sClient := NewNamespacedClient(client, ns)
+	k8sClient := NewRuntimeNamespacedClient(client, ns)
 	branch, err := k8sClient.GetCBBranch(ctx, name)
 	assert.True(t, k8serrors.IsNotFound(err))
 	assert.Nil(t, branch)
@@ -86,7 +86,7 @@ func TestNamespacedClient_DeleteCBBranch_NotFound(t *testing.T) {
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
 	cbBranchCR := createcbBranchCRByNamespace(ns2)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(cbBranchCR).Build()
-	k8sClient := NewNamespacedClient(client, ns)
+	k8sClient := NewRuntimeNamespacedClient(client, ns)
 	err := k8sClient.DeleteCBBranch(ctx, name)
 	assert.True(t, k8serrors.IsNotFound(err))
 }
@@ -97,7 +97,7 @@ func TestNamespacedClient_DeleteCBBranch(t *testing.T) {
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
 	cbBranchCR := createcbBranchCRByNamespace(ns)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(cbBranchCR).Build()
-	k8sClient := NewNamespacedClient(client, ns)
+	k8sClient := NewRuntimeNamespacedClient(client, ns)
 	err := k8sClient.DeleteCBBranch(ctx, name)
 	assert.NoError(t, err)
 
@@ -118,7 +118,7 @@ func TestNamespacedClient_UpdateCBBranchByCustomFields(t *testing.T) {
 		Release:    false,
 	}
 
-	k8sClient := NewNamespacedClient(client, ns)
+	k8sClient := NewRuntimeNamespacedClient(client, ns)
 	err := k8sClient.UpdateCBBranchByCustomFields(ctx, name, spec, codeBaseApi.CodebaseBranchStatus{})
 	assert.NoError(t, err)
 	branch, err := k8sClient.GetCBBranch(ctx, name)
@@ -137,7 +137,7 @@ func TestNamespacedClient_UpdateCBBranchByCustomFields_NotExist(t *testing.T) {
 		Release:    false,
 	}
 
-	k8sClient := NewNamespacedClient(client, ns)
+	k8sClient := NewRuntimeNamespacedClient(client, ns)
 	err := k8sClient.UpdateCBBranchByCustomFields(ctx, name, spec, codeBaseApi.CodebaseBranchStatus{})
 	assert.Error(t, err)
 	assert.True(t, k8serrors.IsNotFound(err))
@@ -152,7 +152,7 @@ func TestNamespacedClient_CreateCBBranchByCustomFields(t *testing.T) {
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(initCR).Build()
 	spec := codeBaseApi.CodebaseBranchSpec{BranchName: "test"}
 
-	k8sClient := NewNamespacedClient(client, ns)
+	k8sClient := NewRuntimeNamespacedClient(client, ns)
 	err := k8sClient.CreateCBBranchByCustomFields(context.TODO(), name, spec, codeBaseApi.CodebaseBranchStatus{})
 	assert.Error(t, err)
 	assert.True(t, k8serrors.IsAlreadyExists(err))
@@ -168,7 +168,7 @@ func TestNamespacedClient_GetCBBranch_BadClient(t *testing.T) {
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
 	CR := createcbBranchCRByNamespace(ns)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(CR).Build()
-	k8sClient := NamespacedClient{
+	k8sClient := RuntimeNamespacedClient{
 		Client: client,
 	}
 	branch, err := k8sClient.GetCBBranch(ctx, "name")
@@ -188,7 +188,7 @@ func TestNamespacedClient_UpdateCBBranchByCustomFields_BadClient(t *testing.T) {
 		BranchName: "master",
 		Release:    false,
 	}
-	k8sClient := NamespacedClient{
+	k8sClient := RuntimeNamespacedClient{
 		Client: client,
 	}
 
@@ -203,7 +203,7 @@ func TestNamespacedClient_DeleteCBBranch_BadClient(t *testing.T) {
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
 	cbBranchCR := createcbBranchCRByNamespace(ns)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(cbBranchCR).Build()
-	k8sClient := NamespacedClient{
+	k8sClient := RuntimeNamespacedClient{
 		Client: client,
 	}
 	err := k8sClient.DeleteCBBranch(ctx, "name")
@@ -219,7 +219,7 @@ func TestNamespacedClient_CreateCBBranchByCustomFields_BadClient(t *testing.T) {
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(initCR).Build()
 	spec := codeBaseApi.CodebaseBranchSpec{BranchName: "test"}
 
-	k8sClient := NamespacedClient{
+	k8sClient := RuntimeNamespacedClient{
 		Client: client,
 	}
 	err := k8sClient.CreateCBBranchByCustomFields(context.TODO(), name, spec, codeBaseApi.CodebaseBranchStatus{})
@@ -231,7 +231,7 @@ func TestK8SClient_GetCDStage_BadClient(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects().Build()
-	k8sClient := NamespacedClient{Client: client}
+	k8sClient := RuntimeNamespacedClient{Client: client}
 	stage, err := k8sClient.GetCDStage(ctx, name)
 	var emptyNamespaceErr *EmptyNamespaceErr
 	assert.ErrorAs(t, err, &emptyNamespaceErr)
@@ -244,7 +244,7 @@ func TestK8SClient_GetCDStage_NotExist(t *testing.T) {
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{})
 	cdStageCR := createCDStageCR(ns2)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(cdStageCR).Build()
-	k8sClient := NewNamespacedClient(client, ns)
+	k8sClient := NewRuntimeNamespacedClient(client, ns)
 	stage, err := k8sClient.GetCDStage(ctx, name)
 	assert.True(t, k8serrors.IsNotFound(err))
 	assert.Nil(t, stage)
@@ -256,7 +256,7 @@ func TestK8SClient_GetCDStage(t *testing.T) {
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{})
 	cdStageCR := createCDStageCR(ns)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(cdStageCR).Build()
-	k8sClient := NewNamespacedClient(client, ns)
+	k8sClient := NewRuntimeNamespacedClient(client, ns)
 	stage, err := k8sClient.GetCDStage(ctx, name)
 	assert.NoError(t, err)
 	assert.Equal(t, name, stage.Name)
@@ -267,7 +267,7 @@ func TestK8SClient_GetCDPipeline_BadClient(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects().Build()
-	k8sClient := NamespacedClient{Client: client}
+	k8sClient := RuntimeNamespacedClient{Client: client}
 	cdPipeline, err := k8sClient.GetCDPipeline(ctx, name)
 	var emptyNamespaceErr *EmptyNamespaceErr
 	assert.ErrorAs(t, err, &emptyNamespaceErr)
@@ -280,7 +280,7 @@ func TestK8SClient_GetCDPipeline_NotExist(t *testing.T) {
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.CDPipeline{})
 	cdPipelineCR := createCDPipelineCR(ns2)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(cdPipelineCR).Build()
-	k8sClient := NewNamespacedClient(client, ns)
+	k8sClient := NewRuntimeNamespacedClient(client, ns)
 	cdPipeline, err := k8sClient.GetCDPipeline(ctx, name)
 	assert.True(t, k8serrors.IsNotFound(err))
 	assert.Nil(t, cdPipeline)
@@ -292,7 +292,7 @@ func TestK8SClient_GetCDPipeline(t *testing.T) {
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.CDPipeline{})
 	cdPipelineCR := createCDPipelineCR(ns)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(cdPipelineCR).Build()
-	k8sClient := NewNamespacedClient(client, ns)
+	k8sClient := NewRuntimeNamespacedClient(client, ns)
 	cdPipeline, err := k8sClient.GetCDPipeline(ctx, name)
 	assert.NoError(t, err)
 	assert.Equal(t, name, cdPipeline.Name)

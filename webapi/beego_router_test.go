@@ -1,12 +1,20 @@
 package webapi
 
 import (
+	"os"
 	"testing"
 
 	"github.com/astaxie/beego"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+
+	"edp-admin-console/k8s"
 )
 
 func TestSetupRouter(t *testing.T) {
+	err := os.Setenv(k8s.NamespaceEnv, "Test")
+	if err != nil {
+		t.Fatal(err)
+	}
 	mustSetAppConfig(t, "runmode", "local")
 	mustSetAppConfig(t, "keycloakAuthEnabled", "false")
 	mustSetAppConfig(t, "dbEnabled", "false")
@@ -17,7 +25,13 @@ func TestSetupRouter(t *testing.T) {
 	mustSetAppConfig(t, "deploymentScript", "openshift-template")
 	mustSetAppConfig(t, "ciTools", "Jenkins,GitLab CI")
 	mustSetAppConfig(t, "perfDataSources", "Sonar,Jenkins,GitLab")
-	SetupRouter() // rewrite this setup ASAP
+	fakeClient := fake.NewClientBuilder().Build()
+	namespaceClient := k8s.NewRuntimeNamespacedClient(fakeClient, "test")
+	SetupRouter(namespaceClient) // rewrite this setup ASAP
+	err = os.Unsetenv(k8s.NamespaceEnv)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func mustSetAppConfig(t *testing.T, k, v string) {

@@ -41,7 +41,7 @@ In order to run the operator, follow the steps below:
     3.3. In the Environment field, specify the platform name (OpenShift/Kubernetes) and NameSpace;
 
    ```bash
-   WATCH_NAMESPACE=test-go-env;PLATFORM_TYPE=openshift
+   NAMESPACE=test-go-env;PLATFORM_TYPE=openshift
    ```
 
     ![build-config](readme-resource/build_config.png "build-config")
