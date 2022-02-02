@@ -2,6 +2,8 @@ package k8s
 
 import (
 	"context"
+	"os"
+	"strings"
 	"testing"
 
 	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
@@ -20,7 +22,7 @@ const (
 	ns2  = "ns2"
 )
 
-func createcbBranchCRByNamespace(ns string) *codeBaseApi.CodebaseBranch {
+func createCDBranchCRByNamespace(ns string) *codeBaseApi.CodebaseBranch {
 	return &codeBaseApi.CodebaseBranch{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "CodebaseBranch",
@@ -59,7 +61,7 @@ func TestK8SClient_GetCBBranch(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
-	cbBranchCR := createcbBranchCRByNamespace(ns)
+	cbBranchCR := createCDBranchCRByNamespace(ns)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(cbBranchCR).Build()
 	k8sClient := NewRuntimeNamespacedClient(client, "ns")
 	branch, err := k8sClient.GetCBBranch(ctx, "name")
@@ -72,7 +74,7 @@ func TestK8SClient_GetCBBranch_NotExist(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
-	cbBranchCR := createcbBranchCRByNamespace(ns2)
+	cbBranchCR := createCDBranchCRByNamespace(ns2)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(cbBranchCR).Build()
 	k8sClient := NewRuntimeNamespacedClient(client, ns)
 	branch, err := k8sClient.GetCBBranch(ctx, name)
@@ -84,7 +86,7 @@ func TestNamespacedClient_DeleteCBBranch_NotFound(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
-	cbBranchCR := createcbBranchCRByNamespace(ns2)
+	cbBranchCR := createCDBranchCRByNamespace(ns2)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(cbBranchCR).Build()
 	k8sClient := NewRuntimeNamespacedClient(client, ns)
 	err := k8sClient.DeleteCBBranch(ctx, name)
@@ -95,7 +97,7 @@ func TestNamespacedClient_DeleteCBBranch(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
-	cbBranchCR := createcbBranchCRByNamespace(ns)
+	cbBranchCR := createCDBranchCRByNamespace(ns)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(cbBranchCR).Build()
 	k8sClient := NewRuntimeNamespacedClient(client, ns)
 	err := k8sClient.DeleteCBBranch(ctx, name)
@@ -111,7 +113,7 @@ func TestNamespacedClient_UpdateCBBranchByCustomFields(t *testing.T) {
 	scheme := runtime.NewScheme()
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
 
-	initCR := createcbBranchCRByNamespace(ns)
+	initCR := createCDBranchCRByNamespace(ns)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(initCR).Build()
 	spec := codeBaseApi.CodebaseBranchSpec{
 		BranchName: "master",
@@ -148,7 +150,7 @@ func TestNamespacedClient_CreateCBBranchByCustomFields(t *testing.T) {
 	scheme := runtime.NewScheme()
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
 
-	initCR := createcbBranchCRByNamespace(ns)
+	initCR := createCDBranchCRByNamespace(ns)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(initCR).Build()
 	spec := codeBaseApi.CodebaseBranchSpec{BranchName: "test"}
 
@@ -166,7 +168,7 @@ func TestNamespacedClient_GetCBBranch_BadClient(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
-	CR := createcbBranchCRByNamespace(ns)
+	CR := createCDBranchCRByNamespace(ns)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(CR).Build()
 	k8sClient := RuntimeNamespacedClient{
 		Client: client,
@@ -182,7 +184,7 @@ func TestNamespacedClient_UpdateCBBranchByCustomFields_BadClient(t *testing.T) {
 	scheme := runtime.NewScheme()
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
 
-	initCR := createcbBranchCRByNamespace(ns)
+	initCR := createCDBranchCRByNamespace(ns)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(initCR).Build()
 	spec := codeBaseApi.CodebaseBranchSpec{
 		BranchName: "master",
@@ -201,7 +203,7 @@ func TestNamespacedClient_DeleteCBBranch_BadClient(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
-	cbBranchCR := createcbBranchCRByNamespace(ns)
+	cbBranchCR := createCDBranchCRByNamespace(ns)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(cbBranchCR).Build()
 	k8sClient := RuntimeNamespacedClient{
 		Client: client,
@@ -215,7 +217,7 @@ func TestNamespacedClient_CreateCBBranchByCustomFields_BadClient(t *testing.T) {
 	scheme := runtime.NewScheme()
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.CodebaseBranch{})
 
-	initCR := createcbBranchCRByNamespace(ns)
+	initCR := createCDBranchCRByNamespace(ns)
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(initCR).Build()
 	spec := codeBaseApi.CodebaseBranchSpec{BranchName: "test"}
 
@@ -297,4 +299,30 @@ func TestK8SClient_GetCDPipeline(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, name, cdPipeline.Name)
 	assert.Equal(t, ns, cdPipeline.Namespace)
+}
+
+func TestSetupNamespacedClient_EnvErr(t *testing.T) {
+	err := os.Unsetenv(NamespaceEnv)
+	if err != nil {
+		t.Fatal()
+	}
+	client, err := SetupNamespacedClient()
+	assert.Error(t, err)
+	assert.True(t, strings.Contains(err.Error(), "cant find NAMESPACE env"))
+	assert.Nil(t, client)
+}
+
+func TestSetupNamespacedClient_NewClientErr(t *testing.T) {
+	err := os.Setenv(NamespaceEnv, "test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	client, err := SetupNamespacedClient()
+	assert.Error(t, err)
+	assert.True(t, strings.Contains(err.Error(), "cant setup client"))
+	assert.Nil(t, client)
+	err = os.Unsetenv(NamespaceEnv)
+	if err != nil {
+		t.Fatal()
+	}
 }
