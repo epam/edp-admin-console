@@ -57,6 +57,15 @@ func createCDPipelineCR(ns string) *cdPipeApi.CDPipeline {
 	}
 }
 
+func createCodebaseCR(ns string) *codeBaseApi.Codebase {
+	return &codeBaseApi.Codebase{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: ns,
+		},
+	}
+}
+
 func createCodebaseImageStreamCR(t *testing.T, ns string) *codeBaseApi.CodebaseImageStream {
 	t.Helper()
 	return &codeBaseApi.CodebaseImageStream{
@@ -311,32 +320,6 @@ func TestK8SClient_GetCDPipeline(t *testing.T) {
 	assert.Equal(t, ns, cdPipeline.Namespace)
 }
 
-func TestSetupNamespacedClient_EnvErr(t *testing.T) {
-	err := os.Unsetenv(NamespaceEnv)
-	if err != nil {
-		t.Fatal()
-	}
-	client, err := SetupNamespacedClient()
-	assert.Error(t, err)
-	assert.True(t, strings.Contains(err.Error(), "cant find NAMESPACE env"))
-	assert.Nil(t, client)
-}
-
-func TestSetupNamespacedClient_NewClientErr(t *testing.T) {
-	err := os.Setenv(NamespaceEnv, "test")
-	if err != nil {
-		t.Fatal(err)
-	}
-	client, err := SetupNamespacedClient()
-	assert.Error(t, err)
-	assert.True(t, strings.Contains(err.Error(), "cant setup client"))
-	assert.Nil(t, client)
-	err = os.Unsetenv(NamespaceEnv)
-	if err != nil {
-		t.Fatal()
-	}
-}
-
 func TestK8SClient_GetCodebaseImageStream_BadClient(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
@@ -371,4 +354,69 @@ func TestK8SClient_GetCodebaseImageStream_Success(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, name, codebaseImageStream.Name)
 	assert.Equal(t, ns, codebaseImageStream.Namespace)
+}
+
+func TestK8SClient_GetCodebase_BadClient(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects().Build()
+	k8sClient := RuntimeNamespacedClient{Client: client}
+	codebase, err := k8sClient.GetCodebase(ctx, name)
+	var emptyNamespaceErr *EmptyNamespaceErr
+	assert.ErrorAs(t, err, &emptyNamespaceErr)
+	assert.Nil(t, codebase)
+}
+
+func TestK8SClient_GetCodebase_NotExist(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.Codebase{})
+	codebaseCR := createCodebaseCR(ns2)
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(codebaseCR).Build()
+	k8sClient := NewRuntimeNamespacedClient(client, ns)
+	codebase, err := k8sClient.GetCodebase(ctx, name)
+	assert.True(t, k8serrors.IsNotFound(err))
+	assert.Nil(t, codebase)
+}
+
+func TestSetupNamespacedClient_EnvErr(t *testing.T) {
+	err := os.Unsetenv(NamespaceEnv)
+	if err != nil {
+		t.Fatal()
+	}
+	client, err := SetupNamespacedClient()
+	assert.Error(t, err)
+	assert.True(t, strings.Contains(err.Error(), "cant find NAMESPACE env"))
+	assert.Nil(t, client)
+}
+
+func TestSetupNamespacedClient_NewClientErr(t *testing.T) {
+	err := os.Setenv(NamespaceEnv, "test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	client, err := SetupNamespacedClient()
+	assert.Error(t, err)
+	assert.True(t, strings.Contains(err.Error(), "cant setup client"))
+	assert.Nil(t, client)
+	err = os.Unsetenv(NamespaceEnv)
+	if err != nil {
+		t.Fatal()
+	}
+}
+
+func TestK8SClient_GetCodebase(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	err := codeBaseApi.AddToScheme(scheme)
+	if err != nil {
+		t.Fatal(err)
+	}
+	codebaseCR := createCodebaseCR(ns)
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(codebaseCR).Build()
+	k8sClient := NewRuntimeNamespacedClient(client, ns)
+	codebase, err := k8sClient.GetCodebase(ctx, name)
+	assert.NoError(t, err)
+	assert.Equal(t, name, codebase.Name)
+	assert.Equal(t, ns, codebase.Namespace)
 }

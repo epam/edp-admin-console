@@ -21,7 +21,6 @@ const NamespaceEnv = "NAMESPACE"
 func SetupNamespacedClient() (*RuntimeNamespacedClient, error) {
 	utilRuntime.Must(codeBaseApi.AddToScheme(scheme.Scheme))
 	utilRuntime.Must(cdPipeApi.AddToScheme(scheme.Scheme))
-
 	namespace, ok := os.LookupEnv(NamespaceEnv)
 	if !ok {
 		return nil, errors.New("cant find NAMESPACE env")
@@ -30,6 +29,7 @@ func SetupNamespacedClient() (*RuntimeNamespacedClient, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%w cant setup client", err)
 	}
+
 	return NewRuntimeNamespacedClient(client, namespace), nil
 }
 
@@ -173,4 +173,21 @@ func (c *RuntimeNamespacedClient) GetCodebaseImageStream(ctx context.Context, cr
 		return nil, err
 	}
 	return codebaseImageStream, err
+}
+
+// GetCodebase retrieves a Codebase structure ptr for the given custom resource name from the Kubernetes Cluster CR.
+func (c *RuntimeNamespacedClient) GetCodebase(ctx context.Context, crName string) (*codeBaseApi.Codebase, error) {
+	if c.Namespace == "" {
+		return nil, NemEmptyNamespaceErr("client namespace is not set")
+	}
+	codebase := &codeBaseApi.Codebase{}
+	nsn := types.NamespacedName{
+		Name:      crName,
+		Namespace: c.Namespace,
+	}
+	err := c.Get(ctx, nsn, codebase)
+	if err != nil {
+		return nil, err
+	}
+	return codebase, err
 }

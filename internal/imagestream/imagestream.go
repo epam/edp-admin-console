@@ -99,6 +99,22 @@ func inputCISListFromApplicationsToPromote(ctx context.Context, client *k8s.Runt
 	}
 }
 
+// GetOutputISForStage gets OutputIS list by CR CDPipeline name and Jenkins stage name
+func GetOutputISForStage(ctx context.Context, client *k8s.RuntimeNamespacedClient, cdPipeCRName string, stageName string) ([]string, error) {
+	cdPipeCR, err := client.GetCDPipeline(ctx, cdPipeCRName)
+	if err != nil {
+		return nil, err
+	}
+	var outputIS []string
+	if cdPipeCR.Spec.ApplicationsToPromote == nil {
+		return nil, NewEmptyImageStreamErr(cdPipeCRName)
+	}
+	for _, appName := range cdPipeCR.Spec.ApplicationsToPromote {
+		outputIS = append(outputIS, createCISName(cdPipeCRName, stageName, appName))
+	}
+	return outputIS, nil
+}
+
 // createCISName: CIS is abbreviation for CodebaseImageStream
 func createCISName(pipelineName, stageName, codebaseName string) string {
 	return fmt.Sprintf("%s-%s-%s-%s", pipelineName, stageName, codebaseName, verifiedImageStreamSuffix)

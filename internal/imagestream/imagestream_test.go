@@ -26,6 +26,7 @@ const (
 	zeroOrder         = 0
 	nonZeroOrder      = 1
 	previousStageName = "previous-stage-name"
+	appName           = "app-name"
 )
 
 func createStageCR(order int, cdPipeName string) cdPipeApi.Stage {
@@ -278,4 +279,52 @@ func TestGetImageStreamFromStage_NoPreviousStageName(t *testing.T) {
 	applicationsToPromote, err := GetInputISForStage(ctx, k8sClient, name, cdPipelineName)
 	assert.Nil(t, applicationsToPromote)
 	assert.True(t, strings.Contains(err.Error(), "there is no annotation"))
+}
+
+func TestGetOutputISForStage_GetErr(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{}, &cdPipeApi.CDPipeline{})
+	client := fake.NewClientBuilder().WithScheme(scheme).Build()
+	k8sClient := k8s.NewRuntimeNamespacedClient(client, ns)
+	imageStreams, err := GetOutputISForStage(ctx, k8sClient, cdPipelineName, name)
+	assert.Error(t, err)
+	assert.Nil(t, imageStreams)
+}
+func TestGetOutputISForStage_EmptyIsErr(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{}, &cdPipeApi.CDPipeline{})
+	cdPipelineCR := cdPipeApi.CDPipeline{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      cdPipelineName,
+			Namespace: ns,
+		},
+	}
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&cdPipelineCR).Build()
+	k8sClient := k8s.NewRuntimeNamespacedClient(client, ns)
+	imageStreams, err := GetOutputISForStage(ctx, k8sClient, cdPipelineName, name)
+	var emptyImageStreamEr *EmptyImageStreamErr
+	assert.ErrorAs(t, err, &emptyImageStreamEr)
+	assert.Nil(t, imageStreams)
+}
+func TestGetOutputISForStage(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	expectedIS := []string{createCISName(cdPipelineName, name, appName)}
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{}, &cdPipeApi.CDPipeline{})
+	cdPipelineCR := cdPipeApi.CDPipeline{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      cdPipelineName,
+			Namespace: ns,
+		},
+		Spec: cdPipeApi.CDPipelineSpec{
+			ApplicationsToPromote: []string{appName},
+		},
+	}
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&cdPipelineCR).Build()
+	k8sClient := k8s.NewRuntimeNamespacedClient(client, ns)
+	imageStreams, err := GetOutputISForStage(ctx, k8sClient, cdPipelineName, name)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedIS, imageStreams)
 }
