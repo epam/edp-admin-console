@@ -18,19 +18,20 @@ import (
 )
 
 const (
-	name           = "name"
-	ns             = "ns"
-	firstImage     = "firstImage"
-	secondImage    = "secondImage"
-	cdPipelineName = "CDPipeline"
-	zeroOrder      = 0
-	nonZeroOrder   = 1
+	name              = "name"
+	ns                = "ns"
+	firstImage        = "firstImage"
+	secondImage       = "secondImage"
+	cdPipelineName    = "CDPipeline"
+	zeroOrder         = 0
+	nonZeroOrder      = 1
+	previousStageName = "previous-stage-name"
 )
 
 func createStageCR(order int, cdPipeName string) cdPipeApi.Stage {
 	return cdPipeApi.Stage{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
+			Name:      createStageCrName(cdPipelineName, name),
 			Namespace: ns,
 		},
 		Spec: cdPipeApi.StageSpec{
@@ -45,10 +46,10 @@ func TestGetImageStreamFromStage_BadClient(t *testing.T) {
 	scheme := runtime.NewScheme()
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{})
 
-	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects().Build()
+	client := fake.NewClientBuilder().WithScheme(scheme).Build()
 	k8sClient := k8s.RuntimeNamespacedClient{Client: client}
 
-	stage, err := GetInputISForStage(ctx, &k8sClient, name)
+	stage, err := GetInputISForStage(ctx, &k8sClient, name, cdPipelineName)
 	assert.Error(t, err)
 	assert.Nil(t, stage)
 	assert.True(t, k8s.AsEmptyNamespaceErr(err))
@@ -59,10 +60,10 @@ func TestGetImageStreamFromStage_GetStageErr(t *testing.T) {
 	scheme := runtime.NewScheme()
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{})
 
-	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects().Build()
+	client := fake.NewClientBuilder().WithScheme(scheme).Build()
 	k8sClient := k8s.NewRuntimeNamespacedClient(client, ns)
 
-	stage, err := GetInputISForStage(ctx, k8sClient, name)
+	stage, err := GetInputISForStage(ctx, k8sClient, name, cdPipelineName)
 	assert.Error(t, err)
 	assert.Nil(t, stage)
 	assert.True(t, k8serrors.IsNotFound(err))
@@ -77,7 +78,7 @@ func TestGetImageStreamFromStage_NonZeroOrder(t *testing.T) {
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stageCR).Build()
 	k8sClient := k8s.NewRuntimeNamespacedClient(client, ns)
 
-	stage, err := GetInputISForStage(ctx, k8sClient, name)
+	stage, err := GetInputISForStage(ctx, k8sClient, name, cdPipelineName)
 	assert.Error(t, err)
 	assert.Nil(t, stage)
 	assert.True(t, strings.Contains(err.Error(), "Spec.CdPipeline is empty in Stage CR named"))
@@ -92,7 +93,7 @@ func TestGetImageStreamFromStage_EmptyCDPipeName(t *testing.T) {
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stageCR).Build()
 	k8sClient := k8s.NewRuntimeNamespacedClient(client, ns)
 
-	stage, err := GetInputISForStage(ctx, k8sClient, name)
+	stage, err := GetInputISForStage(ctx, k8sClient, name, cdPipelineName)
 	assert.Error(t, err)
 	assert.Nil(t, stage)
 	assert.True(t, strings.Contains(err.Error(), "Spec.CdPipeline is empty in Stage CR named"))
@@ -107,7 +108,7 @@ func TestGetImageStreamFromStage_GetCdPipeErr(t *testing.T) {
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stageCR).Build()
 	k8sClient := k8s.NewRuntimeNamespacedClient(client, ns)
 
-	stage, err := GetInputISForStage(ctx, k8sClient, name)
+	stage, err := GetInputISForStage(ctx, k8sClient, name, cdPipelineName)
 	assert.Error(t, err)
 	assert.Nil(t, stage)
 	assert.True(t, runtime.IsNotRegisteredError(err))
@@ -129,7 +130,7 @@ func TestGetImageStreamFromStage_EmptyImageStreamErr(t *testing.T) {
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stageCR, &cdPipelineCR).Build()
 	k8sClient := k8s.NewRuntimeNamespacedClient(client, ns)
 
-	stage, err := GetInputISForStage(ctx, k8sClient, name)
+	stage, err := GetInputISForStage(ctx, k8sClient, name, cdPipelineName)
 	var emptyImageStreamEr *EmptyImageStreamErr
 	assert.ErrorAs(t, err, &emptyImageStreamEr)
 	assert.Nil(t, stage)
@@ -156,7 +157,7 @@ func TestGetImageStreamFromStage(t *testing.T) {
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stageCR, &cdPipelineCR).Build()
 	k8sClient := k8s.NewRuntimeNamespacedClient(client, ns)
 
-	stage, err := GetInputISForStage(ctx, k8sClient, name)
+	stage, err := GetInputISForStage(ctx, k8sClient, name, cdPipelineName)
 	assert.NoError(t, err)
 	assert.Equal(t, inputStreams, stage)
 }
@@ -164,6 +165,9 @@ func TestGetImageStreamFromStage(t *testing.T) {
 func TestGetImageStreamFromStage_NonZeroStageOrder(t *testing.T) {
 	ctx := context.Background()
 	stageCR := createStageCR(nonZeroOrder, cdPipelineName)
+	stageCR.Annotations = make(map[string]string)
+	stageCR.Annotations[previousStageNameAnnotationKey] = previousStageName
+
 	cdPipelineCR := cdPipeApi.CDPipeline{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cdPipelineName,
@@ -176,14 +180,14 @@ func TestGetImageStreamFromStage_NonZeroStageOrder(t *testing.T) {
 
 	firstImageStream := codeBaseApi.CodebaseImageStream{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      createCISName(cdPipelineCR.Name, name, firstImage),
+			Name:      createCISName(cdPipelineCR.Name, previousStageName, firstImage),
 			Namespace: ns,
 		},
 	}
 
 	secondImageStream := codeBaseApi.CodebaseImageStream{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      createCISName(cdPipelineCR.Name, name, secondImage),
+			Name:      createCISName(cdPipelineCR.Name, previousStageName, secondImage),
 			Namespace: ns,
 		},
 	}
@@ -194,9 +198,9 @@ func TestGetImageStreamFromStage_NonZeroStageOrder(t *testing.T) {
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stageCR, &cdPipelineCR, &firstImageStream, &secondImageStream).Build()
 	k8sClient := k8s.NewRuntimeNamespacedClient(client, ns)
 
-	expectedResult := []string{createCISName(cdPipelineCR.Name, name, firstImage), createCISName(cdPipelineCR.Name, name, secondImage)}
+	expectedResult := []string{createCISName(cdPipelineCR.Name, previousStageName, firstImage), createCISName(cdPipelineCR.Name, previousStageName, secondImage)}
 
-	applicationsToPromote, err := GetInputISForStage(ctx, k8sClient, name)
+	applicationsToPromote, err := GetInputISForStage(ctx, k8sClient, name, cdPipelineName)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedResult, applicationsToPromote)
 }
@@ -204,6 +208,9 @@ func TestGetImageStreamFromStage_NonZeroStageOrder(t *testing.T) {
 func TestGetImageStreamFromStage_BadApplicationsToPromoteValues(t *testing.T) {
 	ctx := context.Background()
 	stageCR := createStageCR(nonZeroOrder, cdPipelineName)
+	stageCR.Annotations = make(map[string]string)
+	stageCR.Annotations[previousStageNameAnnotationKey] = previousStageName
+
 	cdPipelineCR := cdPipeApi.CDPipeline{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cdPipelineName,
@@ -220,7 +227,7 @@ func TestGetImageStreamFromStage_BadApplicationsToPromoteValues(t *testing.T) {
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stageCR, &cdPipelineCR).Build()
 	k8sClient := k8s.NewRuntimeNamespacedClient(client, ns)
 
-	applicationsToPromote, err := GetInputISForStage(ctx, k8sClient, name)
+	applicationsToPromote, err := GetInputISForStage(ctx, k8sClient, name, cdPipelineName)
 	var emptyImageStreamEr *EmptyImageStreamErr
 	assert.ErrorAs(t, err, &emptyImageStreamEr)
 	assert.Nil(t, applicationsToPromote)
@@ -229,6 +236,9 @@ func TestGetImageStreamFromStage_BadApplicationsToPromoteValues(t *testing.T) {
 func TestGetImageStreamFromStage_EmptyAnnotationToPromote(t *testing.T) {
 	ctx := context.Background()
 	stageCR := createStageCR(nonZeroOrder, cdPipelineName)
+	stageCR.Annotations = make(map[string]string)
+	stageCR.Annotations[previousStageNameAnnotationKey] = previousStageName
+
 	cdPipelineCR := cdPipeApi.CDPipeline{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cdPipelineName,
@@ -242,8 +252,30 @@ func TestGetImageStreamFromStage_EmptyAnnotationToPromote(t *testing.T) {
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stageCR, &cdPipelineCR).Build()
 	k8sClient := k8s.NewRuntimeNamespacedClient(client, ns)
 
-	applicationsToPromote, err := GetInputISForStage(ctx, k8sClient, name)
+	applicationsToPromote, err := GetInputISForStage(ctx, k8sClient, name, cdPipelineName)
 	var emptyImageStreamEr *EmptyImageStreamErr
 	assert.ErrorAs(t, err, &emptyImageStreamEr)
 	assert.Nil(t, applicationsToPromote)
+}
+
+func TestGetImageStreamFromStage_NoPreviousStageName(t *testing.T) {
+	ctx := context.Background()
+	stageCR := createStageCR(nonZeroOrder, cdPipelineName)
+
+	cdPipelineCR := cdPipeApi.CDPipeline{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      cdPipelineName,
+			Namespace: ns,
+		},
+	}
+
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{}, &cdPipeApi.CDPipeline{}, &codeBaseApi.CodebaseImageStream{})
+
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stageCR, &cdPipelineCR).Build()
+	k8sClient := k8s.NewRuntimeNamespacedClient(client, ns)
+
+	applicationsToPromote, err := GetInputISForStage(ctx, k8sClient, name, cdPipelineName)
+	assert.Nil(t, applicationsToPromote)
+	assert.True(t, strings.Contains(err.Error(), "there is no annotation"))
 }

@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	verifiedImageStreamSuffix = "verified"
+	verifiedImageStreamSuffix      = "verified"
+	previousStageNameAnnotationKey = "deploy.edp.epam.com/previous-stage-name"
 )
 
 type EmptyImageStreamErr struct {
@@ -34,14 +35,15 @@ func AsEmptyImageStreamErr(err error) bool {
 }
 
 // GetInputISForStage gets InputDockerStream list by CR Stage name
-func GetInputISForStage(ctx context.Context, client *k8s.RuntimeNamespacedClient, crName string) ([]string, error) {
-	stageCR, err := client.GetCDStage(ctx, crName)
+func GetInputISForStage(ctx context.Context, client *k8s.RuntimeNamespacedClient, stageName, cdPipeline string) ([]string, error) {
+	stageCrName := createStageCrName(cdPipeline, stageName)
+	stageCR, err := client.GetCDStage(ctx, stageCrName)
 	if err != nil {
 		return nil, err
 	}
 
 	if stageCR.Spec.CdPipeline == "" {
-		return nil, fmt.Errorf("Spec.CdPipeline is empty in Stage CR named %s", crName)
+		return nil, fmt.Errorf("Spec.CdPipeline is empty in Stage CR named %s", stageCrName)
 	}
 
 	cdPipelineName := stageCR.Spec.CdPipeline
@@ -51,7 +53,11 @@ func GetInputISForStage(ctx context.Context, client *k8s.RuntimeNamespacedClient
 	}
 
 	if stageCR.Spec.Order != 0 {
-		return inputCISListFromApplicationsToPromote(ctx, client, cdPipelineCR, crName)
+		previousStageName, err := findPreviousStageName(stageCR.Annotations)
+		if err != nil {
+			return nil, err
+		}
+		return inputCISListFromApplicationsToPromote(ctx, client, cdPipelineCR, previousStageName)
 	}
 
 	if cdPipelineCR.Spec.InputDockerStreams == nil {
@@ -61,7 +67,7 @@ func GetInputISForStage(ctx context.Context, client *k8s.RuntimeNamespacedClient
 }
 
 // inputCISListFromApplicationsToPromote gets ApplicationsToPromote list by CR Stage name
-func inputCISListFromApplicationsToPromote(ctx context.Context, client *k8s.RuntimeNamespacedClient, cdPipelineCR *cdPipeApi.CDPipeline, stageName string) ([]string, error) {
+func inputCISListFromApplicationsToPromote(ctx context.Context, client *k8s.RuntimeNamespacedClient, cdPipelineCR *cdPipeApi.CDPipeline, previousStageName string) ([]string, error) {
 	if cdPipelineCR.Spec.ApplicationsToPromote == nil {
 		return nil, NewEmptyImageStreamErr(cdPipelineCR.Name)
 	}
@@ -72,7 +78,7 @@ func inputCISListFromApplicationsToPromote(ctx context.Context, client *k8s.Runt
 	for _, name := range cdPipelineCR.Spec.ApplicationsToPromote {
 		re := strings.NewReplacer("/", "-", ".", "-")
 		name = re.Replace(name)
-		CISName := createCISName(cdPipelineCR.Name, stageName, name)
+		CISName := createCISName(cdPipelineCR.Name, previousStageName, name)
 		cisNames = append(cisNames, CISName)
 	}
 
@@ -96,4 +102,21 @@ func inputCISListFromApplicationsToPromote(ctx context.Context, client *k8s.Runt
 // createCISName: CIS is abbreviation for CodebaseImageStream
 func createCISName(pipelineName, stageName, codebaseName string) string {
 	return fmt.Sprintf("%s-%s-%s-%s", pipelineName, stageName, codebaseName, verifiedImageStreamSuffix)
+}
+
+func findPreviousStageName(annotations map[string]string) (string, error) {
+	if annotations == nil {
+		return "", fmt.Errorf("there is no annotation")
+	}
+
+	if val, ok := annotations[previousStageNameAnnotationKey]; ok {
+		return val, nil
+	}
+
+	return "", fmt.Errorf("stage doesn`t contain %s annotation", previousStageNameAnnotationKey)
+}
+
+// createStageCrName: creates a full stageName for stage CR
+func createStageCrName(cdPipelineName, stageName string) string {
+	return fmt.Sprintf("%s-%s", cdPipelineName, stageName)
 }
