@@ -26,7 +26,10 @@ func TestSetupRouter(t *testing.T) {
 	mustSetAppConfig(t, "ciTools", "Jenkins,GitLab CI")
 	mustSetAppConfig(t, "perfDataSources", "Sonar,Jenkins,GitLab")
 	fakeClient := fake.NewClientBuilder().Build()
-	namespaceClient := k8s.NewRuntimeNamespacedClient(fakeClient, "test")
+	namespaceClient, err := k8s.NewRuntimeNamespacedClient(fakeClient, "test")
+	if err != nil {
+		t.Fatal(err)
+	}
 	SetupRouter(namespaceClient) // rewrite this setup ASAP
 	err = os.Unsetenv(k8s.NamespaceEnv)
 	if err != nil {

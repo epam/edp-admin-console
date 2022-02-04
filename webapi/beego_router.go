@@ -352,6 +352,7 @@ func V2APIRouter(h *HandlerEnv, logger *zap.Logger) *chi.Mux {
 	router.Route(V2RoutePrefix, func(v2APIRouter chi.Router) {
 		v2APIRouter.Route(edpScope, func(edpScope chi.Router) {
 			edpScope.Get("/cd-pipeline/{pipelineName}/stage/{stageName}", h.GetStagePipeline)
+			edpScope.Get("/codebase", h.GetCodebases)
 		})
 	})
 

@@ -45,7 +45,11 @@ func TestStagePipelineSuite(t *testing.T) {
 	}
 
 	client := fake.NewClientBuilder().WithScheme(scheme).Build()
-	namespacedClient := k8s.NewRuntimeNamespacedClient(client, namespace)
+	namespacedClient, err := k8s.NewRuntimeNamespacedClient(client, namespace)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	h := NewHandlerEnv(namespacedClient)
 	logger := applog.GetLogger()
 	router := V2APIRouter(h, logger)

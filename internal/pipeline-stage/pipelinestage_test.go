@@ -26,7 +26,10 @@ func TestCreateApplicationStage_Err(t *testing.T) {
 	outputIS := []string{"output1"}
 	appNames := []string{"app1"}
 	client := fake.NewClientBuilder().Build()
-	namespacedClient := k8s.NewRuntimeNamespacedClient(client, namespace)
+	namespacedClient, err := k8s.NewRuntimeNamespacedClient(client, namespace)
+	if err != nil {
+		t.Fatal(err)
+	}
 	ctx := context.Background()
 
 	stages, err := BuildApplicationStages(ctx, namespacedClient, inputIS, outputIS, appNames)
@@ -54,7 +57,11 @@ func TestCreateApplicationStage(t *testing.T) {
 		},
 	}
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&cbBranch).Build()
-	namespacedClient := k8s.NewRuntimeNamespacedClient(client, namespace)
+	namespacedClient, err := k8s.NewRuntimeNamespacedClient(client, namespace)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	ctx := context.Background()
 
 	expectedStages := []ApplicationStage{
@@ -73,7 +80,11 @@ func TestCreateApplicationStage(t *testing.T) {
 
 func TestCdPipelineNameByCRName_Err(t *testing.T) {
 	client := fake.NewClientBuilder().Build()
-	namespacedClient := k8s.NewRuntimeNamespacedClient(client, namespace)
+	namespacedClient, err := k8s.NewRuntimeNamespacedClient(client, namespace)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	ctx := context.Background()
 
 	name, err := CdPipelineAppNamesByCRName(ctx, namespacedClient, cdPipelineName)
@@ -99,7 +110,11 @@ func TestCdPipelineNameByCRName(t *testing.T) {
 		},
 	}
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&cdPipe).Build()
-	namespacedClient := k8s.NewRuntimeNamespacedClient(client, namespace)
+	namespacedClient, err := k8s.NewRuntimeNamespacedClient(client, namespace)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	ctx := context.Background()
 
 	name, err := CdPipelineAppNamesByCRName(ctx, namespacedClient, cdPipelineName)
@@ -167,7 +182,11 @@ func TestStageViewByCRName(t *testing.T) {
 	}
 
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stage, &branch, &codebase).Build()
-	namespacedClient := k8s.NewRuntimeNamespacedClient(client, namespace)
+	namespacedClient, err := k8s.NewRuntimeNamespacedClient(client, namespace)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	ctx := context.Background()
 
 	emptyString := ""
@@ -200,7 +219,11 @@ func TestStageViewByCRName(t *testing.T) {
 
 func TestStageViewByCRName_Err(t *testing.T) {
 	client := fake.NewClientBuilder().Build()
-	namespacedClient := k8s.NewRuntimeNamespacedClient(client, namespace)
+	namespacedClient, err := k8s.NewRuntimeNamespacedClient(client, namespace)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	ctx := context.Background()
 
 	name, err := StageViewByCRName(ctx, namespacedClient, stageName)

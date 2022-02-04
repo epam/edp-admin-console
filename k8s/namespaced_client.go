@@ -29,8 +29,11 @@ func SetupNamespacedClient() (*RuntimeNamespacedClient, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%w cant setup client", err)
 	}
-
-	return NewRuntimeNamespacedClient(client, namespace), nil
+	namespacedClient, err := NewRuntimeNamespacedClient(client, namespace)
+	if err != nil {
+		return nil, err
+	}
+	return namespacedClient, nil
 }
 
 type RuntimeNamespacedClient struct {
@@ -56,11 +59,14 @@ func AsEmptyNamespaceErr(err error) bool {
 }
 
 // NewRuntimeNamespacedClient wraps an existing client enforcing the namespace value.
-func NewRuntimeNamespacedClient(client runtimeClient.Client, namespace string) *RuntimeNamespacedClient {
+func NewRuntimeNamespacedClient(client runtimeClient.Client, namespace string) (*RuntimeNamespacedClient, error) {
+	if namespace == "" {
+		return nil, NemEmptyNamespaceErr("client namespace is not set")
+	}
 	return &RuntimeNamespacedClient{
 		Client:    client,
 		Namespace: namespace,
-	}
+	}, nil
 }
 
 // GetCBBranch retrieves an CodebaseBranch structure ptr for the given custom resource name from the Kubernetes Cluster CR.
@@ -177,9 +183,6 @@ func (c *RuntimeNamespacedClient) GetCodebaseImageStream(ctx context.Context, cr
 
 // GetCodebase retrieves a Codebase structure ptr for the given custom resource name from the Kubernetes Cluster CR.
 func (c *RuntimeNamespacedClient) GetCodebase(ctx context.Context, crName string) (*codeBaseApi.Codebase, error) {
-	if c.Namespace == "" {
-		return nil, NemEmptyNamespaceErr("client namespace is not set")
-	}
 	codebase := &codeBaseApi.Codebase{}
 	nsn := types.NamespacedName{
 		Name:      crName,
