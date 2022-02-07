@@ -83,6 +83,9 @@ func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient) {
 		beego.InsertFilter(fmt.Sprintf("%s/api/v1/edp/*", context.BasePath), beego.BeforeRouter, filters.AuthRestFilter)
 		beego.InsertFilter(fmt.Sprintf("%s/admin/edp/*", context.BasePath), beego.BeforeRouter, accessHandlerEnv.RoleAccessControlFilter)
 		beego.InsertFilter(fmt.Sprintf("%s/api/v1/edp/*", context.BasePath), beego.BeforeRouter, accessHandlerEnv.RoleAccessControlRestFilter)
+		// auth and role access for v2 api
+		beego.InsertFilter(fmt.Sprintf("%s%s%s/*", context.BasePath, apiV2Scope, edpScope), beego.BeforeRouter, filters.AuthRestFilter)
+		beego.InsertFilter(fmt.Sprintf("%s%s%s/*", context.BasePath, apiV2Scope, edpScope), beego.BeforeRouter, accessHandlerEnv.RoleAccessControlRestFilter)
 	} else {
 		beego.InsertFilter(fmt.Sprintf("%s/*", context.BasePath), beego.BeforeRouter, filters.StubAuthFilter)
 	}

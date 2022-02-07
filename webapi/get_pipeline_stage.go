@@ -4,22 +4,75 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+
+	"edp-admin-console/internal/imagestream"
+	pipelinestage "edp-admin-console/internal/pipeline-stage"
 )
 
-type StagePipelineResponse struct {
-	StageName      string `json:"name"`
-	CDPipelineName string `json:"cdPipeline"`
+type Response struct {
+	Name            string                           `json:"name"`
+	CDPipeline      string                           `json:"cdPipeline"`
+	Description     string                           `json:"description"`
+	TriggerType     string                           `json:"triggerType"`
+	Order           string                           `json:"order"`
+	Applications    []pipelinestage.ApplicationStage `json:"applications"`
+	QualityGates    []pipelinestage.QualityGate      `json:"qualityGates"`
+	JobProvisioning string                           `json:"jobProvisioning"`
 }
 
 func (h *HandlerEnv) GetStagePipeline(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	logger := LoggerFromContext(ctx)
 	logger.Debug("in handler")
+
 	stageName := chi.URLParam(r, "stageName")
 	cdPipelineName := chi.URLParam(r, "pipelineName")
-	response := &StagePipelineResponse{
-		StageName:      stageName,
-		CDPipelineName: cdPipelineName,
+	stageCRName := cdPipelineName + "-" + stageName
+
+	partialStageView, err := pipelinestage.StageViewByCRName(ctx, h.NamespacedClient, stageCRName)
+	if err != nil {
+		logger.Error(err.Error())
+		ErrNotFoundResponse(ctx, w, "stage not found")
+		return
+	}
+
+	cdPipelineAppNames, err := pipelinestage.CdPipelineAppNamesByCRName(ctx, h.NamespacedClient, cdPipelineName)
+	if err != nil {
+		logger.Error(err.Error())
+		ErrNotFoundResponse(ctx, w, "cdPipeline not found")
+		return
+	}
+
+	inputIS, err := imagestream.GetInputISForStage(ctx, h.NamespacedClient, stageName, cdPipelineName)
+	if err != nil {
+		logger.Error(err.Error())
+		ErrNotFoundResponse(ctx, w, "input IS not found")
+		return
+	}
+
+	outputIS, err := imagestream.GetOutputISForStage(ctx, h.NamespacedClient, cdPipelineName, stageName)
+	if err != nil {
+		logger.Error(err.Error())
+		ErrNotFoundResponse(ctx, w, "output IS not found")
+		return
+	}
+
+	applications, err := pipelinestage.BuildApplicationStages(ctx, h.NamespacedClient, inputIS, outputIS, cdPipelineAppNames)
+	if err != nil {
+		logger.Error(err.Error())
+		ErrNotFoundResponse(ctx, w, "inputIS and outputIS not the same size")
+		return
+	}
+
+	response := &Response{
+		Name:            stageName,
+		CDPipeline:      cdPipelineName,
+		TriggerType:     partialStageView.TriggerType,
+		Order:           partialStageView.Order,
+		JobProvisioning: partialStageView.JobProvisioning,
+		Description:     partialStageView.Description,
+		Applications:    applications,
+		QualityGates:    partialStageView.QualityGates,
 	}
 	OKJsonResponse(ctx, w, response)
 }

@@ -167,7 +167,7 @@ func TestGetImageStreamFromStage_NonZeroStageOrder(t *testing.T) {
 	ctx := context.Background()
 	stageCR := createStageCR(nonZeroOrder, cdPipelineName)
 	stageCR.Annotations = make(map[string]string)
-	stageCR.Annotations[previousStageNameAnnotationKey] = previousStageName
+	stageCR.Annotations[PreviousStageNameAnnotationKey] = previousStageName
 
 	cdPipelineCR := cdPipeApi.CDPipeline{
 		ObjectMeta: metav1.ObjectMeta{
@@ -210,7 +210,7 @@ func TestGetImageStreamFromStage_BadApplicationsToPromoteValues(t *testing.T) {
 	ctx := context.Background()
 	stageCR := createStageCR(nonZeroOrder, cdPipelineName)
 	stageCR.Annotations = make(map[string]string)
-	stageCR.Annotations[previousStageNameAnnotationKey] = previousStageName
+	stageCR.Annotations[PreviousStageNameAnnotationKey] = previousStageName
 
 	cdPipelineCR := cdPipeApi.CDPipeline{
 		ObjectMeta: metav1.ObjectMeta{
@@ -229,8 +229,8 @@ func TestGetImageStreamFromStage_BadApplicationsToPromoteValues(t *testing.T) {
 	k8sClient := k8s.NewRuntimeNamespacedClient(client, ns)
 
 	applicationsToPromote, err := GetInputISForStage(ctx, k8sClient, name, cdPipelineName)
-	var emptyImageStreamEr *EmptyImageStreamErr
-	assert.ErrorAs(t, err, &emptyImageStreamEr)
+	assert.Error(t, err)
+	assert.True(t, strings.Contains(err.Error(), "InputIS verification failed"))
 	assert.Nil(t, applicationsToPromote)
 }
 
@@ -238,7 +238,7 @@ func TestGetImageStreamFromStage_EmptyAnnotationToPromote(t *testing.T) {
 	ctx := context.Background()
 	stageCR := createStageCR(nonZeroOrder, cdPipelineName)
 	stageCR.Annotations = make(map[string]string)
-	stageCR.Annotations[previousStageNameAnnotationKey] = previousStageName
+	stageCR.Annotations[PreviousStageNameAnnotationKey] = previousStageName
 
 	cdPipelineCR := cdPipeApi.CDPipeline{
 		ObjectMeta: metav1.ObjectMeta{

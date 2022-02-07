@@ -13,7 +13,7 @@ import (
 
 const (
 	verifiedImageStreamSuffix      = "verified"
-	previousStageNameAnnotationKey = "deploy.edp.epam.com/previous-stage-name"
+	PreviousStageNameAnnotationKey = "deploy.edp.epam.com/previous-stage-name"
 )
 
 type EmptyImageStreamErr struct {
@@ -74,6 +74,9 @@ func inputCISListFromApplicationsToPromote(ctx context.Context, client *k8s.Runt
 
 	var imageStream []string
 	var cisNames []string
+	if cdPipelineCR.Spec.ApplicationsToPromote == nil {
+		return nil, NewEmptyImageStreamErr(cdPipelineCR.Name)
+	}
 
 	for _, name := range cdPipelineCR.Spec.ApplicationsToPromote {
 		re := strings.NewReplacer("/", "-", ".", "-")
@@ -95,7 +98,8 @@ func inputCISListFromApplicationsToPromote(ctx context.Context, client *k8s.Runt
 	if len(imageStream) != 0 {
 		return imageStream, nil
 	} else {
-		return nil, NewEmptyImageStreamErr(cdPipelineCR.Name)
+		//this error only occurs when we can't find any ImageStreamCR with cisName
+		return nil, errors.New("InputIS verification failed")
 	}
 }
 
@@ -125,11 +129,11 @@ func findPreviousStageName(annotations map[string]string) (string, error) {
 		return "", fmt.Errorf("there is no annotation")
 	}
 
-	if val, ok := annotations[previousStageNameAnnotationKey]; ok {
+	if val, ok := annotations[PreviousStageNameAnnotationKey]; ok {
 		return val, nil
 	}
 
-	return "", fmt.Errorf("stage doesn`t contain %s annotation", previousStageNameAnnotationKey)
+	return "", fmt.Errorf("stage doesn`t contain %s annotation", PreviousStageNameAnnotationKey)
 }
 
 // createStageCrName: creates a full stageName for stage CR
