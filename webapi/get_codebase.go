@@ -27,12 +27,18 @@ func (h *HandlerEnv) GetCodebase(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	codebaseResponse := GetCodebase{
-		Name:         crCodebase.Name,
-		GitServer:    crCodebase.Spec.GitServer,
-		BuildTool:    strings.ToLower(crCodebase.Spec.BuildTool),
-		Type:         crCodebase.Spec.Type,
-		EmptyProject: crCodebase.Spec.EmptyProject,
-		JenkinsSlave: pointerToStr(crCodebase.Spec.JenkinsSlave),
+		Name:             crCodebase.Name,
+		GitServer:        crCodebase.Spec.GitServer,
+		BuildTool:        strings.ToLower(crCodebase.Spec.BuildTool),
+		Type:             crCodebase.Spec.Type,
+		EmptyProject:     crCodebase.Spec.EmptyProject,
+		JenkinsSlave:     pointerToStr(crCodebase.Spec.JenkinsSlave),
+		Language:         crCodebase.Spec.Lang,
+		VersioningType:   string(crCodebase.Spec.Versioning.Type),
+		DeploymentScript: crCodebase.Spec.DeploymentScript,
+		Framework:        pointerToStr(crCodebase.Spec.Framework),
+		JobProvisioning:  pointerToStr(crCodebase.Spec.JobProvisioning),
+		Strategy:         string(crCodebase.Spec.Strategy),
 	}
 
 	response := GetCodebaseResponse(codebaseResponse)

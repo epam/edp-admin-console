@@ -126,6 +126,42 @@ func WithJenkinsSlave(jenkinsSlave *string) CodebaseCROption {
 	}
 }
 
+func WithLanguage(language string) CodebaseCROption {
+	return func(codebase *codeBaseApi.Codebase) {
+		codebase.Spec.Lang = language
+	}
+}
+
+func WithVersioningType(versioningType string) CodebaseCROption {
+	return func(codebase *codeBaseApi.Codebase) {
+		codebase.Spec.Versioning.Type = codeBaseApi.VersioningType(versioningType)
+	}
+}
+
+func WithDeploymentScript(deploymentScript string) CodebaseCROption {
+	return func(codebase *codeBaseApi.Codebase) {
+		codebase.Spec.DeploymentScript = deploymentScript
+	}
+}
+
+func WithFramework(framework *string) CodebaseCROption {
+	return func(codebase *codeBaseApi.Codebase) {
+		codebase.Spec.Framework = framework
+	}
+}
+
+func WithJobProvisioning(jobProvisioning *string) CodebaseCROption {
+	return func(codebase *codeBaseApi.Codebase) {
+		codebase.Spec.JobProvisioning = jobProvisioning
+	}
+}
+
+func WithStrategy(strategy string) CodebaseCROption {
+	return func(codebase *codeBaseApi.Codebase) {
+		codebase.Spec.Strategy = codeBaseApi.Strategy(strategy)
+	}
+}
+
 func (s *GetCodebaseSuite) TestGetCodebase_OK() {
 	t := s.T()
 
@@ -135,6 +171,12 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
 	npmBuildTool := "npm"
 	specType := "application"
 	jenkinsSlave := "npm"
+	language := "javascript"
+	versioningType := "default"
+	deploymentScript := "helm-chart"
+	framework := "java8"
+	jobProvisioning := "default"
+	strategy := "create"
 
 	stubCodebase_1 := createCodebaseCRWithOptions(
 		WithCrNamespace(namespaceName),
@@ -143,6 +185,12 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
 		WithBuildTool(npmBuildTool),
 		WithSpecType(specType),
 		WithJenkinsSlave(&jenkinsSlave),
+		WithLanguage(language),
+		WithVersioningType(versioningType),
+		WithDeploymentScript(deploymentScript),
+		WithFramework(&framework),
+		WithJobProvisioning(&jobProvisioning),
+		WithStrategy(strategy),
 	)
 	stubCodebases := []*codeBaseApi.Codebase{
 		stubCodebase_1,
@@ -161,10 +209,10 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
 	"codebase_branch": null,
 	"commitMessagePattern": "",
 	"defaultBranch": "",
-	"deploymentScript": "",
+	"deploymentScript": "%s",
 	"description": "",
 	"emptyProject": false,
-    "framework": "",
+    "framework": "%s",
     "gitProjectPath": null,
     "gitServer": "%s",
     "git_url": "",
@@ -172,21 +220,21 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
     "jenkinsSlave": "%s",
     "jiraIssueFields": null,
     "jiraServer": null,
-    "jobProvisioning": "",
-    "language": "",
+    "jobProvisioning": "%s",
+    "language": "%s",
     "name": "%s",
     "perf": null,
     "startFrom": null,
     "status": "",
-    "strategy": "",
+    "strategy": "%s",
     "testReportFramework": "",
     "ticketNamePattern": "",
     "type": "%s",
-    "versioningType": ""
+    "versioningType": "%s"
 }
 `,
-		npmBuildTool, crCodebaseGitServer_1, jenkinsSlave,
-		crCodebaseName_1, specType,
+		npmBuildTool, deploymentScript, framework, crCodebaseGitServer_1, jenkinsSlave, jobProvisioning,
+		language, crCodebaseName_1, strategy, specType, versioningType,
 	)
 
 	gotPlainBody := response.Body().Raw()
