@@ -351,7 +351,12 @@ func V2APIRouter(h *HandlerEnv, logger *zap.Logger) *chi.Mux {
 	V2RoutePrefix := path.Join(context.BasePath, apiV2Scope)
 	router.Route(V2RoutePrefix, func(v2APIRouter chi.Router) {
 		v2APIRouter.Route(edpScope, func(edpScope chi.Router) {
-			edpScope.Get("/cd-pipeline/{pipelineName}/stage/{stageName}", h.GetStagePipeline)
+			edpScope.Route("/cd-pipeline", func(pipelinesRoute chi.Router) {
+				pipelinesRoute.Route("/{pipelineName}", func(pipelineRoute chi.Router) {
+					pipelineRoute.Get("/", h.GetPipeline)
+					pipelineRoute.Get("/stage/{stageName}", h.GetStagePipeline)
+				})
+			})
 			edpScope.Route("/codebase", func(codebasesRoute chi.Router) {
 				codebasesRoute.Get("/", h.GetCodebases)
 				codebasesRoute.Get("/{codebaseName}", h.GetCodebase)
