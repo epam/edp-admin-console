@@ -7,64 +7,22 @@ import (
 	"go.uber.org/zap"
 )
 
-type GetCodebasesResponse []GetCodebase
+type GetCodebasesResponse []CodebaseForList
 
-type GetCodebase struct {
-	ID                   int                    `json:"id"` // legacy ?
-	Name                 string                 `json:"name"`
-	Language             string                 `json:"language"`
-	BuildTool            string                 `json:"build_tool"`
-	Framework            string                 `json:"framework"`
-	Strategy             string                 `json:"strategy"`
-	GitURL               string                 `json:"git_url"`
-	Type                 string                 `json:"type"`
-	Status               string                 `json:"status"`
-	TestReportFramework  string                 `json:"testReportFramework"`
-	Description          string                 `json:"description"`
-	CodebaseBranch       []CodebaseBranch       `json:"codebase_branch"`
-	GitServer            string                 `json:"gitServer"`
-	GitProjectPath       *string                `json:"gitProjectPath"`
-	JenkinsSlave         string                 `json:"jenkinsSlave"`
-	JobProvisioning      string                 `json:"jobProvisioning"`
-	DeploymentScript     string                 `json:"deploymentScript"`
-	VersioningType       string                 `json:"versioningType"`
-	StartFrom            *string                `json:"startFrom"`
-	JiraServer           *string                `json:"jiraServer"`
-	CommitMessagePattern string                 `json:"commitMessagePattern"`
-	TicketNamePattern    string                 `json:"ticketNamePattern"`
-	CiTool               string                 `json:"ciTool"`
-	Perf                 *Perf                  `json:"perf"`
-	DefaultBranch        string                 `json:"defaultBranch"`
-	JiraIssueFields      map[string]interface{} `json:"jiraIssueFields"`
-	EmptyProject         bool                   `json:"emptyProject"`
+type CodebaseMini struct {
+	Name             string `json:"name"`
+	DeploymentScript string `json:"deploymentScript"`
+	GitServer        string `json:"gitServer"`
+	VersioningType   string `json:"versioningType"`
+	Strategy         string `json:"strategy"`
 }
 
-type CodebaseBranch struct {
-	ID                   int                    `json:"id"`
-	BranchName           string                 `json:"branchName"`
-	FromCommit           string                 `json:"from_commit"`
-	Status               string                 `json:"status"`
-	Version              *string                `json:"version"`
-	BuildNumber          *string                `json:"build_number"`
-	LastSuccessBuild     *string                `json:"last_success_build"`
-	BranchLink           string                 `json:"branchLink"`
-	JenkinsLink          string                 `json:"jenkinsLink"`
-	AppName              string                 `json:"appName"`
-	Release              bool                   `json:"release"`
-	CodebaseDockerStream []CodebaseDockerStream `json:"codebaseDockerStream"`
-}
-
-type CodebaseDockerStream struct {
-	ID                int    `json:"id"`
-	OcImageStreamName string `json:"ocImageStreamName"`
-	ImageLink         string `json:"imageLink"`
-	JenkinsLink       string `json:"jenkinsLink"`
-	// CdPipelines       interface{} `json:"CdPipelines"` // looks suspicious
-}
-
-type Perf struct {
-	Name        string   `json:"name"`
-	DataSources []string `json:"dataSources"`
+type CodebaseForList struct {
+	CodebaseMini
+	Type           string  `json:"type"`
+	GitProjectPath *string `json:"gitProjectPath"`
+	JenkinsSlave   string  `json:"jenkinsSlave"`
+	EmptyProject   bool    `json:"emptyProject"`
 }
 
 func (h *HandlerEnv) GetCodebases(w http.ResponseWriter, r *http.Request) {
@@ -90,7 +48,7 @@ func (h *HandlerEnv) GetCodebases(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	codebasesResponse := make([]GetCodebase, 0)
+	codebasesResponse := make([]CodebaseForList, 0)
 	for _, codebaseName := range cleanCodebases {
 		crCodebase, err := h.NamespacedClient.GetCodebase(ctx, codebaseName)
 		if err != nil {
@@ -98,9 +56,15 @@ func (h *HandlerEnv) GetCodebases(w http.ResponseWriter, r *http.Request) {
 			InternalErrorResponse(ctx, w, "get codebase by name failed")
 			return
 		}
-		codebaseResponse := GetCodebase{
-			Name:      crCodebase.Name,
-			GitServer: crCodebase.Spec.GitServer,
+		codebaseResponse := CodebaseForList{
+			CodebaseMini: CodebaseMini{
+				Name:             crCodebase.Name,
+				GitServer:        crCodebase.Spec.GitServer,
+				Strategy:         string(crCodebase.Spec.Strategy),
+				DeploymentScript: crCodebase.Spec.DeploymentScript,
+				VersioningType:   string(crCodebase.Spec.Versioning.Type),
+			},
+			GitProjectPath: crCodebase.Spec.GitUrlPath,
 		}
 		codebasesResponse = append(codebasesResponse, codebaseResponse)
 	}
