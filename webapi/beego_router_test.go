@@ -30,7 +30,7 @@ func TestSetupRouter(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	SetupRouter(namespaceClient) // rewrite this setup ASAP
+	SetupRouter(namespaceClient, "") // rewrite this setup ASAP
 	err = os.Unsetenv(k8s.NamespaceEnv)
 	if err != nil {
 		t.Fatal(err)

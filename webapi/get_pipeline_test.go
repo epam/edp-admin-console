@@ -55,7 +55,7 @@ func TestGetPipelineSuite(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	h := NewHandlerEnv(k8sClient)
+	h := NewHandlerEnv(WithClient(k8sClient))
 	logger := applog.GetLogger()
 	router := V2APIRouter(h, logger)
 	s := &GetPipelineSuite{

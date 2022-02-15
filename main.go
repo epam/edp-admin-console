@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/astaxie/beego"
 
@@ -11,11 +12,15 @@ import (
 )
 
 func main() {
+	workingDir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
 	namespacedClient, err := k8s.SetupNamespacedClient()
 	if err != nil {
 		log.Fatal(err)
 	}
-	webapi.SetupRouter(namespacedClient)
+	webapi.SetupRouter(namespacedClient, workingDir)
 	template_function.RegisterTemplateFuncs()
 	beego.Run()
 }

@@ -1,8 +1,10 @@
 package webapi
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"html/template"
 	"net/http"
 
 	"go.uber.org/zap"
@@ -46,5 +48,27 @@ func InternalErrorResponse(ctx context.Context, w http.ResponseWriter, msg strin
 	_, wErr := w.Write([]byte(msg))
 	if wErr != nil {
 		logger.Error("write error response failed", zap.Error(wErr))
+	}
+}
+
+func OkHTMLResponse(ctx context.Context, writer http.ResponseWriter, data interface{}, tmpl *template.Template, mainFileName string, templatePaths ...string) {
+	logger := LoggerFromContext(ctx)
+	tmplInternal, err := tmpl.ParseFiles(templatePaths...)
+	if err != nil {
+		logger.Error("cant find template page", zap.Error(err), zap.Strings("template_paths", templatePaths))
+		InternalErrorResponse(ctx, writer, "cant find template page")
+		return
+	}
+	var buf bytes.Buffer
+	err = tmplInternal.ExecuteTemplate(&buf, mainFileName, data)
+	if err != nil {
+		logger.Error("cant exec page", zap.Error(err), zap.Strings("template_paths", templatePaths), zap.String("main_template", mainFileName))
+		InternalErrorResponse(ctx, writer, "cant exec page")
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+	_, err = writer.Write(buf.Bytes())
+	if err != nil {
+		logger.Error("write error response failed", zap.Error(err))
 	}
 }

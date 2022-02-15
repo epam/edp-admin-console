@@ -59,9 +59,10 @@ const (
 	CreateStrategy = "Create"
 	apiV2Scope     = "/api/v2"
 	edpScope       = "/edp"
+	edpScopeV2     = "/v2/admin/edp"
 )
 
-func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient) {
+func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir string) {
 	zaplog.Info("Start application...",
 		zap.String("mode", beego.AppConfig.String("runmode")),
 		zap.String("edp version", context.EDPVersion))
@@ -337,11 +338,12 @@ func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient) {
 	)
 	beego.AddNamespace(apiV1Namespace)
 
-	v2APIHandler := NewHandlerEnv(namespacedClient)
+	v2APIHandler := NewHandlerEnv(WithClient(namespacedClient), WithWorkingDir(workingDir), WithFuncMapTemplate(CreateCommonFuncMap()))
 	v2APIRouter := V2APIRouter(v2APIHandler, zaplog)
 	// see https://github.com/beego/beedoc/blob/master/en-US/mvc/controller/router.md#handler-register
 	// and isPrefix parameter
 	beego.Handler(path.Join(context.BasePath, apiV2Scope, edpScope), v2APIRouter, true)
+	beego.Handler(path.Join(context.BasePath, edpScopeV2), v2APIRouter, true)
 }
 
 func V2APIRouter(h *HandlerEnv, logger *zap.Logger) *chi.Mux {
@@ -362,6 +364,12 @@ func V2APIRouter(h *HandlerEnv, logger *zap.Logger) *chi.Mux {
 				codebasesRoute.Get("/{codebaseName}", h.GetCodebase)
 			})
 		})
+
+	})
+
+	edpV2Prefix := path.Join(context.BasePath, edpScopeV2)
+	router.Route(edpV2Prefix, func(edpScope chi.Router) {
+		edpScope.Get("/index", h.Index)
 	})
 
 	return router

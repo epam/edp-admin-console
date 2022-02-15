@@ -2,7 +2,9 @@ package webapi
 
 import (
 	"context"
+	"html/template"
 	"log"
+	"time"
 
 	"go.uber.org/zap"
 
@@ -11,10 +13,47 @@ import (
 
 type HandlerEnv struct {
 	NamespacedClient *k8s.RuntimeNamespacedClient
+	Template         *template.Template
+	WorkingDir       string
 }
 
-func NewHandlerEnv(namespacedClient *k8s.RuntimeNamespacedClient) *HandlerEnv {
-	return &HandlerEnv{NamespacedClient: namespacedClient}
+func getCurrentYear() int {
+	return time.Now().Year()
+}
+
+func CreateCommonFuncMap() template.FuncMap {
+	return template.FuncMap{
+		"getCurrentYear": getCurrentYear,
+	}
+}
+
+type HandlerEnvOption func(handler *HandlerEnv)
+
+func WithClient(client *k8s.RuntimeNamespacedClient) HandlerEnvOption {
+	return func(handler *HandlerEnv) {
+		handler.NamespacedClient = client
+	}
+}
+
+func WithFuncMapTemplate(funcMap template.FuncMap) HandlerEnvOption {
+	tmpl := template.New("").Funcs(funcMap)
+	return func(handler *HandlerEnv) {
+		handler.Template = tmpl
+	}
+}
+
+func WithWorkingDir(workingDir string) HandlerEnvOption {
+	return func(handler *HandlerEnv) {
+		handler.WorkingDir = workingDir
+	}
+}
+
+func NewHandlerEnv(opts ...HandlerEnvOption) *HandlerEnv {
+	handler := &HandlerEnv{}
+	for i := range opts {
+		opts[i](handler)
+	}
+	return handler
 }
 
 type logCtx struct{}

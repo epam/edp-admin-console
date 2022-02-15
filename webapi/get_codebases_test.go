@@ -55,7 +55,7 @@ func TestGetCodebasesSuite(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	h := NewHandlerEnv(k8sClient)
+	h := NewHandlerEnv(WithClient(k8sClient))
 	logger := applog.GetLogger()
 	router := V2APIRouter(h, logger)
 
@@ -92,7 +92,7 @@ func (s *GetCodebasesSuite) RedefineK8SClientWithCodebaseCR(crCodebases []*codeB
 	if err != nil {
 		s.T().Fatal(err)
 	}
-	testHandler := NewHandlerEnv(k8sClient)
+	testHandler := NewHandlerEnv(WithClient(k8sClient))
 	newRouter := V2APIRouter(testHandler, applog.GetLogger())
 	s.TestServer.Config.Handler = newRouter
 }

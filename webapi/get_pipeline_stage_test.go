@@ -50,7 +50,7 @@ func TestStagePipelineSuite(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	h := NewHandlerEnv(namespacedClient)
+	h := NewHandlerEnv(WithClient(namespacedClient))
 	logger := applog.GetLogger()
 	router := V2APIRouter(h, logger)
 
