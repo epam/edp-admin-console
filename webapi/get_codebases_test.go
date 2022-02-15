@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	appsv1 "k8s.io/api/apps/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
@@ -28,18 +27,6 @@ type GetCodebasesSuite struct {
 	suite.Suite
 	Router     *chi.Mux
 	TestServer *httptest.Server
-}
-
-func createCodebaseCR(namespace, crName, gitServerName string) *codeBaseApi.Codebase {
-	return &codeBaseApi.Codebase{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      crName,
-			Namespace: namespace,
-		},
-		Spec: codeBaseApi.CodebaseSpec{
-			GitServer: gitServerName,
-		},
-	}
 }
 
 func TestGetCodebasesSuite(t *testing.T) {
@@ -97,17 +84,47 @@ func (s *GetCodebasesSuite) RedefineK8SClientWithCodebaseCR(crCodebases []*codeB
 	s.TestServer.Config.Handler = newRouter
 }
 
+func WithGITUrl(gitURL string) CodebaseCROption {
+	return func(codebase *codeBaseApi.Codebase) {
+		codebase.Spec.GitUrlPath = &gitURL
+	}
+}
+
 func (s *GetCodebasesSuite) TestGetCodebases_OK() {
 	t := s.T()
 
 	namespaceName := testNamespace
 	crCodebaseName_1 := "fake_spring-petclinic"
 	crCodebaseGitServer_1 := "gerrit"
+	crVersioningType_1 := "edp"
+	crStrategy_1 := "clone"
+	crGitProjectPath_1 := "git.com/foo/bar"
+	deploymentScript_1 := "bash"
 	crCodebaseName_2 := "fake_2"
 	crCodebaseGitServer_2 := "gitlab"
+	crVersioningType_2 := "default"
+	crStrategy_2 := "create"
+	crGitProjectPath_2 := "hg.com/foo/bar"
+	deploymentScript_2 := "hands"
 
-	stubCodebase_1 := createCodebaseCR(namespaceName, crCodebaseName_1, crCodebaseGitServer_1)
-	stubCodebase_2 := createCodebaseCR(namespaceName, crCodebaseName_2, crCodebaseGitServer_2)
+	stubCodebase_1 := createCodebaseCRWithOptions(
+		WithCrNamespace(namespaceName),
+		WithCrName(crCodebaseName_1),
+		WithGitServerName(crCodebaseGitServer_1),
+		WithVersioningType(crVersioningType_1),
+		WithStrategy(crStrategy_1),
+		WithGITUrl(crGitProjectPath_1),
+		WithDeploymentScript(deploymentScript_1),
+	)
+	stubCodebase_2 := createCodebaseCRWithOptions(
+		WithCrNamespace(namespaceName),
+		WithCrName(crCodebaseName_2),
+		WithGitServerName(crCodebaseGitServer_2),
+		WithVersioningType(crVersioningType_2),
+		WithStrategy(crStrategy_2),
+		WithGITUrl(crGitProjectPath_2),
+		WithDeploymentScript(deploymentScript_2),
+	)
 	stubCodebases := []*codeBaseApi.Codebase{
 		stubCodebase_1, stubCodebase_2,
 	}
@@ -122,66 +139,30 @@ func (s *GetCodebasesSuite) TestGetCodebases_OK() {
 
 	expectedJSONBody := fmt.Sprintf(`[
 {
-	"build_tool" : "",
-	"ciTool": "",
-	"codebase_branch": null,
-	"commitMessagePattern": "",
-	"defaultBranch": "",
-	"deploymentScript": "",
-	"description": "",
-	"emptyProject": false,
-    "framework": "",
-    "gitProjectPath": null,
+    "deploymentScript": "%s",
+    "emptyProject": false,
     "gitServer": "%s",
-    "git_url": "",
-    "id": 0,
+    "gitProjectPath": "%s",
     "jenkinsSlave": "",
-    "jiraIssueFields": null,
-    "jiraServer": null,
-    "jobProvisioning": "",
-    "language": "",
     "name": "%s",
-    "perf": null,
-    "startFrom": null,
-    "status": "",
-    "strategy": "",
-    "testReportFramework": "",
-    "ticketNamePattern": "",
+    "strategy": "%s",
     "type": "",
-    "versioningType": ""
+    "versioningType": "%s"
 },
 {
-	"build_tool" : "",
-	"ciTool": "",
-	"codebase_branch": null,
-	"commitMessagePattern": "",
-	"defaultBranch": "",
-	"deploymentScript": "",
-	"description": "",
-	"emptyProject": false,
-    "framework": "",
-    "gitProjectPath": null,
+    "deploymentScript": "%s",
+    "emptyProject": false,
     "gitServer": "%s",
-    "git_url": "",
-    "id": 0,
+    "gitProjectPath": "%s",
     "jenkinsSlave": "",
-    "jiraIssueFields": null,
-    "jiraServer": null,
-    "jobProvisioning": "",
-    "language": "",
     "name": "%s",
-    "perf": null,
-    "startFrom": null,
-    "status": "",
-    "strategy": "",
-    "testReportFramework": "",
-    "ticketNamePattern": "",
+    "strategy": "%s",
     "type": "",
-    "versioningType": ""
+    "versioningType": "%s"
 }
 ]`,
-		crCodebaseGitServer_1, crCodebaseName_1,
-		crCodebaseGitServer_2, crCodebaseName_2,
+		deploymentScript_1, crCodebaseGitServer_1, crGitProjectPath_1, crCodebaseName_1, crStrategy_1, crVersioningType_1,
+		deploymentScript_2, crCodebaseGitServer_2, crGitProjectPath_2, crCodebaseName_2, crStrategy_2, crVersioningType_2,
 	)
 
 	gotPlainBody := response.Body().Raw()

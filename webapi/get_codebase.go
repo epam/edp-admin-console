@@ -10,6 +10,17 @@ import (
 
 type GetCodebaseResponse GetCodebase
 
+type GetCodebase struct {
+	CodebaseMini
+	BuildTool       string `json:"build_tool"`
+	Type            string `json:"type"`
+	EmptyProject    bool   `json:"emptyProject"`
+	JenkinsSlave    string `json:"jenkinsSlave"`
+	Language        string `json:"language"`
+	Framework       string `json:"framework"`
+	JobProvisioning string `json:"jobProvisioning"`
+}
+
 func (h *HandlerEnv) GetCodebase(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	logger := LoggerFromContext(ctx)
@@ -27,18 +38,20 @@ func (h *HandlerEnv) GetCodebase(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	codebaseResponse := GetCodebase{
-		Name:             crCodebase.Name,
-		GitServer:        crCodebase.Spec.GitServer,
-		BuildTool:        strings.ToLower(crCodebase.Spec.BuildTool),
-		Type:             crCodebase.Spec.Type,
-		EmptyProject:     crCodebase.Spec.EmptyProject,
-		JenkinsSlave:     pointerToStr(crCodebase.Spec.JenkinsSlave),
-		Language:         crCodebase.Spec.Lang,
-		VersioningType:   string(crCodebase.Spec.Versioning.Type),
-		DeploymentScript: crCodebase.Spec.DeploymentScript,
-		Framework:        pointerToStr(crCodebase.Spec.Framework),
-		JobProvisioning:  pointerToStr(crCodebase.Spec.JobProvisioning),
-		Strategy:         string(crCodebase.Spec.Strategy),
+		CodebaseMini: CodebaseMini{
+			Name:             crCodebase.Name,
+			DeploymentScript: crCodebase.Spec.DeploymentScript,
+			GitServer:        crCodebase.Spec.GitServer,
+			Strategy:         string(crCodebase.Spec.Strategy),
+			VersioningType:   string(crCodebase.Spec.Versioning.Type),
+		},
+		BuildTool:       strings.ToLower(crCodebase.Spec.BuildTool),
+		Type:            crCodebase.Spec.Type,
+		EmptyProject:    crCodebase.Spec.EmptyProject,
+		JenkinsSlave:    pointerToStr(crCodebase.Spec.JenkinsSlave),
+		Language:        crCodebase.Spec.Lang,
+		Framework:       pointerToStr(crCodebase.Spec.Framework),
+		JobProvisioning: pointerToStr(crCodebase.Spec.JobProvisioning),
 	}
 
 	response := GetCodebaseResponse(codebaseResponse)
