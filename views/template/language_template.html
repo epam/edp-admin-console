@@ -102,6 +102,19 @@
         </div>
         {{end}}
 
+        {{if eq .Type "library" }}
+        <div class="form__radio-btn-wrapper">
+            <input name="appLang" type="radio" class="form__radio-btn"
+                   id="appLang-Container" value="container"
+                   data-target=".formSubsection-container">
+            <label class="form__radio-label" for="appLang-Container">
+                <img class="form__radio-label-icon"
+                     src="{{ .BasePath }}/static/img/container-logo.png" alt="logo">
+                <span class="form__radio-label-text">Container</span>
+            </label>
+        </div>
+        {{end}}
+
         <div class="form__radio-btn-wrapper other-language">
             <input name="appLang" type="radio" class="form__radio-btn"
                    id="appLang-other" value="other"
