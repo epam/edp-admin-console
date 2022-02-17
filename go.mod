@@ -14,7 +14,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/coreos/go-oidc v2.1.0+incompatible
 	github.com/epam/edp-cd-pipeline-operator/v2 v2.10.0
-	github.com/epam/edp-codebase-operator/v2 v2.10.0
+	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20220217141504-d2f4939373bf
 	github.com/gavv/httpexpect v2.0.0+incompatible
 	github.com/gavv/httpexpect/v2 v2.3.1
 	github.com/go-chi/chi/v5 v5.0.7

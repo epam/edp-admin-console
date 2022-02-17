@@ -51,6 +51,15 @@ func InternalErrorResponse(ctx context.Context, w http.ResponseWriter, msg strin
 	}
 }
 
+func NotFoundResponse(ctx context.Context, w http.ResponseWriter, msg string) {
+	logger := LoggerFromContext(ctx)
+	w.WriteHeader(http.StatusNotFound)
+	_, wErr := w.Write([]byte(msg))
+	if wErr != nil {
+		logger.Error("write error response failed", zap.Error(wErr))
+	}
+}
+
 func OkHTMLResponse(ctx context.Context, writer http.ResponseWriter, data interface{}, tmpl *template.Template, mainFileName string, templatePaths ...string) {
 	logger := LoggerFromContext(ctx)
 	tmplInternal, err := tmpl.ParseFiles(templatePaths...)

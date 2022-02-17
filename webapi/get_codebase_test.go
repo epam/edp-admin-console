@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	"github.com/epam/edp-codebase-operator/v2/pkg/codebasebranch"
 	"github.com/gavv/httpexpect/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
@@ -56,16 +57,32 @@ func (s *GetCodebaseSuite) TearDownSuite() {
 	s.TestServer.Close()
 }
 
-func (s *GetCodebaseSuite) RedefineK8SClientWithCodebaseCR(crCodebases []*codeBaseApi.Codebase) {
+type crObjects struct {
+	crCodebase       []*codeBaseApi.Codebase
+	crCodebaseBranch []*codeBaseApi.CodebaseBranch
+}
+
+func (s *GetCodebaseSuite) RedefineK8SClientWithCodebaseCR(stubObjects crObjects) {
 	runtimeScheme := runtime.NewScheme()
-	runtimeScheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.Codebase{})
+	runtimeScheme.AddKnownTypes(appsv1.SchemeGroupVersion,
+		&codeBaseApi.Codebase{}, &codeBaseApi.CodebaseBranch{},
+		&codeBaseApi.CodebaseBranchList{},
+	)
 	namespaceName := testNamespace
 
 	builder := fake.NewClientBuilder().WithScheme(runtimeScheme)
-	if len(crCodebases) > 0 {
+	if len(stubObjects.crCodebase) > 0 {
 		fakeObjects := make([]runtime.Object, 0)
-		for _, crCodebase := range crCodebases {
+		for _, crCodebase := range stubObjects.crCodebase {
 			fakeObjects = append(fakeObjects, crCodebase)
+		}
+		builder = builder.WithRuntimeObjects(fakeObjects...)
+	}
+
+	if len(stubObjects.crCodebaseBranch) > 0 {
+		fakeObjects := make([]runtime.Object, 0)
+		for _, crCodebaseBranch := range stubObjects.crCodebaseBranch {
+			fakeObjects = append(fakeObjects, crCodebaseBranch)
 		}
 		builder = builder.WithRuntimeObjects(fakeObjects...)
 	}
@@ -162,6 +179,58 @@ func WithStrategy(strategy string) CodebaseCROption {
 	}
 }
 
+func createCodebaseBranchCRWithOptions(opts ...CodebaseBranchCROption) *codeBaseApi.CodebaseBranch {
+	codebaseBranchCR := new(codeBaseApi.CodebaseBranch)
+	for i := range opts {
+		opts[i](codebaseBranchCR)
+	}
+	return codebaseBranchCR
+}
+
+func cbBranchWithName(name string) CodebaseBranchCROption {
+	return func(cbBranch *codeBaseApi.CodebaseBranch) {
+		cbBranch.Name = name
+	}
+}
+
+func cbBranchWithNamespace(namespace string) CodebaseBranchCROption {
+	return func(cbBranch *codeBaseApi.CodebaseBranch) {
+		cbBranch.Namespace = namespace
+	}
+}
+
+func cbBranchWithLabels(labels map[string]string) CodebaseBranchCROption {
+	return func(cbBranch *codeBaseApi.CodebaseBranch) {
+		cbBranch.Labels = labels
+	}
+}
+
+func cbBranchWithSpecBranchName(branchName string) CodebaseBranchCROption {
+	return func(cbBranch *codeBaseApi.CodebaseBranch) {
+		cbBranch.Spec.BranchName = branchName
+	}
+}
+
+func cbBranchWithBuildNumber(buildNumber *string) CodebaseBranchCROption {
+	return func(cbBranch *codeBaseApi.CodebaseBranch) {
+		cbBranch.Status.Build = buildNumber
+	}
+}
+
+func cbBranchWithIsRelease(isRelease bool) CodebaseBranchCROption {
+	return func(cbBranch *codeBaseApi.CodebaseBranch) {
+		cbBranch.Spec.Release = isRelease
+	}
+}
+
+func cbBranchWithVersion(version *string) CodebaseBranchCROption {
+	return func(cbBranch *codeBaseApi.CodebaseBranch) {
+		cbBranch.Spec.Version = version
+	}
+}
+
+type CodebaseBranchCROption func(codebase *codeBaseApi.CodebaseBranch)
+
 func (s *GetCodebaseSuite) TestGetCodebase_OK() {
 	t := s.T()
 
@@ -195,7 +264,33 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
 	stubCodebases := []*codeBaseApi.Codebase{
 		stubCodebase_1,
 	}
-	s.RedefineK8SClientWithCodebaseCR(stubCodebases)
+
+	cbBranchName_1 := "develop"
+	crCbBranchName := fmt.Sprintf("%s-%s", crCodebaseName_1, cbBranchName_1)
+	cbLabels_1 := map[string]string{
+		codebasebranch.LabelCodebaseName: crCodebaseName_1,
+	}
+	buildNumber_1 := "1"
+	isRelease_1 := true
+	cbVersion_1 := "release-v1.2.5"
+	stubCodebaseBranch_1 := createCodebaseBranchCRWithOptions(
+		cbBranchWithName(crCbBranchName),
+		cbBranchWithNamespace(namespaceName),
+		cbBranchWithLabels(cbLabels_1),
+		cbBranchWithSpecBranchName(cbBranchName_1),
+		cbBranchWithBuildNumber(&buildNumber_1),
+		cbBranchWithIsRelease(isRelease_1),
+		cbBranchWithVersion(&cbVersion_1),
+	)
+	stubCbBranches := []*codeBaseApi.CodebaseBranch{
+		stubCodebaseBranch_1,
+	}
+
+	stubObjects := crObjects{
+		crCodebase:       stubCodebases,
+		crCodebaseBranch: stubCbBranches,
+	}
+	s.RedefineK8SClientWithCodebaseCR(stubObjects)
 	httpExpect := httpexpect.New(t, s.TestServer.URL)
 	response := httpExpect.
 		GET(fmt.Sprintf("/api/v2/edp/codebase/%s", "fake_spring-petclinic")).
@@ -205,6 +300,14 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
 
 	expectedJSONBody := fmt.Sprintf(`{
 	"build_tool" : "%s",
+    "codebase_branch": [
+        {
+             "branchName": "%s",
+             "build_number": "%s",
+             "release": %t,
+             "version": "%s"
+        }
+    ],
 	"deploymentScript": "%s",
 	"emptyProject": false,
     "framework": "%s",
@@ -218,7 +321,8 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
     "versioningType": "%s"
 }
 `,
-		npmBuildTool, deploymentScript, framework, crCodebaseGitServer_1, jenkinsSlave, jobProvisioning,
+		npmBuildTool, cbBranchName_1, buildNumber_1, isRelease_1, cbVersion_1,
+		deploymentScript, framework, crCodebaseGitServer_1, jenkinsSlave, jobProvisioning,
 		language, crCodebaseName_1, strategy, specType, versioningType,
 	)
 
