@@ -8,6 +8,7 @@ import (
 
 	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	"github.com/epam/edp-codebase-operator/v2/pkg/codebasebranch"
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -459,4 +460,54 @@ func TestNewRuntimeNamespacedClient_EmptyNamespace(t *testing.T) {
 	var emptyNamespaceErr *EmptyNamespaceErr
 	assert.ErrorAs(t, err, &emptyNamespaceErr)
 	assert.Nil(t, k8sClient)
+}
+
+func TestRuntimeNamespacedClient_CodebaseBranchesListByCodebaseName(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	err := codeBaseApi.AddToScheme(scheme)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	namespace_1 := "k8s"
+	namespace_2 := "linux"
+	crCodebaseBranch_1 := &codeBaseApi.CodebaseBranch{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "docker-master",
+			Namespace: namespace_1,
+			Labels: map[string]string{
+				codebasebranch.LabelCodebaseName: "docker",
+			},
+		},
+		Spec: codeBaseApi.CodebaseBranchSpec{
+			CodebaseName: "docker",
+			BranchName:   "master",
+		},
+	}
+	crCodebaseBranch_2 := &codeBaseApi.CodebaseBranch{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "docker-master",
+			Namespace: namespace_2,
+			Labels: map[string]string{
+				codebasebranch.LabelCodebaseName: "docker",
+			},
+		},
+		Spec: codeBaseApi.CodebaseBranchSpec{
+			CodebaseName: "docker",
+			BranchName:   "master",
+		},
+	}
+
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(crCodebaseBranch_1, crCodebaseBranch_2).Build()
+	k8sClient, err := NewRuntimeNamespacedClient(client, namespace_1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cbBranchesList, err := k8sClient.CodebaseBranchesListByCodebaseName(ctx, "docker")
+	assert.NoError(t, err)
+	expectedCbBranches := []*codeBaseApi.CodebaseBranch{
+		crCodebaseBranch_1,
+	}
+	assert.Equal(t, expectedCbBranches, cbBranchesList)
 }

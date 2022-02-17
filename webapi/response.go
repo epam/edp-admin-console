@@ -48,3 +48,12 @@ func InternalErrorResponse(ctx context.Context, w http.ResponseWriter, msg strin
 		logger.Error("write error response failed", zap.Error(wErr))
 	}
 }
+
+func NotFoundResponse(ctx context.Context, w http.ResponseWriter, msg string) {
+	logger := LoggerFromContext(ctx)
+	w.WriteHeader(http.StatusNotFound)
+	_, wErr := w.Write([]byte(msg))
+	if wErr != nil {
+		logger.Error("write error response failed", zap.Error(wErr))
+	}
+}

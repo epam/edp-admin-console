@@ -8,7 +8,10 @@ import (
 
 	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	"github.com/epam/edp-codebase-operator/v2/pkg/codebasebranch"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/selection"
 	"k8s.io/apimachinery/pkg/types"
 	utilRuntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -193,4 +196,25 @@ func (c *RuntimeNamespacedClient) GetCodebase(ctx context.Context, crName string
 		return nil, err
 	}
 	return codebase, err
+}
+
+func (c *RuntimeNamespacedClient) CodebaseBranchesListByCodebaseName(ctx context.Context, codebaseName string) ([]*codeBaseApi.CodebaseBranch, error) {
+	cbBranchList := new(codeBaseApi.CodebaseBranchList)
+	requirement, err := labels.NewRequirement(codebasebranch.LabelCodebaseName, selection.Equals, []string{codebaseName})
+	if err != nil {
+		return nil, err
+	}
+	selector := labels.NewSelector().Add(*requirement)
+	err = c.List(ctx, cbBranchList, &runtimeClient.ListOptions{
+		LabelSelector: selector,
+		Namespace:     c.Namespace,
+	})
+	if err != nil {
+		return nil, err
+	}
+	cbBranches := make([]*codeBaseApi.CodebaseBranch, len(cbBranchList.Items))
+	for i := range cbBranchList.Items {
+		cbBranches[i] = &cbBranchList.Items[i]
+	}
+	return cbBranches, nil
 }
