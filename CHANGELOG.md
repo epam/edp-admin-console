@@ -2,8 +2,20 @@
 ## [Unreleased]
 
 
+<a name="v2.11.1"></a>
+## [v2.11.1] - 2022-02-17
+### Features
+
+- get codebase request - added fields to the response. [EPMDEDP-8412](https://jiraeu.epam.com/browse/EPMDEDP-8412)
+- get codebases request - added fields to the response. [EPMDEDP-8412](https://jiraeu.epam.com/browse/EPMDEDP-8412)
+
+### Routine
+
+- Update release flow for GH [EPMDEDP-8383](https://jiraeu.epam.com/browse/EPMDEDP-8383)
+
+
 <a name="v2.11.0"></a>
-## [v2.11.0] - 2022-02-10
+## [v2.11.0] - 2022-02-14
 ### Features
 
 - Update Makefile changelog target [EPMDEDP-8218](https://jiraeu.epam.com/browse/EPMDEDP-8218)
@@ -91,7 +103,8 @@
 - [EPMDEDP-3929] Add new action type to display in Action Log table
 
 
-[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.11.0...HEAD
+[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.11.1...HEAD
+[v2.11.1]: https://github.com/epam/edp-admin-console/compare/v2.11.0...v2.11.1
 [v2.11.0]: https://github.com/epam/edp-admin-console/compare/v2.10.0...v2.11.0
 [v2.10.0]: https://github.com/epam/edp-admin-console/compare/v2.9.0...v2.10.0
 [v2.9.0]: https://github.com/epam/edp-admin-console/compare/v2.8.1...v2.9.0
