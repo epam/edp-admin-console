@@ -24,7 +24,7 @@ func OKJsonResponse(ctx context.Context, w http.ResponseWriter, data interface{}
 	return
 }
 
-func ErrNotFoundResponse(ctx context.Context, w http.ResponseWriter, msg string) {
+func NotFoundResponse(ctx context.Context, w http.ResponseWriter, msg string) {
 	logger := LoggerFromContext(ctx)
 	w.WriteHeader(http.StatusNotFound)
 	_, wErr := w.Write([]byte(msg))
@@ -51,27 +51,19 @@ func InternalErrorResponse(ctx context.Context, w http.ResponseWriter, msg strin
 	}
 }
 
-func NotFoundResponse(ctx context.Context, w http.ResponseWriter, msg string) {
+func OkHTMLResponse(ctx context.Context, writer http.ResponseWriter, t *Template) {
 	logger := LoggerFromContext(ctx)
-	w.WriteHeader(http.StatusNotFound)
-	_, wErr := w.Write([]byte(msg))
-	if wErr != nil {
-		logger.Error("write error response failed", zap.Error(wErr))
-	}
-}
-
-func OkHTMLResponse(ctx context.Context, writer http.ResponseWriter, data interface{}, tmpl *template.Template, mainFileName string, templatePaths ...string) {
-	logger := LoggerFromContext(ctx)
-	tmplInternal, err := tmpl.ParseFiles(templatePaths...)
+	tmpl := template.New(t.MainTemplateName).Funcs(t.FuncMap)
+	tmplInternal, err := tmpl.ParseFiles(t.TemplatePaths...)
 	if err != nil {
-		logger.Error("cant find template page", zap.Error(err), zap.Strings("template_paths", templatePaths))
+		logger.Error("cant find template page", zap.Error(err), zap.Strings("template_paths", t.TemplatePaths))
 		InternalErrorResponse(ctx, writer, "cant find template page")
 		return
 	}
 	var buf bytes.Buffer
-	err = tmplInternal.ExecuteTemplate(&buf, mainFileName, data)
+	err = tmplInternal.ExecuteTemplate(&buf, t.MainTemplateName, t.Data)
 	if err != nil {
-		logger.Error("cant exec page", zap.Error(err), zap.Strings("template_paths", templatePaths), zap.String("main_template", mainFileName))
+		logger.Error("cant exec page", zap.Error(err), zap.Strings("template_paths", t.TemplatePaths), zap.String("main_template", t.MainTemplateName))
 		InternalErrorResponse(ctx, writer, "cant exec page")
 		return
 	}
@@ -80,4 +72,11 @@ func OkHTMLResponse(ctx context.Context, writer http.ResponseWriter, data interf
 	if err != nil {
 		logger.Error("write error response failed", zap.Error(err))
 	}
+}
+
+type Template struct {
+	Data             interface{}
+	FuncMap          template.FuncMap
+	MainTemplateName string
+	TemplatePaths    []string
 }

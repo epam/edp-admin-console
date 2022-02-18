@@ -21,8 +21,18 @@ func (h *HandlerEnv) Index(writer http.ResponseWriter, request *http.Request) {
 		Username:   "testname",
 	}
 
-	OkHTMLResponse(request.Context(), writer, tmplData, h.Template, "index.html",
+	templatePaths := []string{
 		path.Join(h.WorkingDir, "/viewsV2/index.html"),
 		path.Join(h.WorkingDir, "/views/template/footer_template.html"),
-		path.Join(h.WorkingDir, "/views/template/header_template.html"))
+		path.Join(h.WorkingDir, "/views/template/header_template.html"),
+	}
+
+	template := &Template{
+		Data:             tmplData,
+		FuncMap:          h.FuncMap,
+		MainTemplateName: "index.html",
+		TemplatePaths:    templatePaths,
+	}
+
+	OkHTMLResponse(request.Context(), writer, template)
 }

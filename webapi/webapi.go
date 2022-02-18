@@ -13,7 +13,7 @@ import (
 
 type HandlerEnv struct {
 	NamespacedClient *k8s.RuntimeNamespacedClient
-	Template         *template.Template
+	FuncMap          template.FuncMap
 	WorkingDir       string
 }
 
@@ -35,10 +35,9 @@ func WithClient(client *k8s.RuntimeNamespacedClient) HandlerEnvOption {
 	}
 }
 
-func WithFuncMapTemplate(funcMap template.FuncMap) HandlerEnvOption {
-	tmpl := template.New("").Funcs(funcMap)
+func WithFuncMap(funcMap template.FuncMap) HandlerEnvOption {
 	return func(handler *HandlerEnv) {
-		handler.Template = tmpl
+		handler.FuncMap = funcMap
 	}
 }
 

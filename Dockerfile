@@ -15,6 +15,7 @@ COPY static static
 COPY views views
 COPY conf conf
 COPY db db
+COPY viewsV2 viewsV2
 
 USER ${USER_UID}
 

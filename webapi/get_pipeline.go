@@ -22,7 +22,7 @@ func (h *HandlerEnv) GetPipeline(w http.ResponseWriter, r *http.Request) {
 	cdPipelineName := chi.URLParam(r, "pipelineName")
 	if cdPipelineName == "" {
 		logger.Error("pipeline not passed")
-		ErrNotFoundResponse(ctx, w, "pipeline not passed")
+		NotFoundResponse(ctx, w, "pipeline not passed")
 		return
 	}
 

@@ -338,7 +338,7 @@ func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir strin
 	)
 	beego.AddNamespace(apiV1Namespace)
 
-	v2APIHandler := NewHandlerEnv(WithClient(namespacedClient), WithWorkingDir(workingDir), WithFuncMapTemplate(CreateCommonFuncMap()))
+	v2APIHandler := NewHandlerEnv(WithClient(namespacedClient), WithWorkingDir(workingDir), WithFuncMap(CreateCommonFuncMap()))
 	v2APIRouter := V2APIRouter(v2APIHandler, zaplog)
 	// see https://github.com/beego/beedoc/blob/master/en-US/mvc/controller/router.md#handler-register
 	// and isPrefix parameter
@@ -349,7 +349,6 @@ func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir strin
 func V2APIRouter(h *HandlerEnv, logger *zap.Logger) *chi.Mux {
 	router := chi.NewRouter()
 	router.Use(WithLoggerMw(logger))
-
 	V2RoutePrefix := path.Join(context.BasePath, apiV2Scope)
 	router.Route(V2RoutePrefix, func(v2APIRouter chi.Router) {
 		v2APIRouter.Route(edpScope, func(edpScope chi.Router) {
@@ -369,8 +368,8 @@ func V2APIRouter(h *HandlerEnv, logger *zap.Logger) *chi.Mux {
 
 	edpV2Prefix := path.Join(context.BasePath, edpScopeV2)
 	router.Route(edpV2Prefix, func(edpScope chi.Router) {
+		//edpScope.Use(Auth())
 		edpScope.Get("/index", h.Index)
 	})
-
 	return router
 }

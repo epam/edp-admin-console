@@ -32,7 +32,7 @@ func TestIndexSuite(t *testing.T) {
 		t.Fatal(err)
 	}
 	workingDir, _ := path.Split(currentDir)
-	h := NewHandlerEnv(WithClient(namespacedClient), WithWorkingDir(workingDir), WithFuncMapTemplate(CreateCommonFuncMap()))
+	h := NewHandlerEnv(WithClient(namespacedClient), WithWorkingDir(workingDir), WithFuncMap(CreateCommonFuncMap()))
 	logger := applog.GetLogger()
 	router := V2APIRouter(h, logger)
 
