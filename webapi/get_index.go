@@ -3,8 +3,6 @@ package webapi
 import (
 	"net/http"
 	"path"
-
-	edpcontext "edp-admin-console/context"
 )
 
 func (h *HandlerEnv) Index(writer http.ResponseWriter, request *http.Request) {
@@ -16,8 +14,8 @@ func (h *HandlerEnv) Index(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	tmplData := data{
-		BasePath:   edpcontext.BasePath,
-		EDPVersion: edpcontext.EDPVersion,
+		BasePath:   h.Config.BasePath,
+		EDPVersion: h.Config.BasePath,
 		Username:   "testname",
 	}
 

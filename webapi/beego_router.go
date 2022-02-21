@@ -30,6 +30,7 @@ import (
 	cdPipeController "edp-admin-console/controllers/cd-pipeline"
 	"edp-admin-console/controllers/stage"
 	"edp-admin-console/filters"
+	"edp-admin-console/internal/config"
 	"edp-admin-console/k8s"
 	"edp-admin-console/repository"
 	edpComponentRepo "edp-admin-console/repository/edp-component"
@@ -59,10 +60,10 @@ const (
 	CreateStrategy = "Create"
 	apiV2Scope     = "/api/v2"
 	edpScope       = "/edp"
-	edpScopeV2     = "/v2/admin/edp"
+	edpV2Scope     = "/v2/admin/edp"
 )
 
-func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir string) {
+func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir string, confV2 *config.AppConfig, authController *config.AuthController) {
 	zaplog.Info("Start application...",
 		zap.String("mode", beego.AppConfig.String("runmode")),
 		zap.String("edp version", context.EDPVersion))
@@ -338,38 +339,46 @@ func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir strin
 	)
 	beego.AddNamespace(apiV1Namespace)
 
-	v2APIHandler := NewHandlerEnv(WithClient(namespacedClient), WithWorkingDir(workingDir), WithFuncMap(CreateCommonFuncMap()))
-	v2APIRouter := V2APIRouter(v2APIHandler, zaplog)
+	v2APIHandler := NewHandlerEnv(WithClient(namespacedClient), WithWorkingDir(workingDir), WithFuncMap(CreateCommonFuncMap()), WithConfig(confV2))
+	v2APIAuthHandler := HandlerAuthWithOption(WithAuthController(authController), WithBasePath(confV2.BasePath))
+	v2APIRouter := V2APIRouter(v2APIHandler, v2APIAuthHandler, zaplog)
 	// see https://github.com/beego/beedoc/blob/master/en-US/mvc/controller/router.md#handler-register
 	// and isPrefix parameter
+	beego.Handler(path.Join(context.BasePath, "/v2"), v2APIRouter, true)
 	beego.Handler(path.Join(context.BasePath, apiV2Scope, edpScope), v2APIRouter, true)
-	beego.Handler(path.Join(context.BasePath, edpScopeV2), v2APIRouter, true)
+	beego.Handler(path.Join(context.BasePath, edpV2Scope), v2APIRouter, true)
 }
 
-func V2APIRouter(h *HandlerEnv, logger *zap.Logger) *chi.Mux {
+func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.Logger) *chi.Mux {
 	router := chi.NewRouter()
 	router.Use(WithLoggerMw(logger))
-	V2RoutePrefix := path.Join(context.BasePath, apiV2Scope)
-	router.Route(V2RoutePrefix, func(v2APIRouter chi.Router) {
-		v2APIRouter.Route(edpScope, func(edpScope chi.Router) {
-			edpScope.Route("/cd-pipeline", func(pipelinesRoute chi.Router) {
-				pipelinesRoute.Route("/{pipelineName}", func(pipelineRoute chi.Router) {
-					pipelineRoute.Get("/", h.GetPipeline)
-					pipelineRoute.Get("/stage/{stageName}", h.GetStagePipeline)
+
+	basePath := path.Join(handlerEnv.Config.BasePath, "/")
+	router.Route(basePath, func(baseRouter chi.Router) {
+		baseRouter.Route(apiV2Scope, func(v2APIRouter chi.Router) {
+			v2APIRouter.Route(edpScope, func(edpScope chi.Router) {
+				edpScope.Route("/cd-pipeline", func(pipelinesRoute chi.Router) {
+					pipelinesRoute.Route("/{pipelineName}", func(pipelineRoute chi.Router) {
+						pipelineRoute.Get("/", handlerEnv.GetPipeline)
+						pipelineRoute.Get("/stage/{stageName}", handlerEnv.GetStagePipeline)
+					})
+				})
+				edpScope.Route("/codebase", func(codebasesRoute chi.Router) {
+					codebasesRoute.Get("/", handlerEnv.GetCodebases)
+					codebasesRoute.Get("/{codebaseName}", handlerEnv.GetCodebase)
 				})
 			})
-			edpScope.Route("/codebase", func(codebasesRoute chi.Router) {
-				codebasesRoute.Get("/", h.GetCodebases)
-				codebasesRoute.Get("/{codebaseName}", h.GetCodebase)
-			})
 		})
-
+		baseRouter.Route(edpV2Scope, func(edpScope chi.Router) {
+			if handlerEnv.Config.AuthEnable {
+				edpScope.Use(WithAuth(authHandler.TokenMap, authHandler.UrlMap, authHandler.StateMap, authHandler.AuthController))
+			}
+		})
+		baseRouter.Route("/v2", func(r chi.Router) {
+			r.Get("/", handlerEnv.Index)
+			r.Get("/auth/callback", authHandler.CallBack)
+		})
 	})
 
-	edpV2Prefix := path.Join(context.BasePath, edpScopeV2)
-	router.Route(edpV2Prefix, func(edpScope chi.Router) {
-		//edpScope.Use(Auth())
-		edpScope.Get("/index", h.Index)
-	})
 	return router
 }

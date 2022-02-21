@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
+	"edp-admin-console/internal/config"
 	"edp-admin-console/k8s"
 	applog "edp-admin-console/service/logger"
 )
@@ -32,9 +33,16 @@ func TestIndexSuite(t *testing.T) {
 		t.Fatal(err)
 	}
 	workingDir, _ := path.Split(currentDir)
-	h := NewHandlerEnv(WithClient(namespacedClient), WithWorkingDir(workingDir), WithFuncMap(CreateCommonFuncMap()))
+	conf := &config.AppConfig{
+		BasePath:   "/",
+		AuthEnable: false,
+		EDPVersion: "v1",
+	}
+	h := NewHandlerEnv(WithClient(namespacedClient), WithWorkingDir(workingDir), WithFuncMap(CreateCommonFuncMap()), WithConfig(conf))
 	logger := applog.GetLogger()
-	router := V2APIRouter(h, logger)
+	authHandler := HandlerAuthWithOption()
+
+	router := V2APIRouter(h, authHandler, logger)
 
 	s := &IndexSuite{
 		Handler: h,
@@ -48,7 +56,7 @@ func (s *IndexSuite) TestIndex() {
 
 	httpExpect := httpexpect.New(t, s.TestServer.URL)
 	httpExpect.
-		GET("/v2/admin/edp/index").
+		GET("/v2").
 		Expect().
 		Status(http.StatusOK).
 		ContentType("text/html")

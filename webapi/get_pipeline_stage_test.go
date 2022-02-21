@@ -15,6 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
+	"edp-admin-console/internal/config"
 	"edp-admin-console/internal/imagestream"
 	"edp-admin-console/k8s"
 	applog "edp-admin-console/service/logger"
@@ -50,9 +51,14 @@ func TestStagePipelineSuite(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	h := NewHandlerEnv(WithClient(namespacedClient))
+	conf := &config.AppConfig{
+		BasePath:   "/",
+		AuthEnable: false,
+	}
+	h := NewHandlerEnv(WithClient(namespacedClient), WithConfig(conf))
 	logger := applog.GetLogger()
-	router := V2APIRouter(h, logger)
+	authHandler := HandlerAuthWithOption()
+	router := V2APIRouter(h, authHandler, logger)
 
 	s := &StagePipelineSuite{
 		Handler: h,

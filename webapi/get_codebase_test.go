@@ -17,6 +17,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/json"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
+	"edp-admin-console/internal/config"
 	"edp-admin-console/k8s"
 	applog "edp-admin-console/service/logger"
 )
@@ -40,9 +41,15 @@ func TestGetCodebaseSuite(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	h := NewHandlerEnv(WithClient(k8sClient))
+	conf := &config.AppConfig{
+		BasePath:   "/",
+		AuthEnable: false,
+	}
+	h := NewHandlerEnv(WithClient(k8sClient), WithConfig(conf))
+	authHandler := HandlerAuthWithOption()
 	logger := applog.GetLogger()
-	router := V2APIRouter(h, logger)
+
+	router := V2APIRouter(h, authHandler, logger)
 
 	s := &GetCodebaseSuite{
 		Router: router,
@@ -93,8 +100,13 @@ func (s *GetCodebaseSuite) RedefineK8SClientWithCodebaseCR(stubObjects crObjects
 	if err != nil {
 		s.T().Fatal(err)
 	}
-	testHandler := NewHandlerEnv(WithClient(k8sClient))
-	newRouter := V2APIRouter(testHandler, applog.GetLogger())
+	conf := &config.AppConfig{
+		BasePath:   "/",
+		AuthEnable: false,
+	}
+	testHandler := NewHandlerEnv(WithClient(k8sClient), WithConfig(conf))
+	authHandler := HandlerAuthWithOption()
+	newRouter := V2APIRouter(testHandler, authHandler, applog.GetLogger())
 	s.TestServer.Config.Handler = newRouter
 }
 

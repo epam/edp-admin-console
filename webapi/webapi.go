@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"go.uber.org/zap"
+	"golang.org/x/oauth2"
 
+	"edp-admin-console/internal/config"
 	"edp-admin-console/k8s"
 )
 
@@ -15,6 +17,44 @@ type HandlerEnv struct {
 	NamespacedClient *k8s.RuntimeNamespacedClient
 	FuncMap          template.FuncMap
 	WorkingDir       string
+	Config           *config.AppConfig
+}
+
+type HandlerAuth struct {
+	StateMap       map[string]string
+	TokenMap       map[string]oauth2.TokenSource
+	UrlMap         map[string]string
+	AuthController *config.AuthController
+	BasePath       string
+}
+
+type HandlerAuthOption func(handler *HandlerAuth)
+
+func WithBasePath(basePath string) HandlerAuthOption {
+	return func(handler *HandlerAuth) {
+		handler.BasePath = basePath
+	}
+}
+
+func WithAuthController(controller *config.AuthController) HandlerAuthOption {
+	return func(handler *HandlerAuth) {
+		handler.AuthController = controller
+	}
+}
+
+func HandlerAuthWithOption(opts ...HandlerAuthOption) *HandlerAuth {
+	stateMap := make(map[string]string)
+	tokenMap := make(map[string]oauth2.TokenSource)
+	urlMap := make(map[string]string)
+	handler := &HandlerAuth{
+		StateMap: stateMap,
+		TokenMap: tokenMap,
+		UrlMap:   urlMap,
+	}
+	for i := range opts {
+		opts[i](handler)
+	}
+	return handler
 }
 
 func getCurrentYear() int {
@@ -28,6 +68,12 @@ func CreateCommonFuncMap() template.FuncMap {
 }
 
 type HandlerEnvOption func(handler *HandlerEnv)
+
+func WithConfig(config *config.AppConfig) HandlerEnvOption {
+	return func(handler *HandlerEnv) {
+		handler.Config = config
+	}
+}
 
 func WithClient(client *k8s.RuntimeNamespacedClient) HandlerEnvOption {
 	return func(handler *HandlerEnv) {
@@ -48,6 +94,7 @@ func WithWorkingDir(workingDir string) HandlerEnvOption {
 }
 
 func NewHandlerEnv(opts ...HandlerEnvOption) *HandlerEnv {
+
 	handler := &HandlerEnv{}
 	for i := range opts {
 		opts[i](handler)
