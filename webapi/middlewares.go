@@ -35,7 +35,7 @@ func WithAuth(tokenMap map[string]oauth2.TokenSource, urlMap map[string]string, 
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 			log := LoggerFromContext(r.Context())
-			sessionID, ok := SessionIdByRequest(r, SessionIDName)
+			sessionID, ok := GetCookieByName(r, SessionIDName)
 			if !ok {
 				startAuth(w, r, stateMap, urlMap, oauth2config)
 				return
@@ -89,7 +89,7 @@ func startAuth(w http.ResponseWriter, r *http.Request, stateMap map[string]strin
 	http.Redirect(w, r, redirectURL, http.StatusFound)
 }
 
-func SessionIdByRequest(r *http.Request, name string) (string, bool) {
+func GetCookieByName(r *http.Request, name string) (string, bool) {
 	log := LoggerFromContext(r.Context())
 	cookie, err := r.Cookie(name)
 	if err != nil {

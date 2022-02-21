@@ -33,7 +33,7 @@ func TestSessionIdByRequest(t *testing.T) {
 		Path:    "/",
 	}
 	r.AddCookie(cookie)
-	requestId, ok := SessionIdByRequest(r, AuthSessionIDName)
+	requestId, ok := GetCookieByName(r, AuthSessionIDName)
 	assert.Equal(t, authSessionId, requestId)
 	assert.True(t, ok)
 }
@@ -41,7 +41,7 @@ func TestSessionIdByRequest(t *testing.T) {
 func TestSessionIdByRequestNoCookie(t *testing.T) {
 	r := &http.Request{}
 	r = r.WithContext(testContextWithLogger(t))
-	requestId, ok := SessionIdByRequest(r, AuthSessionIDName)
+	requestId, ok := GetCookieByName(r, AuthSessionIDName)
 	assert.Empty(t, requestId)
 	assert.False(t, ok)
 }

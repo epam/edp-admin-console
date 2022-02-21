@@ -15,7 +15,7 @@ func (h *HandlerEnv) Index(writer http.ResponseWriter, request *http.Request) {
 
 	tmplData := data{
 		BasePath:   h.Config.BasePath,
-		EDPVersion: h.Config.BasePath,
+		EDPVersion: h.Config.EDPVersion,
 		Username:   "testname",
 	}
 

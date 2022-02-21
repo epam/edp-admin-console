@@ -13,7 +13,7 @@ func (h *HandlerAuth) CallBack(writer http.ResponseWriter, request *http.Request
 	log := LoggerFromContext(request.Context())
 	log.Info("Start callback flow...")
 	ctx := request.Context()
-	authSessionID, ok := SessionIdByRequest(request, AuthSessionIDName)
+	authSessionID, ok := GetCookieByName(request, AuthSessionIDName)
 	if !ok {
 		InternalErrorResponse(ctx, writer, "cant find auth session id")
 		return

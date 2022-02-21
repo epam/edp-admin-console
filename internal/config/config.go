@@ -9,13 +9,17 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const AuthEnable = "keycloakAuthEnabled"
+const (
+	AuthEnable         = "keycloakAuthEnabled"
+	DiagramPageEnabled = "diagramPageEnabled"
+)
 
 type AppConfig struct {
-	RunMode    string
-	EDPVersion string
-	AuthEnable bool
-	BasePath   string
+	RunMode            string
+	EDPVersion         string
+	AuthEnable         bool
+	BasePath           string
+	DiagramPageEnabled bool
 }
 
 type KeycloakConfig struct {
@@ -42,11 +46,16 @@ func SetupConfig(_ context.Context, _ string) (*AppConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+	diagramPageEnabled, err := beego.AppConfig.Bool(DiagramPageEnabled)
+	if err != nil {
+		return nil, err
+	}
 	config := &AppConfig{
-		RunMode:    beego.AppConfig.String("runmode"),
-		EDPVersion: beego.AppConfig.String("edpVersion"),
-		BasePath:   beego.AppConfig.String("basePath"),
-		AuthEnable: authEnable,
+		RunMode:            beego.AppConfig.String("runmode"),
+		EDPVersion:         beego.AppConfig.String("edpVersion"),
+		BasePath:           beego.AppConfig.String("basePath"),
+		AuthEnable:         authEnable,
+		DiagramPageEnabled: diagramPageEnabled,
 	}
 	return config, nil
 }

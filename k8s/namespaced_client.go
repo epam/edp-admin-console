@@ -215,6 +215,22 @@ func (c *RuntimeNamespacedClient) GetCodebase(ctx context.Context, crName string
 	return codebase, err
 }
 
+// GetCodebaseList retrieves all Codebase structure ptr for the given custom resource name from the Kubernetes Cluster CR.
+func (c *RuntimeNamespacedClient) GetCodebaseList(ctx context.Context) (*codeBaseApi.CodebaseList, error) {
+	if c.Namespace == "" {
+		return nil, NemEmptyNamespaceErr("client namespace is not set")
+	}
+
+	codebaseList := &codeBaseApi.CodebaseList{}
+	err := c.List(ctx, codebaseList, &runtimeClient.ListOptions{
+		Namespace: c.Namespace,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return codebaseList, err
+}
+
 func (c *RuntimeNamespacedClient) CodebaseBranchesListByCodebaseName(ctx context.Context, codebaseName string) ([]*codeBaseApi.CodebaseBranch, error) {
 	cbBranchList := new(codeBaseApi.CodebaseBranchList)
 	requirement, err := labels.NewRequirement(codebasebranch.LabelCodebaseName, selection.Equals, []string{codebaseName})

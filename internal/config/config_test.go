@@ -10,13 +10,13 @@ import (
 
 func TestSetupConfig(t *testing.T) {
 	mustSetAppConfig(t, AuthEnable, "false")
+	mustSetAppConfig(t, DiagramPageEnabled, "false")
 
 	ctx := context.Background()
 	emptyStr := ""
 	config, err := SetupConfig(ctx, emptyStr)
 	assert.NoError(t, err)
 	assert.False(t, config.AuthEnable)
-
 }
 
 func mustSetAppConfig(t *testing.T, k, v string) {

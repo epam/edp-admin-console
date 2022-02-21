@@ -507,6 +507,39 @@ func TestNewRuntimeNamespacedClient_EmptyNamespace(t *testing.T) {
 	assert.Nil(t, k8sClient)
 }
 
+func TestGetCodebaseList_Success(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(codeBaseApi.SchemeGroupVersion, &codeBaseApi.Codebase{}, &codeBaseApi.CodebaseList{})
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(createCodebaseCR(ns)).Build()
+	k8sClient, err := NewRuntimeNamespacedClient(client, ns)
+	assert.NoError(t, err)
+
+	expectedCodebase := codeBaseApi.Codebase{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            name,
+			Namespace:       ns,
+			ResourceVersion: "999",
+		},
+	}
+	expectedList := []codeBaseApi.Codebase{expectedCodebase}
+	codebase, err := k8sClient.GetCodebaseList(ctx)
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedList, codebase.Items)
+}
+
+func TestGetCodebaseList_BadClient(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	client := fake.NewClientBuilder().WithScheme(scheme).Build()
+	k8sClient := RuntimeNamespacedClient{Client: client}
+	codebaseList, err := k8sClient.GetCodebaseList(ctx)
+	var emptyNamespaceErr *EmptyNamespaceErr
+	assert.ErrorAs(t, err, &emptyNamespaceErr)
+	assert.Nil(t, codebaseList)
+}
+
 func TestRuntimeNamespacedClient_CodebaseBranchesListByCodebaseName(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
