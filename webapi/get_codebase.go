@@ -14,14 +14,15 @@ type GetCodebaseResponse GetCodebase
 
 type GetCodebase struct {
 	CodebaseMini
-	BuildTool       string           `json:"build_tool"`
-	Type            string           `json:"type"`
-	EmptyProject    bool             `json:"emptyProject"`
-	JenkinsSlave    string           `json:"jenkinsSlave"`
-	Language        string           `json:"language"`
-	Framework       string           `json:"framework"`
-	JobProvisioning string           `json:"jobProvisioning"`
-	CodebaseBranch  []CodebaseBranch `json:"codebase_branch"`
+	BuildTool            string           `json:"build_tool"`
+	Type                 string           `json:"type"`
+	EmptyProject         bool             `json:"emptyProject"`
+	JenkinsSlave         string           `json:"jenkinsSlave"`
+	Language             string           `json:"language"`
+	Framework            string           `json:"framework"`
+	JobProvisioning      string           `json:"jobProvisioning"`
+	CodebaseBranch       []CodebaseBranch `json:"codebase_branch"`
+	CommitMessagePattern string           `json:"commitMessagePattern"`
 }
 
 type CodebaseBranch struct {
@@ -80,14 +81,15 @@ func (h *HandlerEnv) GetCodebase(w http.ResponseWriter, r *http.Request) {
 			Strategy:         string(crCodebase.Spec.Strategy),
 			VersioningType:   string(crCodebase.Spec.Versioning.Type),
 		},
-		BuildTool:       strings.ToLower(crCodebase.Spec.BuildTool),
-		Type:            crCodebase.Spec.Type,
-		EmptyProject:    crCodebase.Spec.EmptyProject,
-		JenkinsSlave:    pointerToStr(crCodebase.Spec.JenkinsSlave),
-		Language:        crCodebase.Spec.Lang,
-		Framework:       pointerToStr(crCodebase.Spec.Framework),
-		JobProvisioning: pointerToStr(crCodebase.Spec.JobProvisioning),
-		CodebaseBranch:  codebaseBranches,
+		BuildTool:            strings.ToLower(crCodebase.Spec.BuildTool),
+		Type:                 crCodebase.Spec.Type,
+		EmptyProject:         crCodebase.Spec.EmptyProject,
+		JenkinsSlave:         pointerToStr(crCodebase.Spec.JenkinsSlave),
+		Language:             crCodebase.Spec.Lang,
+		Framework:            pointerToStr(crCodebase.Spec.Framework),
+		JobProvisioning:      pointerToStr(crCodebase.Spec.JobProvisioning),
+		CodebaseBranch:       codebaseBranches,
+		CommitMessagePattern: pointerToStr(crCodebase.Spec.CommitMessagePattern),
 	}
 
 	response := GetCodebaseResponse(codebaseResponse)

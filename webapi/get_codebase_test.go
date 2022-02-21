@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/json"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"edp-admin-console/k8s"
@@ -179,6 +180,12 @@ func WithStrategy(strategy string) CodebaseCROption {
 	}
 }
 
+func WithCommitMessagePattern(pattern string) CodebaseCROption {
+	return func(codebase *codeBaseApi.Codebase) {
+		codebase.Spec.CommitMessagePattern = &pattern
+	}
+}
+
 func createCodebaseBranchCRWithOptions(opts ...CodebaseBranchCROption) *codeBaseApi.CodebaseBranch {
 	codebaseBranchCR := new(codeBaseApi.CodebaseBranch)
 	for i := range opts {
@@ -246,6 +253,7 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
 	framework := "java8"
 	jobProvisioning := "default"
 	strategy := "create"
+	commitMessagePattern := `[JIRA\-\d{4}]\s+test|feat`
 
 	stubCodebase_1 := createCodebaseCRWithOptions(
 		WithCrNamespace(namespaceName),
@@ -260,6 +268,7 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
 		WithFramework(&framework),
 		WithJobProvisioning(&jobProvisioning),
 		WithStrategy(strategy),
+		WithCommitMessagePattern(commitMessagePattern),
 	)
 	stubCodebases := []*codeBaseApi.Codebase{
 		stubCodebase_1,
@@ -298,6 +307,10 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
 		Status(http.StatusOK).
 		ContentType("application/json")
 
+	escapedJSONCommitMessagePattern, err := json.Marshal(commitMessagePattern)
+	if err != nil {
+		t.Fatal(err)
+	}
 	expectedJSONBody := fmt.Sprintf(`{
 	"build_tool" : "%s",
     "codebase_branch": [
@@ -308,6 +321,7 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
              "version": "%s"
         }
     ],
+    "commitMessagePattern": %s,
 	"deploymentScript": "%s",
 	"emptyProject": false,
     "framework": "%s",
@@ -321,7 +335,7 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
     "versioningType": "%s"
 }
 `,
-		npmBuildTool, cbBranchName_1, buildNumber_1, isRelease_1, cbVersion_1,
+		npmBuildTool, cbBranchName_1, buildNumber_1, isRelease_1, cbVersion_1, string(escapedJSONCommitMessagePattern),
 		deploymentScript, framework, crCodebaseGitServer_1, jenkinsSlave, jobProvisioning,
 		language, crCodebaseName_1, strategy, specType, versioningType,
 	)
