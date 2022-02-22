@@ -2,8 +2,19 @@
 ## [Unreleased]
 
 
+<a name="v2.11.2"></a>
+## [v2.11.2] - 2022-02-22
+### Features
+
+- get codebase request - added commitMessagePattern-field  to the response. [EPMDEDP-8457](https://jiraeu.epam.com/browse/EPMDEDP-8457)
+
+### Bug Fixes
+
+- Fix changelog generation in GH Release Action [EPMDEDP-8386](https://jiraeu.epam.com/browse/EPMDEDP-8386)
+
+
 <a name="v2.11.1"></a>
-## [v2.11.1] - 2022-02-17
+## [v2.11.1] - 2022-02-18
 ### Features
 
 - get codebase request - added fields to the response. [EPMDEDP-8412](https://jiraeu.epam.com/browse/EPMDEDP-8412)
@@ -103,7 +114,8 @@
 - [EPMDEDP-3929] Add new action type to display in Action Log table
 
 
-[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.11.1...HEAD
+[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.11.2...HEAD
+[v2.11.2]: https://github.com/epam/edp-admin-console/compare/v2.11.1...v2.11.2
 [v2.11.1]: https://github.com/epam/edp-admin-console/compare/v2.11.0...v2.11.1
 [v2.11.0]: https://github.com/epam/edp-admin-console/compare/v2.10.0...v2.11.0
 [v2.10.0]: https://github.com/epam/edp-admin-console/compare/v2.9.0...v2.10.0
