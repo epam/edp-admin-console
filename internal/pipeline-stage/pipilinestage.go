@@ -120,11 +120,8 @@ func StageViewByCRName(ctx context.Context, namespacedClient *k8s.RuntimeNamespa
 			autotest = nil
 		}
 
-		branch := &CodebaseBranch{}
-		if v.BranchName != nil {
-			branch = getBranchByCRName(ctx, *v.BranchName, namespacedClient)
-		} else {
-			branch = nil
+		branch := &CodebaseBranch{
+			Name: emptyIfNil(v.BranchName),
 		}
 
 		//database compatibility
@@ -184,22 +181,6 @@ func emptyIfNil(str *string) string {
 		return ""
 	}
 	return *str
-}
-
-func getBranchByCRName(ctx context.Context, crName string, namespacedClient *k8s.RuntimeNamespacedClient) *CodebaseBranch {
-	var cbBranch CodebaseBranch
-	branch, err := namespacedClient.GetCBBranch(ctx, crName)
-	if err != nil {
-		return nil
-	}
-	cbBranch.Name = branch.Spec.BranchName
-	cbBranch.FromCommit = branch.Spec.FromCommit
-	cbBranch.Status = branch.Status.Status
-	cbBranch.Version = branch.Spec.Version
-	cbBranch.Build = branch.Status.Build
-	cbBranch.LastSuccessBuild = branch.Status.LastSuccessfulBuild
-	cbBranch.Release = branch.Spec.Release
-	return &cbBranch
 }
 
 func getBranchNameByISName(ctx context.Context, namespacedClient *k8s.RuntimeNamespacedClient, crName string) string {
