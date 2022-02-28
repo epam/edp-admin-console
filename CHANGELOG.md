@@ -2,6 +2,13 @@
 ## [Unreleased]
 
 
+<a name="v2.11.3"></a>
+## [v2.11.3] - 2022-02-28
+### Features
+
+- add new fields to responses. [EPMDEDP-8479](https://jiraeu.epam.com/browse/EPMDEDP-8479)
+
+
 <a name="v2.11.2"></a>
 ## [v2.11.2] - 2022-02-22
 ### Features
@@ -114,7 +121,8 @@
 - [EPMDEDP-3929] Add new action type to display in Action Log table
 
 
-[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.11.2...HEAD
+[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.11.3...HEAD
+[v2.11.3]: https://github.com/epam/edp-admin-console/compare/v2.11.2...v2.11.3
 [v2.11.2]: https://github.com/epam/edp-admin-console/compare/v2.11.1...v2.11.2
 [v2.11.1]: https://github.com/epam/edp-admin-console/compare/v2.11.0...v2.11.1
 [v2.11.0]: https://github.com/epam/edp-admin-console/compare/v2.10.0...v2.11.0
