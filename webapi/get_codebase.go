@@ -23,6 +23,9 @@ type GetCodebase struct {
 	JobProvisioning      string           `json:"jobProvisioning"`
 	CodebaseBranch       []CodebaseBranch `json:"codebase_branch"`
 	CommitMessagePattern string           `json:"commitMessagePattern"`
+	TicketNamePattern    string           `json:"ticketNamePattern"`
+	DefaultBranch        string           `json:"defaultBranch"`
+	TestReportFramework  string           `json:"testReportFramework"`
 }
 
 type CodebaseBranch struct {
@@ -90,8 +93,10 @@ func (h *HandlerEnv) GetCodebase(w http.ResponseWriter, r *http.Request) {
 		JobProvisioning:      pointerToStr(crCodebase.Spec.JobProvisioning),
 		CodebaseBranch:       codebaseBranches,
 		CommitMessagePattern: pointerToStr(crCodebase.Spec.CommitMessagePattern),
+		TicketNamePattern:    pointerToStr(crCodebase.Spec.TicketNamePattern),
+		DefaultBranch:        crCodebase.Spec.DefaultBranch,
+		TestReportFramework:  pointerToStr(crCodebase.Spec.TestReportFramework),
 	}
-
 	response := GetCodebaseResponse(codebaseResponse)
 	OKJsonResponse(ctx, w, response)
 }

@@ -236,6 +236,24 @@ func cbBranchWithVersion(version *string) CodebaseBranchCROption {
 	}
 }
 
+func WithTicketNamePattern(ticketNamePattern string) CodebaseCROption {
+	return func(codebase *codeBaseApi.Codebase) {
+		codebase.Spec.TicketNamePattern = &ticketNamePattern
+	}
+}
+
+func WithDefaultBranch(defaultBranch string) CodebaseCROption {
+	return func(codebase *codeBaseApi.Codebase) {
+		codebase.Spec.DefaultBranch = defaultBranch
+	}
+}
+
+func WithTestReportFramework(testReportFramework string) CodebaseCROption {
+	return func(codebase *codeBaseApi.Codebase) {
+		codebase.Spec.TestReportFramework = &testReportFramework
+	}
+}
+
 type CodebaseBranchCROption func(codebase *codeBaseApi.CodebaseBranch)
 
 func (s *GetCodebaseSuite) TestGetCodebase_OK() {
@@ -254,6 +272,9 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
 	jobProvisioning := "default"
 	strategy := "create"
 	commitMessagePattern := `[JIRA\-\d{4}]\s+test|feat`
+	ticketNamePattern := "pattern"
+	defaultBranch := "master"
+	testReportFramework := "framework"
 
 	stubCodebase_1 := createCodebaseCRWithOptions(
 		WithCrNamespace(namespaceName),
@@ -269,6 +290,9 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
 		WithJobProvisioning(&jobProvisioning),
 		WithStrategy(strategy),
 		WithCommitMessagePattern(commitMessagePattern),
+		WithTicketNamePattern(ticketNamePattern),
+		WithDefaultBranch(defaultBranch),
+		WithTestReportFramework(testReportFramework),
 	)
 	stubCodebases := []*codeBaseApi.Codebase{
 		stubCodebase_1,
@@ -322,6 +346,7 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
         }
     ],
     "commitMessagePattern": %s,
+	"defaultBranch": "%s",
 	"deploymentScript": "%s",
 	"emptyProject": false,
     "framework": "%s",
@@ -331,13 +356,15 @@ func (s *GetCodebaseSuite) TestGetCodebase_OK() {
     "language": "%s",
     "name": "%s",
     "strategy": "%s",
+ 	"testReportFramework": "%s",
+	"ticketNamePattern": "%s",
     "type": "%s",
     "versioningType": "%s"
 }
 `,
 		npmBuildTool, cbBranchName_1, buildNumber_1, isRelease_1, cbVersion_1, string(escapedJSONCommitMessagePattern),
-		deploymentScript, framework, crCodebaseGitServer_1, jenkinsSlave, jobProvisioning,
-		language, crCodebaseName_1, strategy, specType, versioningType,
+		defaultBranch, deploymentScript, framework, crCodebaseGitServer_1, jenkinsSlave, jobProvisioning,
+		language, crCodebaseName_1, strategy, testReportFramework, ticketNamePattern, specType, versioningType,
 	)
 
 	gotPlainBody := response.Body().Raw()
