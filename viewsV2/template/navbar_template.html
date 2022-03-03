@@ -1,0 +1,49 @@
+{{if .Type}}
+
+
+<nav class="navbar navbar-expand navbar-dark bg-dark flex-column flex-row align-items-start p-0">
+    <div class="navbar-collapse">
+        <ul class="flex-column flex-row navbar-nav w-100 justify-content-between">
+            <li class="nav-item {{if eq .Type "overview"}}active{{end}}" >
+                <a class="nav-link pl-0" href="{{ .BasePath }}/admin/edp/overview">
+                    <i class="icon-dashboard"></i>
+                    <span class="link-name">OVERVIEW</span>
+                </a>
+            </li>
+            <li class="nav-item {{if eq .Type "delivery"}}active{{end}}" >
+                <a class="nav-link pl-0" href="{{ .BasePath }}/admin/edp/cd-pipeline/overview">
+                    <i class="icon-continuous_delivery"></i>
+                    <span class="link-name">CONTINUOUS DELIVERY</span>
+                </a>
+            </li>
+            <li class="nav-item {{if eq .Type "application"}}active{{end}}" >
+                <a class="nav-link pl-0 " href="{{ .BasePath }}/admin/edp/application/overview">
+                    <i class="icon-apps"></i>
+                    <span class="link-name">APPLICATIONS</span>
+                </a>
+            </li>
+            <li class="nav-item {{if eq .Type "autotests"}}active{{end}}" >
+                <a class="nav-link pl-0" href="{{ .BasePath }}/admin/edp/autotest/overview">
+                    <i class="icon-autotest"></i>
+                    <span class="link-name">AUTOTESTS</span>
+                </a>
+            </li>
+            <li class="nav-item {{if eq .Type  "library"}}active{{end}}" >
+                <a class="nav-link pl-0" href="{{ .BasePath }}/admin/edp/library/overview">
+                    <i class="icon-apps"></i>
+                    <span class="link-name">LIBRARIES</span>
+                </a>
+            </li>
+            {{if .DiagramPageEnabled}}
+                <li class="nav-item {{if eq .Type "diagram"}}active{{end}}" >
+                    <a class="nav-link pl-0" href="{{ .BasePath }}/admin/edp/diagram/overview">
+                        <i class="icon-enlarge"></i>
+                        <span class="navbar-text-padding link-name">DELIVERY DASHBOARD DIAGRAM</span>
+                    </a>
+                </li>
+            {{end}}
+        </ul>
+    </div>
+</nav>
+
+{{end}}

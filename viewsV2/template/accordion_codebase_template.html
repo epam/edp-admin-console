@@ -1,0 +1,116 @@
+<div class="card codebase-block">
+    <div class="card-header" id="headingOne" data-toggle="collapse"
+         data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        <h5 class="mb-0">
+            <button class="btn btn-link collapsed" type="button">
+                Codebase Info
+            </button>
+        </h5>
+    </div>
+    <input type="hidden" id=basepath value="{{ .BasePath }}">
+    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+         data-parent="#accordionCreateCodebase">
+        <div class="card-body">
+
+            {{if .CodeBaseIntegrationStrategy }}
+                <div class="form-group">
+                    <label for="strategy">Codebase Integration Strategy
+                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                              title="Select the existing codebase for reproduction or create new codebase."></span>
+                    </label>
+                    <select class="form-control" id="strategy" name="strategy">
+                        {{range $value := .IntegrationStrategies}}
+                            <option value="{{$value}}">{{$value}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            {{end}}
+
+            {{if .GitServers}}
+                <div class="form-group gitServerEl">
+                    <label for="gitServer">Git Server
+                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                              title="Select the existing Git Server."></span>
+                    </label>
+                    <select class="form-control" id="gitServer" name="gitServer">
+                        {{range .GitServers}}
+                            <option value="{{.Name}}">{{.Hostname}}</option>
+                        {{end}}
+                    </select>
+                </div>
+
+                <div class="form-group gitRelativePathEl">
+                    <label for="gitRelativePath">Relative path
+                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                              title="Specify relative path to repository."></span>
+                    </label>
+                    <input name="gitRelativePath" type="text" class="form-control" id="gitRelativePath"
+                           placeholder="Enter repository path ">
+                    <div class="invalid-feedback repo-path-validation">
+                        Path to the repository should start with a slash and may contain only: lower-case letters, numbers, and dashes.
+                    </div>
+                </div>
+            {{end}}
+
+            <div class="form-group repo-url {{if .CodeBaseIntegrationStrategy}} hide-element {{end}}">
+                <label for="gitRepoUrl">Git Repository URL
+                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                          title="Please specify URL to Codebase in the following format: http(s)://git.sample.com/sample.git"></span>
+                </label>
+                <input name="gitRepoUrl" type="text" class="form-control" id="gitRepoUrl"
+                       placeholder="http(s)://git.sample.com/sample.git">
+                <div class="invalid-feedback git-url-validation">
+                    Please specify URL to Codebase in the following format:
+                    http(s)://git.sample.com/sample.git
+                </div>
+                <div class="repo-validation">
+                    <div class="invalid-feedback git-repo-error">
+                        Current repository doesn't exist.
+                    </div>
+                    <div class="invalid-feedback git-url">
+                        Invalid Url.
+                    </div>
+                    <div class="invalid-feedback git-creds">
+                        Invalid credentials.
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-check private-repo {{if .CodeBaseIntegrationStrategy}} hide-element {{end}} form-group">
+                <input class="form-check-input" type="checkbox" value="true" id="isRepoPrivate"
+                       name="isRepoPrivate">
+                <label class="form-check-label" for="isRepoPrivate">
+                    Codebase Authentication
+                </label>
+            </div>
+            <div class="form-group repoLogin hide-element">
+                <label for="site">Repository Login
+                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                          title="Please specify repository login"></span>
+                </label>
+                <input name="repoLogin" type="text" class="form-control" id="repoLogin"
+                       placeholder="Enter repository login ">
+                <div class="invalid-feedback repo-login-validation">
+                    Please specify user to clone repository. User should have read role.
+                </div>
+            </div>
+            <div class="form-group repoPassword hide-element">
+                <label for="site">Repository password (or API Token)
+                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                          title="Provide repository password or API Token"></span>
+                </label>
+                <input name="repoPassword" type="password" class="form-control" id="repoPassword"
+                       placeholder="Enter repository password (or API Token)">
+                <div class="invalid-feedback repo-password-validation">
+                    Please specify password (or API Token) to clone repository.
+                </div>
+            </div>
+            <button type="button" class="codebase-info-button edp-submit-form-btn btn btn-primary"
+                    data-toggle="collapse"
+                    data-target="#collapseTwo" aria-expanded="false"
+                    aria-controls="collapseOne">
+                Proceed
+            </button>
+        </div>
+    </div>
+</div>

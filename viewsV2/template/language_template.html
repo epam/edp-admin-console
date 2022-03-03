@@ -1,0 +1,130 @@
+<fieldset id="languageSelection" class="language">
+    <div class="d-flex flex-wrap">
+
+        <div class="form__radio-btn-wrapper">
+            <input name="appLang" type="radio" class="form__radio-btn"
+                   id="appLang-Java"
+                   value="Java" data-target=".formSubsection-java">
+            <label class="form__radio-label" for="appLang-Java">
+                <img class="form__radio-label-icon" src="{{ .BasePath }}/static/img/java-logo.png"
+                     alt="logo">
+                <span class="form__radio-label-text">Java</span>
+            </label>
+        </div>
+
+        {{if ne .Type "autotests" }}
+            <div class="form__radio-btn-wrapper">
+                <input name="appLang" type="radio" class="form__radio-btn"
+                       id="appLang-JavaScript" value="JavaScript"
+                       data-target=".formSubsection-js">
+                <label class="form__radio-label" for="appLang-JavaScript">
+                    <img class="form__radio-label-icon"
+                         src="{{ .BasePath }}/static/img/unofficial-java-script-logo-2.png" alt="logo">
+                    <span class="form__radio-label-text">JavaScript</span>
+                </label>
+            </div>
+
+            <div class="form__radio-btn-wrapper">
+                <input name="appLang" type="radio" class="form__radio-btn"
+                       id="appLang-DotNet" value="DotNet"
+                       data-target=".formSubsection-dotnet">
+                <label class="form__radio-label" for="appLang-DotNet">
+                    <img class="form__radio-label-icon"
+                         src="{{ .BasePath }}/static/img/dotNet.png" alt="logo">
+                    <span class="form__radio-label-text">DotNet</span>
+                </label>
+            </div>
+
+        {{end}}
+
+        {{if eq .Type "library" }}
+            <div class="form__radio-btn-wrapper">
+                <input name="appLang" type="radio" class="form__radio-btn"
+                       id="appLang-Groovy-pipeline" value="groovy-pipeline"
+                       data-target=".formSubsection-groovy-pipeline">
+                <label class="form__radio-label" for="appLang-Groovy-pipeline">
+                    <img class="form__radio-label-icon"
+                         src="{{ .BasePath }}/static/img/groovy-logo.png" alt="logo">
+                    <span class="form__radio-label-text">Groovy-pipeline</span>
+                </label>
+            </div>
+        {{end}}
+
+        {{if eq .Type "library" }}
+            <div class="form__radio-btn-wrapper">
+                <input name="appLang" type="radio" class="form__radio-btn"
+                       id="appLang-Terraform" value="terraform"
+                       data-target=".formSubsection-terraform">
+                <label class="form__radio-label" for="appLang-Terraform">
+                    <img class="form__radio-label-icon"
+                         src="{{ .BasePath }}/static/img/terraform-logo.png" alt="logo">
+                    <span class="form__radio-label-text">Terraform</span>
+                </label>
+            </div>
+        {{end}}
+
+        {{if eq .Type "application" }}
+        <div class="form__radio-btn-wrapper">
+            <input name="appLang" type="radio" class="form__radio-btn"
+                   id="appLang-go"
+                   value="Go" data-target=".formSubsection-go">
+            <label class="form__radio-label" for="appLang-go">
+                <img class="form__radio-label-icon" src="{{ .BasePath }}/static/img/go-logo.png"
+                     alt="logo">
+                <span class="form__radio-label-text">Go</span>
+            </label>
+        </div>
+        {{end}}
+
+        {{if ne .Type "autotests" }}
+            <div class="form__radio-btn-wrapper">
+                <input name="appLang" type="radio" class="form__radio-btn"
+                       id="appLang-python"
+                       value="Python" data-target=".formSubsection-python">
+                <label class="form__radio-label" for="appLang-python">
+                    <img class="form__radio-label-icon" src="{{ .BasePath }}/static/img/python-logo.png"
+                         alt="logo">
+                    <span class="form__radio-label-text">Python</span>
+                </label>
+            </div>
+        {{end}}
+
+        {{if eq .Type "library" }}
+        <div class="form__radio-btn-wrapper">
+            <input name="appLang" type="radio" class="form__radio-btn"
+                   id="appLang-Rego" value="rego"
+                   data-target=".formSubsection-rego">
+            <label class="form__radio-label" for="appLang-Rego">
+                <img class="form__radio-label-icon"
+                     src="{{ .BasePath }}/static/img/opa-logo.png" alt="logo">
+                <span class="form__radio-label-text">Rego</span>
+            </label>
+        </div>
+        {{end}}
+
+        {{if eq .Type "library" }}
+        <div class="form__radio-btn-wrapper">
+            <input name="appLang" type="radio" class="form__radio-btn"
+                   id="appLang-Container" value="container"
+                   data-target=".formSubsection-container">
+            <label class="form__radio-label" for="appLang-Container">
+                <img class="form__radio-label-icon"
+                     src="{{ .BasePath }}/static/img/container-logo.png" alt="logo">
+                <span class="form__radio-label-text">Container</span>
+            </label>
+        </div>
+        {{end}}
+
+        <div class="form__radio-btn-wrapper other-language">
+            <input name="appLang" type="radio" class="form__radio-btn"
+                   id="appLang-other" value="other"
+                   data-target=".formSubsection-other">
+            <label class="form__radio-label" for="appLang-other">
+                <img class="form__radio-label-icon" src="{{ .BasePath }}/static/img/other-logo.png"
+                     alt="logo">
+                <span class="form__radio-label-text">Other</span>
+            </label>
+        </div>
+
+    </div>
+</fieldset>

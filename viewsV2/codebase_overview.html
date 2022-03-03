@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EDP Admin Console</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/index.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/validation.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/codebase-overview.css">
+</head>
+<body>
+<main>
+    {{template "header_template.html" .}}
+
+    <section class="content d-flex">
+        <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
+            {{template "navbar_template.html" .}}
+        </aside>
+        <div class="flex-fill pl-4 pr-4 wrapper">
+            <div class="edp-form wide col-12 nosidepadding" id="createAppForm">
+                <h1 class="edp-form-header">
+                    {{if eq .Type "application"}}
+                        <a href="{{ .BasePath }}/v2/admin/edp/application/overview" class="edp-back-link"></a>
+                    {{else if eq .Type "autotests"}}
+                        <a href="{{ .BasePath }}/admin/edp/autotest/overview" class="edp-back-link"></a>
+                    {{else}}
+                        <a href="{{ .BasePath }}/admin/edp/library/overview" class="edp-back-link"></a>
+                    {{end}}
+                    {{.TypeCaption | capitalizeFirst}} "{{.Codebase.Name}}"
+                    {{if and .JiraEnabled (ne .Codebase.CiTool "GitLab CI")}}
+                        <a href="{{ .BasePath }}/admin/edp/codebase/{{.Codebase.Name}}/update">
+                            <button class="delete">
+                                <i class="icon-pencil"></i>
+                            </button>
+                        </a>
+                    {{end}}
+                </h1>
+                <p>Find below the {{.TypeSingular}} details, manage branches and track all the happened actions.</p>
+
+                <div class="accordion col-6 nosidepadding" id="accordionCreateApplication">
+                    <div class="card">
+                        <div class="card-header" id="headingOne"
+                             aria-expanded="true" aria-controls="collapseOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" type="button">
+                                    General Info
+                                </button>
+                            </h5>
+                        </div>
+
+                        <div id="collapseOne" class="show" aria-labelledby="headingOne">
+                            <div class="card-body">
+                                <table class="edp-card-table">
+                                    <tbody>
+                                    <tr>
+                                        <th style="width: 50%">Language</th>
+                                        <td>{{.Codebase.Language | lowercaseAll}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Empty project</th>
+                                        <td>{{.Codebase.EmptyProject}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Build Tool</th>
+                                        <td>{{.Codebase.BuildTool | lowercaseAll}}</td>
+                                    </tr>
+                                    {{if .Codebase.Framework}}
+                                        <tr>
+                                            <th>Framework</th>
+                                            <td>{{.Codebase.Framework | lowercaseAll}}</td>
+                                        </tr>
+                                    {{end}}
+                                    <tr>
+                                        <th>Strategy</th>
+                                        <td>{{.Codebase.Strategy}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Default Branch</th>
+                                        <td>{{.Codebase.DefaultBranch}}</td>
+                                    </tr>
+                                    {{if .Codebase.GitProjectPath }}
+                                        <tr>
+                                            <th>Relative path</th>
+                                            <td>{{.Codebase.GitProjectPath}}</td>
+                                        </tr>
+                                    {{end}}
+                                    {{if .Codebase.TestReportFramework }}
+                                        <tr>
+                                            <th>Test Report Framework</th>
+                                            <td>{{.Codebase.TestReportFramework}}</td>
+                                        </tr>
+                                    {{end}}
+                                    {{if .Codebase.GitUrl }}
+                                        <tr>
+                                            <th>Git Url</th>
+                                            <td>{{.Codebase.GitUrl}}</td>
+                                        </tr>
+                                    {{end}}
+                                    {{if ne (len .Codebase.Description) 0}}
+                                        <tr>
+                                            <th>Description</th>
+                                            <td>{{.Codebase.Description}}</td>
+                                        </tr>
+                                    {{end}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header" id="head-advanced-settings"
+                             aria-expanded="true" aria-controls="collapse-advanced-settings">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" type="button">
+                                    Advanced Settings
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapse-advanced-settings" class="show route"
+                             aria-labelledby="head-advanced-settings">
+                            <div class="card-body">
+                                <table class="edp-card-table">
+                                    <tbody>
+                                    {{if .Codebase.JobProvisioning}}
+                                        <tr>
+                                            <th style="width: 50%">Job Provisioner</th>
+                                            <td>{{.Codebase.JobProvisioning}}</td>
+                                        </tr>
+                                    {{end}}
+                                    {{if .Codebase.JenkinsSlave}}
+                                        <tr>
+                                            <th>Jenkins Slave</th>
+                                            <td>{{.Codebase.JenkinsSlave}}</td>
+                                        </tr>
+                                    {{end}}
+                                    {{if .Codebase.DeploymentScript}}
+                                        <tr>
+                                            <th>Deployment Script</th>
+                                            <td>{{.Codebase.DeploymentScript}}</td>
+                                        </tr>
+                                    {{end}}
+                                    {{if .Codebase.CiTool}}
+                                        <tr>
+                                            <th>CI tool</th>
+                                            <td>{{.Codebase.CiTool}}</td>
+                                        </tr>
+                                    {{end}}
+                                    <tr>
+                                        <th>Versioning Type</th>
+                                        <td>{{.Codebase.VersioningType}}</td>
+                                    </tr>
+                                    {{if .Codebase.StartVersioningFrom}}
+                                        <tr>
+                                            <th>Start Versioning From</th>
+                                            <td>{{.Codebase.StartVersioningFrom}}</td>
+                                        </tr>
+                                    {{end}}
+                                    {{if .Codebase.JiraServer}}
+                                        <tr>
+                                            <th>Jira server</th>
+                                            <td>{{.Codebase.JiraServer}}</td>
+                                        </tr>
+                                    {{end}}
+                                    {{if .Codebase.CommitMessagePattern}}
+                                        <tr>
+                                            <th>Commit Message Pattern</th>
+                                            <td>{{.Codebase.CommitMessagePattern}}</td>
+                                        </tr>
+                                    {{end}}
+                                    {{if .Codebase.TicketNamePattern}}
+                                        <tr>
+                                            <th>Ticket Name Pattern</th>
+                                            <td>{{.Codebase.TicketNamePattern}}</td>
+                                        </tr>
+                                    {{end}}
+                                    {{if .Codebase.JiraIssueFields}}
+                                        {{range $key, $value := .Codebase.JiraIssueFields}}
+                                            <tr>
+                                                <th>{{$key}}</th>
+                                                <td>{{$value}}</td>
+                                            </tr>
+                                        {{end}}
+                                    {{end}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {{if .Codebase.Perf}}
+                        <div class="card">
+                            <div class="card-header" id="head-perf-settings"
+                                 aria-expanded="true" aria-controls="collapse-perf-settings">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link" type="button">
+                                        PERF settings
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapse-perf-settings" class="show route"
+                                 aria-labelledby="head-perf-settings">
+                                <div class="card-body">
+                                    <table class="edp-card-table">
+                                        <tbody>
+                                        <tr>
+                                            <th style="width: 50%">PERF server</th>
+                                            <td>{{.Codebase.Perf.Name}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th style="width: 50%">Data Sources</th>
+                                            <td>
+                                                {{$len := (len .Codebase.Perf.DataSources)}}
+                                                {{range $i, $e := .Codebase.Perf.DataSources}}
+                                                    {{$isLast := eq (add $i 1) $len}}
+                                                    {{if not $isLast}}
+                                                        {{.}},
+                                                    {{else}}
+                                                        {{.}}
+                                                    {{end}}
+                                                {{end}}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    {{end}}
+
+
+
+
+                    {{if and (eq .Codebase.Status "active") (ne (len .Codebase.CodebaseBranch) 0) }}
+                        <div class="card">
+                            <div class="card-header" id="headingThree"
+                                 aria-expanded="true" aria-controls="collapseThree">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link" type="button">
+                                        Branches
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseThree" class="show route" aria-labelledby="headingThree">
+                                <div class="card-body">
+                                    {{ $isLibrary := eq $.Codebase.Type "library"}}
+                                    {{ $isBuildToolNone := eq $.Codebase.BuildTool "none"}}
+                                    {{ $libWithBuildToolNone := and $isLibrary $isBuildToolNone}}
+                                    {{ $isVersioningTypeEdp := eq $.Codebase.VersioningType "edp"}}
+                                    <table class="edp-card-table">
+                                        <tbody>
+                                        <tr>
+                                            <th scope="col">Status</th>
+                                            <th scope="col">Branch</th>
+                                            <th scope="col">VCS</th>
+                                            {{if not $libWithBuildToolNone}}
+                                                <th scope="col">CI</th>
+                                            {{end}}
+                                            {{if $isVersioningTypeEdp}}
+                                                <th scope="col">Version</th>
+                                                <th scope="col">Build Number</th>
+                                                <th scope="col">Last Successful Build</th>
+                                            {{end}}
+                                            <th scope="col"></th>
+                                        </tr>
+                                        {{range .Codebase.CodebaseBranch}}
+                                            <tr data-branch-name="{{.Name}}" data-branch-status="{{.Status}}">
+                                                <td>
+                                                    <img src="{{if eq .Status "active"}}{{ $.BasePath }}/static/img/green_circle.svg{{else if eq .Status "failed"}}{{ $.BasePath }}/static/img/red_circle.svg{{else}}{{ $.BasePath }}/static/img/grey_circle.svg{{end}}"
+                                                         alt="" style="width:25px; height:25px;">
+                                                </td>
+                                                <td>{{.Name}}</td>
+                                                <td>
+                                                    <a href="{{.VCSLink}}" target="_blank" rel="noopener noreferrer"
+                                                       class="edp-link {{if ne .Status "active"}}disabled{{end}}">Link</a>
+                                                </td>
+                                                {{if not $libWithBuildToolNone}}
+                                                    <td>
+                                                        <a href="{{.CICDLink}}" target="_blank"
+                                                           rel="noopener noreferrer"
+                                                           class="edp-link {{if ne .Status "active"}}disabled{{end}}">Link</a>
+                                                    </td>
+                                                {{end}}
+                                                {{if $isVersioningTypeEdp}}
+                                                    {{if or .Version}}
+                                                        <td>
+                                                            {{.Version}}
+                                                        </td>
+                                                    {{else}}
+                                                        <td>
+                                                            —
+                                                        </td>
+                                                    {{end}}
+                                                    {{if or .Build}}
+                                                        <td>
+                                                            {{.Build}}
+                                                        </td>
+                                                    {{else}}
+                                                        <td>
+                                                            —
+                                                        </td>
+                                                    {{end}}
+                                                    {{if or .LastSuccessBuild}}
+                                                        <td>
+                                                            {{.LastSuccessBuild}}
+                                                        </td>
+                                                    {{else}}
+                                                        <td>
+                                                            —
+                                                        </td>
+                                                    {{end}}
+                                                {{end}}
+                                                <td>
+                                                    {{if and (ne $.Codebase.DefaultBranch .Name) $.IsAdmin}}
+                                                        <button class="delete delete-branch"
+                                                                data-toggle="modal"
+                                                                data-name="{{.Name}}">
+                                                            <i class="icon-trashcan"></i>
+                                                        </button>
+                                                    {{end}}
+                                                </td>
+                                            </tr>
+                                        {{end}}
+                                        </tbody>
+                                    </table>
+                                    <div class="form-group"></div>
+                                    <button type="button" class="modal-release-branch btn btn-primary" aria-controls="">
+                                        Create
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {{end}}
+                </div>
+
+                <div class="accordion">
+                    <div class="card status-info">
+                        <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
+                             data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" type="button">
+                                    Status Info
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseTwo" class="collapse status" aria-labelledby="headingTwo"
+                             data-parent="#accordionCreateApplication">
+                            <div class="card-body">
+                                <table class="action-log-table edp-card-table">
+                                    <tbody>
+                                    <tr>
+                                        <th scope="col" style="width: 20%">Date</th>
+                                        <th scope="col" style="width: 25%">User</th>
+                                        <th scope="col" style="width: 22.5%">Action</th>
+                                        <th scope="col" style="width: 10%">Result</th>
+                                        <th scope="col" style="width: 22.5%">Message</th>
+                                    </tr>
+                                    {{range .Codebase.ActionLog}}
+                                        <tr>
+                                            <td>{{.LastTimeUpdate.Format "02.01.2006 15:04:05 (UTC-07)" }}</td>
+                                            <td>{{.UserName}}</td>
+                                            <td>{{.Action}}</td>
+                                            <td>{{.Result}}</td>
+                                            <td>{{.Message}}</td>
+                                        </tr>
+                                    {{end}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {{template "footer_template.html" .}}
+    {{template "modal_success_template.html" .}}
+
+    <div class="modal fade" id="releaseBranchModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create New Branch</h5>
+                    <button id="btn-cross-close" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body create-new-branch-modal">
+                    <form id="create-branch-action"
+                          action="{{ .BasePath }}/admin/edp/codebase/{{.Codebase.Name}}/branch"
+                          method="post">
+                        {{if .Codebase.StartVersioningFrom}}
+                            <div class="form-group">
+                                <input type="checkbox" value="true" id="releaseBranch"
+                                       name="releaseBranch">
+                                <label class="form-check-label" for="releaseBranch">
+                                    Release Branch
+                                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                          title="Select the check box in order to create a release branch."></span>
+                                </label>
+                            </div>
+                        {{end}}
+
+                        <div class="form-group">
+                            <label for="site">Branch Name
+                                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                      title="Type the branch name that will be created in the Version Control System."></span>
+                            </label>
+                            <input type="text" class="form-control branch-name" id="branchName" name="name"
+                                   placeholder="Enter Branch Name">
+                            <div class="error-block branch-exists-modal invalid-feedback" style="display: none;"></div>
+                            <div class="invalid-feedback branch-name">
+                                Branch name may contain only: lower-case letters, numbers, slashes, dashes and dots.
+                                Can start and end only with lower-case letters and numbers. Minimum 2 characters.
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>From Commit Hash
+                                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                      title="The new branch will be created starting from the selected commit hash. If this field is empty, the Default branch will be used."></span>
+                            </label>
+                            <input type="text" class="form-control" id="commitNumber" name="commit"
+                                   placeholder="Enter Commit">
+                            <div class="invalid-feedback commit-message">
+                                Commit hash field may contain only fully qualified hash string (40 letters)
+                            </div>
+                        </div>
+
+                        {{if .Codebase.StartVersioningFrom}}
+                            <div class="form-group">
+                                <label>Branch Version
+                                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                          title="Enter the necessary branch version for the artifact."></span>
+                                </label>
+                                <div class="d-flex">
+                                    <input type="text" class="form-control branch-version" id="branch-version"
+                                           name="version"
+                                           placeholder="Enter Version"
+                                           value={{ getDefaultBranchVersion .Codebase.CodebaseBranch .Codebase.DefaultBranch }}>
+                                    <input name="versioningPostfix" type="text" class="form-control versioning-postfix"
+                                           id="versioningPostfix" value="SNAPSHOT" readonly="readonly">
+                                </div>
+                                <div class="invalid-feedback branch-version">
+                                    The branch version field cannot be empty and should be filled out in compliance with
+                                    the semantic versioning rules. The correct example: 1.2.3 or 10.10.10.
+                                </div>
+                            </div>
+                            <div class="form-group master-branch-version hide-element">
+                                <label>Master Branch Version
+                                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                          title="Type the branch version that will be used in a master branch after the release creation."></span>
+                                </label>
+                                <div class="d-flex">
+                                    <input type="text" class="form-control" id="master-branch-version"
+                                           name="masterVersion"
+                                           placeholder="Enter Master Branch Version"
+                                           value={{ incrementVersion (getDefaultBranchVersion .Codebase.CodebaseBranch .Codebase.DefaultBranch) }}>
+                                    <input name="snapshotStaticField" type="text"
+                                           class="snapshot-static-field form-control pull-right"
+                                           id="snapshotStaticField" value="SNAPSHOT" readonly="readonly">
+                                </div>
+                                <div class="invalid-feedback master-branch-version">
+                                    The branch version field cannot be empty and should be filled out in compliance with
+                                    the semantic versioning rules. The correct example: 1.2.3 or 10.10.10.
+                                </div>
+                            </div>
+                        {{end}}
+                        {{ .Xsrfdata }}
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="btn-modal-close" type="button" class="btn btn-secondary btn-modal-close"
+                            data-dismiss="modal">Cancel
+                    </button>
+                    <button id="create-release-branch" type="button" class="edp-submit-form-btn btn btn-primary">
+                        Proceed
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{{template "delete_confirmation_template.html" params "action" (print .BasePath "/admin/edp/codebase/branch/delete") "kind" "codebase-branch" "codebasename" .Codebase.Name "Xsrfdata" .Xsrfdata "error" .ErrorBranch}}
+<script src="{{ .BasePath }}/static/js/jquery-3.6.0.js"></script>
+<script src="{{ .BasePath }}/static/js/popper.js"></script>
+<script src="{{ .BasePath }}/static/js/bootstrap.js"></script>
+<script src="{{ .BasePath }}/static/js/util.js"></script>
+<script src="{{ .BasePath }}/static/js/confirmation-popup.js"></script>
+<script src="{{ .BasePath }}/static/js/branch-util.js"></script>
+<script src="{{ .BasePath }}/static/js/codebase-branch-validation.js"></script>
+<script src="{{ .BasePath }}/static/js/bootstrap-notify.js"></script>
+</body>
+</html>

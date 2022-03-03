@@ -1,0 +1,48 @@
+<div class="card vcs-block">
+    <div class="card-header collapsed" id="headingVCS" data-toggle="collapse"
+         data-target="#collapseVCS" aria-expanded="false" aria-controls="collapseVCS">
+        <h5 class="mb-0">
+            <button class="btn btn-link collapsed" type="button">
+                VCS Info
+            </button>
+        </h5>
+    </div>
+    <div id="collapseVCS" class="collapse" aria-labelledby="headingThree"
+         data-parent="#accordionCreateCodebase">
+        <div class="card-body">
+            <div class="form-group vcs-login">
+                <label for="vcsLogin">VCS Login</label>
+                <input name="vcsLogin" type="text" class="form-control" id="vcsLogin"
+                       placeholder="Enter vcs login">
+                <div class="invalid-feedback vcs-login-validation">
+                    Please specify VCS login.
+                </div>
+            </div>
+            <div class="form-group vcs-password">
+                <label for="vcsPassword">VCS Password (or API Token)</label>
+                <input name="vcsPassword" type="password" class="form-control" id="vcsPassword"
+                       placeholder="Enter VCS Password (or API Token)">
+                <div class="invalid-feedback vcs-password-validation">
+                    Please specify VCS Password (or API Token).
+                </div>
+            </div>
+
+            {{if eq .Type "application"}}
+              <button type="button" class="vcs-submit edp-submit-form-btn btn btn-primary"
+                    data-toggle="collapse"
+                    data-target="#collapseFour" aria-expanded="false"
+                    aria-controls="collapseVCS">
+                Proceed
+              </button>
+            {{else if eq .Type "library"}}
+            <div class="form-buttons-footer-left">
+                <button type="submit" class="create-library edp-submit-form-btn btn btn-primary">Create</button>
+            </div>
+            {{else if eq .Type "autotests"}}
+            <div class="form-buttons-footer-left">
+                <button type="submit" class="create-autotest edp-submit-form-btn btn btn-primary">Create</button>
+            </div>
+            {{end}}
+        </div>
+    </div>
+</div>

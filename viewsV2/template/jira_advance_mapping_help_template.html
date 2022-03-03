@@ -1,0 +1,23 @@
+<label class="form-group">Advance mapping
+    <a data-toggle="collapse" href="#jiraAdvanceMappingTooltip" aria-expanded="false"
+       aria-controls="jiraAdvanceMappingTooltip">
+        <img alt="question mark" src="{{ .BasePath }}/static/img/question_mark.png"
+             width="16px" height="16px">
+    </a>
+</label>
+
+<div class="collapse" id="jiraAdvanceMappingTooltip">
+    <div class="div-tooltip card card-body-tooltip">
+        <p>
+            There are four predefined variables with the respective values that can be specified singly or as a combination: </br>
+            <ul type="square">
+                <li> <b>EDP_COMPONENT</b> – returns application-name </br>
+                <li> <b>EDP_VERSION</b> – returns <b>0.0.0-SNAPSHOT</b> or <b>0.0.0-RC</b> </br>
+                <li> <b>EDP_SEM_VERSION</b> – returns <b>0.0.0</b> </br>
+                <li> <b>EDP_GITTAG</b> – returns <b>build/0.0.0-SNAPSHOT.2</b> or <b>build/0.0.0-RC.2</b> </br>
+            </ul>
+            <em>There are no character restrictions when combining the variables, combination samples:
+                <b>EDP_SEM_VERSION-EDP_COMPONENT</b> or <b>EDP_COMPONENT-hello-world/EDP_VERSION</b>, etc.</em>
+        </p>
+    </div>
+</div>

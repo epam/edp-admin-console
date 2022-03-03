@@ -1,0 +1,285 @@
+<div class="card advanced-settings-block" data-openshift="{{.IsOpenshift}}"
+     data-vcs-enabled="{{.IsVcsEnabled}}" data-codebase-type="{{.Type}}">
+
+    <div class="card-header collapsed" id="headingThree" data-toggle="collapse"
+         data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+        <h5 class="mb-0">
+            <button class="btn btn-link" type="button">
+                Advanced Settings
+            </button>
+        </h5>
+    </div>
+
+    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionCreateCodebase">
+        <div class="card-body">
+
+            <div class="form-group ci-provision">
+                <label for="jobProvisioning">Select CI pipeline provisioner
+                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                          title="Select Job Provisioner which will be used to handle codebase."></span>
+                </label>
+                <select class="form-control jobProvisioning" name="jobProvisioning">
+                    {{range .JobProvisioners}}
+                        <option>{{.Name}}</option>
+                    {{end}}
+                </select>
+            </div>
+
+            <div class="form-group jenkins-slave">
+                <label for="jenkinsSlave">Select Jenkins Slave
+                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                          title="Select Jenkins Slave which will be used to handle codebase."></span>
+                </label>
+                <select class="form-control jenkinsSlave" name="jenkinsSlave">
+                    {{range .JenkinsSlaves}}
+                        <option value="{{.Name}}">{{.Name}}</option>
+                    {{end}}
+                </select>
+            </div>
+
+            <div class="form-group versioningType">
+                <label for="versioningType">Select Codebase Versioning Type
+                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                          title="Select codebase versioning type which will be used to handle codebase versioning flow."></span>
+                </label>
+                <select class="form-control versioningType" name="versioningType" id="versioningType">
+                    {{range $type := .VersioningTypes}}
+                        <option data-versioning-type="{{$type}}">{{$type}}</option>
+                    {{end}}
+                </select>
+            </div>
+
+            <div class="form-group startVersioningFrom hide-element">
+                <label for="startVersioningFrom">Start Version From
+                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                          title="Version may contain only: numbers and dashes and cannot start and end with dash."></span>
+                </label>
+                <div class="d-flex">
+                    <input name="startVersioningFrom" type="text" class="start-versioning-from form-control pull-right"
+                           id="startVersioningFrom"
+                           placeholder="Type desired initial version">
+                    <input name="snapshotStaticField" type="text" class="snapshot-static-field form-control pull-right"
+                           id="snapshotStaticField" value="SNAPSHOT" readonly="readonly">
+                </div>
+                <div class="invalid-feedback startVersioningFrom">
+                    The branch version field cannot be empty and should be filled out in compliance with the semantic
+                    versioning rules. The correct example: 1.2.3 or 10.10.10.
+                </div>
+            </div>
+
+            {{if eq .Type "application" }}
+                <div class="form-group">
+                    <label for="deploymentScript">Select Deployment Scripts
+                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                              title="Select Deployment Script which will be used for deploy"></span>
+                    </label>
+                    <select class="form-control deploymentScript" name="deploymentScript">
+                        {{range $ds := .DeploymentScripts}}
+                            <option>{{$ds}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            {{end}}
+
+            <div class="form-group ciTools hide-element">
+                <label for="ciTool">Select CI tool
+                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                          title="Select CI tool which will be used for building your codebase"></span>
+                </label>
+                <select class="form-control ciTool" name="ciTool">
+                    {{range $tool := .CiTools}}
+                        <option>{{$tool}}</option>
+                    {{end}}
+                </select>
+            </div>
+
+            <div class="form-check jiraServerToggle">
+                <input type="checkbox" class="form-check-input" id="jiraServerToggle"
+                       {{if not .JiraServer}}disabled{{end}}>
+                <label class="form-check-label" for="jiraServerToggle">Integrate with Jira server</label>
+            </div>
+
+            <div class="form-group jiraServerBlock hide-element">
+                <label for="jiraServer">Select Jira Server
+                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                          title="Select Jira server that will be integrated with the codebase (application, library, autotest)."></span>
+                </label>
+                <select class="form-control jiraServer" name="jiraServer" disabled>
+                    {{range .JiraServer}}
+                        <option>{{.Name}}</option>
+                    {{end}}
+                </select>
+            </div>
+
+            <div class="form-group commitMessagePatternBlock hide-element">
+                <label for="commitMessagePattern">Specify the pattern to validate a commit message
+                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                          title="Specify the pattern to validate a commit message."></span>
+                </label>
+                <input name="commitMessagePattern"
+                       type="text"
+                       class="form-control"
+                       id="commitMessagePattern"
+                       placeholder="^\[PROJECT_NAME-\d{4}\]:.*$"
+                       disabled>
+                <div class="invalid-feedback commitMessagePattern">
+                    The commit message pattern field cannot be empty.
+                </div>
+            </div>
+
+            <div class="form-group ticketNamePatternBlock hide-element">
+                <label for="ticketNamePattern">Specify the pattern to find a Jira ticket number in a commit message
+                    <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                          title="Specify the pattern to find a Jira ticket number in a commit message."></span>
+                </label>
+                <input name="ticketNamePattern"
+                       type="text"
+                       class="form-control"
+                       id="ticketNamePattern"
+                       placeholder="PROJECT_NAME-\d{4}"
+                       disabled>
+                <div class="invalid-feedback ticketNamePattern">
+                    The ticket name pattern field cannot be empty.
+                </div>
+            </div>
+
+            <div class="jiraIssueMetadata hide-element">
+                {{template "template/jira_advance_mapping_help_template.html" .}}
+
+                <div class="jira-issue-metadata-row">
+                    <div class="d-flex justify-content-start">
+                        <div class="form-group w-40 mr-4 mb-2 div-jira-row-width">
+                            <label for="jiraFieldName"
+                                   class="jiraFieldNameLabel">Jira Field Name
+                                <span class="tooltip-icon" data-toggle="tooltip"
+                                      data-placement="top" title=""
+                                      data-original-title="Select Jira field name"></span>
+                            </label>
+                            <select name="jiraFieldName" class="jiraIssueFields jiraFieldName"
+                                    placeholder="Select a Jira field...">
+                                <option value="">Select a Jira field...</option>
+                            </select>
+                        </div>
+                        <div class="form-group w-50 mr-4 mb-2">
+                            <label for="jiraPattern"
+                                   class="jiraPatternLabel">Jira Pattern
+                                <span class="tooltip-icon" data-toggle="tooltip"
+                                      data-placement="top" title=""
+                                      data-original-title="Define Jira pattern"></span>
+                            </label>
+                            <input name="jiraPattern" type="text" class="form-control element-width jiraPattern"
+                                   id="jiraPattern"
+                                   placeholder="Enter Jira pattern">
+                        </div>
+
+                        <button type="button" class="delete remove-jira-issue-metadata-row">
+                            <i class="icon-trashcan"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+                <button type="button" class="add-jira-field circle plus"></button>
+
+                <div class="invalid-feedback jira-row-invalid-msg">
+                    Some of the above fields are invalid. Jira Field Name and Jira pattern fields should not be an
+                    empty.
+                </div>
+
+            </div>
+
+            {{if .IsPerfEnabled}}
+                {{template "../template/perf_template.html" .}}
+            {{end}}
+
+            {{if eq .Type "application" }}
+
+                {{if .IsVcsEnabled}}
+                    <button type="button"
+                            class="adv-setting-application-submit advanced-settings-submit edp-submit-form-btn btn btn-primary"
+                            data-toggle="collapse"
+                            data-target="#collapseVCS"
+                            aria-expanded="false"
+                            aria-controls="collapseThree">
+                        Proceed
+                    </button>
+                {{else}}
+                    <button disabled type="button"
+                            class="adv-setting-application-submit advanced-settings-submit edp-submit-form-btn btn btn-primary hide-element"
+                            data-toggle="collapse"
+                            data-target="#collapseVCS"
+                            aria-expanded="false"
+                            aria-controls="collapseThree">
+                        Proceed
+                    </button>
+
+                    <button type="button"
+                            class="adv-setting-create-application create-codebase edp-submit-form-btn btn btn-primary">
+                        Create
+                    </button>
+                {{end}}
+
+            {{end}}
+
+            {{if eq .Type "autotests" }}
+
+                {{if .IsVcsEnabled}}
+                    <button type="button"
+                            class="adv-setting-autotest-submit advanced-settings-submit edp-submit-form-btn btn btn-primary"
+                            data-toggle="collapse"
+                            data-target="#collapseVCS"
+                            aria-expanded="false"
+                            aria-controls="collapseThree">
+                        Proceed
+                    </button>
+                {{else}}
+                    <button disabled type="button"
+                            class="adv-setting-autotest-submit advanced-settings-submit edp-submit-form-btn btn btn-primary hide-element"
+                            data-toggle="collapse"
+                            data-target="#collapseVCS"
+                            aria-expanded="false"
+                            aria-controls="collapseThree">
+                        Proceed
+                    </button>
+
+                    <button type="submit"
+                            class="adv-setting-create-autotest create-autotest edp-submit-form-btn btn btn-primary">
+                        Create
+                    </button>
+                {{end}}
+
+            {{end}}
+
+            {{if eq .Type "library" }}
+
+                {{if .IsVcsEnabled}}
+                    <button type="button"
+                            class="adv-setting-library-submit advanced-settings-submit edp-submit-form-btn btn btn-primary"
+                            data-toggle="collapse"
+                            data-target="#collapseVCS"
+                            aria-expanded="false"
+                            aria-controls="collapseThree">
+                        Proceed
+                    </button>
+                {{else}}
+                    <button disabled type="button"
+                            class="adv-setting-library-submit advanced-settings-submit edp-submit-form-btn btn btn-primary hide-element"
+                            data-toggle="collapse"
+                            data-target="#collapseVCS"
+                            aria-expanded="false"
+                            aria-controls="collapseThree">
+                        Proceed
+                    </button>
+
+                    <button type="submit"
+                            class="adv-setting-create-library create-library edp-submit-form-btn btn btn-primary">
+                        Create
+                    </button>
+                {{end}}
+
+            {{end}}
+
+        </div>
+    </div>
+
+</div>

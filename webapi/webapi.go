@@ -2,10 +2,8 @@ package webapi
 
 import (
 	"context"
-	"errors"
 	"html/template"
 	"log"
-	"time"
 
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
@@ -58,14 +56,17 @@ func HandlerAuthWithOption(opts ...HandlerAuthOption) *HandlerAuth {
 	return handler
 }
 
-func getCurrentYear() int {
-	return time.Now().Year()
-}
-
 func CreateCommonFuncMap() template.FuncMap {
 	return template.FuncMap{
-		"getCurrentYear": getCurrentYear,
-		"params":         arrayParamsToMap,
+		"getCurrentYear":          getCurrentYear,
+		"add":                     add,
+		"getDefaultBranchVersion": getDefaultBranchVersion,
+		"incrementVersion":        incrementVersion,
+		"compareJiraServer":       compareJiraServer,
+		"params":                  params,
+		"capitalizeFirst":         CapitalizeFirstLetter,
+		"capitalizeAll":           CapitalizeAll,
+		"lowercaseAll":            LowercaseAll,
 	}
 }
 
@@ -122,19 +123,4 @@ func LoggerFromContext(ctx context.Context) *zap.Logger {
 		return logger
 	}
 	return v
-}
-
-func arrayParamsToMap(values ...interface{}) (map[string]interface{}, error) {
-	if len(values)%2 != 0 {
-		return nil, errors.New("invalid arrayParamsToMap call")
-	}
-	p := make(map[string]interface{}, len(values)/2)
-	for i := 0; i < len(values); i += 2 {
-		k, ok := values[i].(string)
-		if !ok {
-			return nil, errors.New("arrayParamsToMap keys must be strings")
-		}
-		p[k] = values[i+1]
-	}
-	return p, nil
 }

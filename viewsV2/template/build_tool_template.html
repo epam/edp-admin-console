@@ -1,0 +1,118 @@
+<div class="form-group build-tool">
+
+    <div class="js-form-subsection form-subsection formSubsection-java">
+        <label for="buildTool">Select Build Tool
+            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                  title="Select application build tool."></span>
+        </label>
+        <select class="form-control buildTool java-build-tools" name="buildTool">
+            <option data-build-tool="gradle">Gradle</option>
+            <option data-build-tool="maven">Maven</option>
+        </select>
+    </div>
+
+    {{if ne .Type "autotests" }}
+        <div class="js-form-subsection form-subsection formSubsection-js">
+            <label for="buildTool">Select Build Tool
+                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                      title="Select application build tool."></span>
+            </label>
+            <select class="form-control buildTool js-build-tools" name="buildTool">
+                <option data-build-tool="npm">NPM</option>
+            </select>
+        </div>
+
+        <div class="js-form-subsection form-subsection formSubsection-dotnet">
+            <label for="buildTool">Select Build Tool
+                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                      title="Select application build tool."></span>
+            </label>
+            <select class="form-control buildTool dotnet-build-tools" name="buildTool">
+                <option data-build-tool="dotnet">dotnet</option>
+            </select>
+        </div>
+    {{end}}
+
+    <div class="js-form-subsection form-subsection formSubsection-other">
+        <label for="buildTool">Select Build Tool
+            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                  title="Select application build tool."></span>
+        </label>
+        <select class="form-control buildTool other-build-tools" name="buildTool">
+            {{range $tool := .BuildTools}}
+                <option data-build-tool="{{$tool}}">{{$tool}}</option>
+            {{end}}
+        </select>
+    </div>
+
+    {{if eq .Type "application" }}
+    <div class="js-form-subsection form-subsection formSubsection-go hide-element">
+        <label for="buildTool">Select Build Tool
+            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                  title="Select application build tool."></span>
+        </label>
+        <select class="form-control buildTool go-build-tools" name="buildTool">
+            <option data-build-tool="go">Go</option>
+        </select>
+    </div>
+    {{end}}
+
+        <div class="js-form-subsection form-subsection formSubsection-python hide-element">
+            <label for="buildTool">Select Build Tool
+                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                      title="Select application build tool."></span>
+            </label>
+            <select class="form-control buildTool python-build-tools" name="buildTool">
+                <option data-build-tool="python">Python</option>
+            </select>
+        </div>
+
+    {{if eq .Type "library" }}
+        <div class="js-form-subsection form-subsection formSubsection-terraform hide-element">
+            <label for="buildTool">Select Build Tool
+                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                    title="Select application build tool."></span>
+            </label>
+            <select class="form-control buildTool terraform-build-tools" name="buildTool">
+                <option data-build-tool="terraform">Terraform</option>
+            </select>
+        </div>
+    {{end}}
+
+    {{if eq .Type "library" }}
+    <div class="js-form-subsection form-subsection formSubsection-rego hide-element">
+        <label for="buildTool">Select Build Tool
+            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                  title="Select application build tool."></span>
+        </label>
+        <select class="form-control buildTool opa-build-tools" name="buildTool">
+            <option data-build-tool="opa">OPA</option>
+        </select>
+    </div>
+    {{end}}
+
+    {{if eq .Type "library" }}
+    <div class="js-form-subsection form-subsection formSubsection-groovy-pipeline  hide-element">
+        <label for="buildTool">Select Build Tool
+            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                  title="Select application build tool."></span>
+        </label>
+        <select class="form-control buildTool groovy-pipeline-build-tools" name="buildTool">
+            <option data-build-tool="codenarc">Codenarc</option>
+        </select>
+    </div>
+    {{end}}
+
+    {{if eq .Type "library" }}
+    <div class="js-form-subsection form-subsection formSubsection-container hide-element">
+        <label for="buildTool">Select Build Tool
+            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                  title="Select application build tool."></span>
+        </label>
+        <select class="form-control buildTool kaniko-build-tools" name="buildTool">
+            <option data-build-tool="kaniko">Kaniko</option>
+        </select>
+    </div>
+    {{end}}
+
+</div>

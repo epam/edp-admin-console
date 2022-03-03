@@ -2,8 +2,9 @@ package util
 
 import (
 	"fmt"
-	"github.com/astaxie/beego"
 	"strings"
+
+	"github.com/astaxie/beego"
 )
 
 func CreateNativeProjectLink(domain, project string) string {

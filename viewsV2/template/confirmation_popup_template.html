@@ -1,0 +1,43 @@
+{{if .Type}}
+
+<div class="modal fade" id="confirmationPopup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true" data-backdrop="static" data-keyboard="false">
+
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">CONFIRMATION</h5>
+                <button id="btn-cross-close" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{if eq .Type "application"}}
+                  Press continue for adding your Application. Status will be available on "Applications" page.
+                {{else if eq .Type "library"}}
+                  Press continue for adding your Library. Status will be available on "Libraries" page.
+                {{else if eq .Type "autotests"}}
+                   Press continue for adding your Autotest. Status will be available on "Autotests" page.
+                {{end}}
+                <p/>
+                <table id="window-table" class="table table-bordered">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Parameter</th>
+                        <th scope="col">Value</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-modal-close" type="button" class="btn btn-secondary btn-modal-close" data-dismiss="modal">
+                    Cancel
+                </button>
+                <button id="btn-modal-continue" type="button" class="edp-submit-form-btn btn btn-primary">
+                    Continue
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
