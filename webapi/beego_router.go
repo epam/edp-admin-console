@@ -373,6 +373,7 @@ func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.L
 			if handlerEnv.Config.AuthEnable {
 				edpScope.Use(WithAuth(authHandler.TokenMap, authHandler.UrlMap, authHandler.StateMap, authHandler.AuthController))
 			}
+			edpScope.Post("/application", handlerEnv.CreateApplication)
 		})
 		baseRouter.Route("/v2", func(r chi.Router) {
 			r.Get("/", handlerEnv.Index)

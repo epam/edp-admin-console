@@ -118,6 +118,23 @@ func (c *RuntimeNamespacedClient) CreateCBBranchByCustomFields(ctx context.Conte
 	return err
 }
 
+// CreateCodebaseByCustomFields creates Codebase CR by custom fields and name
+func (c *RuntimeNamespacedClient) CreateCodebaseByCustomFields(ctx context.Context, crName string, spec codeBaseApi.CodebaseSpec, status codeBaseApi.CodebaseStatus) error {
+	if c.Namespace == "" {
+		return NemEmptyNamespaceErr("client namespace is not set")
+	}
+	codebaseBranch := &codeBaseApi.Codebase{
+		ObjectMeta: v1.ObjectMeta{
+			Name:      crName,
+			Namespace: c.Namespace,
+		},
+		Spec:   spec,
+		Status: status,
+	}
+	err := c.Create(ctx, codebaseBranch)
+	return err
+}
+
 // DeleteCBBranch deletes CodebaseBranch CR from the Kubernetes Cluster by name.
 func (c *RuntimeNamespacedClient) DeleteCBBranch(ctx context.Context, crName string) error {
 	if c.Namespace == "" {

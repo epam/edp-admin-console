@@ -77,6 +77,51 @@ func createCodebaseImageStreamCR(t *testing.T, ns string) *codeBaseApi.CodebaseI
 	}
 }
 
+func TestRuntimeNamespacedClient_CreateCodebaseByCustomFields_AlreadyExist(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.Codebase{})
+
+	initCR := createCodebaseCR(ns)
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(initCR).Build()
+	lang := "go"
+	spec := codeBaseApi.CodebaseSpec{Lang: lang}
+
+	k8sClient, err := NewRuntimeNamespacedClient(client, ns)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = k8sClient.CreateCodebaseByCustomFields(ctx, name, spec, codeBaseApi.CodebaseStatus{})
+	assert.Error(t, err)
+	assert.True(t, k8serrors.IsAlreadyExists(err))
+
+	codebase, err := k8sClient.GetCodebase(ctx, name)
+	assert.NoError(t, err)
+	assert.Equal(t, name, codebase.Name)
+}
+
+func TestRuntimeNamespacedClient_CreateCodebaseByCustomFields(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.Codebase{})
+
+	client := fake.NewClientBuilder().WithScheme(scheme).Build()
+	lang := "go"
+	spec := codeBaseApi.CodebaseSpec{Lang: lang}
+
+	k8sClient, err := NewRuntimeNamespacedClient(client, ns)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = k8sClient.CreateCodebaseByCustomFields(ctx, name, spec, codeBaseApi.CodebaseStatus{})
+	assert.NoError(t, err)
+
+	codebase, err := k8sClient.GetCodebase(ctx, name)
+	assert.NoError(t, err)
+	assert.Equal(t, name, codebase.Name)
+	assert.Equal(t, lang, codebase.Spec.Lang)
+}
+
 func TestK8SClient_GetCBBranch(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
