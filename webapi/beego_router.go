@@ -17,6 +17,7 @@
 package webapi
 
 import (
+	"context"
 	"fmt"
 	"path"
 
@@ -24,7 +25,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 
-	"edp-admin-console/context"
+	edpcontext "edp-admin-console/context"
 	"edp-admin-console/controllers"
 	"edp-admin-console/controllers/auth"
 	cdPipeController "edp-admin-console/controllers/cd-pipeline"
@@ -63,10 +64,10 @@ const (
 	edpV2Scope     = "/v2/admin/edp"
 )
 
-func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir string, confV2 *config.AppConfig, authController *config.AuthController) {
+func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir string, confV2 *config.AppConfig) {
 	zaplog.Info("Start application...",
 		zap.String("mode", beego.AppConfig.String("runmode")),
-		zap.String("edp version", context.EDPVersion))
+		zap.String("edp version", edpcontext.EDPVersion))
 	authEnabled, err := beego.AppConfig.Bool("keycloakAuthEnabled")
 	if err != nil {
 		zaplog.Error("Cannot read property keycloakAuthEnabled. Set default: false", zap.Error(err))
@@ -79,17 +80,17 @@ func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir strin
 	}
 
 	if authEnabled {
-		context.InitAuth()
-		beego.Router(fmt.Sprintf("%s/auth/callback", context.BasePath), &auth.AuthController{}, "get:Callback")
-		beego.InsertFilter(fmt.Sprintf("%s/admin/*", context.BasePath), beego.BeforeRouter, filters.AuthFilter)
-		beego.InsertFilter(fmt.Sprintf("%s/api/v1/edp/*", context.BasePath), beego.BeforeRouter, filters.AuthRestFilter)
-		beego.InsertFilter(fmt.Sprintf("%s/admin/edp/*", context.BasePath), beego.BeforeRouter, accessHandlerEnv.RoleAccessControlFilter)
-		beego.InsertFilter(fmt.Sprintf("%s/api/v1/edp/*", context.BasePath), beego.BeforeRouter, accessHandlerEnv.RoleAccessControlRestFilter)
+		edpcontext.InitAuth()
+		beego.Router(fmt.Sprintf("%s/auth/callback", edpcontext.BasePath), &auth.AuthController{}, "get:Callback")
+		beego.InsertFilter(fmt.Sprintf("%s/admin/*", edpcontext.BasePath), beego.BeforeRouter, filters.AuthFilter)
+		beego.InsertFilter(fmt.Sprintf("%s/api/v1/edp/*", edpcontext.BasePath), beego.BeforeRouter, filters.AuthRestFilter)
+		beego.InsertFilter(fmt.Sprintf("%s/admin/edp/*", edpcontext.BasePath), beego.BeforeRouter, accessHandlerEnv.RoleAccessControlFilter)
+		beego.InsertFilter(fmt.Sprintf("%s/api/v1/edp/*", edpcontext.BasePath), beego.BeforeRouter, accessHandlerEnv.RoleAccessControlRestFilter)
 		// auth and role access for v2 api
-		beego.InsertFilter(fmt.Sprintf("%s%s%s/*", context.BasePath, apiV2Scope, edpScope), beego.BeforeRouter, filters.AuthRestFilter)
-		beego.InsertFilter(fmt.Sprintf("%s%s%s/*", context.BasePath, apiV2Scope, edpScope), beego.BeforeRouter, accessHandlerEnv.RoleAccessControlRestFilter)
+		beego.InsertFilter(fmt.Sprintf("%s%s%s/*", edpcontext.BasePath, apiV2Scope, edpScope), beego.BeforeRouter, filters.AuthRestFilter)
+		beego.InsertFilter(fmt.Sprintf("%s%s%s/*", edpcontext.BasePath, apiV2Scope, edpScope), beego.BeforeRouter, accessHandlerEnv.RoleAccessControlRestFilter)
 	} else {
-		beego.InsertFilter(fmt.Sprintf("%s/*", context.BasePath), beego.BeforeRouter, filters.StubAuthFilter)
+		beego.InsertFilter(fmt.Sprintf("%s/*", edpcontext.BasePath), beego.BeforeRouter, filters.StubAuthFilter)
 	}
 
 	dbEnable, err := beego.AppConfig.Bool("dbEnabled")
@@ -99,7 +100,7 @@ func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir strin
 	}
 
 	if dbEnable {
-		context.InitDb()
+		edpcontext.InitDb()
 	}
 
 	k8sClientConf := k8s.ClientConfig()
@@ -152,8 +153,8 @@ func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir strin
 	}
 
 	beego.ErrorController(&controllers.ErrorController{})
-	beego.Router(fmt.Sprintf("%s/", context.BasePath), &controllers.MainController{EDPTenantService: edpService}, "get:Index")
-	beego.SetStaticPath(fmt.Sprintf("%s/static", context.BasePath), "static")
+	beego.Router(fmt.Sprintf("%s/", edpcontext.BasePath), &controllers.MainController{EDPTenantService: edpService}, "get:Index")
+	beego.SetStaticPath(fmt.Sprintf("%s/static", edpcontext.BasePath), "static")
 
 	integrationStrategies := util.GetValuesFromConfig(integrationStrategies)
 	if integrationStrategies == nil {
@@ -285,7 +286,7 @@ func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir strin
 
 	csc := stage.InitStageController(pipelineService)
 
-	adminEdpNamespace := beego.NewNamespace(fmt.Sprintf("%s/admin/edp", context.BasePath),
+	adminEdpNamespace := beego.NewNamespace(fmt.Sprintf("%s/admin/edp", edpcontext.BasePath),
 		beego.NSRouter("/overview", &ec, "get:GetEDPComponents"),
 		beego.NSRouter("/application/overview", &appc, "get:GetApplicationsOverviewPage"),
 		beego.NSRouter("/application/create", &appc, "get:GetCreateApplicationPage"),
@@ -319,7 +320,7 @@ func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir strin
 	)
 	beego.AddNamespace(adminEdpNamespace)
 
-	apiV1EdpNamespace := beego.NewNamespace(fmt.Sprintf("%s/api/v1/edp", context.BasePath),
+	apiV1EdpNamespace := beego.NewNamespace(fmt.Sprintf("%s/api/v1/edp", edpcontext.BasePath),
 		beego.NSRouter("/codebase", &controllers.CodebaseRestController{CodebaseService: codebaseService}, "post:CreateCodebase"),
 		beego.NSRouter("/codebase", &controllers.CodebaseRestController{CodebaseService: codebaseService}, "get:GetCodebases"),
 		beego.NSRouter("/codebase/:codebaseName", &controllers.CodebaseRestController{CodebaseService: codebaseService}, "get:GetCodebase"),
@@ -333,20 +334,29 @@ func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir strin
 	)
 	beego.AddNamespace(apiV1EdpNamespace)
 
-	apiV1Namespace := beego.NewNamespace(fmt.Sprintf("%s/api/v1", context.BasePath),
+	apiV1Namespace := beego.NewNamespace(fmt.Sprintf("%s/api/v1", edpcontext.BasePath),
 		beego.NSRouter("/storage-class", &controllers.OpenshiftRestController{ClusterService: clusterService}, "get:GetAllStorageClasses"),
 		beego.NSRouter("/repository/available", &controllers.RepositoryRestController{}, "post:IsGitRepoAvailable"),
 	)
 	beego.AddNamespace(apiV1Namespace)
 
 	v2APIHandler := NewHandlerEnv(WithClient(namespacedClient), WithWorkingDir(workingDir), WithFuncMap(CreateCommonFuncMap()), WithConfig(confV2))
-	v2APIAuthHandler := HandlerAuthWithOption(WithAuthController(authController), WithBasePath(confV2.BasePath))
+
+	authOpts := make([]HandlerAuthOption, 0)
+	authOpts = append(authOpts, WithBasePath(confV2.BasePath))
+	if v2APIHandler.Config.AuthEnable {
+		authController, err := config.SetupAuthController(context.Background(), "conf/app.conf")
+		if err != nil {
+			zaplog.Error("cant setup authController", zap.Error(err))
+		}
+		authOpts = append(authOpts, WithAuthController(authController))
+	}
+	v2APIAuthHandler := HandlerAuthWithOption(authOpts...)
 	v2APIRouter := V2APIRouter(v2APIHandler, v2APIAuthHandler, zaplog)
 	// see https://github.com/beego/beedoc/blob/master/en-US/mvc/controller/router.md#handler-register
 	// and isPrefix parameter
-	beego.Handler(path.Join(context.BasePath, "/v2"), v2APIRouter, true)
-	beego.Handler(path.Join(context.BasePath, apiV2Scope, edpScope), v2APIRouter, true)
-	beego.Handler(path.Join(context.BasePath, edpV2Scope), v2APIRouter, true)
+	beego.Handler(path.Join(v2APIHandler.Config.BasePath, "/v2"), v2APIRouter, true)
+	beego.Handler(path.Join(v2APIHandler.Config.BasePath, apiV2Scope, edpScope), v2APIRouter, true)
 }
 
 func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.Logger) *chi.Mux {

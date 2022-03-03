@@ -26,11 +26,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	authController, err := config.SetupAuthController(context.Background(), "conf/app.conf")
-	if err != nil {
-		log.Fatal(err)
-	}
-	webapi.SetupRouter(namespacedClient, workingDir, conf, authController)
+
+	webapi.SetupRouter(namespacedClient, workingDir, conf)
 	template_function.RegisterTemplateFuncs()
 	beego.Run()
 }

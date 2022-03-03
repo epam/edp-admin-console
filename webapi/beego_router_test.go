@@ -32,7 +32,7 @@ func TestSetupRouter(t *testing.T) {
 		t.Fatal(err)
 	}
 	conf := &config.AppConfig{AuthEnable: false}
-	SetupRouter(namespaceClient, "", conf, &config.AuthController{}) // rewrite this setup ASAP
+	SetupRouter(namespaceClient, "", conf) // rewrite this setup ASAP
 	err = os.Unsetenv(k8s.NamespaceEnv)
 	if err != nil {
 		t.Fatal(err)
