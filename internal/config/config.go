@@ -2,7 +2,13 @@ package config
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 	"time"
+
+	"edp-admin-console/util/consts"
+
+	"edp-admin-console/util"
 
 	"github.com/astaxie/beego"
 	"github.com/coreos/go-oidc"
@@ -10,17 +16,37 @@ import (
 )
 
 const (
-	AuthEnable         = "keycloakAuthEnabled"
-	DiagramPageEnabled = "diagramPageEnabled"
+	AuthEnable            = "keycloakAuthEnabled"
+	DiagramPageEnabled    = "diagramPageEnabled"
+	IntegrationStrategies = "integrationStrategies"
+	BuildTools            = "buildTools"
+	VersioningTypes       = "versioningTypes"
+	DeploymentScript      = "deploymentScript"
+	CiTools               = "ciTools"
+	PerfDataSources       = "perfDataSources"
+	platformType          = "platformType"
+	vcsIntegrationEnabled = "vcsIntegrationEnabled"
 )
 
 type AppConfig struct {
-	RunMode            string
-	EDPVersion         string
-	AuthEnable         bool
-	BasePath           string
-	DiagramPageEnabled bool
-	XSRFKey            []byte
+	RunMode                 string
+	EDPVersion              string
+	AuthEnable              bool
+	BasePath                string
+	DiagramPageEnabled      bool
+	IsOpenshift             bool
+	IsVcsIntegrationEnabled bool
+	XSRFKey                 []byte
+	Reference               Reference
+}
+
+type Reference struct {
+	IntegrationStrategies []string
+	BuildTools            []string
+	VersioningTypes       []string
+	DeploymentScript      []string
+	CiTools               []string
+	PerfDataSources       []string
 }
 
 type KeycloakConfig struct {
@@ -47,19 +73,67 @@ type AuthController struct {
 func SetupConfig(_ context.Context, _ string) (*AppConfig, error) {
 	authEnable, err := beego.AppConfig.Bool(AuthEnable)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("read %s from config failed: %w", AuthEnable, err)
 	}
 	diagramPageEnabled, err := beego.AppConfig.Bool(DiagramPageEnabled)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("read %s from config failed: %w", DiagramPageEnabled, err)
 	}
+
+	isVcsIntegrationEnabled, err := strconv.ParseBool(beego.AppConfig.String(vcsIntegrationEnabled))
+	if err != nil {
+		return nil, fmt.Errorf("read %s from config failed: %w", AuthEnable, err)
+	}
+
+	isOpenshift := beego.AppConfig.String(platformType) == consts.Openshift
+
+	integrationStrategies := util.GetValuesFromConfig(IntegrationStrategies)
+	if integrationStrategies == nil {
+		return nil, fmt.Errorf("read %s from config failed: %w", IntegrationStrategies, err)
+	}
+
+	buildTools := util.GetValuesFromConfig(BuildTools)
+	if buildTools == nil {
+		return nil, fmt.Errorf("read %s from config failed: %w", BuildTools, err)
+	}
+
+	versioningTypes := util.GetValuesFromConfig(VersioningTypes)
+	if versioningTypes == nil {
+		return nil, fmt.Errorf("read %s from config failed: %w", VersioningTypes, err)
+	}
+
+	deploymentScript := util.GetValuesFromConfig(DeploymentScript)
+	if deploymentScript == nil {
+		return nil, fmt.Errorf("read %s from config failed: %w", DeploymentScript, err)
+	}
+
+	ciTools := util.GetValuesFromConfig(CiTools)
+	if ciTools == nil {
+		return nil, fmt.Errorf("read %s from config failed: %w", CiTools, err)
+	}
+
+	perfDataSources := util.GetValuesFromConfig(PerfDataSources)
+	if perfDataSources == nil {
+		return nil, fmt.Errorf("read %s from config failed: %w", PerfDataSources, err)
+	}
+
 	config := &AppConfig{
-		RunMode:            beego.AppConfig.String("runmode"),
-		EDPVersion:         beego.AppConfig.String("edpVersion"),
-		BasePath:           beego.AppConfig.String("basePath"),
-		AuthEnable:         authEnable,
-		DiagramPageEnabled: diagramPageEnabled,
-		XSRFKey:            []byte(beego.AppConfig.String("XSRFKey")),
+		RunMode:                 beego.AppConfig.String("runmode"),
+		EDPVersion:              beego.AppConfig.String("edpVersion"),
+		BasePath:                beego.AppConfig.String("basePath"),
+		AuthEnable:              authEnable,
+		DiagramPageEnabled:      diagramPageEnabled,
+		IsOpenshift:             isOpenshift,
+		IsVcsIntegrationEnabled: isVcsIntegrationEnabled,
+		XSRFKey:                 []byte(beego.AppConfig.String("XSRFKey")),
+		Reference: Reference{
+			IntegrationStrategies: integrationStrategies,
+			BuildTools:            buildTools,
+			VersioningTypes:       versioningTypes,
+			DeploymentScript:      deploymentScript,
+			CiTools:               ciTools,
+			PerfDataSources:       perfDataSources,
+		},
 	}
 	return config, nil
 }

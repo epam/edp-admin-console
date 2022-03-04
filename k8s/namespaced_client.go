@@ -10,6 +10,8 @@ import (
 	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	"github.com/epam/edp-codebase-operator/v2/pkg/codebasebranch"
 	edpComponentApi "github.com/epam/edp-component-operator/pkg/apis/v1/v1alpha1"
+	jenkinsAPI "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
+	perfApi "github.com/epam/edp-perf-operator/v2/pkg/apis/edp/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/selection"
@@ -25,6 +27,8 @@ const NamespaceEnv = "NAMESPACE"
 func SetupNamespacedClient() (*RuntimeNamespacedClient, error) {
 	utilRuntime.Must(codeBaseApi.AddToScheme(scheme.Scheme))
 	utilRuntime.Must(cdPipeApi.AddToScheme(scheme.Scheme))
+	utilRuntime.Must(jenkinsAPI.AddToScheme(scheme.Scheme))
+	utilRuntime.Must(perfApi.AddToScheme(scheme.Scheme))
 	utilRuntime.Must(edpComponentApi.AddToScheme(scheme.Scheme))
 	namespace, ok := os.LookupEnv(NamespaceEnv)
 	if !ok {

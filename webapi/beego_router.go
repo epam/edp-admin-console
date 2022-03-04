@@ -388,6 +388,7 @@ func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.L
 			edpScope.Route("/application", func(applicationRoute chi.Router) {
 				applicationRoute.Post("/", handlerEnv.CreateApplication)
 				applicationRoute.Get("/overview", handlerEnv.ApplicationOverview)
+				applicationRoute.Get("/create", handlerEnv.CreateApplicationPage)
 			})
 			edpScope.Route("/codebase/{codebaseName}", func(codebaseRoute chi.Router) {
 				codebaseRoute.Use(csrf.Protect(handlerEnv.Config.XSRFKey, csrf.CookieName("_edp_csrf")))
