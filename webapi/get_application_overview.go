@@ -29,7 +29,7 @@ type createApplicationOverviewData struct {
 	Xsrfdata           string
 	Error              string
 	DeletionError      string
-	HasRights          bool
+	IsAdmin            bool
 	DiagramPageEnabled bool
 	JiraEnabled        bool
 	Success            bool
@@ -38,6 +38,7 @@ type createApplicationOverviewData struct {
 func (h *HandlerEnv) ApplicationOverview(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 	logger := LoggerFromContext(ctx)
+	user := UserFromContext(ctx)
 
 	applications := make([]Codebase, 0)
 
@@ -60,14 +61,13 @@ func (h *HandlerEnv) ApplicationOverview(writer http.ResponseWriter, request *ht
 
 	xsrfData, _ := GetCookieByName(request, "_xsrf")
 
-	//TODO: read Username and HasRights from session
 	tmplData := createApplicationOverviewData{
 		BasePath:           h.Config.BasePath,
 		EDPVersion:         h.Config.EDPVersion,
 		Codebases:          applications,
 		Type:               application,
-		Username:           "stub-name", // should read from session
-		HasRights:          true,        // should read from session
+		Username:           user.UserName(),
+		IsAdmin:            user.IsAdmin(),
 		DiagramPageEnabled: h.Config.DiagramPageEnabled,
 		JiraEnabled:        true,
 		Xsrfdata:           xsrfData,

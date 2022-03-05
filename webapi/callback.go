@@ -56,7 +56,7 @@ func (h *HandlerAuth) CallBack(writer http.ResponseWriter, request *http.Request
 	cookie := &http.Cookie{
 		Name:    SessionIDName,
 		Value:   sessionID,
-		Expires: time.Now().Add(SessionExpirationTime),
+		Expires: time.Now().Add(h.AuthController.SessionTTL),
 		Path:    "/",
 	}
 	http.SetCookie(writer, cookie)

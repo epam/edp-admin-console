@@ -19,6 +19,7 @@ require (
 	github.com/gavv/httpexpect/v2 v2.3.1
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-resty/resty/v2 v2.7.0
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/jarcoal/httpmock v1.1.0
 	github.com/lib/pq v1.8.0
@@ -50,7 +51,7 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/emicklei/go-restful v2.12.0+incompatible // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
-	github.com/epam/edp-component-operator v0.1.1-0.20211129100139-b5b7659f98f6 // indirect
+	github.com/epam/edp-component-operator v0.1.1-0.20211129100139-b5b7659f98f6
 	github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20211129152322-3fdc74f98b19 // indirect
 	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
 	github.com/fatih/structs v1.1.0 // indirect

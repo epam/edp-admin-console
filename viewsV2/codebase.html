@@ -48,7 +48,7 @@
                     </div>
                     {{ end }}
                 </div>
-                {{if .HasRights}}
+                {{if .IsAdmin}}
                 <div class="flex-fill">
                     <div class="float-right">
                         {{if eq .Type "application"}}
@@ -107,7 +107,7 @@
                             {{end}}
                         </td>
                         <td>
-                            {{if $.HasRights}}
+                            {{if $.IsAdmin}}
                             <button class="delete delete-codebase" data-toggle="modal"
                                     data-codebase="{{.Name}}">
                                 <i class="icon-trashcan"></i>

@@ -2,11 +2,10 @@ package webapi
 
 import (
 	"context"
-	"html/template"
-	"log"
-
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
+	"html/template"
+	"log"
 
 	"edp-admin-console/internal/config"
 	"edp-admin-console/k8s"
@@ -123,4 +122,14 @@ func LoggerFromContext(ctx context.Context) *zap.Logger {
 		return logger
 	}
 	return v
+}
+
+func UserFromContext(ctx context.Context) AuthorisedUser {
+	user, ok := ctx.Value(AuthorisedUserKey{}).(AuthorisedUser)
+	if ok {
+		return user
+	}
+	user = GuestUser()
+	return user
+
 }

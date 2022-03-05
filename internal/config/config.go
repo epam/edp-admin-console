@@ -37,6 +37,8 @@ type AuthController struct {
 	StateAuthKey   string
 	AuthSessionTTL time.Duration
 	SessionTTL     time.Duration
+	AdminRoleName  string
+	DevRoleName    string
 }
 
 //TODO remake config
@@ -88,9 +90,15 @@ func SetupAuthController(ctx context.Context, _ string) (*AuthController, error)
 	}
 
 	verifier := provider.Verifier(oidcConfig)
-	authConfig := &AuthController{Oauth2Service: oauth2Config, Verifier: verifier,
-		StateAuthKey: keycloakConfig.StateAuthKey, AuthSessionTTL: time.Duration(authExpirationTime) * time.Minute,
-		SessionTTL: time.Duration(sessionTTL) * time.Minute}
+	authConfig := &AuthController{
+		Oauth2Service:  oauth2Config,
+		Verifier:       verifier,
+		StateAuthKey:   keycloakConfig.StateAuthKey,
+		AuthSessionTTL: time.Duration(authExpirationTime) * time.Minute,
+		SessionTTL:     time.Duration(sessionTTL) * time.Minute,
+		DevRoleName:    beego.AppConfig.String("adminRole"),
+		AdminRoleName:  beego.AppConfig.String("developerRole"),
+	}
 	return authConfig, nil
 }
 

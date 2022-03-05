@@ -51,6 +51,30 @@ func TestIndexSuite(t *testing.T) {
 	suite.Run(t, s)
 }
 
+func CustomUser(userName string, isAdmin, isDeveloper bool) AuthorisedUser {
+	adminRole := "admin"
+	devRole := "dev"
+	var roles []string
+	if isAdmin {
+		roles = append(roles, adminRole)
+	}
+	if isDeveloper {
+		roles = append(roles, devRole)
+	}
+	return AuthorisedUser{
+		TokenClaim: TokenClaim{
+			Name: userName,
+			RealmAccess: RealmAccess{
+				Roles: roles,
+			},
+		},
+		ConfigRoles: ConfigRoles{
+			DevRole:   adminRole,
+			AdminRole: devRole,
+		},
+	}
+}
+
 func (s *IndexSuite) TestIndex() {
 	t := s.T()
 

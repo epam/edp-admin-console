@@ -7,6 +7,10 @@ import (
 
 func (h *HandlerEnv) Index(writer http.ResponseWriter, request *http.Request) {
 
+	ctx := request.Context()
+
+	user := UserFromContext(ctx)
+
 	type data struct {
 		BasePath   string
 		EDPVersion string
@@ -16,7 +20,7 @@ func (h *HandlerEnv) Index(writer http.ResponseWriter, request *http.Request) {
 	tmplData := data{
 		BasePath:   h.Config.BasePath,
 		EDPVersion: h.Config.EDPVersion,
-		Username:   "testname",
+		Username:   user.UserName(),
 	}
 
 	templatePaths := []string{
