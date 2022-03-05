@@ -19,29 +19,7 @@ import (
 	applog "edp-admin-console/service/logger"
 )
 
-type JiraServerCROption func(codebase *v1alpha1.JiraServer)
-
-func createJiraServerCRWithOptions(opts ...JiraServerCROption) *v1alpha1.JiraServer {
-	jiraServerCR := new(v1alpha1.JiraServer)
-	for i := range opts {
-		opts[i](jiraServerCR)
-	}
-	return jiraServerCR
-}
-
-func WithJiraServerCrName(crName string) JiraServerCROption {
-	return func(codebase *v1alpha1.JiraServer) {
-		codebase.ObjectMeta.Name = crName
-	}
-}
-
-func WithJiraServerCrNamespace(crNamespace string) JiraServerCROption {
-	return func(codebase *v1alpha1.JiraServer) {
-		codebase.ObjectMeta.Namespace = crNamespace
-	}
-}
-
-func TestGetCodebaseOverview_OK(t *testing.T) {
+func TestGetCodebaseUpdate_OK(t *testing.T) {
 	scheme := runtime.NewScheme()
 	scheme.AddKnownTypes(v1alpha1.SchemeGroupVersion,
 		&edpComponentAPI.EDPComponent{},
@@ -94,7 +72,7 @@ func TestGetCodebaseOverview_OK(t *testing.T) {
 	codebaseName := crCodebaseName_1
 	httpExpect := httpexpect.New(t, testServer.URL)
 	httpExpect.
-		GET(fmt.Sprintf("/v2/admin/edp/codebase/%s/overview", codebaseName)).
+		GET(fmt.Sprintf("/v2/admin/edp/codebase/%s/update", codebaseName)).
 		WithCookie("_edp_csrf", "csrf_token").
 		Expect().
 		Status(http.StatusOK).

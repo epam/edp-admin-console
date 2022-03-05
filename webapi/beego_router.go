@@ -23,6 +23,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/go-chi/chi/v5"
+	"github.com/gorilla/csrf"
 	"go.uber.org/zap"
 
 	edpcontext "edp-admin-console/context"
@@ -388,7 +389,11 @@ func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.L
 				applicationRoute.Post("/", handlerEnv.CreateApplication)
 				applicationRoute.Get("/overview", handlerEnv.ApplicationOverview)
 			})
-			edpScope.Get("/codebase/{codebaseName}/overview", handlerEnv.GetCodebaseOverview)
+			edpScope.Route("/codebase/{codebaseName}", func(codebaseRoute chi.Router) {
+				codebaseRoute.Use(csrf.Protect(handlerEnv.Config.XSRFKey, csrf.CookieName("_edp_csrf")))
+				codebaseRoute.Get("/overview", handlerEnv.GetCodebaseOverview)
+				codebaseRoute.Get("/update", handlerEnv.GetCodebaseUpdate)
+			})
 		})
 		baseRouter.Route("/v2", func(r chi.Router) {
 			r.Get("/", handlerEnv.Index)

@@ -110,9 +110,10 @@ func (h *HandlerEnv) GetCodebaseOverview(w http.ResponseWriter, r *http.Request)
 	}
 
 	jenkinsURL := ""
+	jenkinsComponent := consts.Jenkins
 	jenkinsEDPComponent, err := edpcomponent.ByNameIFExists(ctx, h.NamespacedClient, consts.Jenkins)
 	if err != nil {
-		logger.Error("get edp component failed", zap.String("edp_component", gerritComponent), zap.Error(err))
+		logger.Error("get edp component failed", zap.String("edp_component", jenkinsComponent), zap.Error(err))
 		InternalErrorResponse(ctx, w, "get edp component failed")
 		return
 	}

@@ -29,7 +29,7 @@
                     {{end}}
                     {{.TypeCaption | capitalizeFirst}} "{{.Codebase.Name}}"
                     {{if and .JiraEnabled (ne .Codebase.CiTool "GitLab CI")}}
-                        <a href="{{ .BasePath }}/admin/edp/codebase/{{.Codebase.Name}}/update">
+                        <a href="{{ .BasePath }}/v2/admin/edp/codebase/{{.Codebase.Name}}/update">
                             <button class="delete">
                                 <i class="icon-pencil"></i>
                             </button>

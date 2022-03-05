@@ -20,6 +20,7 @@ type AppConfig struct {
 	AuthEnable         bool
 	BasePath           string
 	DiagramPageEnabled bool
+	XSRFKey            []byte
 }
 
 type KeycloakConfig struct {
@@ -58,6 +59,7 @@ func SetupConfig(_ context.Context, _ string) (*AppConfig, error) {
 		BasePath:           beego.AppConfig.String("basePath"),
 		AuthEnable:         authEnable,
 		DiagramPageEnabled: diagramPageEnabled,
+		XSRFKey:            []byte(beego.AppConfig.String("XSRFKey")),
 	}
 	return config, nil
 }

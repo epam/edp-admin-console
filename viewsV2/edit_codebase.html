@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EDP Admin Console</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/index.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/validation.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/circle.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/selectize.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/jira-issue-row.css">
+</head>
+<body>
+<main>
+    {{template "header_template.html" .}}
+    <section class="content d-flex">
+        <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
+            {{template "navbar_template.html" .}}
+        </aside>
+        <div class="flex-fill pl-4 pr-4 wrapper">
+
+            <form class="edp-form" id="updateCodebase" method="post"
+                  action="{{ .BasePath }}/admin/edp/codebase/{{.Codebase.Name}}/update">
+                <h1 class="edp-form-header">
+                    <a href="{{ .BasePath }}/admin/edp/{{.Codebase.Type}}/overview" class="edp-back-link"></a>
+                    Edit Codebase
+                </h1>
+                <p>Edit pattern to validate commit messages.</p>
+
+                {{if .CodebaseUpdateError}}
+                    <div class="backend-validation-error">
+                        {{.CodebaseUpdateError}}
+                    </div>
+                {{end}}
+
+                <div class="accordion" id="updateCodebase">
+
+                    <div class="card pattern">
+                        <div class="card-header jira-config" id="headingOne" aria-expanded="true" aria-controls="collapseOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button">
+                                    Jira configuration
+                                </button>
+                            </h5>
+                        </div>
+
+                        <div id="collapseOne" class="show"
+                             aria-expanded="false" aria-controls="collapseOne"
+                             data-parent="#updateCodebase">
+                            <div class="card-body">
+
+                                <div class="form-check jiraServerToggle">
+                                    <input type="checkbox" class="form-check-input" name="jiraServerToggle" id="jiraServerToggle"
+                                           {{if .Codebase.JiraServer}}checked{{end}}>
+                                    <label class="form-check-label" for="jiraServerToggle">Integrate with Jira server</label>
+                                </div>
+
+                                <div class="form-group jiraServerBlock" hide-element>
+                                    <label for="jiraServer">Select Jira Server
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Select Jira server that will be integrated with the codebase (application, library, autotest)."></span>
+                                    </label>
+                                    <select class="form-control jiraServer" name="jiraServer" disabled>
+                                        {{range .JiraServer}}
+                                            {{ if compareJiraServer $.Codebase.JiraServer .Name }}
+                                                <option selected>{{.Name}}</option>
+                                            {{else}}
+                                                <option>{{.Name}}</option>
+                                            {{end}}
+                                        {{end}}
+                                    </select>
+                                </div>
+
+                                <div class="form-group commitMessagePatternBlock hide-element">
+                                    <label for="commitMessagePattern">Specify the pattern to validate a commit message
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Specify the pattern to validate a commit message."></span>
+                                    </label>
+                                    <input name="commitMessagePattern"
+                                           value="{{.Codebase.CommitMessagePattern}}"
+                                           type="text"
+                                           class="form-control"
+                                           id="commitMessagePattern"
+                                           placeholder="^\[PROJECT_NAME-\d{4}\]:.*$"
+                                           disabled>
+                                    <div class="invalid-feedback commitMessagePattern">
+                                        The commit message pattern field cannot be empty.
+                                    </div>
+                                </div>
+
+                                <div class="form-group ticketNamePatternBlock hide-element">
+                                    <label for="ticketNamePattern">Specify the pattern to find a Jira ticket number in a commit message
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Specify the pattern to find a Jira ticket number in a commit message."></span>
+                                    </label>
+                                    <input name="ticketNamePattern"
+                                           value="{{.Codebase.TicketNamePattern}}"
+                                           type="text"
+                                           class="form-control"
+                                           id="ticketNamePattern"
+                                           placeholder="PROJECT_NAME-\d{4}"
+                                           disabled>
+                                    <div class="invalid-feedback ticketNamePattern">
+                                        The ticket name pattern field cannot be empty.
+                                    </div>
+                                </div>
+
+                                {{if .Codebase.JiraIssueFields}}
+                                    <div class="jiraIssueMetadata hide-element"
+                                         data-conf="{{.Codebase.JiraIssueMetadataPayload}}">
+                                        <label class="form-group">Advance mapping
+                                            <a data-toggle="collapse" href="#jiraAdvanceMappingTooltip"
+                                               aria-expanded="false"
+                                               aria-controls="jiraAdvanceMappingTooltip">
+                                                <img alt="question mark"
+                                                     src="{{ .BasePath }}/static/img/question_mark.png"
+                                                     width="16px" height="16px">
+                                            </a>
+                                        </label>
+                                        <div class="collapse" id="jiraAdvanceMappingTooltip">
+                                            <div class="div-tooltip card card-body-tooltip">
+                                                <p>
+                                                    There are four predefined variables with the respective values that can be specified singly or as a combination: </br>
+                                                <ul type="square">
+                                                    <li> <b>EDP_COMPONENT</b> – returns application-name </br>
+                                                    <li> <b>EDP_VERSION</b> – returns <b>0.0.0-SNAPSHOT</b> or <b>0.0.0-RC</b> </br>
+                                                    <li> <b>EDP_SEM_VERSION</b> – returns <b>0.0.0</b> </br>
+                                                    <li> <b>EDP_GITTAG</b> – returns <b>build/0.0.0-SNAPSHOT.2</b> or <b>build/0.0.0-RC.2</b> </br>
+                                                </ul>
+                                                <em>There are no character restrictions when combining the variables, combination samples:
+                                                    <b>EDP_SEM_VERSION-EDP_COMPONENT</b> or <b>EDP_COMPONENT-hello-world/EDP_VERSION</b>, etc.</em>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="add-jira-field circle plus"></button>
+
+                                        <div class="invalid-feedback jira-row-invalid-msg">
+                                            Some of the above fields are invalid. Jira Field Name and Jira pattern
+                                            fields
+                                            should not be an empty.
+                                        </div>
+
+                                    </div>
+                                {{else}}
+                                    <div class="jiraIssueMetadata" data-conf>
+
+                                        {{template "jira_advance_mapping_help_template.html" .}}
+
+                                        <button type="button" class="add-jira-field circle plus"></button>
+
+                                        <div class="invalid-feedback jira-row-invalid-msg">
+                                            Some of the above fields are invalid. Jira Field Name and Jira pattern
+                                            fields
+                                            should not be an empty.
+                                        </div>
+
+                                    </div>
+                                {{end}}
+
+                                <button type="button" class="update-codebase edp-submit-form-btn btn btn-primary"
+                                        data-toggle="collapse" aria-expanded="false">
+                                    Proceed
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <input type="hidden" name="_xsrf" value="{{.Csrf}}" />
+
+                <input name="name" value="{{.Codebase.Name}}" type="hidden">
+
+            </form>
+        </div>
+    </section>
+    {{template "footer_template.html" .}}
+    {{template "modal_success_template.html" .}}
+    {{template "jira_issue_metadata_template.html" .}}
+</main>
+
+<script src="{{ .BasePath }}/static/js/jquery-3.6.0.js"></script>
+<script src="{{ .BasePath }}/static/js/popper.js"></script>
+<script src="{{ .BasePath }}/static/js/bootstrap.js"></script>
+<script src="{{ .BasePath }}/static/js/edit-codebase.js"></script>
+<script src="{{ .BasePath }}/static/js/bootstrap-notify.js"></script>
+<script src="{{ .BasePath }}/static/js/selectize.js"></script>
+<script src="{{ .BasePath }}/static/js/jira-util.js"></script>
+<script src="{{ .BasePath }}/static/js/jira-block-edit.js"></script>
+</body>
+</html>

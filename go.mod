@@ -21,6 +21,7 @@ require (
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
+	github.com/gorilla/csrf v1.7.1
 	github.com/jarcoal/httpmock v1.1.0
 	github.com/lib/pq v1.8.0
 	github.com/openshift/api v3.9.0+incompatible
@@ -134,6 +135,7 @@ require (
 require (
 	github.com/docker/docker v1.13.1 // indirect
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
+	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
 	github.com/pquerna/cachecontrol v0.0.0-20180517163645-1555304b9b35 // indirect
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
