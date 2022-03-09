@@ -5,6 +5,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
+
+	"edp-admin-console/internal/applog"
 )
 
 type cdPipelineResponse struct {
@@ -18,11 +20,11 @@ type codebaseBranchResponse struct {
 
 func (h *HandlerEnv) GetPipeline(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	logger := LoggerFromContext(ctx)
+	logger := applog.LoggerFromContext(ctx)
 	cdPipelineName := chi.URLParam(r, "pipelineName")
 	if cdPipelineName == "" {
 		logger.Error("pipeline not passed")
-		ErrNotFoundResponse(ctx, w, "pipeline not passed")
+		NotFoundResponse(ctx, w, "pipeline not passed")
 		return
 	}
 

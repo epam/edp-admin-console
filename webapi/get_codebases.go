@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"go.uber.org/zap"
+
+	"edp-admin-console/internal/applog"
 )
 
 type GetCodebasesResponse []CodebaseForList
@@ -27,7 +29,7 @@ type CodebaseForList struct {
 
 func (h *HandlerEnv) GetCodebases(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	logger := LoggerFromContext(ctx)
+	logger := applog.LoggerFromContext(ctx)
 	urlCodebases := r.URL.Query().Get("codebases")
 	if urlCodebases == "" {
 		logger.Error("codebases not passed")

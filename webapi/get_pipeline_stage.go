@@ -4,7 +4,9 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"go.uber.org/zap"
 
+	"edp-admin-console/internal/applog"
 	"edp-admin-console/internal/imagestream"
 	pipelinestage "edp-admin-console/internal/pipeline-stage"
 )
@@ -22,7 +24,7 @@ type Response struct {
 
 func (h *HandlerEnv) GetStagePipeline(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	logger := LoggerFromContext(ctx)
+	logger := applog.LoggerFromContext(ctx)
 	logger.Debug("in handler")
 
 	stageName := chi.URLParam(r, "stageName")
@@ -32,35 +34,36 @@ func (h *HandlerEnv) GetStagePipeline(w http.ResponseWriter, r *http.Request) {
 	partialStageView, err := pipelinestage.StageViewByCRName(ctx, h.NamespacedClient, stageCRName)
 	if err != nil {
 		logger.Error(err.Error())
-		ErrNotFoundResponse(ctx, w, "stage not found")
+		NotFoundResponse(ctx, w, "stage not found")
 		return
 	}
 
 	cdPipelineAppNames, err := pipelinestage.CdPipelineAppNamesByCRName(ctx, h.NamespacedClient, cdPipelineName)
 	if err != nil {
 		logger.Error(err.Error())
-		ErrNotFoundResponse(ctx, w, "cdPipeline not found")
+		NotFoundResponse(ctx, w, "cdPipeline not found")
 		return
 	}
 
 	inputIS, err := imagestream.GetInputISForStage(ctx, h.NamespacedClient, stageName, cdPipelineName)
 	if err != nil {
-		logger.Error(err.Error())
-		ErrNotFoundResponse(ctx, w, "input IS not found")
+		logger.Error("get input image stream failed", zap.Error(err),
+			zap.String("stage_name", stageName), zap.String("cd_pipeline_name", cdPipelineName))
+		NotFoundResponse(ctx, w, "input IS not found")
 		return
 	}
 
 	outputIS, err := imagestream.GetOutputISForStage(ctx, h.NamespacedClient, cdPipelineName, stageName)
 	if err != nil {
 		logger.Error(err.Error())
-		ErrNotFoundResponse(ctx, w, "output IS not found")
+		NotFoundResponse(ctx, w, "output IS not found")
 		return
 	}
 
 	applications, err := pipelinestage.BuildApplicationStages(ctx, h.NamespacedClient, inputIS, outputIS, cdPipelineAppNames)
 	if err != nil {
 		logger.Error(err.Error())
-		ErrNotFoundResponse(ctx, w, "inputIS and outputIS not the same size")
+		NotFoundResponse(ctx, w, "inputIS and outputIS not the same size")
 		return
 	}
 

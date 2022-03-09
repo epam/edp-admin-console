@@ -6,7 +6,10 @@ import (
 	"fmt"
 	"strings"
 
+	"edp-admin-console/internal/applog"
+
 	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	"go.uber.org/zap"
 
 	"edp-admin-console/k8s"
 )
@@ -27,11 +30,6 @@ func (err *EmptyImageStreamErr) Error() string {
 
 func NewEmptyImageStreamErr(crName string) *EmptyImageStreamErr {
 	return &EmptyImageStreamErr{crName: crName}
-}
-
-func AsEmptyImageStreamErr(err error) bool {
-	var emptyImageStreamEr *EmptyImageStreamErr
-	return errors.As(err, &emptyImageStreamEr)
 }
 
 // GetInputISForStage gets InputDockerStream list by CR Stage name
@@ -68,6 +66,7 @@ func GetInputISForStage(ctx context.Context, client *k8s.RuntimeNamespacedClient
 
 // inputCISListFromApplicationsToPromote gets ApplicationsToPromote list by CR Stage name
 func inputCISListFromApplicationsToPromote(ctx context.Context, client *k8s.RuntimeNamespacedClient, cdPipelineCR *cdPipeApi.CDPipeline, previousStageName string) ([]string, error) {
+	logger := applog.LoggerFromContext(ctx)
 	if cdPipelineCR.Spec.ApplicationsToPromote == nil {
 		return nil, NewEmptyImageStreamErr(cdPipelineCR.Name)
 	}
@@ -88,7 +87,7 @@ func inputCISListFromApplicationsToPromote(ctx context.Context, client *k8s.Runt
 	for _, cisName := range cisNames {
 		_, err := client.GetCodebaseImageStream(ctx, cisName)
 		if err != nil {
-			//TODO: add error logging
+			logger.Error("get codebase image stream failed", zap.Error(err), zap.String("cis_name", cisName))
 			continue
 		} else {
 			imageStream = append(imageStream, cisName)

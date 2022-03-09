@@ -6,10 +6,12 @@ import (
 	"net/http"
 
 	"go.uber.org/zap"
+
+	"edp-admin-console/internal/applog"
 )
 
 func OKJsonResponse(ctx context.Context, w http.ResponseWriter, data interface{}) {
-	logger := LoggerFromContext(ctx)
+	logger := applog.LoggerFromContext(ctx)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(data); err != nil {
@@ -22,8 +24,8 @@ func OKJsonResponse(ctx context.Context, w http.ResponseWriter, data interface{}
 	return
 }
 
-func ErrNotFoundResponse(ctx context.Context, w http.ResponseWriter, msg string) {
-	logger := LoggerFromContext(ctx)
+func NotFoundResponse(ctx context.Context, w http.ResponseWriter, msg string) {
+	logger := applog.LoggerFromContext(ctx)
 	w.WriteHeader(http.StatusNotFound)
 	_, wErr := w.Write([]byte(msg))
 	if wErr != nil {
@@ -32,7 +34,7 @@ func ErrNotFoundResponse(ctx context.Context, w http.ResponseWriter, msg string)
 }
 
 func BadRequestResponse(ctx context.Context, w http.ResponseWriter, msg string) {
-	logger := LoggerFromContext(ctx)
+	logger := applog.LoggerFromContext(ctx)
 	w.WriteHeader(http.StatusBadRequest)
 	_, wErr := w.Write([]byte(msg))
 	if wErr != nil {
@@ -41,17 +43,8 @@ func BadRequestResponse(ctx context.Context, w http.ResponseWriter, msg string) 
 }
 
 func InternalErrorResponse(ctx context.Context, w http.ResponseWriter, msg string) {
-	logger := LoggerFromContext(ctx)
+	logger := applog.LoggerFromContext(ctx)
 	w.WriteHeader(http.StatusInternalServerError)
-	_, wErr := w.Write([]byte(msg))
-	if wErr != nil {
-		logger.Error("write error response failed", zap.Error(wErr))
-	}
-}
-
-func NotFoundResponse(ctx context.Context, w http.ResponseWriter, msg string) {
-	logger := LoggerFromContext(ctx)
-	w.WriteHeader(http.StatusNotFound)
 	_, wErr := w.Write([]byte(msg))
 	if wErr != nil {
 		logger.Error("write error response failed", zap.Error(wErr))
