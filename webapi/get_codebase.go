@@ -8,6 +8,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 	k8sErrors "k8s.io/apimachinery/pkg/api/errors"
+
+	"edp-admin-console/internal/applog"
 )
 
 type GetCodebaseResponse GetCodebase
@@ -37,7 +39,7 @@ type CodebaseBranch struct {
 
 func (h *HandlerEnv) GetCodebase(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	logger := LoggerFromContext(ctx)
+	logger := applog.LoggerFromContext(ctx)
 	codebaseName := chi.URLParam(r, "codebaseName")
 	if codebaseName == "" {
 		logger.Error("codebase not passed")

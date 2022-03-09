@@ -10,12 +10,13 @@ import (
 	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	"go.uber.org/zap"
 
+	"edp-admin-console/internal/applog"
 	"edp-admin-console/util"
 )
 
 func (h *HandlerEnv) CreateApplication(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	logger := LoggerFromContext(ctx)
+	logger := applog.LoggerFromContext(ctx)
 	logger.Debug("in handler")
 
 	err := r.ParseForm()

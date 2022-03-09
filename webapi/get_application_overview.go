@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"path"
 
+	"edp-admin-console/internal/applog"
 	"edp-admin-console/models/query"
 )
 
@@ -37,7 +38,7 @@ type createApplicationOverviewData struct {
 
 func (h *HandlerEnv) ApplicationOverview(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
-	logger := LoggerFromContext(ctx)
+	logger := applog.LoggerFromContext(ctx)
 	user := UserFromContext(ctx)
 
 	applications := make([]Codebase, 0)

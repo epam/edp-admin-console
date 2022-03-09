@@ -7,10 +7,12 @@ import (
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
+
+	"edp-admin-console/internal/applog"
 )
 
 func (h *HandlerAuth) CallBack(writer http.ResponseWriter, request *http.Request) {
-	log := LoggerFromContext(request.Context())
+	log := applog.LoggerFromContext(request.Context())
 	log.Info("Start callback flow...")
 	ctx := request.Context()
 	authSessionID, ok := GetCookieByName(request, AuthSessionIDName)

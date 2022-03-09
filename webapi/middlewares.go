@@ -6,11 +6,12 @@ import (
 	"path"
 	"time"
 
-	"edp-admin-console/internal/config"
-
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
+
+	"edp-admin-console/internal/applog"
+	"edp-admin-console/internal/config"
 )
 
 const (
@@ -22,7 +23,7 @@ func WithLoggerMw(logger *zap.Logger) func(next http.Handler) http.Handler {
 	mw := func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
-			r = r.WithContext(ContextWithLogger(ctx, logger))
+			r = r.WithContext(applog.ContextWithLogger(ctx, logger))
 			next.ServeHTTP(w, r)
 		}
 		return http.HandlerFunc(fn)
@@ -34,7 +35,7 @@ func WithAuthN(tokenMap map[string]oauth2.TokenSource, urlMap map[string]string,
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-			log := LoggerFromContext(r.Context())
+			log := applog.LoggerFromContext(r.Context())
 			sessionID, ok := GetCookieByName(r, SessionIDName)
 			if !ok {
 				startAuth(w, r, stateMap, urlMap, oauth2config)
@@ -65,7 +66,7 @@ func WithAuthN(tokenMap map[string]oauth2.TokenSource, urlMap map[string]string,
 }
 
 func startAuth(w http.ResponseWriter, r *http.Request, stateMap map[string]string, urlMap map[string]string, oauth2config *config.AuthController) {
-	log := LoggerFromContext(r.Context())
+	log := applog.LoggerFromContext(r.Context())
 	state := uuid.New().String()
 	authSessionID := uuid.New().String()
 
@@ -90,7 +91,7 @@ func startAuth(w http.ResponseWriter, r *http.Request, stateMap map[string]strin
 }
 
 func GetCookieByName(r *http.Request, name string) (string, bool) {
-	log := LoggerFromContext(r.Context())
+	log := applog.LoggerFromContext(r.Context())
 	cookie, err := r.Cookie(name)
 	if err != nil {
 		log.Info("cant find cookie by name")
@@ -164,7 +165,7 @@ func WithAuthZ(tokenMap map[string]oauth2.TokenSource, authController *config.Au
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
-			log := LoggerFromContext(ctx)
+			log := applog.LoggerFromContext(ctx)
 			sessionID, ok := GetCookieByName(r, SessionIDName)
 			if !ok {
 				log.Error("cant find session id in cookie")

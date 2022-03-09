@@ -7,6 +7,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/csrf"
 	"go.uber.org/zap"
+
+	"edp-admin-console/internal/applog"
 )
 
 type EditCodebase struct {
@@ -41,7 +43,7 @@ type EditCodebaseTpl struct {
 
 func (h *HandlerEnv) GetCodebaseUpdate(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	logger := LoggerFromContext(ctx)
+	logger := applog.LoggerFromContext(ctx)
 
 	user := UserFromContext(ctx)
 

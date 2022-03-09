@@ -9,14 +9,15 @@ import (
 	"testing"
 	"time"
 
-	"edp-admin-console/internal/config"
-
 	"github.com/coreos/go-oidc"
 	"github.com/golang-jwt/jwt"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
+
+	"edp-admin-console/internal/applog"
+	"edp-admin-console/internal/config"
 )
 
 func testContextWithLogger(t *testing.T) context.Context {
@@ -25,7 +26,7 @@ func testContextWithLogger(t *testing.T) context.Context {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return ContextWithLogger(context.Background(), logger)
+	return applog.ContextWithLogger(context.Background(), logger)
 }
 
 func TestGetCookieByName(t *testing.T) {
@@ -75,7 +76,7 @@ type Verifier struct {
 	Payload []byte
 }
 
-func (v Verifier) VerifySignature(ctx context.Context, jwt string) (payload []byte, err error) {
+func (v Verifier) VerifySignature(_ context.Context, _ string) (payload []byte, err error) {
 	return v.Payload, nil
 }
 

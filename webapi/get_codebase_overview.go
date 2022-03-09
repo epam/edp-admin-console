@@ -9,6 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 
+	"edp-admin-console/internal/applog"
 	"edp-admin-console/internal/edpcomponent"
 	"edp-admin-console/util"
 	"edp-admin-console/util/consts"
@@ -80,7 +81,7 @@ type codebaseOverviewTpl struct {
 
 func (h *HandlerEnv) GetCodebaseOverview(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	logger := LoggerFromContext(ctx)
+	logger := applog.LoggerFromContext(ctx)
 	codebaseName := chi.URLParam(r, "codebaseName")
 	codebaseCR, err := h.NamespacedClient.GetCodebase(ctx, codebaseName)
 	if err != nil {
