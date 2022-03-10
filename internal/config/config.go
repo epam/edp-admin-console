@@ -3,10 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"time"
-
-	"edp-admin-console/util/consts"
 
 	"edp-admin-console/util"
 
@@ -26,6 +23,7 @@ const (
 	PerfDataSources       = "perfDataSources"
 	platformType          = "platformType"
 	vcsIntegrationEnabled = "vcsIntegrationEnabled"
+	XSRFEnable            = "EnableXSRF"
 )
 
 type AppConfig struct {
@@ -37,6 +35,7 @@ type AppConfig struct {
 	IsOpenshift             bool
 	IsVcsIntegrationEnabled bool
 	XSRFKey                 []byte
+	XSRFEnable              bool
 	Reference               Reference
 }
 
@@ -73,25 +72,21 @@ type AuthController struct {
 func SetupConfig(_ context.Context, _ string) (*AppConfig, error) {
 	authEnable, err := beego.AppConfig.Bool(AuthEnable)
 	if err != nil {
-		return nil, fmt.Errorf("read %s from config failed: %w", AuthEnable, err)
+		return nil, err
 	}
 	diagramPageEnabled, err := beego.AppConfig.Bool(DiagramPageEnabled)
 	if err != nil {
-		return nil, fmt.Errorf("read %s from config failed: %w", DiagramPageEnabled, err)
+		return nil, err
 	}
-
-	isVcsIntegrationEnabled, err := strconv.ParseBool(beego.AppConfig.String(vcsIntegrationEnabled))
+	xsrfEnable, err := beego.AppConfig.Bool(XSRFEnable)
 	if err != nil {
-		return nil, fmt.Errorf("read %s from config failed: %w", AuthEnable, err)
+		return nil, err
 	}
-
-	isOpenshift := beego.AppConfig.String(platformType) == consts.Openshift
 
 	integrationStrategies := util.GetValuesFromConfig(IntegrationStrategies)
 	if integrationStrategies == nil {
 		return nil, fmt.Errorf("read %s from config failed: %w", IntegrationStrategies, err)
 	}
-
 	buildTools := util.GetValuesFromConfig(BuildTools)
 	if buildTools == nil {
 		return nil, fmt.Errorf("read %s from config failed: %w", BuildTools, err)
@@ -116,16 +111,14 @@ func SetupConfig(_ context.Context, _ string) (*AppConfig, error) {
 	if perfDataSources == nil {
 		return nil, fmt.Errorf("read %s from config failed: %w", PerfDataSources, err)
 	}
-
 	config := &AppConfig{
-		RunMode:                 beego.AppConfig.String("runmode"),
-		EDPVersion:              beego.AppConfig.String("edpVersion"),
-		BasePath:                beego.AppConfig.String("basePath"),
-		AuthEnable:              authEnable,
-		DiagramPageEnabled:      diagramPageEnabled,
-		IsOpenshift:             isOpenshift,
-		IsVcsIntegrationEnabled: isVcsIntegrationEnabled,
-		XSRFKey:                 []byte(beego.AppConfig.String("XSRFKey")),
+		RunMode:            beego.AppConfig.String("runmode"),
+		EDPVersion:         beego.AppConfig.String("edpVersion"),
+		BasePath:           beego.AppConfig.String("basePath"),
+		AuthEnable:         authEnable,
+		DiagramPageEnabled: diagramPageEnabled,
+		XSRFKey:            []byte(beego.AppConfig.String("XSRFKey")),
+		XSRFEnable:         xsrfEnable,
 		Reference: Reference{
 			IntegrationStrategies: integrationStrategies,
 			BuildTools:            buildTools,

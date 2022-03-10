@@ -107,6 +107,18 @@ func (c *RuntimeNamespacedClient) UpdateCBBranchByCustomFields(ctx context.Conte
 	return err
 }
 
+// UpdateCodebaseByCustomFields updates only the custom fields of the Codebase CR.
+func (c *RuntimeNamespacedClient) UpdateCodebaseByCustomFields(ctx context.Context, crName string, spec codeBaseApi.CodebaseSpec, status codeBaseApi.CodebaseStatus) error {
+	codebaseBranch, err := c.GetCodebase(ctx, crName)
+	if err != nil {
+		return err
+	}
+	codebaseBranch.Status = status
+	codebaseBranch.Spec = spec
+	err = c.Update(ctx, codebaseBranch)
+	return err
+}
+
 // CreateCBBranchByCustomFields creates CodebaseBranch CR by custom fields and name
 func (c *RuntimeNamespacedClient) CreateCBBranchByCustomFields(ctx context.Context, crName string, spec codeBaseApi.CodebaseBranchSpec, status codeBaseApi.CodebaseBranchStatus) error {
 	if c.Namespace == "" {
@@ -209,6 +221,9 @@ func (c *RuntimeNamespacedClient) GetCodebaseImageStream(ctx context.Context, cr
 
 // GetCodebase retrieves a Codebase structure ptr for the given custom resource name from the Kubernetes Cluster CR.
 func (c *RuntimeNamespacedClient) GetCodebase(ctx context.Context, crName string) (*codeBaseApi.Codebase, error) {
+	if c.Namespace == "" {
+		return nil, NemEmptyNamespaceErr("client namespace is not set")
+	}
 	codebase := &codeBaseApi.Codebase{}
 	nsn := types.NamespacedName{
 		Name:      crName,

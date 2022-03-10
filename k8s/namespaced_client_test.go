@@ -265,6 +265,69 @@ func TestNamespacedClient_GetCBBranch_BadClient(t *testing.T) {
 	assert.ErrorAs(t, err, &emptyNamespaceErr)
 }
 
+func TestNamespacedClient_UpdateCodebaseByCustomFields_BadClient(t *testing.T) {
+	branchName := "master"
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.Codebase{})
+
+	initCR := createCodebaseCR(ns)
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(initCR).Build()
+	spec := codeBaseApi.CodebaseSpec{
+		DefaultBranch: branchName,
+	}
+	k8sClient := RuntimeNamespacedClient{
+		Client: client,
+	}
+
+	err := k8sClient.UpdateCodebaseByCustomFields(ctx, name, spec, codeBaseApi.CodebaseStatus{})
+	var emptyNamespaceErr *EmptyNamespaceErr
+	assert.ErrorAs(t, err, &emptyNamespaceErr)
+}
+
+func TestNamespacedClient_UpdateCodebaseByCustomFields_NotExist(t *testing.T) {
+	branchName := "master"
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.Codebase{})
+
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects().Build()
+	spec := codeBaseApi.CodebaseSpec{
+		DefaultBranch: branchName,
+	}
+
+	k8sClient, err := NewRuntimeNamespacedClient(client, ns)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = k8sClient.UpdateCodebaseByCustomFields(ctx, name, spec, codeBaseApi.CodebaseStatus{})
+	assert.Error(t, err)
+	assert.True(t, k8serrors.IsNotFound(err))
+}
+
+func TestNamespacedClient_UpdateCodebaseByCustomFields(t *testing.T) {
+	branchName := "master"
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &codeBaseApi.Codebase{})
+
+	initCR := createCodebaseCR(ns)
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(initCR).Build()
+	spec := codeBaseApi.CodebaseSpec{
+		DefaultBranch: branchName,
+	}
+
+	k8sClient, err := NewRuntimeNamespacedClient(client, ns)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = k8sClient.UpdateCodebaseByCustomFields(ctx, name, spec, codeBaseApi.CodebaseStatus{})
+	assert.NoError(t, err)
+	codebase, err := k8sClient.GetCodebase(ctx, name)
+	assert.NoError(t, err)
+	assert.Equal(t, branchName, codebase.Spec.DefaultBranch)
+}
+
 func TestNamespacedClient_UpdateCBBranchByCustomFields_BadClient(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()

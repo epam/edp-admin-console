@@ -390,7 +390,7 @@
                 </div>
                 <div class="modal-body create-new-branch-modal">
                     <form id="create-branch-action"
-                          action="{{ .BasePath }}/admin/edp/codebase/{{.Codebase.Name}}/branch"
+                          action="{{ .BasePath }}/v2/admin/edp/codebase/{{.Codebase.Name}}/branch"
                           method="post">
                         {{if .Codebase.StartVersioningFrom}}
                             <div class="form-group">

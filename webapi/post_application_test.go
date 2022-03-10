@@ -101,6 +101,7 @@ func (s *CreateApplicationSuite) TestCreateApplication() {
 		Header("location").
 		Equal(fmt.Sprintf("%s/v2/admin/edp/application/overview?%s=%s#codebaseSuccessModal", s.Handler.Config.BasePath, "waitingforcodebase", appName))
 	codebase, err := s.Handler.NamespacedClient.GetCodebase(context.Background(), appName)
+	assert.NoError(t, err)
 
 	expectedJiraIssueMetadata := fmt.Sprintf(`{"%s":"%s","%s":"%s"}`, fields[0], patterns[0], fields[1], patterns[1])
 
