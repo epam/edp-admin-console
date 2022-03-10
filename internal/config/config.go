@@ -23,7 +23,7 @@ const (
 	PerfDataSources       = "perfDataSources"
 	platformType          = "platformType"
 	vcsIntegrationEnabled = "vcsIntegrationEnabled"
-	XSRFEnable            = "EnableXSRF"
+	EnableXSRF            = "EnableXSRF"
 )
 
 type AppConfig struct {
@@ -35,7 +35,7 @@ type AppConfig struct {
 	IsOpenshift             bool
 	IsVcsIntegrationEnabled bool
 	XSRFKey                 []byte
-	XSRFEnable              bool
+	XSRFEnabled             bool
 	Reference               Reference
 }
 
@@ -78,10 +78,6 @@ func SetupConfig(_ context.Context, _ string) (*AppConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	xsrfEnable, err := beego.AppConfig.Bool(XSRFEnable)
-	if err != nil {
-		return nil, err
-	}
 
 	integrationStrategies := util.GetValuesFromConfig(IntegrationStrategies)
 	if integrationStrategies == nil {
@@ -111,6 +107,12 @@ func SetupConfig(_ context.Context, _ string) (*AppConfig, error) {
 	if perfDataSources == nil {
 		return nil, fmt.Errorf("read %s from config failed: %w", PerfDataSources, err)
 	}
+
+	xsrfEnabled, err := beego.AppConfig.Bool(EnableXSRF)
+	if err != nil {
+		return nil, err
+	}
+
 	config := &AppConfig{
 		RunMode:            beego.AppConfig.String("runmode"),
 		EDPVersion:         beego.AppConfig.String("edpVersion"),
@@ -118,7 +120,6 @@ func SetupConfig(_ context.Context, _ string) (*AppConfig, error) {
 		AuthEnable:         authEnable,
 		DiagramPageEnabled: diagramPageEnabled,
 		XSRFKey:            []byte(beego.AppConfig.String("XSRFKey")),
-		XSRFEnable:         xsrfEnable,
 		Reference: Reference{
 			IntegrationStrategies: integrationStrategies,
 			BuildTools:            buildTools,
@@ -127,6 +128,7 @@ func SetupConfig(_ context.Context, _ string) (*AppConfig, error) {
 			CiTools:               ciTools,
 			PerfDataSources:       perfDataSources,
 		},
+		XSRFEnabled: xsrfEnabled,
 	}
 	return config, nil
 }

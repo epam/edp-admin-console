@@ -21,7 +21,7 @@ func TestSetupConfig(t *testing.T) {
 	mustSetAppConfig(t, DeploymentScript, DeploymentScript)
 	mustSetAppConfig(t, CiTools, CiTools)
 	mustSetAppConfig(t, PerfDataSources, PerfDataSources)
-	mustSetAppConfig(t, XSRFEnable, "false")
+	mustSetAppConfig(t, EnableXSRF, "false")
 
 	ctx := context.Background()
 	emptyStr := ""

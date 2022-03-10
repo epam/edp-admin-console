@@ -29,6 +29,8 @@ const (
 	CdPipelineRegistrationAction = "cd_pipeline_registration"
 	SuccessResult                = "success"
 	InactiveValue                = "inactive"
+
+	IssuesLinksKey = "issuesLinks"
 )
 
 var DefaultBuildNumber = "0"

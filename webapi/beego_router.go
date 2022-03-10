@@ -391,11 +391,18 @@ func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.L
 				applicationRoute.Get("/create", handlerEnv.CreateApplicationPage)
 			})
 			edpScope.Route("/codebase/{codebaseName}", func(codebaseRoute chi.Router) {
-				if handlerEnv.Config.XSRFEnable {
-					codebaseRoute.Use(csrf.Protect(handlerEnv.Config.XSRFKey, csrf.CookieName("_edp_csrf")))
+				if handlerEnv.Config.XSRFEnabled {
+					codebaseRoute.Use(
+						csrf.Protect(
+							handlerEnv.Config.XSRFKey,
+							csrf.CookieName("_edp_csrf"),
+							csrf.FieldName("_xsrf"),
+						),
+					)
 				}
 				codebaseRoute.Get("/overview", handlerEnv.GetCodebaseOverview)
 				codebaseRoute.Get("/update", handlerEnv.GetCodebaseUpdate)
+				codebaseRoute.Post("/update", handlerEnv.PostCodebaseUpdate)
 				codebaseRoute.Post("/branch", handlerEnv.CreateBranch)
 			})
 		})

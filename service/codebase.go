@@ -18,6 +18,18 @@ package service
 
 import (
 	ctx "context"
+	"encoding/json"
+	"fmt"
+	"strings"
+	"time"
+
+	edpv1alpha1 "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	"github.com/pkg/errors"
+	"go.uber.org/zap"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	coreV1Client "k8s.io/client-go/kubernetes/typed/core/v1"
+
 	"edp-admin-console/context"
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
@@ -31,16 +43,6 @@ import (
 	"edp-admin-console/util"
 	"edp-admin-console/util/consts"
 	dberror "edp-admin-console/util/error/db-errors"
-	"encoding/json"
-	"fmt"
-	edpv1alpha1 "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/pkg/errors"
-	"go.uber.org/zap"
-	"k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	coreV1Client "k8s.io/client-go/kubernetes/typed/core/v1"
-	"strings"
-	"time"
 )
 
 var clog = logger.GetLogger()
@@ -52,8 +54,6 @@ type CodebaseService struct {
 	BranchService         cbs.CodebaseBranchService
 	PerfService           perfboard.PerfBoard
 }
-
-const issuesLinksKey = "issuesLinks"
 
 func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*edpv1alpha1.Codebase, error) {
 	clog.Info("start creating Codebase resource", zap.String("name", codebase.Name))
@@ -160,7 +160,7 @@ func (s CodebaseService) GetCodebaseByName(name string) (*query.Codebase, error)
 	}
 
 	if c.JiraServer != nil && c.JiraIssueMetadataPayload != nil {
-		payload, err := getFieldMap(*c.JiraIssueMetadataPayload, []string{issuesLinksKey})
+		payload, err := getFieldMap(*c.JiraIssueMetadataPayload, []string{consts.IssuesLinksKey})
 		if err != nil {
 			return nil, err
 		}

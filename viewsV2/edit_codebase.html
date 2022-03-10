@@ -21,9 +21,9 @@
         <div class="flex-fill pl-4 pr-4 wrapper">
 
             <form class="edp-form" id="updateCodebase" method="post"
-                  action="{{ .BasePath }}/admin/edp/codebase/{{.Codebase.Name}}/update">
+                  action="{{ .BasePath }}/v2/admin/edp/codebase/{{.Codebase.Name}}/update">
                 <h1 class="edp-form-header">
-                    <a href="{{ .BasePath }}/admin/edp/{{.Codebase.Type}}/overview" class="edp-back-link"></a>
+                    <a href="{{ .BasePath }}/v2/admin/edp/{{.Codebase.Type}}/overview" class="edp-back-link"></a>
                     Edit Codebase
                 </h1>
                 <p>Edit pattern to validate commit messages.</p>

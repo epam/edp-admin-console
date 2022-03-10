@@ -76,6 +76,10 @@ func OkHTMLResponse(ctx context.Context, writer http.ResponseWriter, t *Template
 	}
 }
 
+func FoundRedirectResponse(w http.ResponseWriter, r *http.Request, redirectURI string) {
+	http.Redirect(w, r, redirectURI, http.StatusFound)
+}
+
 type Template struct {
 	Data             interface{}
 	FuncMap          template.FuncMap

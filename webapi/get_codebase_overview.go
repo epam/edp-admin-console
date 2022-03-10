@@ -1,6 +1,7 @@
 package webapi
 
 import (
+	"encoding/json"
 	"net/http"
 	"path"
 	"time"
@@ -55,7 +56,7 @@ type codebase struct {
 	JiraServer           *string
 	CommitMessagePattern *string
 	TicketNamePattern    *string
-	JiraIssueFields      *string
+	JiraIssueFields      map[string]interface{}
 	Perf                 *codeBaseApi.Perf
 	Status               string
 	Type                 string
@@ -155,6 +156,13 @@ func (h *HandlerEnv) GetCodebaseOverview(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
+	metaDataPayload := pointerToStr(codebaseCR.Spec.JiraIssueMetadataPayload)
+	jiraIssueFields, err := PayloadToFieldMapWithExclude(metaDataPayload, []string{consts.IssuesLinksKey})
+	if err != nil {
+		logger.Error("convert jiraIssueMetadata to map failed", zap.Error(err), zap.String("payload", metaDataPayload))
+		InternalErrorResponse(ctx, w, "get codebase branch list by name failed")
+		return
+	}
 	var tmplData = codebaseOverviewTpl{
 		BasePath:           h.Config.BasePath,
 		EDPVersion:         h.Config.BasePath,
@@ -187,7 +195,7 @@ func (h *HandlerEnv) GetCodebaseOverview(w http.ResponseWriter, r *http.Request)
 			JiraServer:           codebaseCR.Spec.JiraServer,
 			CommitMessagePattern: codebaseCR.Spec.CommitMessagePattern,
 			TicketNamePattern:    codebaseCR.Spec.TicketNamePattern,
-			JiraIssueFields:      codebaseCR.Spec.JiraIssueMetadataPayload, // TODO convert string to map
+			JiraIssueFields:      jiraIssueFields,
 			Perf:                 codebaseCR.Spec.Perf,
 			Status:               codebaseCR.Status.Value,
 			Type:                 codebaseCR.Spec.Type,
@@ -218,4 +226,20 @@ func getCiLink(codebase *codeBaseApi.Codebase, jenkinsHost, branch, gitHost stri
 		return util.CreateCICDApplicationLink(jenkinsHost, codebase.Name, util.ProcessNameToKubernetesConvention(branch))
 	}
 	return util.CreateGitlabCILink(gitHost, *codebase.Spec.GitUrlPath)
+}
+
+func PayloadToFieldMapWithExclude(payload string, keysToDelete []string) (map[string]interface{}, error) {
+	requestPayload := make(map[string]interface{})
+	if len(payload) == 0 {
+		return make(map[string]interface{}), nil
+	}
+	if err := json.Unmarshal([]byte(payload), &requestPayload); err != nil {
+		return nil, err
+	}
+	for k := range requestPayload {
+		if keysToDelete != nil && util.Contains(keysToDelete, k) {
+			delete(requestPayload, k)
+		}
+	}
+	return requestPayload, nil
 }

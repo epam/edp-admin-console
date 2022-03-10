@@ -45,9 +45,9 @@ func TestCreateBranchSuite(t *testing.T) {
 	}
 	workingDir, _ := path.Split(currentDir)
 	conf := &config.AppConfig{
-		BasePath:   "/",
-		AuthEnable: false,
-		XSRFEnable: false,
+		BasePath:    "/",
+		AuthEnable:  false,
+		XSRFEnabled: false,
 	}
 	h := NewHandlerEnv(WithClient(namespacedClient), WithWorkingDir(workingDir), WithFuncMap(CreateCommonFuncMap()), WithConfig(conf))
 	logger := applog.GetLogger()

@@ -21,6 +21,8 @@ $(function () {
                 showNotification(true, `Codebase ${codebase} was marked for deletion.`);
             } else if (anchor === '#codebaseUpdateSuccessModal') {
                 showNotification(true, 'The codebase has been updated successfully.');
+            } else if (anchor === 'codebaseUpdateErrorModal') {
+                showNotification(false, 'Update codebase failed.');
             }
             location.hash = '';
         }

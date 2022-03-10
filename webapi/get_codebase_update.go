@@ -4,11 +4,12 @@ import (
 	"net/http"
 	"path"
 
+	"edp-admin-console/internal/applog"
+	"edp-admin-console/util/consts"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/csrf"
 	"go.uber.org/zap"
-
-	"edp-admin-console/internal/applog"
 )
 
 type EditCodebase struct {
@@ -55,14 +56,25 @@ func (h *HandlerEnv) GetCodebaseUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	metaDataPayload := pointerToStr(crCodebase.Spec.JiraIssueMetadataPayload)
+	jiraIssueFieldsPayload, err := PayloadToFieldMapWithExclude(metaDataPayload, []string{consts.IssuesLinksKey})
+	if err != nil {
+		logger.Error("convert jiraIssueMetadata to map failed", zap.Error(err), zap.String("payload", metaDataPayload))
+		InternalErrorResponse(ctx, w, "get codebase branch list by name failed")
+		return
+	}
+	jiraIssueFields := false
+	if len(jiraIssueFieldsPayload) != 0 {
+		jiraIssueFields = true
+	}
 	editCodebase := &EditCodebase{
 		Name:                     crCodebase.GetName(),
 		Type:                     crCodebase.Spec.Type,
 		JiraServer:               pointerToStr(crCodebase.Spec.JiraServer),
 		CommitMessagePattern:     pointerToStr(crCodebase.Spec.CommitMessagePattern),
 		TicketNamePattern:        pointerToStr(crCodebase.Spec.TicketNamePattern),
-		JiraIssueFields:          false, // TODO: investigate usage
-		JiraIssueMetadataPayload: pointerToStr(crCodebase.Spec.JiraIssueMetadataPayload),
+		JiraIssueFields:          jiraIssueFields,
+		JiraIssueMetadataPayload: metaDataPayload,
 	}
 
 	crJiraServers, err := h.NamespacedClient.JiraServersList(ctx)
