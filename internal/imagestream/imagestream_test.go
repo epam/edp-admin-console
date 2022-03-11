@@ -325,6 +325,7 @@ func TestGetOutputISForStage_GetErr(t *testing.T) {
 	assert.Error(t, err)
 	assert.Nil(t, imageStreams)
 }
+
 func TestGetOutputISForStage_EmptyIsErr(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
@@ -346,6 +347,7 @@ func TestGetOutputISForStage_EmptyIsErr(t *testing.T) {
 	assert.ErrorAs(t, err, &emptyImageStreamEr)
 	assert.Nil(t, imageStreams)
 }
+
 func TestGetOutputISForStage(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
@@ -369,4 +371,47 @@ func TestGetOutputISForStage(t *testing.T) {
 	imageStreams, err := GetOutputISForStage(ctx, k8sClient, cdPipelineName, name)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedIS, imageStreams)
+}
+
+func TestOutputCBStreamsForCodebaseNames_OK(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion,
+		&codeBaseApi.CodebaseImageStream{}, &codeBaseApi.CodebaseImageStreamList{},
+	)
+
+	codebaseName_1 := "gotest"
+	cbImageStream_1 := codeBaseApi.CodebaseImageStream{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "cbImageStream_1",
+			Namespace: ns,
+		},
+		Spec: codeBaseApi.CodebaseImageStreamSpec{
+			Codebase: codebaseName_1,
+		},
+	}
+	cbImageStream_2 := codeBaseApi.CodebaseImageStream{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "cbImageStream_2",
+			Namespace: ns,
+		},
+		Spec: codeBaseApi.CodebaseImageStreamSpec{
+			Codebase: "garbage",
+		},
+	}
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&cbImageStream_1, &cbImageStream_2).Build()
+	k8sClient, err := k8s.NewRuntimeNamespacedClient(client, ns)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedResult := map[string][]codeBaseApi.CodebaseImageStream{
+		codebaseName_1: {
+			cbImageStream_1,
+		},
+	}
+	codebaseNames := []string{codebaseName_1}
+	cbBranchesMap, err := OutputCBStreamsForCodebaseNames(ctx, k8sClient, codebaseNames)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedResult, cbBranchesMap)
 }

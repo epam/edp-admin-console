@@ -11,6 +11,7 @@ const (
 	//Codebase types
 	Application = "application"
 	Autotest    = "autotests"
+	Library     = "library"
 
 	//Kinds
 	CodebasePlural       = "codebases"
@@ -29,8 +30,10 @@ const (
 	CdPipelineRegistrationAction = "cd_pipeline_registration"
 	SuccessResult                = "success"
 	InactiveValue                = "inactive"
+	ActiveValue                  = "active"
 
 	IssuesLinksKey = "issuesLinks"
+	CDMenuItem     = "delivery"
 )
 
 var DefaultBuildNumber = "0"

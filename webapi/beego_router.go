@@ -405,6 +405,9 @@ func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.L
 				codebaseRoute.Post("/update", handlerEnv.PostCodebaseUpdate)
 				codebaseRoute.Post("/branch", handlerEnv.CreateBranch)
 			})
+			edpScope.Route("/cd-pipeline", func(cdScope chi.Router) {
+				cdScope.Get("/create", handlerEnv.GetCDCreatePage)
+			})
 		})
 		baseRouter.Route("/v2", func(r chi.Router) {
 			r.Get("/", handlerEnv.Index)

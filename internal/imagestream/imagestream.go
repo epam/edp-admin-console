@@ -7,11 +7,11 @@ import (
 	"strings"
 
 	"edp-admin-console/internal/applog"
+	"edp-admin-console/k8s"
 
 	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	"go.uber.org/zap"
-
-	"edp-admin-console/k8s"
 )
 
 const (
@@ -138,4 +138,25 @@ func findPreviousStageName(annotations map[string]string) (string, error) {
 // createStageCrName: creates a full stageName for stage CR
 func createStageCrName(cdPipelineName, stageName string) string {
 	return fmt.Sprintf("%s-%s", cdPipelineName, stageName)
+}
+
+func OutputCBStreamsForCodebaseNames(ctx context.Context, k8sClient *k8s.RuntimeNamespacedClient, codebaseNames []string) (map[string][]codeBaseApi.CodebaseImageStream, error) {
+	cbStreams, err := k8sClient.CodebaseImageStreamList(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	cdNamesMap := make(map[string]struct{})
+	for _, name := range codebaseNames {
+		cdNamesMap[name] = struct{}{}
+	}
+
+	codebaseStreams := make(map[string][]codeBaseApi.CodebaseImageStream)
+	for _, cbStream := range cbStreams {
+		codebaseName := cbStream.Spec.Codebase
+		if _, ok := cdNamesMap[codebaseName]; ok {
+			codebaseStreams[codebaseName] = append(codebaseStreams[codebaseName], cbStream)
+		}
+	}
+	return codebaseStreams, nil
 }

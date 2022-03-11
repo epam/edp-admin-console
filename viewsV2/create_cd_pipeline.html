@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EDP Admin Console</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/index.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/cd-pipeline.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/validation.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/circle.css">
+</head>
+<body>
+<main>
+    {{template "header_template.html" .}}
+    <section class="content d-flex">
+        <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
+            {{template "navbar_template.html" .}}
+        </aside>
+        <div class="flex-fill pl-4 pr-4 wrapper">
+
+            <form class="edp-form" id="createCDCR" method="post" action="{{ .BasePath }}/admin/edp/cd-pipeline">
+                <h1 class="edp-form-header">
+                    <a href="{{ .BasePath }}/v2/admin/edp/cd-pipeline/overview" class="edp-back-link"></a>
+                    Create CD Pipeline
+                </h1>
+                <p>Select which applications within this pipeline user wants to deploy.</p>
+
+                {{if .Error}}
+                    <div class="backend-validation-error">
+                        {{.Error}}
+                    </div>
+                {{end}}
+
+                <div class="accordion" id="accordionCreatePipeline">
+
+                    <div class="card pipeline-block">
+                        <div class="card-header" id="headingOne" data-toggle="collapse"
+                             aria-expanded="true" aria-controls="collapseOne" data-target="#collapseOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button">
+                                    Pipeline
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                             data-parent="#accordionCreatePipeline">
+                            <div class="card-body">
+                                <div class="form-group pipeline-name">
+                                    <label for="pipelineName">Pipeline Name:</label>
+                                    <input name="pipelineName" type="text" class="form-control"
+                                           id="pipelineName"
+                                           placeholder="Enter pipeline name ">
+                                    <div class="invalid-feedback pipeline-name-validation">
+                                        Pipeline name may contain only: lower-case letters, numbers and dashes
+                                        and
+                                        cannot start
+                                        and end with dash and dot. Minimum 2 characters.
+                                    </div>
+                                </div>
+
+                                <div class="form-group deploymentType">
+                                    <label for="deploymentType">Deployment Type:</label>
+                                    <select title="Deployment Type"
+                                            class="deploymentType selectpicker form-control"
+                                            name="deploymentType"
+                                            id="deploymentType">
+                                        <option value="container">Container</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                </div>
+
+                                <button type="button" class="pipeline-info-button edp-submit-form-btn btn btn-primary"
+                                        data-toggle="collapse"
+                                        data-target="#collapseTwo" aria-expanded="false"
+                                        aria-controls="collapseOne">
+                                    Proceed
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card application-block">
+                        <div class="card-header collapsed" id="headingTwo" data-toggle="collapse"
+                             aria-expanded="false" aria-controls="collapseTwo" data-target="#collapseTwo">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button">
+                                    Applications
+                                </button>
+                            </h5>
+                        </div>
+
+                        <div id="collapseTwo" class="collapse"
+                             aria-expanded="false" aria-controls="collapseTwo"
+                             data-parent="#accordionCreatePipeline">
+                            <div class="card-body">
+                                {{range .Apps}}
+                                    {{if ne (len .CodebaseBranch) 0}}
+                                        <div class="row">
+                                            <div class="form-group col-sm-4">
+                                                <div class="custom-control custom-checkbox application-checkbox">
+                                                    <input type="checkbox" class="custom-control-input app-name-checkbox"
+                                                           id="{{.Name}}"
+                                                           name="app" value="{{.Name}}">
+                                                    <label class="custom-control-label"
+                                                           for="{{.Name}}">{{.Name}}</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group col-sm-4">
+                                                <select title="Input Docker Streams"
+                                                        class="release-branch selectpicker select-{{.Name}} form-control"
+                                                        name="{{.Name}}" disabled>
+                                                    {{range $i, $rb := .CodebaseBranch}}
+                                                        {{range $rb.CodebaseDockerStream}}
+                                                            <option value="{{.OcImageStreamName}}">{{.OcImageStreamName}}</option>
+                                                        {{end}}
+                                                    {{end}}
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group col-sm-4">
+                                                <div class="custom-control custom-checkbox application-checkbox">
+                                                    <input type="checkbox"
+                                                           class="custom-control-input app-checkbox checkbox-{{.Name}}"
+                                                           id="{{.Name}}-promote"
+                                                           name="{{.Name}}-promote" value="true" checked disabled>
+                                                    <label class="custom-control-label"
+                                                           for="{{.Name}}-promote">Promote in pipeline</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {{end}}
+                                {{end}}
+                                <div class="invalid-feedback app-checkbox-error">
+                                    At least one checkbox must be checked.
+                                </div>
+                                <button type="button"
+                                        class="application-info-button edp-submit-form-btn btn btn-primary"
+                                        data-toggle="collapse"
+                                        data-target="#collapseThree" aria-expanded="false"
+                                        aria-controls="collapseTwo">
+                                    Proceed
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card stage-block">
+                        <div class="card-header collapsed" id="headingThree" data-toggle="collapse"
+                             aria-expanded="false" aria-controls="collapseThree" data-target="#collapseThree">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button">
+                                    Stages
+                                </button>
+                            </h5>
+                        </div>
+
+                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree"
+                             data-parent="#accordionCreatePipeline">
+                            <div class="card-body">
+
+                                <div class="stages-list">
+
+                                </div>
+
+                                {{if .Error}}
+                                    <div class="backend-validation-error">
+                                        {{.Error}}
+                                    </div>
+                                {{end}}
+
+                                <div class="form-group">
+                                    <button type="button" class="add-stage-modal circle plus"></button>
+                                </div>
+
+                                <div class="invalid-feedback stage-error">
+                                    At least one stage must be added.
+                                </div>
+
+                                <div class="form-buttons-footer-left form-buttons-footer-block">
+                                    <button type="submit"
+                                            class="create-cd-pipeline edp-submit-form-btn btn btn-primary">
+                                        Create
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <input type="hidden" name="_xsrf" value="{{.Csrf}}" />
+            </form>
+        </div>
+    </section>
+    {{template "footer_template.html" .}}
+    {{template "modal_success_template.html" .}}
+
+    <!-- Modal add stage -->
+    <div class="modal fade" id="stage-creation" tabindex="-1" role="dialog" aria-labelledby="stageCreationPopupLabel"
+         aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content modal-size modal-size-adding-stages">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="add-header">ADDING STAGE</h5>
+                    <h5 class="modal-title" id="edit-header" style="display: none">EDITING STAGE</h5>
+                    <button type="button" class="close stage-modal-close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body modal-size modal-size-adding-stages scroll-y">
+                    <div class="form-group">
+                        <label for="stageName">Stage name
+                            <span class="tooltip-icon" data-toggle="tooltip"
+                                  data-placement="top" title=""
+                                  data-original-title="Pipeline stage name"></span></label>
+                        <input type="text" class="form-control" id="stageName" placeholder="Enter stage name">
+                        <div class="invalid-feedback stage-name-msg">
+                            Stage name may contain only: lower-case letters, numbers and dashes and cannot start and end
+                            with dash. Minimum 2 characters.
+                        </div>
+                        <div class="invalid-feedback stage-added-msg">
+                            Stage with this name is already added.
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="stageDesc">Description
+                            <span class="tooltip-icon" data-toggle="tooltip"
+                                  data-placement="top" title=""
+                                  data-original-title="Stage description"></span>
+                        </label>
+                        <input type="text" class="form-control" id="stageDesc" placeholder="Enter stage description">
+                        <div class="invalid-feedback">
+                            Can not be empty.
+                        </div>
+                    </div>
+
+                    <div class="quality-gate-row">
+                        <div class="d-flex justify-content-start">
+                            <div class="form-group w-20 mr-4 ml-0 mb-2">
+                                <label for="qualityGateType"
+                                       class="qualityGateTypeLabel">Quality gate type
+                                    <span class="tooltip-icon" data-toggle="tooltip"
+                                          data-placement="top" title=""
+                                          data-original-title="Select quality gate type"></span>
+                                </label>
+                                <select class="form-control element-width qualityGateType" id="qualityGateType">
+                                    <option value="manual">Manual</option>
+                                    <option value="autotests" {{if not .Autotests}}disabled{{end}}>Autotests</option>
+                                </select>
+                            </div>
+                            <div class="form-group w-25 mr-4 ml-6 mb-2">
+                                <label for="nameOfStep"
+                                       class="nameOfStepLabel">Step name
+                                    <span class="tooltip-icon" data-toggle="tooltip"
+                                          data-placement="top" title=""
+                                          data-original-title="Define quality gate step name"></span>
+                                </label>
+                                <input type="text" class="form-control element-width nameOfStep" id="nameOfStep"
+                                       placeholder="Enter step name">
+                            </div>
+
+                            {{if .Autotests}}
+                                <div class="form-group w-25 mr-4 ml-6 mb-2 autotest-block-el hide-element">
+                                    <label class="autotestLabel">Autotests
+                                        <span class="tooltip-icon" data-toggle="tooltip"
+                                              data-placement="top" title=""
+                                              data-original-title="Select autotest for stage"></span>
+                                    </label>
+                                    <select class="form-control element-width autotest-projects">
+                                        {{range .Autotests}}
+                                            <option value="{{.Name}}">{{.Name}}</option>
+                                        {{end}}
+                                    </select>
+                                </div>
+
+                                <div class="form-group w-25 mr-4 ml-6 mb-2 autotest-block-el hide-element">
+                                    <label class="branchLabel">Branch
+                                        <span class="tooltip-icon" data-toggle="tooltip"
+                                              data-placement="top" title=""
+                                              data-original-title="Select branch for autotest"></span>
+                                    </label>
+                                    {{range $autotest := .Autotests}}
+                                        {{if .CodebaseBranch}}
+                                            <select data-selected-autotest="{{$autotest.Name}}"
+                                                    class="form-control element-width autotest-branches">
+                                                {{range .CodebaseBranch}}
+                                                    <option value="{{.Name}}">{{.Name}}</option>
+                                                {{end}}
+                                            </select>
+                                        {{end}}
+                                    {{end}}
+                                </div>
+                            {{end}}
+
+                            <button type="button" class="delete remove-quality-gate-type hide-element">
+                                <i class="icon-trashcan"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="invalid-feedback step-name-validation-msg">
+                        One or more steps are invalid. Step name may contain only: lower-case letters, numbers and
+                        dashes and cannot start and end with
+                        dash. Minimum 2 characters.
+                    </div>
+
+                    <div class="invalid-feedback duplicate-step-name-validation-msg">
+                        There's duplicate of step name.
+                    </div>
+
+                    <button type="button" class="add-quality-gate-row circle plus"></button>
+
+                    <div class="d-flex flex-column justify-content-start">
+                        <div class="d-flex">
+                            <div class="form-group w-50 mb-2">
+                                <label for="triggerType">Trigger type
+                                    <span class="tooltip-icon" data-toggle="tooltip"
+                                          data-placement="top" title=""
+                                          data-original-title="Stage provisioning trigger type"></span>
+                                </label>
+                                <select class="form-control" id="triggerType">
+                                    <option>Manual</option>
+                                    <option>Auto</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-library-row">
+                        <div class="d-flex flex-column justify-content-start">
+                            <div class="d-flex">
+                                <div class="form-group w-25 mr-4 mb-2">
+                                    <label for="pipelineLibrary">Groovy-pipeline library
+                                        <span class="tooltip-icon" data-toggle="tooltip"
+                                              data-placement="top" title=""
+                                              data-original-title="Groovy pipeline library for Stage"></span>
+                                    </label>
+                                    <select class="form-control element-width pipeline-library" id="pipeline-library">
+                                        <option value="default">EDP default</option>
+                                        {{if .GroovyLibs}}
+                                            {{range .GroovyLibs}}
+                                                <option value="{{.Name}}">{{.Name}}</option>
+                                            {{end}}
+                                        {{end}}
+                                    </select>
+                                </div>
+                                <div class="form-group w-25 mr-4 mb-2 branch-block-el hide-element">
+                                    <label class="branchLabel">Branch
+                                        <span class="tooltip-icon" data-toggle="tooltip"
+                                              data-placement="top" title=""
+                                              data-original-title="Groovy pipeline library for Stage"></span>
+                                    </label>
+                                    {{range $pipelineLib := .GroovyLibs}}
+                                        {{if .CodebaseBranch}}
+                                            <select data-selected-pipeline-library="{{$pipelineLib.Name}}"
+                                                    class="form-control element-width pipeline-library-branches" id="pipeline-library-branches">
+                                                {{range .CodebaseBranch}}
+                                                    <option value="{{.Name}}">{{.Name}}</option>
+                                                {{end}}
+                                            </select>
+                                        {{end}}
+                                    {{end}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="job-provisioner-row">
+                        <div class="d-flex flex-column justify-content-start">
+                            <div class="d-flex">
+                                <div class="form-group w-25 mr-4 mb-2">
+                                    <label for="jobProvisioning">Job Provisioner
+                                        <span class="tooltip-icon" data-toggle="tooltip"
+                                              data-placement="top" title=""
+                                              data-original-title="CD Job Provisioner for Pipeline"></span>
+                                    </label>
+                                    <select class="form-control element-width jobProvisioning" id="jobProvisioning">
+                                        {{range .JobProvisioners}}
+                                            <option>{{.Name}}</option>
+                                        {{end}}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="cancel-edit-stage btn btn-secondary btn-modal-close"
+                            data-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="button" class="add-stage btn btn-primary">
+                        Add
+                    </button>
+                    <button type="button" class="confirm-edit-stage btn btn-primary" style="display: none">
+                        Edit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="{{ .BasePath }}/static/js/jquery-3.6.0.js"></script>
+<script src="{{ .BasePath }}/static/js/popper.js"></script>
+<script src="{{ .BasePath }}/static/js/bootstrap.js"></script>
+<script src="{{ .BasePath }}/static/js/util.js"></script>
+<script src="{{ .BasePath }}/static/js/cd-pipeline.js"></script>
+<script src="{{ .BasePath }}/static/js/stage.js"></script>
+<script src="{{ .BasePath }}/static/js/bootstrap-notify.js"></script>
+</body>
+</html>

@@ -46,7 +46,7 @@ type jiraServer struct {
 	Available bool
 }
 
-type jobProvisioners struct {
+type jobProvisioner struct {
 	Name  string
 	Scope string
 }
@@ -67,7 +67,7 @@ type createApplicationData struct {
 	CodeBaseIntegrationStrategy bool
 	GitServers                  []*gitServer
 	JenkinsSlaves               []*jenkinsSlave
-	JobProvisioners             []*jobProvisioners
+	JobProvisioners             []*jobProvisioner
 	JiraServer                  []*jiraServer
 	PerfServer                  []*perfServer
 	IntegrationStrategies       []string
@@ -245,7 +245,7 @@ func getPerfServers(ctx context.Context, client *k8s.RuntimeNamespacedClient) ([
 	return perfServersArray, nil
 }
 
-func getJobProvisionsWithScope(ctx context.Context, client *k8s.RuntimeNamespacedClient, scope string) ([]*jobProvisioners, error) {
+func getJobProvisionsWithScope(ctx context.Context, client *k8s.RuntimeNamespacedClient, scope string) ([]*jobProvisioner, error) {
 	jenkinsCRList, err := client.GetJenkinsList(ctx)
 	if err != nil {
 		return nil, err
@@ -256,10 +256,10 @@ func getJobProvisionsWithScope(ctx context.Context, client *k8s.RuntimeNamespace
 		jenkinsJobProvisioners = append(jenkinsJobProvisioners, jenkinsCR.Status.JobProvisions...)
 	}
 
-	jobProvisionersArray := make([]*jobProvisioners, 0)
+	jobProvisionersArray := make([]*jobProvisioner, 0)
 	for _, jenkinsCRJobProvisioners := range jenkinsJobProvisioners {
 		if jenkinsCRJobProvisioners.Scope == scope {
-			jobProvisionersArray = append(jobProvisionersArray, &jobProvisioners{
+			jobProvisionersArray = append(jobProvisionersArray, &jobProvisioner{
 				Name:  jenkinsCRJobProvisioners.Name,
 				Scope: jenkinsCRJobProvisioners.Scope,
 			})
