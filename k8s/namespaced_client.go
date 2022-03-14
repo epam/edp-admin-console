@@ -252,6 +252,22 @@ func (c *RuntimeNamespacedClient) GetCodebaseList(ctx context.Context) (*codeBas
 	return codebaseList, err
 }
 
+// GetCDPipelineList retrieves all CPipeline CRs from the Kubernetes Cluster.
+func (c *RuntimeNamespacedClient) GetCDPipelineList(ctx context.Context) (*cdPipeApi.CDPipelineList, error) {
+	if c.Namespace == "" {
+		return nil, NemEmptyNamespaceErr("client namespace is not set")
+	}
+
+	cdPipeList := &cdPipeApi.CDPipelineList{}
+	err := c.List(ctx, cdPipeList, &runtimeClient.ListOptions{
+		Namespace: c.Namespace,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return cdPipeList, err
+}
+
 func (c *RuntimeNamespacedClient) CodebaseBranchesListByCodebaseName(ctx context.Context, codebaseName string) ([]*codeBaseApi.CodebaseBranch, error) {
 	cbBranchList := new(codeBaseApi.CodebaseBranchList)
 	requirement, err := labels.NewRequirement(codebasebranch.LabelCodebaseName, selection.Equals, []string{codebaseName})

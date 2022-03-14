@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EDP Admin Console</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/index.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/cd-pipeline-list.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/jquery.dataTables-1.10.23.css">
+</head>
+<body>
+<main>
+    {{template "header_template.html" .}}
+    <section class="content d-flex">
+        <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
+            {{template "navbar_template.html" .}}
+        </aside>
+        <div class="flex-fill pl-4 pr-4 wrapper">
+
+            <div class="d-flex  edp-form wide">
+                <div class="flex-fill">
+                    <h1>CD Pipelines</h1>
+                    {{if .ActiveApplicationsAndBranches}}
+                        {{if .CDPipelines}}
+                            <p>Please find below the list of CD pipelines.</p>
+                        {{else}}
+                            <p>Looks like there're no CD pipelines.</p>
+                        {{end}}
+                    {{else}}
+                        {{if .Applications}}
+                            <p>Looks like there're no active branches in applications.</p>
+                        {{else}}
+                            <p>Looks like there're no applications.</p>
+                        {{end}}
+                    {{end}}
+                </div>
+                {{if .IsAdmin}}
+                    <div class="flex-fill">
+                        <div class="float-right">
+                            <a href="{{ .BasePath }}/v2/admin/edp/cd-pipeline/create">
+                                <button class="btn btn-success" {{if not .ActiveApplicationsAndBranches}}disabled{{end}}>Create</button>
+                            </a>
+                        </div>
+                    </div>
+                {{end}}
+            </div>
+            {{if .ActiveApplicationsAndBranches}}
+                {{if .CDPipelines }}
+                    <div class="edp-table-container">
+                        <table id="edp-table" class="table edp-table">
+                            <thead>
+                            <tr>
+                                <th class="status-width" scope="col">Status</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Jenkins</th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {{range .CDPipelines}}
+                                <tr data-cd-pipeline-name="{{.Name}}" data-cd-pipeline-status="{{.Status}}">
+                                    <td class="cd-pipeline-status" data-status="{{.Status}}">
+                                        <img src="{{if eq .Status "active"}}{{ $.BasePath }}/static/img/green_circle.svg{{else if eq .Status "failed"}}{{ $.BasePath }}/static/img/red_circle.svg{{else}}{{ $.BasePath }}/static/img/grey_circle.svg{{end}}"
+                                             alt="" style="width:25px; height:25px;">
+                                    </td>
+                                    <td class="cd-pipeline-name">
+                                        <a href="{{ $.BasePath }}/v2/admin/edp/cd-pipeline/{{.Name}}/overview"
+                                           class="{{if ne .Status "active"}}disabled{{end}}">{{.Name}}</a>
+                                    </td>
+                                    <td>
+                                        <a href="{{.JenkinsLink}}" target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="edp-link {{if ne .Status "active"}}disabled{{end}}">Link</a>
+                                    </td>
+                                    <td>
+                                        <a href="{{ $.BasePath }}/v2/admin/edp/cd-pipeline/{{.Name}}/update"
+                                            class="{{if ne .Status "active"}}disabled{{end}}">
+                                            <button class="delete">
+                                                <i class="icon-pencil"></i>
+                                            </button>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {{if $.IsAdmin}}
+                                            <button class="delete delete-cd-pipeline"
+                                                    data-toggle="modal"
+                                                    data-name="{{.Name}}">
+                                                <i class="icon-trashcan"></i>
+                                            </button>
+                                        {{end}}
+                                    </td>
+                                </tr>
+                            {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                {{end}}
+            {{end}}
+        </div>
+    </section>
+    {{template "footer_template.html" .}}
+    {{template "modal_success_template.html" .}}
+</main>
+{{template "delete_confirmation_template.html" params "action" (print .BasePath "/v2/admin/edp/cd-pipeline/delete") "kind" "cd-pipeline" "Xsrfdata" .Xsrfdata "error" .Error}}
+<script src="{{ .BasePath }}/static/js/jquery-3.6.0.js"></script>
+<script src="{{ .BasePath }}/static/js/popper.js"></script>
+<script src="{{ .BasePath }}/static/js/bootstrap.js"></script>
+<script src="{{ .BasePath }}/static/js/util.js"></script>
+<script src="{{ .BasePath }}/static/js/confirmation-popup.js"></script>
+<script src="{{ .BasePath }}/static/js/continuous_delivery.js"></script>
+<script src="{{ .BasePath }}/static/js/bootstrap-notify.js"></script>
+<script src="{{ .BasePath }}/static/js/jquery.dataTables-1.10.23.js"></script>
+<script src="{{ .BasePath }}/static/js/view.js"></script>
+</body>
+</html>

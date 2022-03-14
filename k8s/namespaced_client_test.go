@@ -592,6 +592,39 @@ func TestGetCodebaseList_Success(t *testing.T) {
 	assert.Equal(t, expectedList, codebase.Items)
 }
 
+func TestRuntimeNamespacedClient_GetCDPipelineList_Success(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(codeBaseApi.SchemeGroupVersion, &cdPipeApi.CDPipeline{}, &cdPipeApi.CDPipelineList{})
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(createCDPipelineCR(ns)).Build()
+	k8sClient, err := NewRuntimeNamespacedClient(client, ns)
+	assert.NoError(t, err)
+
+	expectedCDPipeline := cdPipeApi.CDPipeline{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            name,
+			Namespace:       ns,
+			ResourceVersion: "999",
+		},
+	}
+	expectedList := []cdPipeApi.CDPipeline{expectedCDPipeline}
+	codebase, err := k8sClient.GetCDPipelineList(ctx)
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedList, codebase.Items)
+}
+
+func TestRuntimeNamespacedClient_GetCDPipelineLis_BadClient(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	client := fake.NewClientBuilder().WithScheme(scheme).Build()
+	k8sClient := RuntimeNamespacedClient{Client: client}
+	codebaseList, err := k8sClient.GetCDPipelineList(ctx)
+	var emptyNamespaceErr *EmptyNamespaceErr
+	assert.ErrorAs(t, err, &emptyNamespaceErr)
+	assert.Nil(t, codebaseList)
+}
+
 func TestGetCodebaseList_BadClient(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
