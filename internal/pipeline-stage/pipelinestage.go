@@ -6,6 +6,8 @@ import (
 	"strconv"
 
 	"edp-admin-console/k8s"
+
+	cdPipelineAPI "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 )
 
 type ApplicationStage struct {
@@ -197,4 +199,19 @@ func CdPipelineAppNamesByCRName(ctx context.Context, namespacedClient *k8s.Runti
 		return nil, err
 	}
 	return cdPipeline.Spec.ApplicationsToPromote, nil
+}
+
+func StageListByPipelineName(ctx context.Context, k8sClient *k8s.RuntimeNamespacedClient, cdPipelineName string) ([]cdPipelineAPI.Stage, error) {
+	stageCRList, err := k8sClient.StageList(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	pipelineStages := make([]cdPipelineAPI.Stage, 0)
+	for _, stageCR := range stageCRList {
+		if stageCR.Spec.CdPipeline == cdPipelineName {
+			pipelineStages = append(pipelineStages, stageCR)
+		}
+	}
+	return pipelineStages, nil
 }

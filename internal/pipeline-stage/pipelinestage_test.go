@@ -214,7 +214,6 @@ func TestStageViewByCRName(t *testing.T) {
 	name, err := StageViewByCRName(ctx, namespacedClient, stageName)
 	assert.NoError(t, err)
 	assert.Equal(t, &expectedStageView, name)
-
 }
 
 func TestStageViewByCRName_Err(t *testing.T) {
@@ -229,4 +228,105 @@ func TestStageViewByCRName_Err(t *testing.T) {
 	name, err := StageViewByCRName(ctx, namespacedClient, stageName)
 	assert.Error(t, err)
 	assert.Nil(t, name)
+}
+
+func TestStageListByPipelineName_OK(t *testing.T) {
+	cdPipelineName_1 := "test_cd_pipeline_1"
+	cdPipelineName_2 := "test_cd_pipeline_2"
+	stageName_1 := "test_stage_1"
+	stageName_2 := "test_stage_2"
+	stageName_3 := "test_stage_3"
+	order_1 := 0
+	order_2 := 1
+	order_3 := 2
+
+	scheme := runtime.NewScheme()
+	err := cdPipeApi.AddToScheme(scheme)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = codeBaseApi.AddToScheme(scheme)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	stage_1 := &cdPipeApi.Stage{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      stageName_1,
+			Namespace: namespace,
+		},
+		Spec: cdPipeApi.StageSpec{
+			Name:       stageName_1,
+			CdPipeline: cdPipelineName_1,
+			Order:      order_1,
+		},
+	}
+	stage_2 := &cdPipeApi.Stage{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      stageName_2,
+			Namespace: namespace,
+		},
+		Spec: cdPipeApi.StageSpec{
+			Name:       stageName_2,
+			CdPipeline: cdPipelineName_1,
+			Order:      order_2,
+		},
+	}
+	stage_3 := &cdPipeApi.Stage{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      stageName_3,
+			Namespace: namespace,
+		},
+		Spec: cdPipeApi.StageSpec{
+			Name:       stageName_3,
+			CdPipeline: cdPipelineName_2,
+			Order:      order_3,
+		},
+	}
+
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(stage_1, stage_2, stage_3).Build()
+	namespacedClient, err := k8s.NewRuntimeNamespacedClient(client, namespace)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := context.Background()
+	expectedStageList := []cdPipeApi.Stage{
+		{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "",
+				APIVersion: "",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:            stageName_1,
+				Namespace:       namespace,
+				ResourceVersion: "999",
+			},
+			Spec: cdPipeApi.StageSpec{
+				Name:       stageName_1,
+				CdPipeline: cdPipelineName_1,
+				Order:      order_1,
+			},
+		},
+		{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "",
+				APIVersion: "",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:            stageName_2,
+				Namespace:       namespace,
+				ResourceVersion: "999",
+			},
+			Spec: cdPipeApi.StageSpec{
+				Name:       stageName_2,
+				CdPipeline: cdPipelineName_1,
+				Order:      order_2,
+			},
+		},
+	}
+
+	gotStageList, err := StageListByPipelineName(ctx, namespacedClient, cdPipelineName_1)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedStageList, gotStageList)
 }

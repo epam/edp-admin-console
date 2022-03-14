@@ -15,6 +15,9 @@ $(function () {
                 $('.confirmation-msg').text(`Confirm Deletion of '${name}'`);
                 $modal.find('.server-error').show();
                 $modal.modal('show');
+            } else if (anchor === '#cdPipelineDeletedErrorModal') {
+                let name = getUrlParameter('name');
+                showNotification(true, null, `Failed to delete CD Pipeline ${name}. Explore admin console logs for more details`);
             } else {
                 showNotification(true, null, 'The pipeline has been edited successfully.', 'Editing has been failed.');
             }
