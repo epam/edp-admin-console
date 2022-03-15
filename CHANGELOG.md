@@ -2,6 +2,13 @@
 ## [Unreleased]
 
 
+<a name="v2.11.4"></a>
+## [v2.11.4] - 2022-03-09
+### Routine
+
+- extended logging for the get stage info request. [EPMDEDP-8497](https://jiraeu.epam.com/browse/EPMDEDP-8497)
+
+
 <a name="v2.11.3"></a>
 ## [v2.11.3] - 2022-02-28
 ### Features
@@ -121,7 +128,8 @@
 - [EPMDEDP-3929] Add new action type to display in Action Log table
 
 
-[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.11.3...HEAD
+[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.11.4...HEAD
+[v2.11.4]: https://github.com/epam/edp-admin-console/compare/v2.11.3...v2.11.4
 [v2.11.3]: https://github.com/epam/edp-admin-console/compare/v2.11.2...v2.11.3
 [v2.11.2]: https://github.com/epam/edp-admin-console/compare/v2.11.1...v2.11.2
 [v2.11.1]: https://github.com/epam/edp-admin-console/compare/v2.11.0...v2.11.1
