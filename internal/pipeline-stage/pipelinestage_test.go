@@ -24,7 +24,6 @@ const (
 func TestCreateApplicationStage_Err(t *testing.T) {
 	inputIS := []string{"input1", "input2"}
 	outputIS := []string{"output1"}
-	appNames := []string{"app1"}
 	client := fake.NewClientBuilder().Build()
 	namespacedClient, err := k8s.NewRuntimeNamespacedClient(client, namespace)
 	if err != nil {
@@ -32,7 +31,7 @@ func TestCreateApplicationStage_Err(t *testing.T) {
 	}
 	ctx := context.Background()
 
-	stages, err := BuildApplicationStages(ctx, namespacedClient, inputIS, outputIS, appNames)
+	stages, err := BuildApplicationStages(ctx, namespacedClient, inputIS, outputIS)
 	assert.Error(t, err)
 	assert.Nil(t, stages)
 }
@@ -40,23 +39,23 @@ func TestCreateApplicationStage_Err(t *testing.T) {
 func TestCreateApplicationStage(t *testing.T) {
 	inputIS := []string{"input1"}
 	outputIS := []string{"output1"}
-	appNames := []string{"app1"}
+	appName := "app1"
 
 	scheme := runtime.NewScheme()
 	err := codeBaseApi.AddToScheme(scheme)
 	if err != nil {
 		t.Fatal(err)
 	}
-	cbBranch := codeBaseApi.CodebaseBranch{
+	inputISCR := codeBaseApi.CodebaseImageStream{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      inputIS[0],
 			Namespace: namespace,
 		},
-		Spec: codeBaseApi.CodebaseBranchSpec{
-			BranchName: branchName,
+		Spec: codeBaseApi.CodebaseImageStreamSpec{
+			Codebase: appName,
 		},
 	}
-	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&cbBranch).Build()
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&inputISCR).Build()
 	namespacedClient, err := k8s.NewRuntimeNamespacedClient(client, namespace)
 	if err != nil {
 		t.Fatal(err)
@@ -66,60 +65,15 @@ func TestCreateApplicationStage(t *testing.T) {
 
 	expectedStages := []ApplicationStage{
 		{
-			Name:       appNames[0],
-			InputIs:    inputIS[0],
-			OutputIs:   outputIS[0],
-			BranchName: branchName,
+			Name:     appName,
+			InputIs:  inputIS[0],
+			OutputIs: outputIS[0],
 		},
 	}
 
-	stages, err := BuildApplicationStages(ctx, namespacedClient, inputIS, outputIS, appNames)
+	stages, err := BuildApplicationStages(ctx, namespacedClient, inputIS, outputIS)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedStages, stages)
-}
-
-func TestCdPipelineNameByCRName_Err(t *testing.T) {
-	client := fake.NewClientBuilder().Build()
-	namespacedClient, err := k8s.NewRuntimeNamespacedClient(client, namespace)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	ctx := context.Background()
-
-	name, err := CdPipelineAppNamesByCRName(ctx, namespacedClient, cdPipelineName)
-	assert.Error(t, err)
-	assert.True(t, runtime.IsNotRegisteredError(err))
-	assert.Empty(t, name)
-}
-
-func TestCdPipelineNameByCRName(t *testing.T) {
-	appNames := []string{"app1"}
-	scheme := runtime.NewScheme()
-	err := cdPipeApi.AddToScheme(scheme)
-	if err != nil {
-		t.Fatal(err)
-	}
-	cdPipe := cdPipeApi.CDPipeline{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      cdPipelineName,
-			Namespace: namespace,
-		},
-		Spec: cdPipeApi.CDPipelineSpec{
-			ApplicationsToPromote: appNames,
-		},
-	}
-	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&cdPipe).Build()
-	namespacedClient, err := k8s.NewRuntimeNamespacedClient(client, namespace)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	ctx := context.Background()
-
-	name, err := CdPipelineAppNamesByCRName(ctx, namespacedClient, cdPipelineName)
-	assert.NoError(t, err)
-	assert.Equal(t, appNames, name)
 }
 
 func TestStageViewByCRName(t *testing.T) {

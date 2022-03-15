@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"strconv"
 
-	"edp-admin-console/k8s"
-
 	cdPipelineAPI "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+
+	"edp-admin-console/internal/applications"
+	"edp-admin-console/k8s"
 )
 
 type ApplicationStage struct {
@@ -17,22 +18,24 @@ type ApplicationStage struct {
 	OutputIs   string `json:"outputIs"`
 }
 
-func BuildApplicationStages(ctx context.Context, namespacedClient *k8s.RuntimeNamespacedClient, inputIS, outputIS []string, applicationNames []string) ([]ApplicationStage, error) {
-	if len(inputIS) != len(outputIS) || len(inputIS) != len(applicationNames) || len(outputIS) != len(applicationNames) {
-		return nil, fmt.Errorf("inputIS, outputIS, applicationNames not the same size. InputIS size %v. OutputIS size %v. applicationNames size %v", len(inputIS), len(outputIS), len(applicationNames))
+func BuildApplicationStages(ctx context.Context, namespacedClient *k8s.RuntimeNamespacedClient, inputIS, outputIS []string) ([]ApplicationStage, error) {
+	if len(inputIS) != len(outputIS) {
+		return nil, fmt.Errorf("inputIS, outputIS not the same size. InputIS size %v. OutputIS size %v", len(inputIS), len(outputIS))
 	}
-	var applications []ApplicationStage
+	var apps []ApplicationStage
 	for index := range inputIS {
-		branchName := getBranchNameByISName(ctx, namespacedClient, inputIS[index])
-		tmpApplication := ApplicationStage{
-			Name:       applicationNames[index],
-			InputIs:    inputIS[index],
-			OutputIs:   outputIS[index],
-			BranchName: branchName,
+		appName, err := applications.AppNameByInputIS(ctx, namespacedClient, inputIS[index])
+		if err != nil {
+			return nil, err
 		}
-		applications = append(applications, tmpApplication)
+		tmpApplication := ApplicationStage{
+			Name:     appName,
+			InputIs:  inputIS[index],
+			OutputIs: outputIS[index],
+		}
+		apps = append(apps, tmpApplication)
 	}
-	return applications, nil
+	return apps, nil
 }
 
 type StageMainData struct {
@@ -183,22 +186,6 @@ func emptyIfNil(str *string) string {
 		return ""
 	}
 	return *str
-}
-
-func getBranchNameByISName(ctx context.Context, namespacedClient *k8s.RuntimeNamespacedClient, crName string) string {
-	stream, err := namespacedClient.GetCBBranch(ctx, crName)
-	if err != nil {
-		return ""
-	}
-	return stream.Spec.BranchName
-}
-
-func CdPipelineAppNamesByCRName(ctx context.Context, namespacedClient *k8s.RuntimeNamespacedClient, cdPipeCRName string) ([]string, error) {
-	cdPipeline, err := namespacedClient.GetCDPipeline(ctx, cdPipeCRName)
-	if err != nil {
-		return nil, err
-	}
-	return cdPipeline.Spec.ApplicationsToPromote, nil
 }
 
 func StageListByPipelineName(ctx context.Context, k8sClient *k8s.RuntimeNamespacedClient, cdPipelineName string) ([]cdPipelineAPI.Stage, error) {

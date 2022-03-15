@@ -193,7 +193,8 @@ func TestGetImageStreamFromStage_NonZeroStageOrder(t *testing.T) {
 			Namespace: ns,
 		},
 		Spec: cdPipeApi.CDPipelineSpec{
-			ApplicationsToPromote: []string{firstImage, secondImage, "nonExistingImage"},
+			InputDockerStreams: []string{createCISName(cdPipelineName, previousStageName, firstImage),
+				createCISName(cdPipelineName, previousStageName, secondImage)},
 		},
 	}
 
@@ -202,12 +203,18 @@ func TestGetImageStreamFromStage_NonZeroStageOrder(t *testing.T) {
 			Name:      createCISName(cdPipelineCR.Name, previousStageName, firstImage),
 			Namespace: ns,
 		},
+		Spec: codeBaseApi.CodebaseImageStreamSpec{
+			Codebase: firstImage,
+		},
 	}
 
 	secondImageStream := codeBaseApi.CodebaseImageStream{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      createCISName(cdPipelineCR.Name, previousStageName, secondImage),
 			Namespace: ns,
+		},
+		Spec: codeBaseApi.CodebaseImageStreamSpec{
+			Codebase: secondImage,
 		},
 	}
 
@@ -258,34 +265,6 @@ func TestGetImageStreamFromStage_BadApplicationsToPromoteValues(t *testing.T) {
 	assert.Nil(t, applicationsToPromote)
 }
 
-func TestGetImageStreamFromStage_EmptyAnnotationToPromote(t *testing.T) {
-	ctx := context.Background()
-	stageCR := createStageCR(nonZeroOrder, cdPipelineName)
-	stageCR.Annotations = make(map[string]string)
-	stageCR.Annotations[PreviousStageNameAnnotationKey] = previousStageName
-
-	cdPipelineCR := cdPipeApi.CDPipeline{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      cdPipelineName,
-			Namespace: ns,
-		},
-	}
-
-	scheme := runtime.NewScheme()
-	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{}, &cdPipeApi.CDPipeline{})
-
-	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stageCR, &cdPipelineCR).Build()
-	k8sClient, err := k8s.NewRuntimeNamespacedClient(client, ns)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	applicationsToPromote, err := GetInputISForStage(ctx, k8sClient, name, cdPipelineName)
-	var emptyImageStreamEr *EmptyImageStreamErr
-	assert.ErrorAs(t, err, &emptyImageStreamEr)
-	assert.Nil(t, applicationsToPromote)
-}
-
 func TestGetImageStreamFromStage_NoPreviousStageName(t *testing.T) {
 	ctx := context.Background()
 	stageCR := createStageCR(nonZeroOrder, cdPipelineName)
@@ -326,43 +305,32 @@ func TestGetOutputISForStage_GetErr(t *testing.T) {
 	assert.Nil(t, imageStreams)
 }
 
-func TestGetOutputISForStage_EmptyIsErr(t *testing.T) {
-	ctx := context.Background()
-	scheme := runtime.NewScheme()
-	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{}, &cdPipeApi.CDPipeline{})
-	cdPipelineCR := cdPipeApi.CDPipeline{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      cdPipelineName,
-			Namespace: ns,
-		},
-	}
-	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&cdPipelineCR).Build()
-	k8sClient, err := k8s.NewRuntimeNamespacedClient(client, ns)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	imageStreams, err := GetOutputISForStage(ctx, k8sClient, cdPipelineName, name)
-	var emptyImageStreamEr *EmptyImageStreamErr
-	assert.ErrorAs(t, err, &emptyImageStreamEr)
-	assert.Nil(t, imageStreams)
-}
-
 func TestGetOutputISForStage(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
 	expectedIS := []string{createCISName(cdPipelineName, name, appName)}
-	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{}, &cdPipeApi.CDPipeline{})
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{}, &cdPipeApi.CDPipeline{}, &codeBaseApi.CodebaseImageStream{})
+	inputDockerStreams := []string{"input1"}
 	cdPipelineCR := cdPipeApi.CDPipeline{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cdPipelineName,
 			Namespace: ns,
 		},
 		Spec: cdPipeApi.CDPipelineSpec{
-			ApplicationsToPromote: []string{appName},
+			InputDockerStreams: inputDockerStreams,
 		},
 	}
-	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&cdPipelineCR).Build()
+	inputISCR := codeBaseApi.CodebaseImageStream{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      inputDockerStreams[0],
+			Namespace: ns,
+		},
+		Spec: codeBaseApi.CodebaseImageStreamSpec{
+			Codebase: appName,
+		},
+	}
+
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&cdPipelineCR, &inputISCR).Build()
 	k8sClient, err := k8s.NewRuntimeNamespacedClient(client, ns)
 	if err != nil {
 		t.Fatal(err)

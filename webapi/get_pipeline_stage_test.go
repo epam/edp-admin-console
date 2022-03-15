@@ -89,6 +89,8 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidFirst() {
 	t := s.T()
 	ctx := context.Background()
 
+	inputDockerStreams := []string{"java11-cd1-master"}
+	applicationToPromote := []string{"java11-cd1"}
 	validCDPipeline := cdPipeApi.CDPipeline{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      validCDPipelineName,
@@ -96,8 +98,8 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidFirst() {
 		},
 		Spec: cdPipeApi.CDPipelineSpec{
 			Name:                  validCDPipelineName,
-			InputDockerStreams:    []string{"java11-cd1-master"},
-			ApplicationsToPromote: []string{"java11-cd1"},
+			InputDockerStreams:    inputDockerStreams,
+			ApplicationsToPromote: applicationToPromote,
 		},
 	}
 	validFirstStage := cdPipeApi.Stage{
@@ -113,12 +115,25 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidFirst() {
 			TriggerType:     "Manual",
 		},
 	}
+	inputISCR := codeBaseApi.CodebaseImageStream{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      inputDockerStreams[0],
+			Namespace: namespace,
+		},
+		Spec: codeBaseApi.CodebaseImageStreamSpec{
+			Codebase: applicationToPromote[0],
+		},
+	}
 	fakeK8SClient := s.Handler.NamespacedClient
 	err := fakeK8SClient.Create(ctx, &validCDPipeline)
 	if err != nil {
 		t.Fatal(err)
 	}
 	err = fakeK8SClient.Create(ctx, &validFirstStage)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = fakeK8SClient.Create(ctx, &inputISCR)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -154,6 +169,10 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidFirst() {
 	if err != nil {
 		t.Fatal(err)
 	}
+	err = fakeK8SClient.Delete(ctx, &inputISCR)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func (s *StagePipelineSuite) TestGetStagePipeline_ValidSecond() {
@@ -162,15 +181,16 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidSecond() {
 	CISNameForSecondStage := "cd1-first-java11-cd1-verified"
 	t := s.T()
 	ctx := context.Background()
+	applicationToPromote := "java11-cd1"
+	inputDockerStreams := []string{"java11-cd1-master"}
 	validCDPipeline := cdPipeApi.CDPipeline{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      validCDPipelineName,
 			Namespace: namespace,
 		},
 		Spec: cdPipeApi.CDPipelineSpec{
-			Name:                  validCDPipelineName,
-			InputDockerStreams:    []string{"java11-cd1-master"},
-			ApplicationsToPromote: []string{"java11-cd1"},
+			Name:               validCDPipelineName,
+			InputDockerStreams: inputDockerStreams,
 		},
 	}
 	validSecondStage := cdPipeApi.Stage{
@@ -192,7 +212,21 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidSecond() {
 			Name:      CISNameForSecondStage,
 			Namespace: namespace,
 		},
+		Spec: codeBaseApi.CodebaseImageStreamSpec{
+			Codebase: applicationToPromote,
+		},
 	}
+
+	inputISCR := codeBaseApi.CodebaseImageStream{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      inputDockerStreams[0],
+			Namespace: namespace,
+		},
+		Spec: codeBaseApi.CodebaseImageStreamSpec{
+			Codebase: applicationToPromote,
+		},
+	}
+
 	fakeK8SClient := s.Handler.NamespacedClient
 	err := fakeK8SClient.Create(ctx, &validCDPipeline)
 	if err != nil {
@@ -203,6 +237,10 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidSecond() {
 		t.Fatal(err)
 	}
 	err = fakeK8SClient.Create(ctx, &cisForSecondStage)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = fakeK8SClient.Create(ctx, &inputISCR)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -241,38 +279,11 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidSecond() {
 	if err != nil {
 		t.Fatal(err)
 	}
-}
-
-func (s *StagePipelineSuite) TestGetStagePipeline_CDPipeNotFound() {
-	notValidCDPipelineName := "cd2"
-	nameCollision := notValidCDPipelineName + "-" + firstStage
-	t := s.T()
-	ctx := context.Background()
-	nameCollisionStage := cdPipeApi.Stage{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      nameCollision,
-			Namespace: namespace,
-		},
-	}
-	fakeK8SClient := s.Handler.NamespacedClient
-	err := fakeK8SClient.Create(ctx, &nameCollisionStage)
+	err = fakeK8SClient.Delete(ctx, &inputISCR)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	httpExpect := httpexpect.New(t, s.TestServer.URL)
-	response := httpExpect.
-		GET("/api/v2/edp/cd-pipeline/" + notValidCDPipelineName + "/stage/" + firstStage).
-		Expect().
-		Status(http.StatusNotFound)
-
-	expectedBody := `cdPipeline not found`
-	assert.Equal(t, expectedBody, response.Body().Raw(), unexpectedBody)
-
-	err = fakeK8SClient.Delete(ctx, &nameCollisionStage)
-	if err != nil {
-		t.Fatal(err)
-	}
 }
 
 func (s *StagePipelineSuite) TestGetStagePipeline_inputISNotFound() {
@@ -373,60 +384,6 @@ func (s *StagePipelineSuite) TestGetStagePipeline_outputISNotFound() {
 		t.Fatal(err)
 	}
 	err = fakeK8SClient.Delete(ctx, &emptyOutputISCDPipe)
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-func (s *StagePipelineSuite) TestGetStagePipeline_ISDifferentSize() {
-	diffISSizeCDPipeName := "diffSize"
-	diffISSizeStageName := diffISSizeCDPipeName + "-" + firstStage
-	t := s.T()
-	ctx := context.Background()
-	diffSizeISCDPipe := cdPipeApi.CDPipeline{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      diffISSizeCDPipeName,
-			Namespace: namespace,
-		},
-		Spec: cdPipeApi.CDPipelineSpec{
-			Name:                  validCDPipelineName,
-			InputDockerStreams:    []string{"java11-cd1-master", "new"},
-			ApplicationsToPromote: []string{"java11-cd1"},
-		},
-	}
-	diffISSizeStage := cdPipeApi.Stage{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      diffISSizeStageName,
-			Namespace: namespace,
-		},
-		Spec: cdPipeApi.StageSpec{
-			CdPipeline: diffISSizeCDPipeName,
-		},
-	}
-	fakeK8SClient := s.Handler.NamespacedClient
-	err := fakeK8SClient.Create(ctx, &diffSizeISCDPipe)
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = fakeK8SClient.Create(ctx, &diffISSizeStage)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	httpExpect := httpexpect.New(t, s.TestServer.URL)
-	response := httpExpect.
-		GET("/api/v2/edp/cd-pipeline/" + diffISSizeCDPipeName + "/stage/" + firstStage).
-		Expect().
-		Status(http.StatusNotFound)
-
-	expectedBody := `inputIS and outputIS not the same size`
-	assert.Equal(t, expectedBody, response.Body().Raw(), unexpectedBody)
-
-	err = fakeK8SClient.Delete(ctx, &diffISSizeStage)
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = fakeK8SClient.Delete(ctx, &diffSizeISCDPipe)
 	if err != nil {
 		t.Fatal(err)
 	}

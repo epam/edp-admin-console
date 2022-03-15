@@ -38,13 +38,6 @@ func (h *HandlerEnv) GetStagePipeline(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cdPipelineAppNames, err := pipelinestage.CdPipelineAppNamesByCRName(ctx, h.NamespacedClient, cdPipelineName)
-	if err != nil {
-		logger.Error(err.Error())
-		NotFoundResponse(ctx, w, "cdPipeline not found")
-		return
-	}
-
 	inputIS, err := imagestream.GetInputISForStage(ctx, h.NamespacedClient, stageName, cdPipelineName)
 	if err != nil {
 		logger.Error("get input image stream failed", zap.Error(err),
@@ -60,7 +53,7 @@ func (h *HandlerEnv) GetStagePipeline(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	applications, err := pipelinestage.BuildApplicationStages(ctx, h.NamespacedClient, inputIS, outputIS, cdPipelineAppNames)
+	applications, err := pipelinestage.BuildApplicationStages(ctx, h.NamespacedClient, inputIS, outputIS)
 	if err != nil {
 		logger.Error(err.Error())
 		NotFoundResponse(ctx, w, "inputIS and outputIS not the same size")

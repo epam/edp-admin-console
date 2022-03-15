@@ -64,3 +64,11 @@ func ActiveCodebaseBranches(ctx context.Context, k8sClient *k8s.RuntimeNamespace
 	}
 	return activeBranches, nil
 }
+
+func AppNameByInputIS(ctx context.Context, client *k8s.RuntimeNamespacedClient, isName string) (string, error) {
+	stream, err := client.GetCodebaseImageStream(ctx, isName)
+	if err != nil {
+		return "", err
+	}
+	return stream.Spec.Codebase, nil
+}

@@ -6,12 +6,13 @@ import (
 	"fmt"
 	"strings"
 
-	"edp-admin-console/internal/applog"
-	"edp-admin-console/k8s"
-
 	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	"go.uber.org/zap"
+
+	"edp-admin-console/internal/applications"
+	"edp-admin-console/internal/applog"
+	"edp-admin-console/k8s"
 )
 
 const (
@@ -51,11 +52,11 @@ func GetInputISForStage(ctx context.Context, client *k8s.RuntimeNamespacedClient
 	}
 
 	if stageCR.Spec.Order != 0 {
-		previousStageName, err := findPreviousStageName(stageCR.Annotations)
-		if err != nil {
-			return nil, err
+		previousStageName, errPrevStage := findPreviousStageName(stageCR.Annotations)
+		if errPrevStage != nil {
+			return nil, errPrevStage
 		}
-		return inputCISListFromApplicationsToPromote(ctx, client, cdPipelineCR, previousStageName)
+		return inputCISListFromApplications(ctx, client, cdPipelineCR, previousStageName)
 	}
 
 	if cdPipelineCR.Spec.InputDockerStreams == nil {
@@ -64,23 +65,21 @@ func GetInputISForStage(ctx context.Context, client *k8s.RuntimeNamespacedClient
 	return cdPipelineCR.Spec.InputDockerStreams, nil
 }
 
-// inputCISListFromApplicationsToPromote gets ApplicationsToPromote list by CR Stage name
-func inputCISListFromApplicationsToPromote(ctx context.Context, client *k8s.RuntimeNamespacedClient, cdPipelineCR *cdPipeApi.CDPipeline, previousStageName string) ([]string, error) {
+// inputCISListFromApplications gets input CodebaseImageStream list from CDPipeline and Stage CR
+func inputCISListFromApplications(ctx context.Context, client *k8s.RuntimeNamespacedClient, cdPipelineCR *cdPipeApi.CDPipeline, previousStageName string) ([]string, error) {
 	logger := applog.LoggerFromContext(ctx)
-	if cdPipelineCR.Spec.ApplicationsToPromote == nil {
-		return nil, NewEmptyImageStreamErr(cdPipelineCR.Name)
-	}
 
 	var imageStream []string
 	var cisNames []string
-	if cdPipelineCR.Spec.ApplicationsToPromote == nil {
-		return nil, NewEmptyImageStreamErr(cdPipelineCR.Name)
-	}
+	re := strings.NewReplacer("/", "-", ".", "-")
+	for _, inputDSName := range cdPipelineCR.Spec.InputDockerStreams {
+		appName, err := applications.AppNameByInputIS(ctx, client, inputDSName)
+		if err != nil {
+			return nil, err
+		}
 
-	for _, name := range cdPipelineCR.Spec.ApplicationsToPromote {
-		re := strings.NewReplacer("/", "-", ".", "-")
-		name = re.Replace(name)
-		CISName := createCISName(cdPipelineCR.Name, previousStageName, name)
+		appName = re.Replace(appName)
+		CISName := createCISName(cdPipelineCR.Name, previousStageName, appName)
 		cisNames = append(cisNames, CISName)
 	}
 
@@ -109,10 +108,11 @@ func GetOutputISForStage(ctx context.Context, client *k8s.RuntimeNamespacedClien
 		return nil, err
 	}
 	var outputIS []string
-	if cdPipeCR.Spec.ApplicationsToPromote == nil {
-		return nil, NewEmptyImageStreamErr(cdPipeCRName)
-	}
-	for _, appName := range cdPipeCR.Spec.ApplicationsToPromote {
+	for _, inputDSName := range cdPipeCR.Spec.InputDockerStreams {
+		appName, errApp := applications.AppNameByInputIS(ctx, client, inputDSName)
+		if errApp != nil {
+			return nil, errApp
+		}
 		outputIS = append(outputIS, createCISName(cdPipeCRName, stageName, appName))
 	}
 	return outputIS, nil
