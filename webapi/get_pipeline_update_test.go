@@ -7,12 +7,11 @@ import (
 	"path"
 	"testing"
 
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
-	perfApi "github.com/epam/edp-perf-operator/v2/pkg/apis/edp/v1alpha1"
 	"github.com/gavv/httpexpect/v2"
 	"github.com/stretchr/testify/suite"
-	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -22,32 +21,26 @@ import (
 	applog "edp-admin-console/service/logger"
 )
 
-type CreateApplicationOverviewSuite struct {
+type PipelineUpdateSuite struct {
 	suite.Suite
 	Server  *httptest.Server
 	Handler *HandlerEnv
 }
 
-func TestCreateApplicationOverviewSuite(t *testing.T) {
+func TestPipelineUpdateSuite(t *testing.T) {
 	scheme := runtime.NewScheme()
-	scheme.AddKnownTypes(codeBaseApi.SchemeGroupVersion, &codeBaseApi.GitServerList{}, &codeBaseApi.GitServer{})
-	scheme.AddKnownTypes(codeBaseApi.SchemeGroupVersion, &codeBaseApi.JiraServerList{}, &codeBaseApi.JiraServer{})
-	scheme.AddKnownTypes(perfApi.SchemeGroupVersion, &perfApi.PerfServerList{}, &perfApi.PerfServer{})
+	scheme.AddKnownTypes(codeBaseApi.SchemeGroupVersion, &codeBaseApi.CodebaseList{}, &codeBaseApi.Codebase{}, &codeBaseApi.CodebaseImageStream{})
 	scheme.AddKnownTypes(jenkinsApi.SchemeGroupVersion, &jenkinsApi.JenkinsList{}, &jenkinsApi.Jenkins{})
-	scheme.AddKnownTypes(v1.SchemeGroupVersion, &v1.ConfigMap{})
+	scheme.AddKnownTypes(cdPipeApi.SchemeGroupVersion, &cdPipeApi.CDPipeline{})
 
-	data := make(map[string]string)
-	data[perfIntegrationEnabledKey] = "false"
-
-	configMap := v1.ConfigMap{
+	cdPipeline := cdPipeApi.CDPipeline{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      edpConfigMapName,
+			Name:      "testCDPipeline",
 			Namespace: namespace,
 		},
-		Data: data,
 	}
 
-	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&configMap).Build()
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&cdPipeline).Build()
 	namespacedClient, err := k8s.NewRuntimeNamespacedClient(client, namespace)
 	if err != nil {
 		t.Fatal(err)
@@ -68,19 +61,19 @@ func TestCreateApplicationOverviewSuite(t *testing.T) {
 	authHandler := HandlerAuthWithOption()
 	router := V2APIRouter(h, authHandler, logger)
 
-	s := &CreateApplicationOverviewSuite{
+	s := &PipelineUpdateSuite{
 		Handler: h,
 	}
 	s.Server = httptest.NewServer(router)
 	suite.Run(t, s)
 }
 
-func (s *CreateApplicationOverviewSuite) TestCreateApplicationOverview() {
+func (s *PipelineUpdateSuite) TestPipelineUpdatePage() {
 	t := s.T()
 
 	httpExpect := httpexpect.New(t, s.Server.URL)
 	httpExpect.
-		GET("/v2/admin/edp/application/create").
+		GET("/v2/admin/edp/cd-pipeline/testCDPipeline/update").
 		Expect().
 		Status(http.StatusOK).
 		ContentType("text/html")
