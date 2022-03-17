@@ -132,7 +132,7 @@ func (h *HandlerEnv) CreateApplication(w http.ResponseWriter, r *http.Request) {
 }
 
 func strToPtr(s string) *string {
-	if len(s) == 0 {
+	if len(s) == 0 || s == "null" {
 		return nil
 	}
 	return &s

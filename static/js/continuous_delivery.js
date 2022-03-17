@@ -6,6 +6,12 @@ $(function () {
         if (anchor) {
             if (anchor === '#cdPipelineSuccessModal') {
                 showNotification(true, null, 'Provisioning has been started.', 'Provisioning has been failed.');
+            } else if (anchor === '#cdPipelineCreateErrorModal') {
+                let name = getUrlParameter('name');
+                showNotification(false, null, `Failed to create CD Pipeline ${name}. Explore admin console logs for more details`);
+            } else if (anchor === '#stageCreateErrorModal') {
+                let name = getUrlParameter('name');
+                showNotification(false, null, `Failed to create Stage ${name}. Explore admin console logs for more details`);
             } else if (anchor === '#cdPipelineDeletedSuccessModal') {
                 let name = getUrlParameter('name');
                 showNotification(true, null, `CD Pipeline ${name} was marked for deletion.`);
@@ -82,8 +88,8 @@ function showNotification(ok, delay, successMsg, failMsg) {
                 enter: 'animated fadeInRight',
                 exit: 'animated fadeOutRight'
             },
-            onShow: function() {
-                this.css({'width':'auto', 'display': 'flex'});
+            onShow: function () {
+                this.css({'width': 'auto', 'display': 'flex'});
             },
         });
 }
