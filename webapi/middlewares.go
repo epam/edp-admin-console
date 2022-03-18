@@ -208,3 +208,18 @@ func WithAuthZ(tokenMap map[string]oauth2.TokenSource, authController *config.Au
 		})
 	}
 }
+
+func WithLogRequestBoundaries() func(next http.Handler) http.Handler {
+	handler := func(next http.Handler) http.Handler {
+		mw := func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			logger := applog.LoggerFromContext(ctx)
+			requestURI := r.RequestURI
+			logger.Info("REQUEST_STARTED", zap.String("REQUEST_URI", requestURI))
+			next.ServeHTTP(w, r)
+			logger.Info("REQUEST_COMPLETED", zap.String("REQUEST_URI", requestURI))
+		}
+		return http.HandlerFunc(mw)
+	}
+	return handler
+}

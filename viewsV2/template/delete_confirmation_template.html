@@ -33,13 +33,13 @@
                         <div class="invalid-feedback different-name">
                             Names are different
                         </div>
-                        {{if .error }}
+                        {{if .deletionError }}
                             <div class="invalid-feedback server-error">
-                                <p>{{.error}}</p>
+                                <p>{{.deletionError}}</p>
                             </div>
                         {{end}}
                     </div>
-                    {{ .xsrfdata }}
+                    <input type="hidden" name="_xsrf" value="{{.Xsrfdata}}" />
                     {{if eq .kind "codebase"}}
                         <input type="hidden" id="codebase-type" name="codebase-type" value="{{.type}}">
                     {{else if eq .kind "stage"}}

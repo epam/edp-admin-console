@@ -293,3 +293,62 @@ func TestActiveApplications_OK(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedCBCR, filteredList)
 }
+
+func TestByNameIFExists_OK(t *testing.T) {
+	ctx := context.Background()
+	namespace := "test_ns_1"
+	crName_1 := "cb_1"
+	codebaseCR_1 := createCodebaseCRWithOptions(
+		WithCBCrName(crName_1),
+		WithCBCrNamespace(namespace),
+	)
+
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(codeBaseApi.SchemeGroupVersion, &codeBaseApi.Codebase{})
+	fakeK8SClient := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(codebaseCR_1).Build()
+	k8sClient, err := k8s.NewRuntimeNamespacedClient(fakeK8SClient, namespace)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedCBCR := &codeBaseApi.Codebase{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Codebase",
+			APIVersion: "v2.edp.epam.com/v1alpha1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            crName_1,
+			Namespace:       namespace,
+			ResourceVersion: "999",
+		},
+	}
+	k8sCodebase, err := ByNameIFExists(ctx, k8sClient, crName_1)
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedCBCR, k8sCodebase)
+}
+
+func TestByNameIFExists_NotFound(t *testing.T) {
+	ctx := context.Background()
+	namespace := "test_ns_1"
+	crName_1 := "cb_1"
+	codebaseCR_1 := createCodebaseCRWithOptions(
+		WithCBCrName(crName_1),
+		WithCBCrNamespace(namespace),
+	)
+
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(codeBaseApi.SchemeGroupVersion, &codeBaseApi.Codebase{})
+	fakeK8SClient := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(codebaseCR_1).Build()
+	k8sClient, err := k8s.NewRuntimeNamespacedClient(fakeK8SClient, namespace)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	notFound := "not-found"
+	k8sCodebase, err := ByNameIFExists(ctx, k8sClient, notFound)
+
+	var expectedCBCR *codeBaseApi.Codebase
+	assert.NoError(t, err)
+	assert.Equal(t, expectedCBCR, k8sCodebase)
+}

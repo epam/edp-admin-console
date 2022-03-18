@@ -177,3 +177,23 @@ func TestMiddleware(t *testing.T) {
 	httpmock.DeactivateAndReset()
 
 }
+
+type stubOKHandler struct {
+}
+
+func (s *stubOKHandler) ServeHTTP(writer http.ResponseWriter, _ *http.Request) {
+	writer.WriteHeader(http.StatusOK)
+}
+
+func TestWithLogRequestBoundaries(t *testing.T) {
+	mw := WithLogRequestBoundaries()
+	next := new(stubOKHandler)
+
+	w := httptest.NewRecorder()
+	var data []byte
+	reader := bytes.NewReader(data)
+	r := httptest.NewRequest(http.MethodGet, "/end/point", reader)
+
+	mw(next).ServeHTTP(w, r)
+	assert.Equal(t, http.StatusOK, w.Code)
+}

@@ -5,6 +5,7 @@ import (
 
 	cdPipelineAPI "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	runtimeClient "sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func (c *RuntimeNamespacedClient) DeleteCDPipeline(ctx context.Context, cdPipelineCR *cdPipelineAPI.CDPipeline) error {
@@ -41,4 +42,10 @@ func (c *RuntimeNamespacedClient) CreateCDStageBySpec(ctx context.Context, crNam
 	}
 	err := c.Create(ctx, Stage)
 	return err
+}
+
+func (c *RuntimeNamespacedClient) CDPipelineList(ctx context.Context) ([]cdPipelineAPI.CDPipeline, error) {
+	list := new(cdPipelineAPI.CDPipelineList)
+	err := c.List(ctx, list, &runtimeClient.ListOptions{Namespace: c.Namespace})
+	return list.Items, err
 }

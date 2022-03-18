@@ -142,3 +142,9 @@ func WithCDPipelineName(name string) CDPipelineCROption {
 		cdPipe.Name = name
 	}
 }
+
+func WithCDPipelineInputDockerStreams(inputDockerStreams []string) CDPipelineCROption {
+	return func(cdPipe *cdPipeApi.CDPipeline) {
+		cdPipe.Spec.InputDockerStreams = inputDockerStreams
+	}
+}

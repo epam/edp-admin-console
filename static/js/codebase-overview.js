@@ -21,8 +21,11 @@ $(function () {
                 showNotification(true, `Codebase ${codebase} was marked for deletion.`);
             } else if (anchor === '#codebaseUpdateSuccessModal') {
                 showNotification(true, 'The codebase has been updated successfully.');
-            } else if (anchor === 'codebaseUpdateErrorModal') {
-                showNotification(false, 'Update codebase failed.');
+            } else if (anchor === '#codebaseUpdateErrorModal') {
+                let codebase = getUrlParameter('codebase')
+                showNotification(false, `Update codebase '${codebase}' failed. Explore admin console logs for details.`);
+            } else if (anchor === '#codebaseDeleteErrorModal') {
+                showNotification(false, `Delete codebase '${codebase}' failed. Explore admin console logs for details.`);
             }
             location.hash = '';
         }

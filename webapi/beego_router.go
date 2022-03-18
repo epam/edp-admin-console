@@ -362,7 +362,10 @@ func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir strin
 
 func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.Logger) *chi.Mux {
 	router := chi.NewRouter()
-	router.Use(WithLoggerMw(logger))
+	router.Use(
+		WithLoggerMw(logger),
+		WithLogRequestBoundaries(),
+	)
 
 	basePath := path.Join(handlerEnv.Config.BasePath, "/")
 	router.Route(basePath, func(baseRouter chi.Router) {
@@ -391,9 +394,9 @@ func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.L
 				applicationRoute.Get("/overview", handlerEnv.ApplicationOverview)
 				applicationRoute.Get("/create", handlerEnv.CreateApplicationPage)
 			})
-			edpScope.Route("/codebase/{codebaseName}", func(codebaseRoute chi.Router) {
+			edpScope.Route("/codebase", func(codebasesRouter chi.Router) {
 				if handlerEnv.Config.XSRFEnabled {
-					codebaseRoute.Use(
+					codebasesRouter.Use(
 						csrf.Protect(
 							handlerEnv.Config.XSRFKey,
 							csrf.CookieName("_edp_csrf"),
@@ -401,10 +404,13 @@ func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.L
 						),
 					)
 				}
-				codebaseRoute.Get("/overview", handlerEnv.GetCodebaseOverview)
-				codebaseRoute.Get("/update", handlerEnv.GetCodebaseUpdate)
-				codebaseRoute.Post("/update", handlerEnv.PostCodebaseUpdate)
-				codebaseRoute.Post("/branch", handlerEnv.CreateBranch)
+				codebasesRouter.Post("/", handlerEnv.PostCodebase)
+				codebasesRouter.Route("/{codebaseName}", func(codebaseRoute chi.Router) {
+					codebaseRoute.Get("/overview", handlerEnv.GetCodebaseOverview)
+					codebaseRoute.Get("/update", handlerEnv.GetCodebaseUpdate)
+					codebaseRoute.Post("/update", handlerEnv.PostCodebaseUpdate)
+					codebaseRoute.Post("/branch", handlerEnv.CreateBranch)
+				})
 			})
 			edpScope.Route("/cd-pipeline", func(cdScope chi.Router) {
 				cdScope.Get("/create", handlerEnv.GetCDCreatePage)

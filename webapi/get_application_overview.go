@@ -7,6 +7,8 @@ import (
 
 	"edp-admin-console/internal/applog"
 	"edp-admin-console/models/query"
+
+	"github.com/gorilla/csrf"
 )
 
 const (
@@ -60,8 +62,8 @@ func (h *HandlerEnv) ApplicationOverview(writer http.ResponseWriter, request *ht
 		})
 	}
 
-	xsrfData, _ := GetCookieByName(request, "_xsrf")
-
+	xsrfData := csrf.Token(request)
+	errmsg := request.URL.Query().Get("errmsg")
 	tmplData := createApplicationOverviewData{
 		BasePath:           h.Config.BasePath,
 		EDPVersion:         h.Config.EDPVersion,
@@ -74,13 +76,17 @@ func (h *HandlerEnv) ApplicationOverview(writer http.ResponseWriter, request *ht
 		Xsrfdata:           xsrfData,
 		// Now read from Beego.flashData
 		Error:         "",
-		DeletionError: "",
+		DeletionError: errmsg,
 		Success:       true,
 	}
 
-	templatePaths := []string{path.Join(h.WorkingDir, "/viewsV2/codebase.html"), path.Join(h.WorkingDir, "/views/template/footer_template.html"),
-		path.Join(h.WorkingDir, "/views/template/header_template.html"), path.Join(h.WorkingDir, "/views/template/navbar_template.html"),
-		path.Join(h.WorkingDir, "/views/template/modal_success_template.html"), path.Join(h.WorkingDir, "/views/template/delete_confirmation_template.html")}
+	templatePaths := []string{path.Join(h.WorkingDir, "/viewsV2/codebase.html"),
+		path.Join(h.WorkingDir, "/viewsV2/template/footer_template.html"),
+		path.Join(h.WorkingDir, "/viewsV2/template/header_template.html"),
+		path.Join(h.WorkingDir, "/viewsV2/template/navbar_template.html"),
+		path.Join(h.WorkingDir, "/viewsV2/template/modal_success_template.html"),
+		path.Join(h.WorkingDir, "/viewsV2/template/delete_confirmation_template.html"),
+	}
 
 	template := Template{
 		Data:             tmplData,

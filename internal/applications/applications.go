@@ -2,9 +2,12 @@ package applications
 
 import (
 	"context"
+	"errors"
+	"net/http"
 
 	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	"go.uber.org/zap"
+	k8sErrors "k8s.io/apimachinery/pkg/api/errors"
 
 	"edp-admin-console/internal/applog"
 	"edp-admin-console/k8s"
@@ -71,4 +74,19 @@ func AppNameByInputIS(ctx context.Context, client *k8s.RuntimeNamespacedClient, 
 		return "", err
 	}
 	return stream.Spec.Codebase, nil
+}
+
+func ByNameIFExists(ctx context.Context, k8sClient *k8s.RuntimeNamespacedClient, codebaseName string) (*codeBaseApi.Codebase, error) {
+	codebaseCR, err := k8sClient.GetCodebase(ctx, codebaseName)
+	if err != nil {
+		var statusErr *k8sErrors.StatusError
+		if errors.As(err, &statusErr) {
+			if statusErr.ErrStatus.Code == http.StatusNotFound {
+				return nil, nil // not found
+			}
+		}
+		return nil, err
+	}
+
+	return codebaseCR, nil
 }
