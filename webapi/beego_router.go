@@ -411,6 +411,7 @@ func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.L
 				cdScope.Post("/delete", handlerEnv.DeleteCD)
 				cdScope.Post("/", handlerEnv.CreateCDPipeline)
 				cdScope.Get("/{pipelineName}/update", handlerEnv.GetPipelineUpdatePage)
+				cdScope.Post("/{pipelineName}/update", handlerEnv.UpdateCDPipeline)
 			})
 		})
 		baseRouter.Route("/v2", func(r chi.Router) {

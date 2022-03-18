@@ -9,6 +9,9 @@ $(function () {
             } else if (anchor === '#cdPipelineCreateErrorModal') {
                 let name = getUrlParameter('name');
                 showNotification(false, null, `Failed to create CD Pipeline ${name}. Explore admin console logs for more details`);
+            } else if (anchor === '#cdPipelineEditErrorModal') {
+                let name = getUrlParameter('name');
+                showNotification(false, null, `Failed to edit CD Pipeline ${name}. Explore admin console logs for more details`);
             } else if (anchor === '#stageCreateErrorModal') {
                 let name = getUrlParameter('name');
                 showNotification(false, null, `Failed to create Stage ${name}. Explore admin console logs for more details`);
