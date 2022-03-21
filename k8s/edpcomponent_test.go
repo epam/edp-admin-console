@@ -66,3 +66,27 @@ func TestEDPComponentByCRName_Success(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedEDPComponentCR, gotEDPComponent)
 }
+
+func TestEDPComponents(t *testing.T) {
+	ctx := context.Background()
+	namespace := "test_ns_1"
+	crName := "gerrit_1"
+	edpComponentCR := createEDPComponentCRWithOptions(
+		WithEDPComponentCrName(crName),
+		WithEDPComponentCrNamespace(namespace),
+	)
+
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(edpComponentAPI.SchemeGroupVersion, &edpComponentAPI.EDPComponent{}, &edpComponentAPI.EDPComponentList{})
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(edpComponentCR).Build()
+	k8sClient, err := NewRuntimeNamespacedClient(client, namespace)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	gotEDPComponents, err := k8sClient.EDPComponentList(ctx)
+
+	assert.NoError(t, err)
+	assert.Equal(t, crName, gotEDPComponents[0].Name)
+	assert.Equal(t, namespace, gotEDPComponents[0].Namespace)
+}

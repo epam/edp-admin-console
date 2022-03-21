@@ -19,6 +19,7 @@ const (
 	StagePlural          = "stages"
 	CDPipelinePlural     = "cdpipelines"
 	CodebaseKind         = "Codebase"
+	Overview             = "overview"
 
 	ImportStrategy        = "import"
 	CloneStrategy         = "clone"

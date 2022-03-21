@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EDP Admin Console</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/index.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/edp-instance.css">
+</head>
+<body>
+<main>
+    {{template "header_template.html" .}}
+    <section class="content d-flex">
+        <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
+            {{template "navbar_template.html" .}}
+        </aside>
+        <div class="flex-fill pl-4 pr-4 wrapper">
+
+            <div style="margin-top: 10px">
+                <table class="table">
+                    <tbody>
+                        {{ range $i, $val := .EDPComponents }}
+                            {{if $val.Visible}}
+                                <tr>
+                                    <td width="25px">
+                                        <a href="{{ $val.Url }}" target="_blank" rel="noopener noreferrer">
+                                            <img src="data:image/svg+xml;base64,{{ $val.Icon }}" alt="{{ $val.Type }}" height="45" width="42"/>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{{ $val.Url }}" target="_blank" rel="noopener noreferrer" class="component-name">{{ $val.Type }}</a>
+                                    </td>
+                                </tr>
+                            {{end}}
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    {{template "footer_template.html" .}}
+</main>
+<script src="{{ .BasePath }}/static/js/jquery-3.6.0.js"></script>
+<script src="{{ .BasePath }}/static/js/popper.js"></script>
+<script src="{{ .BasePath }}/static/js/bootstrap.js"></script>
+</body>
+</html>
