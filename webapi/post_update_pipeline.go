@@ -79,7 +79,7 @@ func (h *HandlerEnv) UpdateCDPipeline(writer http.ResponseWriter, request *http.
 
 	existedCDPipeCR, err := h.NamespacedClient.GetCDPipeline(ctx, cdPipeName)
 	if err != nil {
-		http.Redirect(writer, request, fmt.Sprintf("%s/admin/edp/cd-pipeline/overview?name=%s#cdPipelineEditErrorModal'", h.Config.BasePath, cdPipeName), http.StatusFound)
+		http.Redirect(writer, request, fmt.Sprintf("%s/v2/admin/edp/cd-pipeline/overview?name=%s#cdPipelineEditErrorModal'", h.Config.BasePath, cdPipeName), http.StatusFound)
 		logger.Error("cant get cd pipeline", zap.Error(err))
 
 		return
@@ -88,7 +88,7 @@ func (h *HandlerEnv) UpdateCDPipeline(writer http.ResponseWriter, request *http.
 	existedCDPipeCR.Spec.ApplicationsToPromote = appsToPromote
 	err = h.NamespacedClient.Update(ctx, existedCDPipeCR)
 	if err != nil {
-		http.Redirect(writer, request, fmt.Sprintf("%s/admin/edp/cd-pipeline/overview?name=%s#cdPipelineEditErrorModal'", h.Config.BasePath, cdPipeName), http.StatusFound)
+		http.Redirect(writer, request, fmt.Sprintf("%s/v2/admin/edp/cd-pipeline/overview?name=%s#cdPipelineEditErrorModal'", h.Config.BasePath, cdPipeName), http.StatusFound)
 		logger.Error("cant get cd pipeline", zap.Error(err))
 		return
 	}
@@ -131,10 +131,10 @@ func (h *HandlerEnv) UpdateCDPipeline(writer http.ResponseWriter, request *http.
 		errStage := h.NamespacedClient.CreateCDStageBySpec(ctx, stageName, stageSpec)
 		if errStage != nil {
 			logger.Error("cant create stage CR", zap.Error(errStage))
-			http.Redirect(writer, request, fmt.Sprintf("%s/admin/edp/cd-pipeline/overview?name=%s#stageCreateErrorModal'", h.Config.BasePath, stageName), http.StatusFound)
+			http.Redirect(writer, request, fmt.Sprintf("%s/v2/admin/edp/cd-pipeline/overview?name=%s#stageCreateErrorModal'", h.Config.BasePath, stageName), http.StatusFound)
 			return
 		}
 	}
 
-	http.Redirect(writer, request, fmt.Sprintf("%s/admin/edp/cd-pipeline/overview#cdPipelineEditSuccessModal", h.Config.BasePath), http.StatusFound)
+	http.Redirect(writer, request, fmt.Sprintf("%s/v2/admin/edp/cd-pipeline/overview#cdPipelineEditSuccessModal", h.Config.BasePath), http.StatusFound)
 }

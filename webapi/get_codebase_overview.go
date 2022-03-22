@@ -83,6 +83,7 @@ type codebaseOverviewTpl struct {
 func (h *HandlerEnv) GetCodebaseOverview(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	logger := applog.LoggerFromContext(ctx)
+	user := UserFromContext(ctx)
 	codebaseName := chi.URLParam(r, "codebaseName")
 	codebaseCR, err := h.NamespacedClient.GetCodebase(ctx, codebaseName)
 	if err != nil {
@@ -166,7 +167,7 @@ func (h *HandlerEnv) GetCodebaseOverview(w http.ResponseWriter, r *http.Request)
 	var tmplData = codebaseOverviewTpl{
 		BasePath:           h.Config.BasePath,
 		EDPVersion:         h.Config.BasePath,
-		Username:           "testname",
+		Username:           user.UserName(),
 		Type:               codebaseCR.Spec.Type,
 		TypeCaption:        codebaseCR.Spec.Type,
 		DiagramPageEnabled: h.Config.DiagramPageEnabled,
@@ -174,7 +175,7 @@ func (h *HandlerEnv) GetCodebaseOverview(w http.ResponseWriter, r *http.Request)
 		TypeSingular:       codebaseCR.Spec.Type,
 		Success:            true, //idk
 		ErrorBranch:        "",
-		IsAdmin:            true,
+		IsAdmin:            user.IsAdmin(),
 		Codebase: codebase{
 			Name:                 codebaseCR.Name,
 			CiTool:               codebaseCR.Spec.CiTool,

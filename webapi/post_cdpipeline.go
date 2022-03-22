@@ -111,7 +111,7 @@ func (h *HandlerEnv) CreateCDPipeline(w http.ResponseWriter, r *http.Request) {
 	err = h.NamespacedClient.CreateCDPipelineBySpec(ctx, cdPipeName, cdPipelineSpec)
 	if err != nil {
 		logger.Error("cant create cdpipe CR", zap.Error(err))
-		http.Redirect(w, r, fmt.Sprintf("%s/admin/edp/cd-pipeline/overview?name=%s#cdPipelineCreateErrorModal'", h.Config.BasePath, cdPipeName), http.StatusFound)
+		http.Redirect(w, r, fmt.Sprintf("%s/v2/admin/edp/cd-pipeline/overview?name=%s#cdPipelineCreateErrorModal'", h.Config.BasePath, cdPipeName), http.StatusFound)
 		return
 	}
 
@@ -153,9 +153,9 @@ func (h *HandlerEnv) CreateCDPipeline(w http.ResponseWriter, r *http.Request) {
 		errStage := h.NamespacedClient.CreateCDStageBySpec(ctx, stageName, stageSpec)
 		if errStage != nil {
 			logger.Error("cant create stage CR", zap.Error(errStage))
-			http.Redirect(w, r, fmt.Sprintf("%s/admin/edp/cd-pipeline/overview?name=%s#stageCreateErrorModal'", h.Config.BasePath, stageName), http.StatusFound)
+			http.Redirect(w, r, fmt.Sprintf("%s/v2/admin/edp/cd-pipeline/overview?name=%s#stageCreateErrorModal'", h.Config.BasePath, stageName), http.StatusFound)
 			return
 		}
 	}
-	http.Redirect(w, r, fmt.Sprintf("%s/admin/edp/cd-pipeline/overview?%s=%s#cdPipelineSuccessModal", h.Config.BasePath, paramWaitingForCdPipeline, cdPipeName), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("%s/v2/admin/edp/cd-pipeline/overview?%s=%s#cdPipelineSuccessModal", h.Config.BasePath, paramWaitingForCdPipeline, cdPipeName), http.StatusFound)
 }

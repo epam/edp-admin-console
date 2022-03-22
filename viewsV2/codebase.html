@@ -98,7 +98,7 @@
                         <td>{{.BuildTool}}</td>
                         <td>
                             {{if and $.JiraEnabled (ne .CiTool "GitLab CI")}}
-                            <a href="{{ $.BasePath }}/admin/edp/codebase/{{.Name}}/update"
+                            <a href="{{ $.BasePath }}/v2/admin/edp/codebase/{{.Name}}/update"
                                class="{{if ne .Status "active"}}disabled{{end}}">
                             <button class="delete">
                                 <i class="icon-pencil"></i>

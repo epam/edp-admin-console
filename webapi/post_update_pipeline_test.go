@@ -102,7 +102,7 @@ func TestHandlerEnv_UpdateCDPipeline(t *testing.T) {
 		WithFormField(strings.Join([]string{newStages[0], stepsForNewStage[0], "stageBranch"}, "-"), stepBranch).
 		WithFormField(strings.Join([]string{newStages[0], stepsForNewStage[0], "stageQualityGateType"}, "-"), manualQualityGate).
 		WithRedirectPolicy(httpexpect.DontFollowRedirects)
-	expectedURL := fmt.Sprintf("%s/admin/edp/cd-pipeline/overview#cdPipelineEditSuccessModal", h.Config.BasePath)
+	expectedURL := fmt.Sprintf("%s/v2/admin/edp/cd-pipeline/overview#cdPipelineEditSuccessModal", h.Config.BasePath)
 
 	req.Expect().
 		Status(http.StatusFound).
