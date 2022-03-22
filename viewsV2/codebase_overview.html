@@ -469,7 +469,7 @@
                                 </div>
                             </div>
                         {{end}}
-                        {{ .Xsrfdata }}
+                        <input type="hidden" name="_xsrf" value="{{.Xsrfdata}}" />
                     </form>
                 </div>
                 <div class="modal-footer">

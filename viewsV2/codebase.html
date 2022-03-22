@@ -94,8 +94,8 @@
                                 {{.Name}}
                             </a>
                         </td>
-                        <td>{{.Language}}</td>
-                        <td>{{.BuildTool}}</td>
+                        <td>{{.Language | lowercaseAll}}</td>
+                        <td>{{.BuildTool | lowercaseAll}}</td>
                         <td>
                             {{if and $.JiraEnabled (ne .CiTool "GitLab CI")}}
                             <a href="{{ $.BasePath }}/v2/admin/edp/codebase/{{.Name}}/update"

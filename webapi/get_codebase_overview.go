@@ -8,6 +8,7 @@ import (
 
 	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	"github.com/go-chi/chi/v5"
+	"github.com/gorilla/csrf"
 	"go.uber.org/zap"
 
 	"edp-admin-console/internal/applog"
@@ -164,6 +165,7 @@ func (h *HandlerEnv) GetCodebaseOverview(w http.ResponseWriter, r *http.Request)
 		InternalErrorResponse(ctx, w, "get codebase branch list by name failed")
 		return
 	}
+	xsrf := csrf.Token(r)
 	var tmplData = codebaseOverviewTpl{
 		BasePath:           h.Config.BasePath,
 		EDPVersion:         h.Config.BasePath,
@@ -176,6 +178,7 @@ func (h *HandlerEnv) GetCodebaseOverview(w http.ResponseWriter, r *http.Request)
 		Success:            true, //idk
 		ErrorBranch:        "",
 		IsAdmin:            user.IsAdmin(),
+		Xsrfdata:           xsrf,
 		Codebase: codebase{
 			Name:                 codebaseCR.Name,
 			CiTool:               codebaseCR.Spec.CiTool,
