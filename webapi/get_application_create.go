@@ -7,15 +7,14 @@ import (
 	"path"
 	"strconv"
 
-	"edp-admin-console/internal/applog"
-
-	"go.uber.org/zap"
-
 	"github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
+	"github.com/gorilla/csrf"
 	"github.com/prometheus/common/log"
+	"go.uber.org/zap"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"edp-admin-console/internal/applog"
 	"edp-admin-console/k8s"
 	"edp-admin-console/models/query"
 )
@@ -81,7 +80,6 @@ type createApplicationData struct {
 func (h *HandlerEnv) CreateApplicationPage(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 	logger := applog.LoggerFromContext(ctx)
-	xsrfData, _ := GetCookieByName(request, "_xsrf")
 	user := UserFromContext(ctx)
 
 	gitServersArray, err := getGitServers(ctx, h.NamespacedClient)
@@ -126,6 +124,7 @@ func (h *HandlerEnv) CreateApplicationPage(writer http.ResponseWriter, request *
 		return
 	}
 
+	xsrfData := csrf.Token(request)
 	tmplData := createApplicationData{
 		Type:                        application,
 		BasePath:                    h.Config.BasePath,

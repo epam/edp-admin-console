@@ -389,6 +389,15 @@ func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.L
 				edpScope.Use(WithAuthN(authHandler.TokenMap, authHandler.UrlMap, authHandler.StateMap, authHandler.AuthController))
 				edpScope.Use(WithAuthZ(authHandler.TokenMap, authHandler.AuthController))
 			}
+			if handlerEnv.Config.XSRFEnabled {
+				edpScope.Use(
+					csrf.Protect(
+						handlerEnv.Config.XSRFKey,
+						csrf.CookieName("_edp_csrf"),
+						csrf.FieldName("_xsrf"),
+					),
+				)
+			}
 			edpScope.Get("/overview", handlerEnv.GetOverviewPage)
 			edpScope.Route("/application", func(applicationRoute chi.Router) {
 				applicationRoute.Post("/", handlerEnv.CreateApplication)
@@ -396,15 +405,6 @@ func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.L
 				applicationRoute.Get("/create", handlerEnv.CreateApplicationPage)
 			})
 			edpScope.Route("/codebase", func(codebasesRouter chi.Router) {
-				if handlerEnv.Config.XSRFEnabled {
-					codebasesRouter.Use(
-						csrf.Protect(
-							handlerEnv.Config.XSRFKey,
-							csrf.CookieName("_edp_csrf"),
-							csrf.FieldName("_xsrf"),
-						),
-					)
-				}
 				codebasesRouter.Post("/", handlerEnv.PostCodebase)
 				codebasesRouter.Route("/{codebaseName}", func(codebaseRoute chi.Router) {
 					codebaseRoute.Get("/overview", handlerEnv.GetCodebaseOverview)

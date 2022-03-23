@@ -2,6 +2,7 @@ package webapi
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"path"
 	"time"
@@ -215,9 +216,11 @@ func WithLogRequestBoundaries() func(next http.Handler) http.Handler {
 			ctx := r.Context()
 			logger := applog.LoggerFromContext(ctx)
 			requestURI := r.RequestURI
-			logger.Info("REQUEST_STARTED", zap.String("REQUEST_URI", requestURI))
+			requestMethod := r.Method
+			logRequest := fmt.Sprintf("%s %s", requestMethod, requestURI)
+			logger.Info("REQUEST_STARTED", zap.String("request", logRequest))
 			next.ServeHTTP(w, r)
-			logger.Info("REQUEST_COMPLETED", zap.String("REQUEST_URI", requestURI))
+			logger.Info("REQUEST_COMPLETED", zap.String("request", logRequest))
 		}
 		return http.HandlerFunc(mw)
 	}

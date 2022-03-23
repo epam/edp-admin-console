@@ -97,7 +97,7 @@ func (h *HandlerEnv) PostCodebase(w http.ResponseWriter, r *http.Request) { // i
 	}
 
 	deleteErr := k8sClient.DeleteCodebase(ctx, codebaseCR)
-	if err != nil {
+	if deleteErr != nil {
 		logger.Error("delete codebase custom resource failed", zap.Error(deleteErr), zap.String("codebase_name", codebaseCR.Name))
 		http.Redirect(w, r,
 			fmt.Sprintf("%s/v2/admin/edp/%v/overview?codebase=%v#codebaseDeleteErrorModal",
