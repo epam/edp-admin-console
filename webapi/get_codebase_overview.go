@@ -138,7 +138,7 @@ func (h *HandlerEnv) GetCodebaseOverview(w http.ResponseWriter, r *http.Request)
 	codebaseBranches := make([]codebaseBranch, len(crCbBranchList))
 	for i := range crCbBranchList {
 		crCbBranch := crCbBranchList[i]
-		cicdLink := getCiLink(codebaseCR, jenkinsURL, crCbBranch.Name, gerritURL)
+		cicdLink := getCiLink(codebaseCR, jenkinsURL, crCbBranch.Spec.BranchName, gerritURL)
 
 		vcsLink := ""
 		switch codebaseCR.Spec.GitServer {
