@@ -122,7 +122,7 @@
                         </div>
 
                         {{if .CDPipeline.Stage}}
-                        <form id="editCDStages" method="post" action="{{ $.BasePath }}/v2/admin/edp/cd-pipeline/{{$.CDPipeline.Name}}/cd-stage/edit">
+                        <form id="editCDStages" method="post" action="{{ $.BasePath }}/admin/edp/cd-pipeline/{{$.CDPipeline.Name}}/cd-stage/edit">
                             <div class="card stages-info">
                                 <div class="card-header static" id="headingThree"
                                      aria-expanded="true" aria-controls="collapseThree">
@@ -263,7 +263,7 @@
                                     </div>
                                 </div>
                             </div>
-                        {{ $.Xsrfdata }}
+                        <input type="hidden" name="_xsrf" value="{{.Xsrfdata}}" />
                         </form>
                         {{end}}
 
@@ -366,7 +366,7 @@
     </div>
 
 </main>
-{{template "delete_confirmation_template.html" params "action" (print .BasePath "/v2/admin/edp/stage") "kind" "stage" "pipeline" .CDPipeline.Name "Xsrfdata" .Xsrfdata "error" .Error}}
+{{template "delete_confirmation_template.html" params "action" (print .BasePath "/admin/edp/stage") "kind" "stage" "pipeline" .CDPipeline.Name "Xsrfdata" .Xsrfdata "error" .Error}}
 <script src="{{ .BasePath }}/static/js/jquery-3.6.0.js"></script>
 <script src="{{ .BasePath }}/static/js/popper.js"></script>
 <script src="{{ .BasePath }}/static/js/bootstrap.js"></script>
