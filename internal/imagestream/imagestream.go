@@ -69,9 +69,10 @@ func GetInputISForStage(ctx context.Context, client *k8s.RuntimeNamespacedClient
 func inputCISListFromApplications(ctx context.Context, client *k8s.RuntimeNamespacedClient, cdPipelineCR *cdPipeApi.CDPipeline, previousStageName string) ([]string, error) {
 	logger := applog.LoggerFromContext(ctx)
 
-	var imageStream []string
+	var imageStreams []string
 	var cisNames []string
 	re := strings.NewReplacer("/", "-", ".", "-")
+	logger.Info("check for the existence of InputDockerStreams in CDPipelineCR", zap.Strings("cdPipelineCR.Spec.InputDockerStreams", cdPipelineCR.Spec.InputDockerStreams))
 	for _, inputDSName := range cdPipelineCR.Spec.InputDockerStreams {
 		appName, err := applications.AppNameByInputIS(ctx, client, inputDSName)
 		if err != nil {
@@ -82,19 +83,19 @@ func inputCISListFromApplications(ctx context.Context, client *k8s.RuntimeNamesp
 		CISName := createCISName(cdPipelineCR.Name, previousStageName, appName)
 		cisNames = append(cisNames, CISName)
 	}
-
+	logger.Info("checking validating CIS names for non-first stage", zap.Strings("CIS", cisNames))
 	for _, cisName := range cisNames {
 		_, err := client.GetCodebaseImageStream(ctx, cisName)
 		if err != nil {
 			logger.Error("get codebase image stream failed", zap.Error(err), zap.String("cis_name", cisName))
 			continue
 		} else {
-			imageStream = append(imageStream, cisName)
+			imageStreams = append(imageStreams, cisName)
 		}
 	}
-
-	if len(imageStream) != 0 {
-		return imageStream, nil
+	logger.Info("checking valid CIS for non-first stage", zap.Strings("validated CIS", imageStreams))
+	if len(imageStreams) != 0 {
+		return imageStreams, nil
 	} else {
 		//this error only occurs when we can't find any ImageStreamCR with cisName
 		return nil, errors.New("InputIS verification failed")
