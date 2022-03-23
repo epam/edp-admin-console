@@ -3,10 +3,10 @@ package webapi
 import (
 	"net/http"
 	"path"
-	"strings"
 
 	"go.uber.org/zap"
 
+	"edp-admin-console/internal"
 	"edp-admin-console/internal/applog"
 	"edp-admin-console/util"
 	"edp-admin-console/util/consts"
@@ -30,9 +30,6 @@ type overviewData struct {
 	InputURL           string
 }
 
-const HttpsScheme = "https://"
-const HttpScheme = "http://"
-
 func (h *HandlerEnv) GetOverviewPage(writer http.ResponseWriter, request *http.Request) {
 
 	ctx := request.Context()
@@ -51,9 +48,8 @@ func (h *HandlerEnv) GetOverviewPage(writer http.ResponseWriter, request *http.R
 		if edpComponentCRs[i].Spec.Type == consts.Openshift || edpComponentCRs[i].Spec.Type == consts.Kubernetes {
 			url = util.CreateNativeProjectLink(url, h.NamespacedClient.Namespace)
 		}
-		if !strings.HasPrefix(url, HttpScheme) && !strings.HasPrefix(url, HttpsScheme) {
-			url = HttpsScheme + url
-		}
+		url = internal.AddSchemeIfNeeded(url)
+
 		edpComp := edpComponent{
 			Visible: edpComponentCRs[i].Spec.Visible,
 			Url:     url,

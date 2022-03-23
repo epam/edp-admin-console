@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/astaxie/beego"
+	clusterConf "sigs.k8s.io/controller-runtime/pkg/client/config"
 
 	"edp-admin-console/internal/config"
 	"edp-admin-console/k8s"
@@ -26,8 +27,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	clusterConfig := clusterConf.GetConfigOrDie()
 
-	webapi.SetupRouter(namespacedClient, workingDir, conf)
+	webapi.SetupRouter(namespacedClient, workingDir, conf, clusterConfig)
 	template_function.RegisterTemplateFuncs()
 	beego.Run()
 }

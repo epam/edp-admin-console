@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EDP Admin Console</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/index.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/stages-edit.css">
+    <link rel="stylesheet" href="{{ .BasePath }}/static/css/validation.css">
+</head>
+<body>
+<main>
+    {{template "header_template.html" .}}
+
+    <section class="content d-flex">
+        <aside class="p-0 bg-dark active js-aside-menu aside-menu active">
+            {{template "navbar_template.html" .}}
+        </aside>
+        <div class="flex-fill pl-4 pr-4 wrapper">
+
+            <div class="edp-form wide nosidepadding cd-pipeline-overview-table">
+                <h1 class="edp-form-header">
+                    <a href="{{ .BasePath }}/v2/admin/edp/cd-pipeline/overview" class="edp-back-link"></a>
+                    CD Pipeline:
+                    <a href="{{.CDPipeline.JenkinsLink}}" target="_blank" class="edp-link" rel="noopener noreferrer">
+                        {{.CDPipeline.Name}}
+                    </a>
+
+                    <a href="{{ .BasePath }}/v2/admin/edp/cd-pipeline/{{.CDPipeline.Name}}/update">
+                        <button class="delete">
+                            <i class="icon-pencil"></i>
+                        </button>
+                    </a>
+                </h1>
+                <p>
+                    Find below the Pipeline details.
+                </p>
+
+                <div class="accordion" id="accordionCreateApplication">
+
+                    <div class="card">
+                        <div class="card general-info">
+                            <div class="card-header static" id="headingOne"
+                                 aria-expanded="true" aria-controls="collapseOne">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link" type="button">
+                                        General Information
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="General information about CD Pipeline below."></span>
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseOne" class="show" aria-labelledby="headingOne">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <table class="edp-card-table">
+                                            <tbody>
+                                            <tr>
+                                                <th style="width: 50%">Name</th>
+                                                <td>{{.CDPipeline.Name}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Deployment Type</th>
+                                                <td>{{.CDPipeline.DeploymentType}}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card applications-info">
+                            <div class="card-header static" id="headingTwo"
+                                 aria-expanded="true" aria-controls="collapseTwo">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link" type="button">
+                                        Applications
+                                        <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                              title="Applications which are deployed on the stages below."></span>
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseTwo" class="show" aria-labelledby="headingTwo">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <table class="table edp-table">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">Application</th>
+                                                <th scope="col">Docker Stream</th>
+                                                <th scope="col">Jenkins</th>
+                                                <th scope="col">Promote in CD Pipeline</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+
+                                            {{range .CDPipeline.CodebaseDockerStream}}
+                                                <tr>
+                                                    <td class="codebaseName">
+                                                        {{.CodebaseName}}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{.ImageLink}}" target="_blank" class="edp-link"
+                                                           rel="noopener noreferrer">{{.OcImageStreamName}}</a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{.CICDLink}}" target="_blank" class="edp-link"
+                                                           rel="noopener noreferrer">Link</a>
+                                                    </td>
+                                                    <td class="promoteCDPipeline">
+                                                        <div class="promote-checkbox-overview cancel"/>
+                                                    </td>
+                                                </tr>
+                                            {{end}}
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{if .CDPipeline.Stage}}
+                        <form id="editCDStages" method="post" action="{{ $.BasePath }}/v2/admin/edp/cd-pipeline/{{$.CDPipeline.Name}}/cd-stage/edit">
+                            <div class="card stages-info">
+                                <div class="card-header static" id="headingThree"
+                                     aria-expanded="true" aria-controls="collapseThree">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" type="button">
+                                            Stages
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Stages which are created for the pipeline."></span>
+                                        </button>
+                                        <button class="delete ml-1" id="edit-stages" onclick="editStages()">
+                                            <i class="icon-pencil-white"></i>
+                                        </button>
+                                        <button class="delete ml-1 edit-cd-stages" id="save-stages" onclick="saveStages()" disabled="disabled">
+                                            <i class="icon-save"></i>
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseThree" class="show" aria-labelledby="headingThree">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <table class="table edp-table">
+                                                <thead>
+                                                <tr>
+                                                    <th scope="col"></th>
+                                                    <th scope="col">Name</th>
+                                                    <th scope="col">Trigger Type</th>
+                                                    <th scope="col">
+                                                        {{if .IsOpenshift}}
+                                                            OpenShift Project
+                                                        {{else}}
+                                                            Kubernetes Namespace
+                                                        {{end}}
+                                                    </th>
+                                                    <th scope="col">Type</th>
+                                                    <th scope="col">Library</th>
+                                                    <th scope="col">Branch</th>
+                                                    <th scope="col">Job provision</th>
+                                                    <th scope="col">Quality Gates</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {{$len := (len .CDPipeline.Stage)}}
+                                                {{range $i, $e := .CDPipeline.Stage}}
+                                                    <tr valign="top">
+                                                        <td>
+                                                            {{if $.IsAdmin}}
+                                                                {{$notOne := ne $i 0}}
+                                                                {{$isLast := eq (add $i 1) $len}}
+                                                                {{if eq $len 1}}
+                                                                    <button class="delete delete-stage"
+                                                                            data-toggle="modal"
+                                                                            data-name="{{.Name}}"
+                                                                            data-order="{{.Order}}"
+                                                                            type="button">
+                                                                        <i class="icon-trashcan"></i>
+                                                                    </button>
+                                                                {{else if and $notOne $isLast}}
+                                                                    <button class="delete delete-stage"
+                                                                            data-toggle="modal"
+                                                                            data-name="{{.Name}}"
+                                                                            data-order="{{.Order}}"
+                                                                            type="button">
+                                                                        <i class="icon-trashcan"></i>
+                                                                    </button>
+                                                                {{end}}
+                                                            {{end}}
+                                                        </td>
+                                                        <td>
+                                                            {{.Name}}
+                                                            {{if .Description}}
+                                                                <span class="tooltip-icon" data-toggle="tooltip"
+                                                                      data-placement="top"
+                                                                      title="{{.Description}}"></span>
+                                                            {{end}}
+                                                        </td>
+                                                        <td>
+                                                            <p class="trigger-type-view" id="triggerType">{{.TriggerType}}</p>
+                                                            <select class="form-control hide-element trigger-type-edit" id="triggerType" name="triggerType">
+                                                                <option {{if eq .TriggerType "manual"}}selected="selected"{{end}}>Manual</option>
+                                                                <option {{if eq .TriggerType "auto"}}selected="selected"{{end}}>Auto</option>
+                                                            </select>
+                                                        </td>
+                                                        <td class="platform-link">
+                                                            <a href="{{.PlatformProjectLink}}" target="_blank"
+                                                               class="edp-link"
+                                                               rel="noopener noreferrer">Link</a>
+                                                        </td>
+                                                        <td>{{.Source.Type}}</td>
+                                                        <td>
+                                                            {{if eq .Source.Type "library"}}
+                                                                {{.Source.Library.Name}}
+                                                            {{end}}
+                                                        </td>
+                                                        <td>
+                                                            {{if eq .Source.Type "library"}}
+                                                                {{.Source.Library.Branch}}
+                                                            {{end}}
+                                                        </td>
+                                                        <td>{{.JobProvisioning.Name}}</td>
+                                                        <td>
+                                                            {{if .QualityGates}}
+                                                                <table>
+                                                                    <thead>
+                                                                    <tr>
+                                                                        <th scope="col">Quality Gate Type</th>
+                                                                        <th scope="col">Jenkins Step Name</th>
+                                                                        <th scope="col">Autotest Name</th>
+                                                                        <th scope="col">Branch Name</th>
+                                                                    </tr>
+                                                                    </thead>
+                                                                    {{range .QualityGates}}
+                                                                        <tr>
+                                                                        <th>{{.QualityGateType}}</th>
+                                                                        <th>{{.StepName}}</th>
+
+                                                                            {{if eq "autotests" .QualityGateType}}
+                                                                                <th>
+                                                                                    <a href="{{ $.BasePath }}/v2/admin/edp/codebase/{{.Autotest.Name}}/overview" class="edp-link">{{.Autotest.Name}}</a>
+                                                                                </th>
+                                                                                <th>
+                                                                                    {{.Branch.Name}}
+                                                                                </th>
+                                                                            {{end}}
+                                                                                <th></th>
+                                                                                <th></th>
+                                                                            {{else}}
+
+                                                                        </tr>
+                                                                    {{end}}
+                                                                </table>
+                                                            {{end}}
+                                                        </td>
+                                                    </tr>
+                                                {{end}}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {{ $.Xsrfdata }}
+                        </form>
+                        {{end}}
+
+                        {{if .CDPipeline.CodebaseStageMatrix}}
+                            <div class="card stages-info">
+                                <div class="card-header static" id="headingFive"
+                                     aria-expanded="true" aria-controls="collapseFive">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" type="button">
+                                            Deployed versions
+                                            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                                                  title="Versions of the deployed artifacts."></span>
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseFive" class="show" aria-labelledby="headingFive">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <table class="table edp-table">
+                                                <thead>
+                                                <tr>
+                                                    <th scope="col">Application/Stage</th>
+                                                    {{range .CDPipeline.Stage}}
+                                                        <th>{{.Name}}</th>
+                                                    {{end}}
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {{$pipeline := .CDPipeline}}
+                                                {{range $i, $codebase := $pipeline.CodebaseBranch}}
+                                                    <tr>
+                                                        <th>{{$codebase.AppName}}</th>
+                                                        {{range $i, $stage := $pipeline.Stage}}
+                                                            {{$version := $pipeline.GetCDCodebaseStageMatrixValue $codebase $stage  }}
+                                                            <td>{{$version.DockerVersion }}</td>
+                                                        {{end}}
+                                                    </tr>
+                                                {{end}}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {{end}}
+
+                        {{if .CDPipeline.ActionLog}}
+                            <div class="card status-info">
+                                <div class="card-header collapsed" id="headingSix" data-toggle="collapse"
+                                     data-target="#collapseSix" aria-expanded="true" aria-controls="collapseSix">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" type="button">
+                                            Status Info
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseSix" class="collapse status" aria-labelledby="headingSix">
+                                    <div class="card-body">
+                                        <table class="action-log-table edp-card-table">
+                                            <tbody>
+                                            <tr>
+                                                <th scope="col" style="width: 20%">Date</th>
+                                                <th scope="col" style="width: 25%">User</th>
+                                                <th scope="col" style="width: 22.5%">Action</th>
+                                                <th scope="col" style="width: 10%">Result</th>
+                                                <th scope="col" style="width: 22.5%">Message</th>
+                                            </tr>
+                                            {{range .CDPipeline.ActionLog}}
+                                                <tr>
+                                                    <td>{{.LastTimeUpdate.Format "02.01.2006 15:04:05 (UTC-07)" }}</td>
+                                                    <td>{{.UserName}}</td>
+                                                    <td>{{.Action}}</td>
+                                                    <td>{{.Result}}</td>
+                                                    <td>{{.Message}}</td>
+                                                </tr>
+                                            {{end}}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="applications-to-promote">
+            {{range $app := .CDPipeline.ApplicationsToPromote}}
+                <input type="hidden" data-app-name="{{$app}}">
+            {{end}}
+        </div>
+    </section>
+    {{template "footer_template.html" .}}
+
+    <div id="kubernetes-component">
+        <p>
+            The link cannot be generated due to the absence of the EDP Kubernetes component.
+        </p>
+    </div>
+
+</main>
+{{template "delete_confirmation_template.html" params "action" (print .BasePath "/v2/admin/edp/stage") "kind" "stage" "pipeline" .CDPipeline.Name "Xsrfdata" .Xsrfdata "error" .Error}}
+<script src="{{ .BasePath }}/static/js/jquery-3.6.0.js"></script>
+<script src="{{ .BasePath }}/static/js/popper.js"></script>
+<script src="{{ .BasePath }}/static/js/bootstrap.js"></script>
+<script src="{{ .BasePath }}/static/js/util.js"></script>
+<script src="{{ .BasePath }}/static/js/confirmation-popup.js"></script>
+<script src="{{ .BasePath }}/static/js/pipeline-overview.js"></script>
+<script src="{{ .BasePath }}/static/js/bootstrap-notify.js"></script>
+<script src="{{ .BasePath }}/static/js/stages-edit.js"></script>
+<script src="{{ .BasePath }}/static/js/codebase-branch-validation.js"></script>
+</body>
+</html>

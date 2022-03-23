@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/astaxie/beego"
+	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"edp-admin-console/internal/config"
@@ -32,7 +33,8 @@ func TestSetupRouter(t *testing.T) {
 		t.Fatal(err)
 	}
 	conf := &config.AppConfig{AuthEnable: false}
-	SetupRouter(namespaceClient, "", conf) // rewrite this setup ASAP
+	clusterConf := &rest.Config{}
+	SetupRouter(namespaceClient, "", conf, clusterConf) // rewrite this setup ASAP
 	err = os.Unsetenv(k8s.NamespaceEnv)
 	if err != nil {
 		t.Fatal(err)

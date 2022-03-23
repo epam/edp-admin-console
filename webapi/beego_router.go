@@ -25,6 +25,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/csrf"
 	"go.uber.org/zap"
+	"k8s.io/client-go/rest"
 
 	edpcontext "edp-admin-console/context"
 	"edp-admin-console/controllers"
@@ -65,7 +66,7 @@ const (
 	edpV2Scope     = "/v2/admin/edp"
 )
 
-func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir string, confV2 *config.AppConfig) {
+func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir string, confV2 *config.AppConfig, clusterConfig *rest.Config) {
 	zaplog.Info("Start application...",
 		zap.String("mode", beego.AppConfig.String("runmode")),
 		zap.String("edp version", edpcontext.EDPVersion))
@@ -341,7 +342,7 @@ func SetupRouter(namespacedClient *k8s.RuntimeNamespacedClient, workingDir strin
 	)
 	beego.AddNamespace(apiV1Namespace)
 
-	v2APIHandler := NewHandlerEnv(WithClient(namespacedClient), WithWorkingDir(workingDir), WithFuncMap(CreateCommonFuncMap()), WithConfig(confV2))
+	v2APIHandler := NewHandlerEnv(WithClient(namespacedClient), WithWorkingDir(workingDir), WithFuncMap(CreateCommonFuncMap()), WithConfig(confV2), WithClusterConfig(clusterConfig))
 
 	authOpts := make([]HandlerAuthOption, 0)
 	authOpts = append(authOpts, WithBasePath(confV2.BasePath))
@@ -417,8 +418,11 @@ func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.L
 				cdScope.Get("/overview", handlerEnv.CDPipelineOverview)
 				cdScope.Post("/delete", handlerEnv.DeleteCD)
 				cdScope.Post("/", handlerEnv.CreateCDPipeline)
-				cdScope.Get("/{pipelineName}/update", handlerEnv.GetPipelineUpdatePage)
-				cdScope.Post("/{pipelineName}/update", handlerEnv.UpdateCDPipeline)
+				cdScope.Route("/{pipelineName}", func(pipelineScope chi.Router) {
+					pipelineScope.Get("/update", handlerEnv.GetPipelineUpdatePage)
+					pipelineScope.Post("/update", handlerEnv.UpdateCDPipeline)
+					pipelineScope.Get("/overview", handlerEnv.GetPipelineOverviewPage)
+				})
 			})
 		})
 		baseRouter.Route("/v2", func(r chi.Router) {

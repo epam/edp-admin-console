@@ -5,6 +5,7 @@ import (
 	"html/template"
 
 	"golang.org/x/oauth2"
+	"k8s.io/client-go/rest"
 
 	"edp-admin-console/internal/config"
 	"edp-admin-console/k8s"
@@ -15,6 +16,7 @@ type HandlerEnv struct {
 	FuncMap          template.FuncMap
 	WorkingDir       string
 	Config           *config.AppConfig
+	ClusterConfig    *rest.Config
 }
 
 type HandlerAuth struct {
@@ -85,6 +87,12 @@ func WithClient(client *k8s.RuntimeNamespacedClient) HandlerEnvOption {
 func WithFuncMap(funcMap template.FuncMap) HandlerEnvOption {
 	return func(handler *HandlerEnv) {
 		handler.FuncMap = funcMap
+	}
+}
+
+func WithClusterConfig(config *rest.Config) HandlerEnvOption {
+	return func(handler *HandlerEnv) {
+		handler.ClusterConfig = config
 	}
 }
 
