@@ -7,8 +7,10 @@ import (
 
 	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	"go.uber.org/zap"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"edp-admin-console/internal/applog"
+	"edp-admin-console/internal/imagestream"
 )
 
 const paramWaitingForCdPipeline = "waitingforcdpipeline"
@@ -136,21 +138,37 @@ func (h *HandlerEnv) CreateCDPipeline(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		stageSpec := cdPipeApi.StageSpec{
-			Name:         stage.Name,
-			CdPipeline:   cdPipeName,
-			Description:  stage.Description,
-			TriggerType:  stage.TriggerType,
-			Order:        i,
-			QualityGates: qualityGates,
-			Source: cdPipeApi.Source{
-				Type:    stageLibraryType,
-				Library: stageLibrary,
-			},
-			JobProvisioning: stage.JobProvisioner,
-		}
 		stageName := strings.Join([]string{cdPipeName, stage.Name}, "-")
-		errStage := h.NamespacedClient.CreateCDStageBySpec(ctx, stageName, stageSpec)
+
+		stageCR := &cdPipeApi.Stage{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      stageName,
+				Namespace: h.NamespacedClient.Namespace,
+			},
+			Spec: cdPipeApi.StageSpec{
+				Name:         stage.Name,
+				CdPipeline:   cdPipeName,
+				Description:  stage.Description,
+				TriggerType:  stage.TriggerType,
+				Order:        i,
+				QualityGates: qualityGates,
+				Source: cdPipeApi.Source{
+					Type:    stageLibraryType,
+					Library: stageLibrary,
+				},
+				JobProvisioning: stage.JobProvisioner,
+			},
+		}
+		if i > 0 {
+			if len(stageCR.Annotations) > 0 {
+				stageCR.Annotations[imagestream.PreviousStageNameAnnotationKey] = stagesInfo[i-1].Name
+			} else {
+				annotation := map[string]string{imagestream.PreviousStageNameAnnotationKey: stagesInfo[i-1].Name}
+				stageCR.Annotations = annotation
+			}
+		}
+
+		errStage := h.NamespacedClient.Create(ctx, stageCR)
 		if errStage != nil {
 			logger.Error("cant create stage CR", zap.Error(errStage))
 			http.Redirect(w, r, fmt.Sprintf("%s/v2/admin/edp/cd-pipeline/overview?name=%s#stageCreateErrorModal'", h.Config.BasePath, stageName), http.StatusFound)
