@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
@@ -60,4 +61,65 @@ func TestRuntimeNamespacedClient_DeleteCodebase(t *testing.T) {
 
 	var expectedK8SCodebase *codeBaseApi.Codebase
 	assert.Equal(t, expectedK8SCodebase, k8sCodebase)
+}
+
+type CodebaseBranchCROption func(codebase *codeBaseApi.CodebaseBranch)
+
+func createCodebaseBranchCRWithOptions(opts ...CodebaseBranchCROption) *codeBaseApi.CodebaseBranch {
+	codebaseBranchCR := new(codeBaseApi.CodebaseBranch)
+	for i := range opts {
+		opts[i](codebaseBranchCR)
+	}
+	return codebaseBranchCR
+}
+
+func cbBranchWithName(name string) CodebaseBranchCROption {
+	return func(cbBranch *codeBaseApi.CodebaseBranch) {
+		cbBranch.Name = name
+	}
+}
+
+func cbBranchWithNamespace(namespace string) CodebaseBranchCROption {
+	return func(cbBranch *codeBaseApi.CodebaseBranch) {
+		cbBranch.Namespace = namespace
+	}
+}
+
+func cbBranchWithSpecBranchName(branchName string) CodebaseBranchCROption {
+	return func(cbBranch *codeBaseApi.CodebaseBranch) {
+		cbBranch.Spec.BranchName = branchName
+	}
+}
+
+func TestRuntimeNamespacedClient_DeleteCodebaseBranch_1(t *testing.T) {
+	ctx := context.Background()
+
+	namespace := "test_ns_1"
+	cbCrName_1 := "cb_1"
+	cbBranchName_1 := "develop"
+	crCbBranchName := fmt.Sprintf("%s-%s", cbCrName_1, cbBranchName_1)
+	stubCodebaseBranch_1 := createCodebaseBranchCRWithOptions(
+		cbBranchWithName(crCbBranchName),
+		cbBranchWithNamespace(namespace),
+		cbBranchWithSpecBranchName(cbBranchName_1),
+	)
+
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion,
+		&codeBaseApi.CodebaseBranch{},
+	)
+	fakeClient := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(stubCodebaseBranch_1).Build()
+	k8sClient, err := NewRuntimeNamespacedClient(fakeClient, namespace)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = k8sClient.DeleteCodebaseBranch(ctx, stubCodebaseBranch_1)
+	assert.NoError(t, err)
+
+	k8sCBBranch, err := k8sClient.GetCBBranch(ctx, crCbBranchName)
+	var notFoundErr *k8sErrors.StatusError
+	assert.ErrorAs(t, err, &notFoundErr)
+	var expectedCBBranchCR *codeBaseApi.CodebaseBranch
+	assert.Equal(t, expectedCBBranchCR, k8sCBBranch)
 }

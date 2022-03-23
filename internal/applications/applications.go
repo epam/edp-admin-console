@@ -90,3 +90,18 @@ func ByNameIFExists(ctx context.Context, k8sClient *k8s.RuntimeNamespacedClient,
 
 	return codebaseCR, nil
 }
+
+func CodebaseBranchByNameIfExists(ctx context.Context, k8sClient *k8s.RuntimeNamespacedClient, cbBranchName string) (*codeBaseApi.CodebaseBranch, error) {
+	codebaseBranchCR, err := k8sClient.GetCBBranch(ctx, cbBranchName)
+	if err != nil {
+		var statusErr *k8sErrors.StatusError
+		if errors.As(err, &statusErr) {
+			if statusErr.ErrStatus.Code == http.StatusNotFound {
+				return nil, nil // not found
+			}
+		}
+		return nil, err
+	}
+
+	return codebaseBranchCR, nil
+}

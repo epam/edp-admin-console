@@ -352,3 +352,58 @@ func TestByNameIFExists_NotFound(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedCBCR, k8sCodebase)
 }
+
+func TestCodebaseBranchByNameIfExists_OK(t *testing.T) {
+	ctx := context.Background()
+
+	namespace := "test_ns_1"
+	cbCrName_1 := "cb_1"
+	cbBranchName_1 := "develop"
+	crCbBranchName := fmt.Sprintf("%s-%s", cbCrName_1, cbBranchName_1)
+	stubCodebaseBranch_1 := createCodebaseBranchCRWithOptions(
+		cbBranchWithName(crCbBranchName),
+		cbBranchWithNamespace(namespace),
+		cbBranchWithSpecBranchName(cbBranchName_1),
+	)
+
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(codeBaseApi.SchemeGroupVersion,
+		&codeBaseApi.CodebaseBranch{},
+	)
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(stubCodebaseBranch_1).Build()
+	k8sClient, err := k8s.NewRuntimeNamespacedClient(client, namespace)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	k8sCBBranch, err := CodebaseBranchByNameIfExists(ctx, k8sClient, crCbBranchName)
+	assert.NoError(t, err)
+	expectedCBBranchCR := stubCodebaseBranch_1.DeepCopy()
+	expectedCBBranchCR.TypeMeta.Kind = "CodebaseBranch"
+	expectedCBBranchCR.TypeMeta.APIVersion = "v2.edp.epam.com/v1alpha1"
+	assert.Equal(t, expectedCBBranchCR, k8sCBBranch)
+}
+
+func TestCodebaseBranchByNameIfExists_NotFound(t *testing.T) {
+	ctx := context.Background()
+
+	namespace := "test_ns_1"
+	cbCrName_1 := "cb_1"
+	cbBranchName_1 := "develop"
+	crCbBranchName := fmt.Sprintf("%s-%s", cbCrName_1, cbBranchName_1)
+
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(codeBaseApi.SchemeGroupVersion,
+		&codeBaseApi.CodebaseBranch{},
+	)
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects().Build()
+	k8sClient, err := k8s.NewRuntimeNamespacedClient(client, namespace)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	k8sCBBranch, err := CodebaseBranchByNameIfExists(ctx, k8sClient, crCbBranchName)
+	assert.NoError(t, err)
+	var expectedCBBranchCR *codeBaseApi.CodebaseBranch
+	assert.Equal(t, expectedCBBranchCR, k8sCBBranch)
+}

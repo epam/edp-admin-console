@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"edp-admin-console/internal/applog"
 
@@ -56,7 +55,7 @@ func (h HandlerEnv) CreateBranch(writer http.ResponseWriter, request *http.Reque
 		ReleaseJobParams: nil,
 	}
 
-	codebaseBranchCRName := fmt.Sprintf("%s-%s", codebaseName, strings.ReplaceAll(codebaseBranchName, "/", "-"))
+	codebaseBranchCRName := buildCobaseBranchCRName(codebaseName, codebaseBranchName)
 	errBranch := h.NamespacedClient.CreateCBBranchByCustomFields(ctx, codebaseBranchCRName, branchSpec, codeBaseApi.CodebaseBranchStatus{})
 	if errBranch != nil && !k8serrors.IsAlreadyExists(errBranch) {
 		logger.Error("cant create codebase branch", zap.Error(errBranch))

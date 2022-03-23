@@ -19,6 +19,9 @@ $(function () {
             } else if (anchor === "#branchDeletedSuccessModal") {
                 let name = getUrlParameter('name');
                 showNotification(true, null, `Codebase Branch ${name} was marked for deletion.`);
+            } else if (anchor === "#branchDeletionErrorModal") {
+                let name = getUrlParameter('name');
+                showNotification(false, null, `Delete Codebase Branch ${name} failed.`);
             } else if (anchor === "#branchIsUsedSuccessModal") {
                 let $modal = $("#delete-confirmation"),
                     name = getUrlParameter('name');

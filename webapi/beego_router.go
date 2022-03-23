@@ -389,24 +389,36 @@ func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.L
 				edpScope.Use(WithAuthN(authHandler.TokenMap, authHandler.UrlMap, authHandler.StateMap, authHandler.AuthController))
 				edpScope.Use(WithAuthZ(authHandler.TokenMap, authHandler.AuthController))
 			}
-			if handlerEnv.Config.XSRFEnabled {
-				edpScope.Use(
-					csrf.Protect(
-						handlerEnv.Config.XSRFKey,
-						csrf.CookieName("_edp_csrf"),
-						csrf.FieldName("_xsrf"),
-					),
-				)
-			}
 			edpScope.Get("/overview", handlerEnv.GetOverviewPage)
 			edpScope.Route("/application", func(applicationRoute chi.Router) {
+				if handlerEnv.Config.XSRFEnabled {
+					applicationRoute.Use(
+						csrf.Protect(
+							handlerEnv.Config.XSRFKey,
+							csrf.CookieName("_edp_csrf"),
+							csrf.FieldName("_xsrf"),
+							csrf.Path("/v2/admin/edp/application"),
+						),
+					)
+				}
 				applicationRoute.Post("/", handlerEnv.CreateApplication)
 				applicationRoute.Get("/overview", handlerEnv.ApplicationOverview)
 				applicationRoute.Get("/create", handlerEnv.CreateApplicationPage)
 			})
 			edpScope.Route("/codebase", func(codebasesRouter chi.Router) {
 				codebasesRouter.Post("/", handlerEnv.PostCodebase)
+				codebasesRouter.Post("/branch/delete", handlerEnv.DeleteCodebaseBranch)
 				codebasesRouter.Route("/{codebaseName}", func(codebaseRoute chi.Router) {
+					if handlerEnv.Config.XSRFEnabled {
+						codebaseRoute.Use(
+							csrf.Protect(
+								handlerEnv.Config.XSRFKey,
+								csrf.CookieName("_edp_csrf"),
+								csrf.FieldName("_xsrf"),
+								csrf.Path("/v2/admin/edp/codebase"),
+							),
+						)
+					}
 					codebaseRoute.Get("/overview", handlerEnv.GetCodebaseOverview)
 					codebaseRoute.Get("/update", handlerEnv.GetCodebaseUpdate)
 					codebaseRoute.Post("/update", handlerEnv.PostCodebaseUpdate)
@@ -419,6 +431,16 @@ func V2APIRouter(handlerEnv *HandlerEnv, authHandler *HandlerAuth, logger *zap.L
 				cdScope.Post("/delete", handlerEnv.DeleteCD)
 				cdScope.Post("/", handlerEnv.CreateCDPipeline)
 				cdScope.Route("/{pipelineName}", func(pipelineScope chi.Router) {
+					if handlerEnv.Config.XSRFEnabled {
+						pipelineScope.Use(
+							csrf.Protect(
+								handlerEnv.Config.XSRFKey,
+								csrf.CookieName("_edp_csrf"),
+								csrf.FieldName("_xsrf"),
+								csrf.Path("/v2/admin/edp/cd-pipeline"),
+							),
+						)
+					}
 					pipelineScope.Get("/update", handlerEnv.GetPipelineUpdatePage)
 					pipelineScope.Post("/update", handlerEnv.UpdateCDPipeline)
 					pipelineScope.Get("/overview", handlerEnv.GetPipelineOverviewPage)
