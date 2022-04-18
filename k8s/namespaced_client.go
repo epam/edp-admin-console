@@ -20,6 +20,8 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	runtimeClient "sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
+
+	"edp-admin-console/util"
 )
 
 const NamespaceEnv = "NAMESPACE"
@@ -209,7 +211,7 @@ func (c *RuntimeNamespacedClient) GetCodebaseImageStream(ctx context.Context, cr
 	}
 	codebaseImageStream := &codeBaseApi.CodebaseImageStream{}
 	nsn := types.NamespacedName{
-		Name:      crName,
+		Name:      util.ProcessCodeBaseImageStreamNameConvention(crName),
 		Namespace: c.Namespace,
 	}
 	err := c.Get(ctx, nsn, codebaseImageStream)

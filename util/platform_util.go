@@ -12,7 +12,10 @@ import (
 	"go.uber.org/zap"
 )
 
-var log = logger.GetLogger()
+var (
+	log                 = logger.GetLogger()
+	imageStreamReplacer = strings.NewReplacer("/", "-", ".", "-")
+)
 
 func GetValuesFromConfig(name string) []string {
 	values := beego.AppConfig.String(name)
@@ -57,6 +60,10 @@ func TrimSuffix(v, s string) string {
 
 func ProcessNameToKubernetesConvention(name string) string {
 	return strings.Replace(name, "/", "-", -1)
+}
+
+func ProcessCodeBaseImageStreamNameConvention(name string) string {
+	return imageStreamReplacer.Replace(name)
 }
 
 func GetStringP(val string) *string {

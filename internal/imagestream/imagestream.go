@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 
 	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
@@ -13,6 +12,7 @@ import (
 	"edp-admin-console/internal/applications"
 	"edp-admin-console/internal/applog"
 	"edp-admin-console/k8s"
+	"edp-admin-console/util"
 )
 
 const (
@@ -71,7 +71,6 @@ func inputCISListFromApplications(ctx context.Context, client *k8s.RuntimeNamesp
 
 	var imageStreams []string
 	var cisNames []string
-	re := strings.NewReplacer("/", "-", ".", "-")
 	logger.Info("check for the existence of InputDockerStreams in CDPipelineCR", zap.Strings("cdPipelineCR.Spec.InputDockerStreams", cdPipelineCR.Spec.InputDockerStreams))
 	for _, inputDSName := range cdPipelineCR.Spec.InputDockerStreams {
 		appName, err := applications.AppNameByInputIS(ctx, client, inputDSName)
@@ -79,7 +78,7 @@ func inputCISListFromApplications(ctx context.Context, client *k8s.RuntimeNamesp
 			return nil, err
 		}
 
-		appName = re.Replace(appName)
+		appName = util.ProcessCodeBaseImageStreamNameConvention(appName)
 		CISName := createCISName(cdPipelineCR.Name, previousStageName, appName)
 		cisNames = append(cisNames, CISName)
 	}

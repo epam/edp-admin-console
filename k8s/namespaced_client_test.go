@@ -504,6 +504,27 @@ func TestK8SClient_GetCodebaseImageStream_Success(t *testing.T) {
 	assert.Equal(t, ns, codebaseImageStream.Namespace)
 }
 
+func TestK8SClient_GetCodebaseImageStream_WithSlash_Success(t *testing.T) {
+	ctx := context.Background()
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypes(codeBaseApi.SchemeGroupVersion, &codeBaseApi.CodebaseImageStream{})
+	codebaseImageStreamCR := &codeBaseApi.CodebaseImageStream{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "feature-one",
+			Namespace: ns,
+		},
+	}
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(codebaseImageStreamCR).Build()
+	k8sClient, err := NewRuntimeNamespacedClient(client, ns)
+	if err != nil {
+		t.Fatal(err)
+	}
+	codebaseImageStream, err := k8sClient.GetCodebaseImageStream(ctx, "feature/one")
+	assert.NoError(t, err)
+	assert.Equal(t, "feature-one", codebaseImageStream.Name)
+	assert.Equal(t, ns, codebaseImageStream.Namespace)
+}
+
 func TestK8SClient_GetCodebase_NotExist(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
