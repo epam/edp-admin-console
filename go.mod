@@ -13,7 +13,7 @@ require (
 	github.com/astaxie/beego v1.12.0
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/coreos/go-oidc v2.1.0+incompatible
-	github.com/epam/edp-cd-pipeline-operator/v2 v2.10.0
+	github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20220420133602-29bfdf5defb2
 	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20220217141504-d2f4939373bf
 	github.com/epam/edp-perf-operator/v2 v2.0.0-20210719113600-816c452ccbb0
 	github.com/gavv/httpexpect v2.0.0+incompatible

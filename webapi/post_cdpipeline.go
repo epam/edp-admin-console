@@ -96,18 +96,21 @@ func (h *HandlerEnv) CreateCDPipeline(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var appsToPromote []string
-	var inputDockerStreams []string
+	pipelineApps := make([]string, len(appsInfo), len(appsInfo))
+	inputDockerStreams := make([]string, len(appsInfo), len(appsInfo))
 	for i := range appsInfo {
 		if appsInfo[i].IsPromote {
 			appsToPromote = append(appsToPromote, appsInfo[i].Name)
 		}
-		inputDockerStreams = append(inputDockerStreams, appsInfo[i].InputIS)
+		pipelineApps[i] = appsInfo[i].Name
+		inputDockerStreams[i] = appsInfo[i].InputIS
 	}
 
 	cdPipelineSpec := cdPipeApi.CDPipelineSpec{
 		Name:                  cdPipeName,
 		DeploymentType:        deploymentType,
 		InputDockerStreams:    inputDockerStreams,
+		Applications:          pipelineApps,
 		ApplicationsToPromote: appsToPromote,
 	}
 	err = h.NamespacedClient.CreateCDPipelineBySpec(ctx, cdPipeName, cdPipelineSpec)

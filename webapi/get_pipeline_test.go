@@ -46,6 +46,7 @@ func TestGetPipelineSuite(t *testing.T) {
 			Namespace: testNamespace,
 		},
 		Spec: cdPipeApi.CDPipelineSpec{
+			Applications:          []string{firstApplication, secondApplication},
 			ApplicationsToPromote: []string{firstApplication, secondApplication},
 		},
 		Status: cdPipeApi.CDPipelineStatus{},

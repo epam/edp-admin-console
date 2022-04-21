@@ -114,6 +114,7 @@ func TestHandlerEnv_CreateCDPipeline(t *testing.T) {
 	pipeline, err := h.NamespacedClient.GetCDPipeline(ctx, pipeName)
 	assert.NoError(t, err)
 	assert.Equal(t, pipeName, pipeline.Spec.Name)
+	assert.Equal(t, apps, pipeline.Spec.Applications)
 	assert.Equal(t, appsToPromote, pipeline.Spec.ApplicationsToPromote)
 	assert.Equal(t, ISName, pipeline.Spec.InputDockerStreams)
 	assert.Equal(t, deploymentType, pipeline.Spec.DeploymentType)

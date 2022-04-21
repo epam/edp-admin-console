@@ -231,13 +231,17 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 		log.Debug("start updating Autotest",
 			zap.String("pipe name", pipelineCR.Spec.Name),
 			zap.Any("apps", pipeline.Applications))
-		var dockerStreams []string
-		for _, v := range pipeline.Applications {
-			dockerStreams = append(dockerStreams, v.InputDockerStream)
+
+		applications := make([]string, len(pipeline.Applications), len(pipeline.Applications))
+		dockerStreams := make([]string, len(pipeline.Applications), len(pipeline.Applications))
+		for i, app := range pipeline.Applications {
+			applications[i] = app.ApplicationName
+			dockerStreams[i] = app.InputDockerStream
 		}
 
 		setAnnotations(&pipelineCR.ObjectMeta, pipelineCR.Spec.InputDockerStreams)
 
+		pipelineCR.Spec.Applications = applications
 		pipelineCR.Spec.InputDockerStreams = dockerStreams
 	}
 
@@ -530,13 +534,16 @@ func fillCodebaseStageMatrixK8s(ocClient *k8s.ClientSet, cdPipeline *query.CDPip
 }
 
 func convertPipelineData(cdPipeline command.CDPipelineCommand) cdPipeApi.CDPipelineSpec {
-	var dockerStreams []string
-	for _, app := range cdPipeline.Applications {
-		dockerStreams = append(dockerStreams, app.InputDockerStream)
+	applications := make([]string, len(cdPipeline.Applications), len(cdPipeline.Applications))
+	dockerStreams := make([]string, len(cdPipeline.Applications), len(cdPipeline.Applications))
+	for i, app := range cdPipeline.Applications {
+		applications[i] = app.ApplicationName
+		dockerStreams[i] = app.InputDockerStream
 	}
 	return cdPipeApi.CDPipelineSpec{
 		Name:                  cdPipeline.Name,
 		InputDockerStreams:    dockerStreams,
+		Applications:          applications,
 		ApplicationsToPromote: cdPipeline.ApplicationToApprove,
 		DeploymentType:        cdPipeline.DeploymentType,
 	}

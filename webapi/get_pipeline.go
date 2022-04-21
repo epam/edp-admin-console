@@ -35,13 +35,8 @@ func (h *HandlerEnv) GetPipeline(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	applications := cdPipeline.Spec.ApplicationsToPromote
-
-	if len(applications) == 0 {
-		logger.Error("empty applications to promote")
-		InternalErrorResponse(ctx, w, "empty applications to promote")
-		return
-	}
+	applications := cdPipeline.Spec.Applications
+	applicationsToPromote := cdPipeline.Spec.ApplicationsToPromote
 
 	codebaseBranches := make([]*codebaseBranchResponse, 0)
 	for _, application := range applications {
@@ -54,7 +49,7 @@ func (h *HandlerEnv) GetPipeline(w http.ResponseWriter, r *http.Request) {
 
 	response := &cdPipelineResponse{
 		CodebaseBranch:        codebaseBranches,
-		ApplicationsToPromote: applications,
+		ApplicationsToPromote: applicationsToPromote,
 	}
 
 	OKJsonResponse(ctx, w, response)

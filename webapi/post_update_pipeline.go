@@ -69,12 +69,14 @@ func (h *HandlerEnv) UpdateCDPipeline(writer http.ResponseWriter, request *http.
 	}
 
 	var appsToPromote []string
-	var inputDockerStreams []string
+	pipelineApps := make([]string, len(appsInfo), len(appsInfo))
+	inputDockerStreams := make([]string, len(appsInfo), len(appsInfo))
 	for i := range appsInfo {
 		if appsInfo[i].IsPromote {
 			appsToPromote = append(appsToPromote, appsInfo[i].Name)
 		}
-		inputDockerStreams = append(inputDockerStreams, appsInfo[i].InputIS)
+		pipelineApps[i] = appsInfo[i].Name
+		inputDockerStreams[i] = appsInfo[i].InputIS
 	}
 
 	existedCDPipeCR, err := h.NamespacedClient.GetCDPipeline(ctx, cdPipeName)
@@ -84,6 +86,7 @@ func (h *HandlerEnv) UpdateCDPipeline(writer http.ResponseWriter, request *http.
 
 		return
 	}
+	existedCDPipeCR.Spec.Applications = pipelineApps
 	existedCDPipeCR.Spec.InputDockerStreams = inputDockerStreams
 	existedCDPipeCR.Spec.ApplicationsToPromote = appsToPromote
 	err = h.NamespacedClient.Update(ctx, existedCDPipeCR)
