@@ -442,7 +442,8 @@
                                            placeholder="Enter Version"
                                            value={{ getDefaultBranchVersion .Codebase.CodebaseBranch .Codebase.DefaultBranch }}>
                                     <input name="versioningPostfix" type="text" class="form-control versioning-postfix"
-                                           id="versioningPostfix" value="SNAPSHOT" readonly="readonly">
+                                           id="versioningPostfix" value="SNAPSHOT"
+                                           maxlength="16" pattern="^[a-zA-Z0-9]*$">
                                 </div>
                                 <div class="invalid-feedback branch-version">
                                     The branch version field cannot be empty and should be filled out in compliance with
@@ -461,7 +462,8 @@
                                            value={{ incrementVersion (getDefaultBranchVersion .Codebase.CodebaseBranch .Codebase.DefaultBranch) }}>
                                     <input name="snapshotStaticField" type="text"
                                            class="snapshot-static-field form-control pull-right"
-                                           id="snapshotStaticField" value="SNAPSHOT" readonly="readonly">
+                                           id="snapshotStaticField" value="SNAPSHOT"
+                                           maxlength="16" pattern="^[a-zA-Z0-9]*$">
                                 </div>
                                 <div class="invalid-feedback master-branch-version">
                                     The branch version field cannot be empty and should be filled out in compliance with

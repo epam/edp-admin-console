@@ -59,7 +59,8 @@
                            id="startVersioningFrom"
                            placeholder="Type desired initial version">
                     <input name="snapshotStaticField" type="text" class="snapshot-static-field form-control pull-right"
-                           id="snapshotStaticField" value="SNAPSHOT" readonly="readonly">
+                           id="snapshotStaticField" value="SNAPSHOT"
+                           maxlength="16" pattern="^[a-zA-Z0-9]*$">
                 </div>
                 <div class="invalid-feedback startVersioningFrom">
                     The branch version field cannot be empty and should be filled out in compliance with the semantic

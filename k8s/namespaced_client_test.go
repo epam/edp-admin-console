@@ -555,7 +555,7 @@ func TestSetupNamespacedClient_NewClientErr(t *testing.T) {
 	}
 	client, err := SetupNamespacedClient()
 	assert.Error(t, err)
-	assert.True(t, strings.Contains(err.Error(), "cant setup client"))
+	assert.Contains(t, err.Error(), "cant setup client")
 	assert.Nil(t, client)
 	err = os.Unsetenv(NamespaceEnv)
 	if err != nil {

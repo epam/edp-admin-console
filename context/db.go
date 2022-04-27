@@ -55,7 +55,8 @@ func InitDb() {
 
 	db, err := orm.GetDB("default")
 	checkErr(err)
-	driver, _ := postgres.WithInstance(db, &postgres.Config{})
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	checkErr(err)
 	m, err := migrate.NewWithDatabaseInstance(
 		"file://db/migrations",
 		pgDatabase, driver)

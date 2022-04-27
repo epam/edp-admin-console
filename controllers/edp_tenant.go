@@ -34,7 +34,7 @@ type EDPTenantController struct {
 func (c *EDPTenantController) GetEDPComponents() {
 	comp, err := c.EDPComponent.GetEDPComponents()
 	if err != nil {
-		c.Abort("500")
+		c.Abort("500") //TODO: log error
 		return
 	}
 
