@@ -1,6 +1,9 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="v2.12.0"></a>
+## [v2.12.0] - 2022-04-27
 ### Features
 
 - Add Container as a library [EPMDEDP-8341](https://jiraeu.epam.com/browse/EPMDEDP-8341)
@@ -29,6 +32,7 @@
 - Implement v2 get "/cd-pipeline/{pipelinename}/overview" request [EPMDEDP-8802](https://jiraeu.epam.com/browse/EPMDEDP-8802)
 - Implemented POST /v2/admin/edp/codebase/branch/delete request in chi-router. [EPMDEDP-8814](https://jiraeu.epam.com/browse/EPMDEDP-8814)
 - Add additional logging [EPMDEDP-8821](https://jiraeu.epam.com/browse/EPMDEDP-8821)
+- Ability to set suffix for branch version [EPMDEDP-8945](https://jiraeu.epam.com/browse/EPMDEDP-8945)
 
 ### Bug Fixes
 
@@ -52,7 +56,16 @@
 - Update current development version [EPMDEDP-8383](https://jiraeu.epam.com/browse/EPMDEDP-8383)
 - extended logging for the get stage info request. [EPMDEDP-8497](https://jiraeu.epam.com/browse/EPMDEDP-8497)
 - Update base docker image to alpine 3.15.4 [EPMDEDP-8853](https://jiraeu.epam.com/browse/EPMDEDP-8853)
+- Update changelog [EPMDEDP-9185](https://jiraeu.epam.com/browse/EPMDEDP-9185)
 
+### BREAKING CHANGE:
+
+
+use gorilla's csrf implementation instead of beego's xsrf.
+
+
+<a name="v2.11.5"></a>
+## [v2.11.5] - 2022-05-17
 
 <a name="v2.11.4"></a>
 ## [v2.11.4] - 2022-03-15
@@ -180,7 +193,9 @@
 - [EPMDEDP-3929] Add new action type to display in Action Log table
 
 
-[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.11.4...HEAD
+[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.12.0...HEAD
+[v2.12.0]: https://github.com/epam/edp-admin-console/compare/v2.11.5...v2.12.0
+[v2.11.5]: https://github.com/epam/edp-admin-console/compare/v2.11.4...v2.11.5
 [v2.11.4]: https://github.com/epam/edp-admin-console/compare/v2.11.3...v2.11.4
 [v2.11.3]: https://github.com/epam/edp-admin-console/compare/v2.11.2...v2.11.3
 [v2.11.2]: https://github.com/epam/edp-admin-console/compare/v2.11.1...v2.11.2
