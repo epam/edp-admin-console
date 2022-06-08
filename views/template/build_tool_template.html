@@ -68,18 +68,15 @@
         </div>
 
     {{if eq .Type "library" }}
-        <div class="js-form-subsection form-subsection formSubsection-terraform hide-element">
-            <label for="buildTool">Select Build Tool
-                <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                    title="Select application build tool."></span>
-            </label>
-            <select class="form-control buildTool terraform-build-tools" name="buildTool">
-                <option data-build-tool="terraform">Terraform</option>
-            </select>
-        </div>
-    {{end}}
-
-    {{if eq .Type "library" }}
+    <div class="js-form-subsection form-subsection formSubsection-terraform hide-element">
+        <label for="buildTool">Select Build Tool
+            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                title="Select application build tool."></span>
+        </label>
+        <select class="form-control buildTool terraform-build-tools" name="buildTool">
+            <option data-build-tool="terraform">Terraform</option>
+        </select>
+    </div>
     <div class="js-form-subsection form-subsection formSubsection-rego hide-element">
         <label for="buildTool">Select Build Tool
             <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
@@ -89,9 +86,6 @@
             <option data-build-tool="opa">OPA</option>
         </select>
     </div>
-    {{end}}
-
-    {{if eq .Type "library" }}
     <div class="js-form-subsection form-subsection formSubsection-groovy-pipeline  hide-element">
         <label for="buildTool">Select Build Tool
             <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
@@ -101,9 +95,6 @@
             <option data-build-tool="codenarc">Codenarc</option>
         </select>
     </div>
-    {{end}}
-
-    {{if eq .Type "library" }}
     <div class="js-form-subsection form-subsection formSubsection-container hide-element">
         <label for="buildTool">Select Build Tool
             <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
@@ -113,6 +104,25 @@
             <option data-build-tool="kaniko">Kaniko</option>
         </select>
     </div>
+    <div class="js-form-subsection form-subsection formSubsection-kubernetes hide-element">
+        <label for="buildTool">Select Build Tool
+            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                  title="Select application build tool."></span>
+        </label>
+        <select class="form-control buildTool helm-build-tools" name="buildTool">
+            <option data-build-tool="template">Template</option>
+        </select>
+    </div>
+    <div class="js-form-subsection form-subsection formSubsection-gitops hide-element">
+        <label for="buildTool">Select Build Tool
+            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
+                  title="Select application build tool."></span>
+        </label>
+        <select class="form-control buildTool argocd-build-tools" name="buildTool">
+            <option data-build-tool="template">Template</option>
+        </select>
+    </div>
     {{end}}
+
 
 </div>

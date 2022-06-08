@@ -34,49 +34,6 @@
                     <span class="form__radio-label-text">DotNet</span>
                 </label>
             </div>
-
-        {{end}}
-
-        {{if eq .Type "library" }}
-            <div class="form__radio-btn-wrapper">
-                <input name="appLang" type="radio" class="form__radio-btn"
-                       id="appLang-Groovy-pipeline" value="groovy-pipeline"
-                       data-target=".formSubsection-groovy-pipeline">
-                <label class="form__radio-label" for="appLang-Groovy-pipeline">
-                    <img class="form__radio-label-icon"
-                         src="{{ .BasePath }}/static/img/groovy-logo.png" alt="logo">
-                    <span class="form__radio-label-text">Groovy-pipeline</span>
-                </label>
-            </div>
-        {{end}}
-
-        {{if eq .Type "library" }}
-            <div class="form__radio-btn-wrapper">
-                <input name="appLang" type="radio" class="form__radio-btn"
-                       id="appLang-Terraform" value="terraform"
-                       data-target=".formSubsection-terraform">
-                <label class="form__radio-label" for="appLang-Terraform">
-                    <img class="form__radio-label-icon"
-                         src="{{ .BasePath }}/static/img/terraform-logo.png" alt="logo">
-                    <span class="form__radio-label-text">Terraform</span>
-                </label>
-            </div>
-        {{end}}
-
-        {{if eq .Type "application" }}
-        <div class="form__radio-btn-wrapper">
-            <input name="appLang" type="radio" class="form__radio-btn"
-                   id="appLang-go"
-                   value="Go" data-target=".formSubsection-go">
-            <label class="form__radio-label" for="appLang-go">
-                <img class="form__radio-label-icon" src="{{ .BasePath }}/static/img/go-logo.png"
-                     alt="logo">
-                <span class="form__radio-label-text">Go</span>
-            </label>
-        </div>
-        {{end}}
-
-        {{if ne .Type "autotests" }}
             <div class="form__radio-btn-wrapper">
                 <input name="appLang" type="radio" class="form__radio-btn"
                        id="appLang-python"
@@ -92,6 +49,26 @@
         {{if eq .Type "library" }}
         <div class="form__radio-btn-wrapper">
             <input name="appLang" type="radio" class="form__radio-btn"
+                    id="appLang-Groovy-pipeline" value="groovy-pipeline"
+                    data-target=".formSubsection-groovy-pipeline">
+            <label class="form__radio-label" for="appLang-Groovy-pipeline">
+                <img class="form__radio-label-icon"
+                        src="{{ .BasePath }}/static/img/groovy-logo.png" alt="logo">
+                <span class="form__radio-label-text">Groovy-pipeline</span>
+            </label>
+        </div>
+        <div class="form__radio-btn-wrapper">
+            <input name="appLang" type="radio" class="form__radio-btn"
+                    id="appLang-Terraform" value="terraform"
+                    data-target=".formSubsection-terraform">
+            <label class="form__radio-label" for="appLang-Terraform">
+                <img class="form__radio-label-icon"
+                        src="{{ .BasePath }}/static/img/terraform-logo.png" alt="logo">
+                <span class="form__radio-label-text">Terraform</span>
+            </label>
+        </div>
+        <div class="form__radio-btn-wrapper">
+            <input name="appLang" type="radio" class="form__radio-btn"
                    id="appLang-Rego" value="rego"
                    data-target=".formSubsection-rego">
             <label class="form__radio-label" for="appLang-Rego">
@@ -100,9 +77,6 @@
                 <span class="form__radio-label-text">Rego</span>
             </label>
         </div>
-        {{end}}
-
-        {{if eq .Type "library" }}
         <div class="form__radio-btn-wrapper">
             <input name="appLang" type="radio" class="form__radio-btn"
                    id="appLang-Container" value="container"
@@ -111,6 +85,39 @@
                 <img class="form__radio-label-icon"
                      src="{{ .BasePath }}/static/img/container-logo.png" alt="logo">
                 <span class="form__radio-label-text">Container</span>
+            </label>
+        </div>
+        <div class="form__radio-btn-wrapper">
+            <input name="appLang" type="radio" class="form__radio-btn"
+                   id="appLang-Kubernetes" value="kubernetes"
+                   data-target=".formSubsection-kubernetes">
+            <label class="form__radio-label" for="appLang-Kubernetes">
+                <img class="form__radio-label-icon"
+                     src="{{ .BasePath }}/static/img/kubernetes-logo.png" alt="logo">
+                <span class="form__radio-label-text">Kubernetes</span>
+            </label>
+        </div>
+        <div class="form__radio-btn-wrapper">
+            <input name="appLang" type="radio" class="form__radio-btn"
+                   id="appLang-GitOps" value="gitops"
+                   data-target=".formSubsection-gitops">
+            <label class="form__radio-label" for="appLang-GitOps">
+                <img class="form__radio-label-icon"
+                     src="{{ .BasePath }}/static/img/gitops-logo.png" alt="logo">
+                <span class="form__radio-label-text">GitOps</span>
+            </label>
+        </div>
+        {{end}}
+
+        {{if eq .Type "application" }}
+        <div class="form__radio-btn-wrapper">
+            <input name="appLang" type="radio" class="form__radio-btn"
+                   id="appLang-go"
+                   value="Go" data-target=".formSubsection-go">
+            <label class="form__radio-label" for="appLang-go">
+                <img class="form__radio-label-icon" src="{{ .BasePath }}/static/img/go-logo.png"
+                     alt="logo">
+                <span class="form__radio-label-text">Go</span>
             </label>
         </div>
         {{end}}

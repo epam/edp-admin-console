@@ -1,0 +1,25 @@
+<div class="js-form-subsection form-subsection formSubsection-gitops hide-element">
+    <hr/>
+    <div class="form__input-wrapper d-flex">
+        <div class="form__radio-btn-wrapper">
+            <input name="framework" type="radio" class="form__radio-btn framework"
+                   id="framework-argocd" value="argocd">
+            <label
+                    class="form__radio-label" for="framework-argocd">
+                <img class="form__radio-label-icon" src="{{ .BasePath }}/static/img/argocd-logo.png"
+                     alt="logo">
+                <span class="form__radio-label-text">ArgoCD</span>
+            </label>
+        </div>
+        <div class="form__radio-btn-wrapper">
+            <input name="framework" type="radio" class="form__radio-btn framework"
+                   id="framework-flux" value="flux">
+            <label
+                    class="form__radio-label" for="framework-flux">
+                <img class="form__radio-label-icon" src="{{ .BasePath }}/static/img/flux-logo.png"
+                     alt="logo">
+                <span class="form__radio-label-text">Flux</span>
+            </label>
+        </div>
+    </div>
+</div>

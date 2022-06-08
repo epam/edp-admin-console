@@ -1,0 +1,25 @@
+<div class="js-form-subsection form-subsection formSubsection-kubernetes hide-element">
+    <hr/>
+    <div class="form__input-wrapper d-flex">
+        <div class="form__radio-btn-wrapper">
+            <input name="framework" type="radio" class="form__radio-btn framework"
+                   id="framework-helm" value="helm">
+            <label
+                    class="form__radio-label" for="framework-helm">
+                <img class="form__radio-label-icon" src="{{ .BasePath }}/static/img/helm-logo.png"
+                     alt="logo">
+                <span class="form__radio-label-text">Helm</span>
+            </label>
+        </div>
+        <div class="form__radio-btn-wrapper">
+            <input name="framework" type="radio" class="form__radio-btn framework"
+                   id="framework-kustomize" value="kustomize">
+            <label
+                    class="form__radio-label" for="framework-kustomize">
+                <img class="form__radio-label-icon" src="{{ .BasePath }}/static/img/kustomize-logo.png"
+                     alt="logo">
+                <span class="form__radio-label-text">Kustomize</span>
+            </label>
+        </div>
+    </div>
+</div>
