@@ -8,8 +8,8 @@ import (
 	"path"
 	"testing"
 
-	cdPipelineAPI "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
-	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	cdPipelineAPI "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 	edpComponentAPI "github.com/epam/edp-component-operator/pkg/apis/v1/v1alpha1"
 	"github.com/gavv/httpexpect/v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

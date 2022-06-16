@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	cdPipelineAPI "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	cdPipelineAPI "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
 
 	"edp-admin-console/internal/applications"
 	"edp-admin-console/k8s"

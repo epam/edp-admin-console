@@ -20,15 +20,13 @@ import (
 	ctx "context"
 	"encoding/json"
 	"fmt"
-	"strings"
-	"time"
-
-	edpv1alpha1 "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	coreV1Client "k8s.io/client-go/kubernetes/typed/core/v1"
+	"strings"
 
 	"edp-admin-console/context"
 	"edp-admin-console/k8s"
@@ -55,7 +53,7 @@ type CodebaseService struct {
 	PerfService           perfboard.PerfBoard
 }
 
-func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*edpv1alpha1.Codebase, error) {
+func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*codeBaseApi.Codebase, error) {
 	clog.Info("start creating Codebase resource", zap.String("name", codebase.Name))
 
 	codebaseCr, err := util.GetCodebaseCR(s.Clients.EDPRestClient, codebase.Name)
@@ -83,9 +81,9 @@ func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*edpv1
 	edpClient := s.Clients.EDPRestClient
 	coreClient := s.Clients.CoreClient
 
-	c := &edpv1alpha1.Codebase{
+	c := &codeBaseApi.Codebase{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: "v2.edp.epam.com/v1alpha1",
+			APIVersion: "v2.edp.epam.com/v1",
 			Kind:       consts.CodebaseKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
@@ -93,9 +91,9 @@ func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*edpv1
 			Namespace: context.Namespace,
 		},
 		Spec: convertData(codebase),
-		Status: edpv1alpha1.CodebaseStatus{
+		Status: codeBaseApi.CodebaseStatus{
 			Available:       false,
-			LastTimeUpdated: time.Now(),
+			LastTimeUpdated: metav1.Now(),
 			Status:          consts.InitializedStatus,
 			Username:        codebase.Username,
 			Action:          "codebase_registration",
@@ -109,18 +107,18 @@ func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*edpv1
 		return nil, err
 	}
 
-	result := &edpv1alpha1.Codebase{}
+	result := &codeBaseApi.Codebase{}
 	err = edpClient.Post().Namespace(context.Namespace).Resource(consts.CodebasePlural).Body(c).Do(ctx.TODO()).Into(result)
 	if err != nil {
 		clog.Error("an error has occurred while creating codebase resource in cluster", zap.Error(err))
-		return &edpv1alpha1.Codebase{}, err
+		return &codeBaseApi.Codebase{}, err
 	}
 
 	p := setCodebaseBranchCr(codebase.Versioning.Type, codebase.Username, codebase.Versioning.StartFrom, codebase.DefaultBranch)
 
 	if _, err = s.BranchService.CreateCodebaseBranch(p, codebase.Name); err != nil {
 		clog.Error("an error has been occurred during the master branch creation", zap.Error(err))
-		return &edpv1alpha1.Codebase{}, err
+		return &codeBaseApi.Codebase{}, err
 	}
 	return result, nil
 }
@@ -249,12 +247,12 @@ func getSecret(name string, username string, password string) *v1.Secret {
 	}
 }
 
-func convertData(codebase command.CreateCodebase) edpv1alpha1.CodebaseSpec {
-	cs := edpv1alpha1.CodebaseSpec{
+func convertData(codebase command.CreateCodebase) codeBaseApi.CodebaseSpec {
+	cs := codeBaseApi.CodebaseSpec{
 		Lang:                 codebase.Lang,
 		Framework:            codebase.Framework,
 		BuildTool:            codebase.BuildTool,
-		Strategy:             edpv1alpha1.Strategy(codebase.Strategy),
+		Strategy:             codeBaseApi.Strategy(codebase.Strategy),
 		Type:                 codebase.Type,
 		GitServer:            codebase.GitServer,
 		JenkinsSlave:         codebase.JenkinsSlave,
@@ -274,7 +272,7 @@ func convertData(codebase command.CreateCodebase) edpv1alpha1.CodebaseSpec {
 		cs.Framework = codebase.Framework
 	}
 	if codebase.Repository != nil {
-		cs.Repository = &edpv1alpha1.Repository{
+		cs.Repository = &codeBaseApi.Repository{
 			Url: codebase.Repository.Url,
 		}
 	}
@@ -284,11 +282,11 @@ func convertData(codebase command.CreateCodebase) edpv1alpha1.CodebaseSpec {
 	if codebase.Description != nil {
 		cs.Description = codebase.Description
 	}
-	cs.Versioning.Type = edpv1alpha1.VersioningType(codebase.Versioning.Type)
+	cs.Versioning.Type = codeBaseApi.VersioningType(codebase.Versioning.Type)
 	cs.Versioning.StartFrom = codebase.Versioning.StartFrom
 
 	if codebase.Perf != nil {
-		cs.Perf = &edpv1alpha1.Perf{
+		cs.Perf = &codeBaseApi.Perf{
 			Name:        codebase.Perf.Name,
 			DataSources: codebase.Perf.DataSources,
 		}
@@ -384,7 +382,7 @@ func (s CodebaseService) getCdPipelinesUsingCodebase(name, codebaseType string) 
 
 func (s CodebaseService) deleteCodebase(name string) error {
 	clog.Debug("start executing codebase delete request", zap.String("codebase", name))
-	r := &edpv1alpha1.Codebase{}
+	r := &codeBaseApi.Codebase{}
 	err := s.Clients.EDPRestClient.Delete().
 		Namespace(context.Namespace).
 		Resource(consts.CodebasePlural).
@@ -414,7 +412,7 @@ func setCodebaseBranchCr(vt string, username string, version *string, defaultBra
 	}
 }
 
-func (s *CodebaseService) Update(command command.UpdateCodebaseCommand) (*edpv1alpha1.Codebase, error) {
+func (s *CodebaseService) Update(command command.UpdateCodebaseCommand) (*codeBaseApi.Codebase, error) {
 	log.Debug("start executing Update method fort codebase", zap.String("name", command.Name))
 	c, err := util.GetCodebaseCR(s.Clients.EDPRestClient, command.Name)
 	if err != nil {
@@ -430,7 +428,7 @@ func (s *CodebaseService) Update(command command.UpdateCodebaseCommand) (*edpv1a
 	return c, nil
 }
 
-func updateSpec(spec *edpv1alpha1.CodebaseSpec, command command.UpdateCodebaseCommand) {
+func updateSpec(spec *codeBaseApi.CodebaseSpec, command command.UpdateCodebaseCommand) {
 	spec.CommitMessagePattern = &command.CommitMessageRegex
 	spec.TicketNamePattern = &command.TicketNameRegex
 	spec.JiraIssueMetadataPayload = command.JiraIssueMetadataPayload
@@ -442,7 +440,7 @@ func updateSpec(spec *edpv1alpha1.CodebaseSpec, command command.UpdateCodebaseCo
 		zap.Any("jiraIssueMetadataPayload", spec.JiraIssueMetadataPayload))
 }
 
-func (s *CodebaseService) executeUpdateRequest(c *edpv1alpha1.Codebase) error {
+func (s *CodebaseService) executeUpdateRequest(c *codeBaseApi.Codebase) error {
 	err := s.Clients.EDPRestClient.Put().
 		Namespace(context.Namespace).
 		Resource("codebases").

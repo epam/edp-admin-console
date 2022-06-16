@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
 	"github.com/gavv/httpexpect"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"

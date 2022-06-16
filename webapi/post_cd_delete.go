@@ -7,7 +7,7 @@ import (
 
 	"edp-admin-console/internal/cdpipelines"
 
-	cdPipelineAPI "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	cdPipelineAPI "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
 	"go.uber.org/zap"
 
 	"edp-admin-console/internal/applog"

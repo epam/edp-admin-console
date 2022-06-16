@@ -13,9 +13,9 @@ require (
 	github.com/astaxie/beego v1.12.0
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/coreos/go-oidc v2.1.0+incompatible
-	github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20220420133602-29bfdf5defb2
-	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20220217141504-d2f4939373bf
-	github.com/epam/edp-perf-operator/v2 v2.0.0-20210719113600-816c452ccbb0
+	github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20220606105731-5ac7dbf2a088
+	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20220609142808-e5274ded7b97
+	github.com/epam/edp-perf-operator/v2 v2.0.0-20220610074242-b9ebbfdf8023
 	github.com/gavv/httpexpect v2.0.0+incompatible
 	github.com/gavv/httpexpect/v2 v2.3.1
 	github.com/go-chi/chi/v5 v5.0.7
@@ -50,8 +50,8 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emicklei/go-restful v2.12.0+incompatible // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
-	github.com/epam/edp-component-operator v0.1.1-0.20211129100139-b5b7659f98f6
-	github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20211129152322-3fdc74f98b19
+	github.com/epam/edp-component-operator v0.1.1-0.20220520092339-3063cc593800
+	github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20220317153036-60f17fac1722
 	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
@@ -110,7 +110,6 @@ require (
 	gomodules.xyz/jsonpatch/v2 v2.1.0 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
-	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -128,10 +127,14 @@ require (
 require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d // indirect
+	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/docker/docker v1.13.1 // indirect
+	github.com/docker/go-connections v0.4.0 // indirect
+	github.com/docker/go-units v0.4.0 // indirect
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
+	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/pquerna/cachecontrol v0.0.0-20180517163645-1555304b9b35 // indirect
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
 	github.com/sirupsen/logrus v1.7.0 // indirect

@@ -4,8 +4,7 @@ import (
 	"context"
 	"testing"
 
-	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
-	cdPipelineAPI "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -105,22 +104,22 @@ func TestRuntimeNamespacedClient_CreateCDStageBySpec(t *testing.T) {
 	assert.Equal(t, cdName, stage.Spec.CdPipeline)
 }
 
-type CDPipelineCROption func(cdPipelineCR *cdPipelineAPI.CDPipeline)
+type CDPipelineCROption func(cdPipelineCR *cdPipeApi.CDPipeline)
 
 func WithCDPipelineCRName(crName string) CDPipelineCROption {
-	return func(cdPipelineCR *cdPipelineAPI.CDPipeline) {
+	return func(cdPipelineCR *cdPipeApi.CDPipeline) {
 		cdPipelineCR.Name = crName
 	}
 }
 
 func WithCDPipelineCRNamespace(crNamespace string) CDPipelineCROption {
-	return func(cdPipelineCR *cdPipelineAPI.CDPipeline) {
+	return func(cdPipelineCR *cdPipeApi.CDPipeline) {
 		cdPipelineCR.Namespace = crNamespace
 	}
 }
 
-func createCDPipelineCRWithOptions(opts ...CDPipelineCROption) *cdPipelineAPI.CDPipeline {
-	cdPipelineCR := new(cdPipelineAPI.CDPipeline)
+func createCDPipelineCRWithOptions(opts ...CDPipelineCROption) *cdPipeApi.CDPipeline {
+	cdPipelineCR := new(cdPipeApi.CDPipeline)
 	for _, opt := range opts {
 		opt(cdPipelineCR)
 	}
@@ -144,7 +143,7 @@ func TestRuntimeNamespacedClient_CDPipelineList(t *testing.T) {
 	)
 	scheme := runtime.NewScheme()
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion,
-		&cdPipelineAPI.CDPipeline{}, &cdPipeApi.CDPipelineList{},
+		&cdPipeApi.CDPipeline{}, &cdPipeApi.CDPipelineList{},
 	)
 	fakeK8SClient := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(cdPipeline_1, cdPipeline_2).Build()
 
@@ -155,7 +154,7 @@ func TestRuntimeNamespacedClient_CDPipelineList(t *testing.T) {
 
 	cdPipelinesListCR, err := k8sClient.CDPipelineList(ctx)
 	assert.NoError(t, err)
-	expectedList := []cdPipelineAPI.CDPipeline{
+	expectedList := []cdPipeApi.CDPipeline{
 		*cdPipeline_1,
 	}
 	assert.Equal(t, expectedList, cdPipelinesListCR)

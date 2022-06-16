@@ -18,6 +18,21 @@ package cd_pipeline
 
 import (
 	ctx "context"
+	"fmt"
+	"sort"
+	"strings"
+
+	"github.com/astaxie/beego/orm"
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
+	openshiftAPi "github.com/openshift/api/apps/v1"
+	"github.com/pkg/errors"
+	"go.uber.org/zap"
+	v1 "k8s.io/api/apps/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
+
 	"edp-admin-console/context"
 	"edp-admin-console/k8s"
 	"edp-admin-console/models"
@@ -32,20 +47,6 @@ import (
 	"edp-admin-console/service/platform"
 	"edp-admin-console/util/consts"
 	dberror "edp-admin-console/util/error/db-errors"
-	"fmt"
-	"github.com/astaxie/beego/orm"
-	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
-	openshiftAPi "github.com/openshift/api/apps/v1"
-	"github.com/pkg/errors"
-	"go.uber.org/zap"
-	v1 "k8s.io/api/apps/v1"
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/rest"
-	"sort"
-	"strings"
-	"time"
 )
 
 type CDPipelineService struct {
@@ -63,7 +64,7 @@ type ErrMsg struct {
 
 const (
 	deploymentConfigsKind                  = "deploymentconfigs"
-	cdPipelineApiVersion                   = "v2.edp.epam.com/v1alpha1"
+	cdPipelineApiVersion                   = "v2.edp.epam.com/v1"
 	cdPipelineKind                         = "CDPipeline"
 	dockerStreamsBeforeUpdateAnnotationKey = "deploy.edp.epam.com/docker-streams-before-update"
 	stagesKind                             = "stages"
@@ -246,7 +247,7 @@ func (s *CDPipelineService) UpdatePipeline(pipeline command.CDPipelineCommand) e
 	}
 
 	pipelineCR.Spec.ApplicationsToPromote = pipeline.ApplicationToApprove
-	pipelineCR.Status.LastTimeUpdated = time.Now()
+	pipelineCR.Status.LastTimeUpdated = metav1.Now()
 
 	edpRestClient := s.Clients.EDPRestClient
 
@@ -379,7 +380,7 @@ func (s *CDPipelineService) UpdatePipelineStage(stage command.CDStageCommand, pi
 	if err != nil {
 		return errors.Wrap(err, "an error has occurred while updating CD Pipeline Stage cluster")
 	}
-	st.Status.LastTimeUpdated = time.Now()
+	st.Status.LastTimeUpdated = metav1.Now()
 	log.Info("CD Pipeline Stage has been updated", zap.String("name", stage.Name))
 	return nil
 }
@@ -552,7 +553,7 @@ func convertPipelineData(cdPipeline command.CDPipelineCommand) cdPipeApi.CDPipel
 func getStatusCreateState(username string) cdPipeApi.CDPipelineStatus {
 	return cdPipeApi.CDPipelineStatus{
 		Available:       false,
-		LastTimeUpdated: time.Now(),
+		LastTimeUpdated: metav1.Now(),
 		Status:          consts.InitializedStatus,
 		Username:        username,
 		Action:          consts.CdPipelineRegistrationAction,
@@ -599,7 +600,7 @@ func (s *CDPipelineService) getCDPipelineStageCR(stageName, pipelineName string)
 func createCr(cdPipelineName string, stage command.CDStageCommand, previousStageName string) cdPipeApi.Stage {
 	return cdPipeApi.Stage{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: "v2.edp.epam.com/v1alpha1",
+			APIVersion: "v2.edp.epam.com/v1",
 			Kind:       "Stage",
 		},
 		ObjectMeta: metav1.ObjectMeta{
@@ -621,7 +622,7 @@ func createCr(cdPipelineName string, stage command.CDStageCommand, previousStage
 		},
 		Status: cdPipeApi.StageStatus{
 			Available:       false,
-			LastTimeUpdated: time.Now(),
+			LastTimeUpdated: metav1.Now(),
 			Status:          consts.InitializedStatus,
 			Username:        stage.Username,
 			Action:          "cd_stage_registration",

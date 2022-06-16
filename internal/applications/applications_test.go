@@ -8,7 +8,7 @@ import (
 	"edp-admin-console/k8s"
 	"edp-admin-console/util/consts"
 
-	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 	"github.com/epam/edp-codebase-operator/v2/pkg/codebasebranch"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -314,7 +314,7 @@ func TestByNameIFExists_OK(t *testing.T) {
 	expectedCBCR := &codeBaseApi.Codebase{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Codebase",
-			APIVersion: "v2.edp.epam.com/v1alpha1",
+			APIVersion: "v2.edp.epam.com/v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:            crName_1,
@@ -380,7 +380,7 @@ func TestCodebaseBranchByNameIfExists_OK(t *testing.T) {
 	assert.NoError(t, err)
 	expectedCBBranchCR := stubCodebaseBranch_1.DeepCopy()
 	expectedCBBranchCR.TypeMeta.Kind = "CodebaseBranch"
-	expectedCBBranchCR.TypeMeta.APIVersion = "v2.edp.epam.com/v1alpha1"
+	expectedCBBranchCR.TypeMeta.APIVersion = "v2.edp.epam.com/v1"
 	assert.Equal(t, expectedCBBranchCR, k8sCBBranch)
 }
 

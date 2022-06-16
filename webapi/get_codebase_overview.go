@@ -6,7 +6,7 @@ import (
 	"path"
 	"time"
 
-	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/csrf"
 	"go.uber.org/zap"

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"path"
 
-	codebaseAPI "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	codebaseAPI "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/csrf"
 	"go.uber.org/zap"

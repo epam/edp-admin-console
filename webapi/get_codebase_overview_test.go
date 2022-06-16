@@ -8,7 +8,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 	edpComponentAPI "github.com/epam/edp-component-operator/pkg/apis/v1/v1alpha1"
 	"github.com/gavv/httpexpect/v2"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -19,10 +19,10 @@ import (
 	applog "edp-admin-console/service/logger"
 )
 
-type JiraServerCROption func(codebase *v1alpha1.JiraServer)
+type JiraServerCROption func(codebase *codeBaseApi.JiraServer)
 
-func createJiraServerCRWithOptions(opts ...JiraServerCROption) *v1alpha1.JiraServer {
-	jiraServerCR := new(v1alpha1.JiraServer)
+func createJiraServerCRWithOptions(opts ...JiraServerCROption) *codeBaseApi.JiraServer {
+	jiraServerCR := new(codeBaseApi.JiraServer)
 	for i := range opts {
 		opts[i](jiraServerCR)
 	}
@@ -30,24 +30,24 @@ func createJiraServerCRWithOptions(opts ...JiraServerCROption) *v1alpha1.JiraSer
 }
 
 func WithJiraServerCrName(crName string) JiraServerCROption {
-	return func(codebase *v1alpha1.JiraServer) {
+	return func(codebase *codeBaseApi.JiraServer) {
 		codebase.ObjectMeta.Name = crName
 	}
 }
 
 func WithJiraServerCrNamespace(crNamespace string) JiraServerCROption {
-	return func(codebase *v1alpha1.JiraServer) {
+	return func(codebase *codeBaseApi.JiraServer) {
 		codebase.ObjectMeta.Namespace = crNamespace
 	}
 }
 
 func TestGetCodebaseOverview_OK(t *testing.T) {
 	scheme := runtime.NewScheme()
-	scheme.AddKnownTypes(v1alpha1.SchemeGroupVersion,
+	scheme.AddKnownTypes(codeBaseApi.SchemeGroupVersion,
 		&edpComponentAPI.EDPComponent{},
-		&v1alpha1.Codebase{}, &v1alpha1.CodebaseList{},
-		&v1alpha1.CodebaseBranch{}, &v1alpha1.CodebaseBranchList{},
-		&v1alpha1.JiraServer{}, &v1alpha1.JiraServerList{},
+		&codeBaseApi.Codebase{}, &codeBaseApi.CodebaseList{},
+		&codeBaseApi.CodebaseBranch{}, &codeBaseApi.CodebaseBranchList{},
+		&codeBaseApi.JiraServer{}, &codeBaseApi.JiraServerList{},
 	)
 
 	crCodebaseName_1 := "test_codebase"

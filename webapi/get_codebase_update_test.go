@@ -8,7 +8,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 	edpComponentAPI "github.com/epam/edp-component-operator/pkg/apis/v1/v1alpha1"
 	"github.com/gavv/httpexpect/v2"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -21,11 +21,11 @@ import (
 
 func TestGetCodebaseUpdate_OK(t *testing.T) {
 	scheme := runtime.NewScheme()
-	scheme.AddKnownTypes(v1alpha1.SchemeGroupVersion,
+	scheme.AddKnownTypes(codeBaseApi.SchemeGroupVersion,
 		&edpComponentAPI.EDPComponent{},
-		&v1alpha1.Codebase{}, &v1alpha1.CodebaseList{},
-		&v1alpha1.CodebaseBranch{}, &v1alpha1.CodebaseBranchList{},
-		&v1alpha1.JiraServer{}, &v1alpha1.JiraServerList{},
+		&codeBaseApi.Codebase{}, &codeBaseApi.CodebaseList{},
+		&codeBaseApi.CodebaseBranch{}, &codeBaseApi.CodebaseBranchList{},
+		&codeBaseApi.JiraServer{}, &codeBaseApi.JiraServerList{},
 	)
 
 	crCodebaseName_1 := "test_codebase"

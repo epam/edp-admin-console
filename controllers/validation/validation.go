@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/astaxie/beego/validation"
-	gateV1alpha1 "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	cdPipelineApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
 )
 
 type ErrMsg struct {
@@ -141,7 +141,7 @@ func ValidateCDPipelineRequest(cdPipeline command.CDPipelineCommand) *ErrMsg {
 	return &ErrMsg{string(CreateErrorResponseBody(valid)), http.StatusBadRequest}
 }
 
-func validateQualityGates(valid validation.Validation, qualityGates []gateV1alpha1.QualityGate) (bool, error) {
+func validateQualityGates(valid validation.Validation, qualityGates []cdPipelineApi.QualityGate) (bool, error) {
 	isQualityGatesValid := true
 
 	if qualityGates != nil {

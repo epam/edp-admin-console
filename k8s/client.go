@@ -19,8 +19,8 @@ package k8s
 import (
 	"edp-admin-console/service/logger"
 
-	edppipelinesv1alpha1 "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
-	edpv1alpha1 "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 	"go.uber.org/zap"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -159,16 +159,16 @@ func createCrdClient(cfg *rest.Config) (*rest.RESTClient, error) {
 
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&edpv1alpha1.Codebase{},
-		&edpv1alpha1.CodebaseList{},
-		&edpv1alpha1.CodebaseBranch{},
-		&edpv1alpha1.CodebaseBranchList{},
-		&edppipelinesv1alpha1.CDPipeline{},
-		&edppipelinesv1alpha1.CDPipelineList{},
-		&edppipelinesv1alpha1.Stage{},
-		&edppipelinesv1alpha1.StageList{},
-		&edpv1alpha1.JiraServer{},
-		&edpv1alpha1.JiraServerList{},
+		&codeBaseApi.Codebase{},
+		&codeBaseApi.CodebaseList{},
+		&codeBaseApi.CodebaseBranch{},
+		&codeBaseApi.CodebaseBranchList{},
+		&cdPipeApi.CDPipeline{},
+		&cdPipeApi.CDPipelineList{},
+		&cdPipeApi.Stage{},
+		&cdPipeApi.StageList{},
+		&codeBaseApi.JiraServer{},
+		&codeBaseApi.JiraServerList{},
 	)
 
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)

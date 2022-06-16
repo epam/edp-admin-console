@@ -40,7 +40,7 @@ import (
 	"sort"
 
 	"github.com/astaxie/beego"
-	edppipelinesv1alpha1 "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	cdPipelineApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
 	"go.uber.org/zap"
 )
 
@@ -432,13 +432,13 @@ func (c *CDPipelineController) retrieveStagesFromRequest(stageCount int) []comma
 	var stages []command.CDStageCommand
 
 	for index, stageName := range c.GetStrings("stageName") {
-		stgSrc := edppipelinesv1alpha1.Source{}
+		stgSrc := cdPipelineApi.Source{}
 		name := c.GetString(stageName + "-pipelineLibraryName")
 		if name == "default" {
 			stgSrc.Type = "default"
 		} else {
 			stgSrc.Type = "library"
-			stgSrc.Library = edppipelinesv1alpha1.Library{
+			stgSrc.Library = cdPipelineApi.Library{
 				Name:   name,
 				Branch: c.GetString(stageName + "-pipelineLibraryBranch"),
 			}
@@ -454,7 +454,7 @@ func (c *CDPipelineController) retrieveStagesFromRequest(stageCount int) []comma
 		}
 
 		for _, stepName := range c.GetStrings(stageName + "-stageStepName") {
-			qualityGateRequest := edppipelinesv1alpha1.QualityGate{
+			qualityGateRequest := cdPipelineApi.QualityGate{
 				QualityGateType: c.GetString(stageName + "-" + stepName + "-stageQualityGateType"),
 				StepName:        stepName,
 			}

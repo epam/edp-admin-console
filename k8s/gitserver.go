@@ -3,7 +3,7 @@ package k8s
 import (
 	"context"
 
-	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 	runtimeClient "sigs.k8s.io/controller-runtime/pkg/client"
 )
 
