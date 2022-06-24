@@ -7,15 +7,16 @@ import (
 	"path"
 	"testing"
 
-	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
-	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
-	perfApi "github.com/epam/edp-perf-operator/v2/pkg/apis/edp/v1"
 	"github.com/gavv/httpexpect/v2"
 	"github.com/stretchr/testify/suite"
 	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
+	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1"
+	perfApi "github.com/epam/edp-perf-operator/v2/pkg/apis/edp/v1"
 
 	"edp-admin-console/internal/config"
 	"edp-admin-console/k8s"
@@ -40,7 +41,7 @@ func TestCreateApplicationOverviewSuite(t *testing.T) {
 	data[perfIntegrationEnabledKey] = "false"
 
 	configMap := v1.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{
+		ObjectMeta: metaV1.ObjectMeta{
 			Name:      edpConfigMapName,
 			Namespace: namespace,
 		},

@@ -143,8 +143,8 @@ github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20220609142808-e5274ded7b97
 github.com/epam/edp-common v0.0.0-20211206180607-3e1ca60d6e4a h1:twumv3j/0cxDlfz1T8De0/4FNuKmPEP1ql0lG8XELFQ=
 github.com/epam/edp-component-operator v0.1.1-0.20220520092339-3063cc593800 h1:NAX6+RcwKkH5HmwS6LFTtFWPST8LlajwBAV5jLuLkzg=
 github.com/epam/edp-component-operator v0.1.1-0.20220520092339-3063cc593800/go.mod h1:gWBTiTRwjIU2Mg/XeN1pXXnZmseaF2C9Bj9Y5+rbKxU=
-github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20220317153036-60f17fac1722 h1:UqdWOXa7y8jYcYuvWIOfclvyaHsn209lmS9eioEXxj4=
-github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20220317153036-60f17fac1722/go.mod h1:djVoTq6+h43XC20BImrHi1vznNpKnncyY2KroPEM8cA=
+github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20220620155815-23e0ee37a393 h1:drU9y0/tQ1ETGcvoEleb5f4+3S1WJhO4/yJf1ug+iss=
+github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20220620155815-23e0ee37a393/go.mod h1:Koz44K32v40h7eWJzpLI0Nbz8Khuvy7yCJip66vluYE=
 github.com/epam/edp-perf-operator/v2 v2.0.0-20220610074242-b9ebbfdf8023 h1:WbjtJ1QNWKcIU7XIT3D/zqoPDuzZ8bv8BU2bgk/UqLo=
 github.com/epam/edp-perf-operator/v2 v2.0.0-20220610074242-b9ebbfdf8023/go.mod h1:8uZvJa1oE2/kQga8/YhZxp5PSvkhqiz59bH+y1MbLcU=
 github.com/evanphx/json-patch v4.5.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQLiYLvXMP4fmwYFNcr97nuDLSk=

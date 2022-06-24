@@ -4,13 +4,14 @@ import (
 	"context"
 	"testing"
 
-	"edp-admin-console/k8s"
-
-	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
 	"github.com/stretchr/testify/assert"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+
+	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1"
+
+	"edp-admin-console/k8s"
 )
 
 const testNamespace = "test_namespace_1"
@@ -30,7 +31,7 @@ func TestList_OK(t *testing.T) {
 		},
 	}
 	jenkins := jenkinsApi.Jenkins{
-		ObjectMeta: metav1.ObjectMeta{
+		ObjectMeta: metaV1.ObjectMeta{
 			Name:      crName_1,
 			Namespace: namespace,
 		},
@@ -75,7 +76,7 @@ func TestListNames_OK(t *testing.T) {
 		},
 	}
 	jenkins := jenkinsApi.Jenkins{
-		ObjectMeta: metav1.ObjectMeta{
+		ObjectMeta: metaV1.ObjectMeta{
 			Name:      crName_1,
 			Namespace: namespace,
 		},

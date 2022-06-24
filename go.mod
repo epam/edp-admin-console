@@ -51,7 +51,7 @@ require (
 	github.com/emicklei/go-restful v2.12.0+incompatible // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/epam/edp-component-operator v0.1.1-0.20220520092339-3063cc593800
-	github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20220317153036-60f17fac1722
+	github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20220620155815-23e0ee37a393
 	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect

@@ -19,10 +19,8 @@ package k8s
 import (
 	"edp-admin-console/service/logger"
 
-	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
-	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 	"go.uber.org/zap"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -32,10 +30,13 @@ import (
 	storageV1Client "k8s.io/client-go/kubernetes/typed/storage/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 )
 
 var log = logger.GetLogger()
-var SchemeGroupVersion = schema.GroupVersion{Group: "v2.edp.epam.com", Version: "v1alpha1"}
+var SchemeGroupVersion = schema.GroupVersion{Group: "v2.edp.epam.com", Version: "v1"}
 
 type ClientSet struct {
 	CoreClient     *coreV1Client.CoreV1Client
@@ -171,6 +172,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&codeBaseApi.JiraServerList{},
 	)
 
-	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
+	metaV1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
 }

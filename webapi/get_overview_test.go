@@ -7,11 +7,12 @@ import (
 	"path"
 	"testing"
 
-	edpComponentAPI "github.com/epam/edp-component-operator/pkg/apis/v1/v1alpha1"
 	"github.com/gavv/httpexpect/v2"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+
+	edpComponentAPI "github.com/epam/edp-component-operator/pkg/apis/v1/v1"
 
 	"edp-admin-console/internal/config"
 	"edp-admin-console/k8s"
@@ -26,7 +27,7 @@ func TestHandlerEnv_GetOverviewPage(t *testing.T) {
 	icon := "icon"
 	componentType := "edp"
 	component := edpComponentAPI.EDPComponent{
-		ObjectMeta: metav1.ObjectMeta{
+		ObjectMeta: metaV1.ObjectMeta{
 			Name:      componentName,
 			Namespace: namespace,
 		},

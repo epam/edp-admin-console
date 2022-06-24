@@ -10,13 +10,13 @@ import (
 	"edp-admin-console/internal/config"
 	"edp-admin-console/k8s"
 	applog "edp-admin-console/service/logger"
-
-	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
-	edpComponentAPI "github.com/epam/edp-component-operator/pkg/apis/v1/v1alpha1"
-	jenkinsAPI "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
 	"github.com/gavv/httpexpect/v2"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
+	edpComponentAPI "github.com/epam/edp-component-operator/pkg/apis/v1/v1"
+	jenkinsAPI "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1"
 )
 
 func TestGetCDCreatePage_OK(t *testing.T) {

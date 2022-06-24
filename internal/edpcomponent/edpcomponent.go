@@ -5,8 +5,9 @@ import (
 	"errors"
 	"net/http"
 
-	edpComponentAPI "github.com/epam/edp-component-operator/pkg/apis/v1/v1alpha1"
 	k8sErrors "k8s.io/apimachinery/pkg/api/errors"
+
+	edpComponentAPI "github.com/epam/edp-component-operator/pkg/apis/v1/v1"
 
 	"edp-admin-console/k8s"
 )

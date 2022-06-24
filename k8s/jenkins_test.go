@@ -4,19 +4,19 @@ import (
 	"context"
 	"testing"
 
-	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
-
 	"github.com/stretchr/testify/assert"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+
+	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1"
 )
 
 func TestRuntimeNamespacedClient_GetJenkinsList(t *testing.T) {
 	ctx := context.Background()
 
 	jenkins := jenkinsApi.Jenkins{
-		ObjectMeta: metav1.ObjectMeta{
+		ObjectMeta: metaV1.ObjectMeta{
 			Name:      name,
 			Namespace: ns,
 		},
@@ -31,7 +31,7 @@ func TestRuntimeNamespacedClient_GetJenkinsList(t *testing.T) {
 	}
 
 	expectedJenkins := jenkinsApi.Jenkins{
-		ObjectMeta: metav1.ObjectMeta{
+		ObjectMeta: metaV1.ObjectMeta{
 			Name:            name,
 			Namespace:       ns,
 			ResourceVersion: "999",

@@ -3,9 +3,10 @@ package k8s
 import (
 	"context"
 
-	jenkinsAPI "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
 	"k8s.io/apimachinery/pkg/types"
 	runtimeClient "sigs.k8s.io/controller-runtime/pkg/client"
+
+	jenkinsAPI "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1"
 )
 
 // GetJenkinsList retrieves all Jenkins structure ptr for the given custom resource name from the Kubernetes Cluster CR.

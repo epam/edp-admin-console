@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	edpComponentAPI "github.com/epam/edp-component-operator/pkg/apis/v1/v1alpha1"
+	edpComponentAPI "github.com/epam/edp-component-operator/pkg/apis/v1/v1"
 	"github.com/stretchr/testify/assert"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 )
@@ -51,14 +51,14 @@ func TestEDPComponentByCRName_Success(t *testing.T) {
 	}
 
 	expectedEDPComponentCR := &edpComponentAPI.EDPComponent{
-		ObjectMeta: metav1.ObjectMeta{
+		ObjectMeta: metaV1.ObjectMeta{
 			Name:            crName,
 			Namespace:       namespace,
 			ResourceVersion: "999",
 		},
-		TypeMeta: metav1.TypeMeta{
+		TypeMeta: metaV1.TypeMeta{
 			Kind:       "EDPComponent",
-			APIVersion: "v1.edp.epam.com/v1alpha1",
+			APIVersion: "v1.edp.epam.com/v1",
 		},
 	}
 	gotEDPComponent, err := k8sClient.EDPComponentByCRName(ctx, crName)

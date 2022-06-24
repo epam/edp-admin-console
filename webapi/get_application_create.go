@@ -7,12 +7,13 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
 	"github.com/gorilla/csrf"
 	"github.com/prometheus/common/log"
 	"go.uber.org/zap"
-	v1 "k8s.io/api/core/v1"
+	coreV1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
+
+	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1"
 
 	"edp-admin-console/internal/applog"
 	"edp-admin-console/k8s"
@@ -198,7 +199,7 @@ func getJenkinsSlaves(ctx context.Context, client *k8s.RuntimeNamespacedClient) 
 		return nil, err
 	}
 
-	jenkinsSlavesArray := make([]v1alpha1.Slave, 0)
+	jenkinsSlavesArray := make([]jenkinsApi.Slave, 0)
 	for _, jenkinsCR := range jenkinsCRList.Items {
 		jenkinsSlavesArray = append(jenkinsSlavesArray, jenkinsCR.Status.Slaves...)
 	}
@@ -250,7 +251,7 @@ func getJobProvisionsWithScope(ctx context.Context, client *k8s.RuntimeNamespace
 		return nil, err
 	}
 
-	jenkinsJobProvisioners := make([]v1alpha1.JobProvision, 0)
+	jenkinsJobProvisioners := make([]jenkinsApi.JobProvision, 0)
 	for _, jenkinsCR := range jenkinsCRList.Items {
 		jenkinsJobProvisioners = append(jenkinsJobProvisioners, jenkinsCR.Status.JobProvisions...)
 	}
@@ -269,7 +270,7 @@ func getJobProvisionsWithScope(ctx context.Context, client *k8s.RuntimeNamespace
 }
 
 func isPerfEnabled(ctx context.Context, client *k8s.RuntimeNamespacedClient, namespace string) (bool, error) {
-	configMap := v1.ConfigMap{}
+	configMap := coreV1.ConfigMap{}
 	err := client.Get(ctx, types.NamespacedName{
 		Namespace: namespace,
 		Name:      edpConfigMapName,

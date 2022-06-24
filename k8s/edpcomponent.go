@@ -3,9 +3,10 @@ package k8s
 import (
 	"context"
 
-	edpComponentAPI "github.com/epam/edp-component-operator/pkg/apis/v1/v1alpha1"
 	"k8s.io/apimachinery/pkg/types"
 	runtimeClient "sigs.k8s.io/controller-runtime/pkg/client"
+
+	edpComponentAPI "github.com/epam/edp-component-operator/pkg/apis/v1/v1"
 )
 
 func (c *RuntimeNamespacedClient) EDPComponentByCRName(ctx context.Context, componentCRName string) (*edpComponentAPI.EDPComponent, error) {

@@ -3,8 +3,9 @@ package jobprovisioners
 import (
 	"context"
 
-	jenkinsAPI "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
 	"go.uber.org/zap"
+
+	jenkinsAPI "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1"
 
 	"edp-admin-console/internal/applog"
 	"edp-admin-console/k8s"

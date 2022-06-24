@@ -6,12 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
-	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
-	"github.com/epam/edp-codebase-operator/v2/pkg/codebasebranch"
-	edpComponentApi "github.com/epam/edp-component-operator/pkg/apis/v1/v1alpha1"
-	jenkinsAPI "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
-	perfApi "github.com/epam/edp-perf-operator/v2/pkg/apis/edp/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/selection"
@@ -20,6 +14,13 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	runtimeClient "sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
+
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
+	"github.com/epam/edp-codebase-operator/v2/pkg/codebasebranch"
+	edpComponentApi "github.com/epam/edp-component-operator/pkg/apis/v1/v1"
+	jenkinsAPI "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1"
+	perfApi "github.com/epam/edp-perf-operator/v2/pkg/apis/edp/v1"
 
 	"edp-admin-console/util"
 )

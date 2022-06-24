@@ -8,13 +8,14 @@ import (
 	"path"
 	"testing"
 
-	cdPipelineAPI "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
-	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
-	edpComponentAPI "github.com/epam/edp-component-operator/pkg/apis/v1/v1alpha1"
 	"github.com/gavv/httpexpect/v2"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+
+	cdPipelineAPI "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
+	edpComponentAPI "github.com/epam/edp-component-operator/pkg/apis/v1/v1"
 
 	"edp-admin-console/internal/config"
 	"edp-admin-console/k8s"
@@ -41,7 +42,7 @@ func TestHandlerEnv_GetPipelineOverviewPage(t *testing.T) {
 	initialISName := []string{"app1master"}
 
 	initialCDPipelineCR := &cdPipelineAPI.CDPipeline{
-		ObjectMeta: metav1.ObjectMeta{
+		ObjectMeta: metaV1.ObjectMeta{
 			Name:      pipeName,
 			Namespace: namespace,
 		},
@@ -52,7 +53,7 @@ func TestHandlerEnv_GetPipelineOverviewPage(t *testing.T) {
 	}
 
 	imageSteamCR := &codeBaseApi.CodebaseImageStream{
-		ObjectMeta: metav1.ObjectMeta{
+		ObjectMeta: metaV1.ObjectMeta{
 			Name:      initialISName[0],
 			Namespace: namespace,
 		},
@@ -61,7 +62,7 @@ func TestHandlerEnv_GetPipelineOverviewPage(t *testing.T) {
 
 	jenkinsUrl := "https://domain"
 	jenkinsComponentCR := &edpComponentAPI.EDPComponent{
-		ObjectMeta: metav1.ObjectMeta{
+		ObjectMeta: metaV1.ObjectMeta{
 			Name:      "jenkins",
 			Namespace: namespace,
 		},
