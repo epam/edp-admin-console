@@ -80,16 +80,6 @@ func (s *CodebaseBranchService) CreateCodebaseBranch(branchInfo command.CreateCo
 			Release:      branchInfo.Release,
 			CodebaseName: appName,
 		},
-		Status: codeBaseApi.CodebaseBranchStatus{
-			Build:               branchInfo.Build,
-			Status:              consts.InitializedStatus,
-			LastTimeUpdated:     metav1.Now(),
-			LastSuccessfulBuild: nil,
-			Username:            branchInfo.Username,
-			Action:              "codebase_branch_registration",
-			Result:              consts.SuccessResult,
-			Value:               consts.InactiveValue,
-		},
 	}
 
 	result := &codeBaseApi.CodebaseBranch{}

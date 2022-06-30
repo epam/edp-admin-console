@@ -111,7 +111,7 @@ func (h *HandlerEnv) CreateApplication(w http.ResponseWriter, r *http.Request) {
 		EmptyProject:             emptyProject,
 	}
 
-	err = h.NamespacedClient.CreateCodebaseByCustomFields(ctx, nameCR, codebaseSpec, codeBaseApi.CodebaseStatus{})
+	err = h.NamespacedClient.CreateCodebaseByCustomFields(ctx, nameCR, codebaseSpec)
 	if err != nil {
 		logger.Error("cant create codebase", zap.Error(err))
 		InternalErrorResponse(ctx, w, "cant create codebase CR")
@@ -122,7 +122,7 @@ func (h *HandlerEnv) CreateApplication(w http.ResponseWriter, r *http.Request) {
 		CodebaseName: nameCR,
 		BranchName:   defaultBranch,
 	}
-	err = h.NamespacedClient.CreateCBBranchByCustomFields(ctx, fmt.Sprintf("%s-%s", nameCR, defaultBranch), codeBaseBranchSpec, codeBaseApi.CodebaseBranchStatus{})
+	err = h.NamespacedClient.CreateCBBranchByCustomFields(ctx, fmt.Sprintf("%s-%s", nameCR, defaultBranch), codeBaseBranchSpec)
 	if err != nil {
 		logger.Error("cant create codebase branch", zap.Error(err))
 		InternalErrorResponse(ctx, w, "cant create codebase branch")

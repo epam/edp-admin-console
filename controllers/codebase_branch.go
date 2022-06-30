@@ -1,14 +1,6 @@
 package controllers
 
 import (
-	"edp-admin-console/context"
-	validation2 "edp-admin-console/controllers/validation"
-	"edp-admin-console/models/command"
-	"edp-admin-console/service"
-	cbs "edp-admin-console/service/codebasebranch"
-	"edp-admin-console/util"
-	"edp-admin-console/util/consts"
-	dberror "edp-admin-console/util/error/db-errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -17,6 +9,14 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
 	"go.uber.org/zap"
+
+	"edp-admin-console/context"
+	validation2 "edp-admin-console/controllers/validation"
+	"edp-admin-console/models/command"
+	"edp-admin-console/service"
+	cbs "edp-admin-console/service/codebasebranch"
+	"edp-admin-console/util"
+	dbErrors "edp-admin-console/util/error/db-errors"
 )
 
 type BranchController struct {
@@ -86,8 +86,6 @@ func (c *BranchController) extractCodebaseBranchRequestData() command.CreateCode
 	px := c.GetString("versioningPostfix")
 	cb.Version = util.GetVersionOrNil(vf, px)
 
-	cb.Build = &consts.DefaultBuildNumber
-
 	r, _ := c.GetBool("releaseBranch", false)
 	cb.Release = r
 
@@ -121,8 +119,8 @@ func (c *BranchController) Delete() {
 		zap.String("codebase name", cn),
 		zap.String("branch name", bn))
 	if err := c.BranchService.Delete(cn, bn); err != nil {
-		if dberror.CodebaseBranchErrorOccurred(err) {
-			cberr := err.(dberror.RemoveCodebaseBranchRestriction)
+		if dbErrors.CodebaseBranchErrorOccurred(err) {
+			cberr := err.(dbErrors.RemoveCodebaseBranchRestriction)
 			f := beego.NewFlash()
 			f.Error(cberr.Message)
 			f.Store(&c.Controller)

@@ -36,5 +36,3 @@ const (
 	IssuesLinksKey = "issuesLinks"
 	CDMenuItem     = "delivery"
 )
-
-var DefaultBuildNumber = "0"

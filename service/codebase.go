@@ -400,7 +400,6 @@ func setCodebaseBranchCr(vt string, username string, version *string, defaultBra
 		return command.CreateCodebaseBranch{
 			Name:     defaultBranch,
 			Username: username,
-			Build:    &consts.DefaultBuildNumber,
 		}
 	}
 
@@ -408,7 +407,6 @@ func setCodebaseBranchCr(vt string, username string, version *string, defaultBra
 		Name:     defaultBranch,
 		Username: username,
 		Version:  version,
-		Build:    &consts.DefaultBuildNumber,
 	}
 }
 

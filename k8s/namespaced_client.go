@@ -33,18 +33,22 @@ func SetupNamespacedClient() (*RuntimeNamespacedClient, error) {
 	utilRuntime.Must(jenkinsAPI.AddToScheme(scheme.Scheme))
 	utilRuntime.Must(perfApi.AddToScheme(scheme.Scheme))
 	utilRuntime.Must(edpComponentApi.AddToScheme(scheme.Scheme))
+
 	namespace, ok := os.LookupEnv(NamespaceEnv)
 	if !ok {
 		return nil, errors.New("cant find NAMESPACE env")
 	}
+
 	client, err := runtimeClient.New(config.GetConfigOrDie(), runtimeClient.Options{})
 	if err != nil {
 		return nil, fmt.Errorf("%w cant setup client", err)
 	}
+
 	namespacedClient, err := NewRuntimeNamespacedClient(client, namespace)
 	if err != nil {
 		return nil, err
 	}
+
 	return namespacedClient, nil
 }
 
@@ -99,12 +103,11 @@ func (c *RuntimeNamespacedClient) GetCBBranch(ctx context.Context, crName string
 }
 
 // UpdateCBBranchByCustomFields updates only the custom fields of the CodebaseBranch CR.
-func (c *RuntimeNamespacedClient) UpdateCBBranchByCustomFields(ctx context.Context, crName string, spec codeBaseApi.CodebaseBranchSpec, status codeBaseApi.CodebaseBranchStatus) error {
+func (c *RuntimeNamespacedClient) UpdateCBBranchByCustomFields(ctx context.Context, crName string, spec codeBaseApi.CodebaseBranchSpec) error {
 	codebaseBranch, err := c.GetCBBranch(ctx, crName)
 	if err != nil {
 		return err
 	}
-	codebaseBranch.Status = status
 	codebaseBranch.Spec = spec
 	err = c.Update(ctx, codebaseBranch)
 	return err
@@ -123,7 +126,7 @@ func (c *RuntimeNamespacedClient) UpdateCodebaseByCustomFields(ctx context.Conte
 }
 
 // CreateCBBranchByCustomFields creates CodebaseBranch CR by custom fields and name
-func (c *RuntimeNamespacedClient) CreateCBBranchByCustomFields(ctx context.Context, crName string, spec codeBaseApi.CodebaseBranchSpec, status codeBaseApi.CodebaseBranchStatus) error {
+func (c *RuntimeNamespacedClient) CreateCBBranchByCustomFields(ctx context.Context, crName string, spec codeBaseApi.CodebaseBranchSpec) error {
 	if c.Namespace == "" {
 		return NemEmptyNamespaceErr("client namespace is not set")
 	}
@@ -132,15 +135,14 @@ func (c *RuntimeNamespacedClient) CreateCBBranchByCustomFields(ctx context.Conte
 			Name:      crName,
 			Namespace: c.Namespace,
 		},
-		Spec:   spec,
-		Status: status,
+		Spec: spec,
 	}
 	err := c.Create(ctx, codebaseBranch)
 	return err
 }
 
 // CreateCodebaseByCustomFields creates Codebase CR by custom fields and name
-func (c *RuntimeNamespacedClient) CreateCodebaseByCustomFields(ctx context.Context, crName string, spec codeBaseApi.CodebaseSpec, status codeBaseApi.CodebaseStatus) error {
+func (c *RuntimeNamespacedClient) CreateCodebaseByCustomFields(ctx context.Context, crName string, spec codeBaseApi.CodebaseSpec) error {
 	if c.Namespace == "" {
 		return NemEmptyNamespaceErr("client namespace is not set")
 	}
@@ -149,8 +151,7 @@ func (c *RuntimeNamespacedClient) CreateCodebaseByCustomFields(ctx context.Conte
 			Name:      crName,
 			Namespace: c.Namespace,
 		},
-		Spec:   spec,
-		Status: status,
+		Spec: spec,
 	}
 	err := c.Create(ctx, codebaseBranch)
 	return err

@@ -69,7 +69,7 @@ func (s *CreateBranchSuite) TestCreateBranch() {
 	codebaseSpec := codeBaseApi.CodebaseSpec{
 		DefaultBranch: defaultBranch,
 	}
-	err := s.Handler.NamespacedClient.CreateCodebaseByCustomFields(ctx, appName, codebaseSpec, codeBaseApi.CodebaseStatus{})
+	err := s.Handler.NamespacedClient.CreateCodebaseByCustomFields(ctx, appName, codebaseSpec)
 	if err != nil {
 		t.Fatal(err)
 	}

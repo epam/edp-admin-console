@@ -56,7 +56,7 @@ func (h HandlerEnv) CreateBranch(writer http.ResponseWriter, request *http.Reque
 	}
 
 	codebaseBranchCRName := buildCobaseBranchCRName(codebaseName, codebaseBranchName)
-	errBranch := h.NamespacedClient.CreateCBBranchByCustomFields(ctx, codebaseBranchCRName, branchSpec, codeBaseApi.CodebaseBranchStatus{})
+	errBranch := h.NamespacedClient.CreateCBBranchByCustomFields(ctx, codebaseBranchCRName, branchSpec)
 	if errBranch != nil && !k8serrors.IsAlreadyExists(errBranch) {
 		logger.Error("cant create codebase branch", zap.Error(errBranch))
 		InternalErrorResponse(ctx, writer, "cant create codebase branch")

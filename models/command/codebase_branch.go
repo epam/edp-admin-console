@@ -5,7 +5,6 @@ type CreateCodebaseBranch struct {
 	Commit   string  `json:"commit"`
 	Username string  `json:"username"`
 	Version  *string `json:"startVersioningFrom,omitempty"`
-	Build    *string `json:"build,omitempty"`
 	Release  bool    `json:"release"`
 }
 
