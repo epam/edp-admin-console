@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	appsV1 "k8s.io/api/apps/v1"
 	k8sErrors "k8s.io/apimachinery/pkg/api/errors"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -548,19 +547,6 @@ func TestSetupNamespacedClient_EnvErr(t *testing.T) {
 	assert.Error(t, err)
 	assert.True(t, strings.Contains(err.Error(), "cant find NAMESPACE env"))
 	assert.Nil(t, client)
-}
-
-func TestSetupNamespacedClient_NewClientErr(t *testing.T) {
-	err := os.Setenv(NamespaceEnv, "test")
-	require.NoError(t, err)
-
-	client, err := SetupNamespacedClient()
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "cant setup client")
-	assert.Nil(t, client)
-
-	err = os.Unsetenv(NamespaceEnv)
-	require.NoError(t, err)
 }
 
 func TestK8SClient_GetCodebase(t *testing.T) {

@@ -32,7 +32,7 @@ const (
 func createStageCR(order int, cdPipeName string) cdPipeApi.Stage {
 	return cdPipeApi.Stage{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      createStageCrName(cdPipelineName, name),
+			Name:      CreateStageCrName(cdPipelineName, name),
 			Namespace: ns,
 		},
 		Spec: cdPipeApi.StageSpec{
@@ -183,9 +183,10 @@ func TestGetImageStreamFromStage(t *testing.T) {
 
 func TestGetImageStreamFromStage_NonZeroStageOrder(t *testing.T) {
 	ctx := context.Background()
+	prevStageCR := createStageCR(0, cdPipelineName)
+	prevStageCR.Name = previousStageName
+	prevStageCR.Spec.Name = previousStageName
 	stageCR := createStageCR(nonZeroOrder, cdPipelineName)
-	stageCR.Annotations = make(map[string]string)
-	stageCR.Annotations[PreviousStageNameAnnotationKey] = previousStageName
 
 	cdPipelineCR := cdPipeApi.CDPipeline{
 		ObjectMeta: metav1.ObjectMeta{
@@ -193,14 +194,14 @@ func TestGetImageStreamFromStage_NonZeroStageOrder(t *testing.T) {
 			Namespace: ns,
 		},
 		Spec: cdPipeApi.CDPipelineSpec{
-			InputDockerStreams: []string{createCISName(cdPipelineName, previousStageName, firstImage),
-				createCISName(cdPipelineName, previousStageName, secondImage)},
+			InputDockerStreams: []string{CreateCodebaseImageStreamCrName(cdPipelineName, previousStageName, firstImage),
+				CreateCodebaseImageStreamCrName(cdPipelineName, previousStageName, secondImage)},
 		},
 	}
 
 	firstImageStream := codeBaseApi.CodebaseImageStream{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      createCISName(cdPipelineCR.Name, previousStageName, firstImage),
+			Name:      CreateCodebaseImageStreamCrName(cdPipelineCR.Name, previousStageName, firstImage),
 			Namespace: ns,
 		},
 		Spec: codeBaseApi.CodebaseImageStreamSpec{
@@ -210,7 +211,7 @@ func TestGetImageStreamFromStage_NonZeroStageOrder(t *testing.T) {
 
 	secondImageStream := codeBaseApi.CodebaseImageStream{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      createCISName(cdPipelineCR.Name, previousStageName, secondImage),
+			Name:      CreateCodebaseImageStreamCrName(cdPipelineCR.Name, previousStageName, secondImage),
 			Namespace: ns,
 		},
 		Spec: codeBaseApi.CodebaseImageStreamSpec{
@@ -219,15 +220,15 @@ func TestGetImageStreamFromStage_NonZeroStageOrder(t *testing.T) {
 	}
 
 	scheme := runtime.NewScheme()
-	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{}, &cdPipeApi.CDPipeline{}, &codeBaseApi.CodebaseImageStream{})
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{}, &cdPipeApi.StageList{}, &cdPipeApi.CDPipeline{}, &codeBaseApi.CodebaseImageStream{})
 
-	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stageCR, &cdPipelineCR, &firstImageStream, &secondImageStream).Build()
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stageCR, &prevStageCR, &cdPipelineCR, &firstImageStream, &secondImageStream).Build()
 	k8sClient, err := k8s.NewRuntimeNamespacedClient(client, ns)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expectedResult := []string{createCISName(cdPipelineCR.Name, previousStageName, firstImage), createCISName(cdPipelineCR.Name, previousStageName, secondImage)}
+	expectedResult := []string{CreateCodebaseImageStreamCrName(cdPipelineCR.Name, previousStageName, firstImage), CreateCodebaseImageStreamCrName(cdPipelineCR.Name, previousStageName, secondImage)}
 
 	applicationsToPromote, err := GetInputISForStage(ctx, k8sClient, name, cdPipelineName)
 	assert.NoError(t, err)
@@ -237,8 +238,8 @@ func TestGetImageStreamFromStage_NonZeroStageOrder(t *testing.T) {
 func TestGetImageStreamFromStage_BadApplicationsToPromoteValues(t *testing.T) {
 	ctx := context.Background()
 	stageCR := createStageCR(nonZeroOrder, cdPipelineName)
-	stageCR.Annotations = make(map[string]string)
-	stageCR.Annotations[PreviousStageNameAnnotationKey] = previousStageName
+	prevStageCR := createStageCR(0, cdPipelineName)
+	prevStageCR.Name = "prev-sage"
 
 	cdPipelineCR := cdPipeApi.CDPipeline{
 		ObjectMeta: metav1.ObjectMeta{
@@ -251,9 +252,9 @@ func TestGetImageStreamFromStage_BadApplicationsToPromoteValues(t *testing.T) {
 	}
 
 	scheme := runtime.NewScheme()
-	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{}, &cdPipeApi.CDPipeline{}, &codeBaseApi.CodebaseImageStream{})
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{}, &cdPipeApi.StageList{}, &cdPipeApi.CDPipeline{}, &codeBaseApi.CodebaseImageStream{})
 
-	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stageCR, &cdPipelineCR).Build()
+	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stageCR, &prevStageCR, &cdPipelineCR).Build()
 	k8sClient, err := k8s.NewRuntimeNamespacedClient(client, ns)
 	if err != nil {
 		t.Fatal(err)
@@ -265,7 +266,7 @@ func TestGetImageStreamFromStage_BadApplicationsToPromoteValues(t *testing.T) {
 	assert.Nil(t, applicationsToPromote)
 }
 
-func TestGetImageStreamFromStage_NoPreviousStageName(t *testing.T) {
+func TestGetImageStreamFromStage_NoPreviousStage(t *testing.T) {
 	ctx := context.Background()
 	stageCR := createStageCR(nonZeroOrder, cdPipelineName)
 
@@ -277,7 +278,7 @@ func TestGetImageStreamFromStage_NoPreviousStageName(t *testing.T) {
 	}
 
 	scheme := runtime.NewScheme()
-	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{}, &cdPipeApi.CDPipeline{}, &codeBaseApi.CodebaseImageStream{})
+	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{}, &cdPipeApi.StageList{}, &cdPipeApi.CDPipeline{}, &codeBaseApi.CodebaseImageStream{})
 
 	client := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(&stageCR, &cdPipelineCR).Build()
 	k8sClient, err := k8s.NewRuntimeNamespacedClient(client, ns)
@@ -287,7 +288,7 @@ func TestGetImageStreamFromStage_NoPreviousStageName(t *testing.T) {
 
 	applicationsToPromote, err := GetInputISForStage(ctx, k8sClient, name, cdPipelineName)
 	assert.Nil(t, applicationsToPromote)
-	assert.True(t, strings.Contains(err.Error(), "there is no annotation"))
+	assert.Contains(t, err.Error(), "previous stage not found")
 }
 
 func TestGetOutputISForStage_GetErr(t *testing.T) {
@@ -308,7 +309,7 @@ func TestGetOutputISForStage_GetErr(t *testing.T) {
 func TestGetOutputISForStage(t *testing.T) {
 	ctx := context.Background()
 	scheme := runtime.NewScheme()
-	expectedIS := []string{createCISName(cdPipelineName, name, appName)}
+	expectedIS := []string{CreateCodebaseImageStreamCrName(cdPipelineName, name, appName)}
 	scheme.AddKnownTypes(appsv1.SchemeGroupVersion, &cdPipeApi.Stage{}, &cdPipeApi.CDPipeline{}, &codeBaseApi.CodebaseImageStream{})
 	inputDockerStreams := []string{"input1"}
 	cdPipelineCR := cdPipeApi.CDPipeline{

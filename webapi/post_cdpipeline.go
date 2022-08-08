@@ -10,7 +10,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"edp-admin-console/internal/applog"
-	"edp-admin-console/internal/imagestream"
 )
 
 const paramWaitingForCdPipeline = "waitingforcdpipeline"
@@ -161,14 +160,6 @@ func (h *HandlerEnv) CreateCDPipeline(w http.ResponseWriter, r *http.Request) {
 				},
 				JobProvisioning: stage.JobProvisioner,
 			},
-		}
-		if i > 0 {
-			if len(stageCR.Annotations) > 0 {
-				stageCR.Annotations[imagestream.PreviousStageNameAnnotationKey] = stagesInfo[i-1].Name
-			} else {
-				annotation := map[string]string{imagestream.PreviousStageNameAnnotationKey: stagesInfo[i-1].Name}
-				stageCR.Annotations = annotation
-			}
 		}
 
 		errStage := h.NamespacedClient.Create(ctx, stageCR)

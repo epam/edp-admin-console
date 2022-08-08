@@ -8,6 +8,7 @@ import (
 	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
 	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 	"go.uber.org/zap"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"edp-admin-console/internal/applications"
 	"edp-admin-console/internal/applog"
@@ -16,8 +17,7 @@ import (
 )
 
 const (
-	verifiedImageStreamSuffix      = "verified"
-	PreviousStageNameAnnotationKey = "deploy.edp.epam.com/previous-stage-name"
+	verifiedImageStreamSuffix = "verified"
 )
 
 type EmptyImageStreamErr struct {
@@ -35,7 +35,7 @@ func NewEmptyImageStreamErr(crName string) *EmptyImageStreamErr {
 
 // GetInputISForStage gets InputDockerStream list by CR Stage name
 func GetInputISForStage(ctx context.Context, client *k8s.RuntimeNamespacedClient, stageName, cdPipeline string) ([]string, error) {
-	stageCrName := createStageCrName(cdPipeline, stageName)
+	stageCrName := CreateStageCrName(cdPipeline, stageName)
 	stageCR, err := client.GetCDStage(ctx, stageCrName)
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func GetInputISForStage(ctx context.Context, client *k8s.RuntimeNamespacedClient
 	}
 
 	if stageCR.Spec.Order != 0 {
-		previousStageName, errPrevStage := findPreviousStageName(stageCR.Annotations)
+		previousStageName, errPrevStage := findPreviousStageName(ctx, client, stageCR)
 		if errPrevStage != nil {
 			return nil, errPrevStage
 		}
@@ -79,7 +79,7 @@ func inputCISListFromApplications(ctx context.Context, client *k8s.RuntimeNamesp
 		}
 
 		appName = util.ProcessCodeBaseImageStreamNameConvention(appName)
-		CISName := createCISName(cdPipelineCR.Name, previousStageName, appName)
+		CISName := CreateCodebaseImageStreamCrName(cdPipelineCR.Name, previousStageName, appName)
 		cisNames = append(cisNames, CISName)
 	}
 	logger.Info("checking validating CIS names for non-first stage", zap.Strings("CIS", cisNames))
@@ -113,30 +113,38 @@ func GetOutputISForStage(ctx context.Context, client *k8s.RuntimeNamespacedClien
 		if errApp != nil {
 			return nil, errApp
 		}
-		outputIS = append(outputIS, createCISName(cdPipeCRName, stageName, appName))
+		outputIS = append(outputIS, CreateCodebaseImageStreamCrName(cdPipeCRName, stageName, appName))
 	}
 	return outputIS, nil
 }
 
-// createCISName: CIS is abbreviation for CodebaseImageStream
-func createCISName(pipelineName, stageName, codebaseName string) string {
+// CreateCodebaseImageStreamCrName CIS is abbreviation for CodebaseImageStream
+func CreateCodebaseImageStreamCrName(pipelineName, stageName, codebaseName string) string {
 	return fmt.Sprintf("%s-%s-%s-%s", pipelineName, stageName, codebaseName, verifiedImageStreamSuffix)
 }
 
-func findPreviousStageName(annotations map[string]string) (string, error) {
-	if annotations == nil {
-		return "", fmt.Errorf("there is no annotation")
+// Temporary solution copy-pasted from cd-pipeline-operator before moving to Headlamp.
+func findPreviousStageName(ctx context.Context, k8sClient client.Client, stage *cdPipeApi.Stage) (string, error) {
+	if stage.IsFirst() {
+		return "", errors.New("can't get previous stage from first stage")
 	}
 
-	if val, ok := annotations[PreviousStageNameAnnotationKey]; ok {
-		return val, nil
+	stages := &cdPipeApi.StageList{}
+	if err := k8sClient.List(ctx, stages, client.InNamespace(stage.Namespace)); err != nil {
+		return "", err
 	}
 
-	return "", fmt.Errorf("stage doesn`t contain %s annotation", PreviousStageNameAnnotationKey)
+	for _, val := range stages.Items {
+		if val.Spec.CdPipeline == stage.Spec.CdPipeline && val.Spec.Order == (stage.Spec.Order-1) {
+			return val.Spec.Name, nil
+		}
+	}
+
+	return "", errors.New("previous stage not found")
 }
 
-// createStageCrName: creates a full stageName for stage CR
-func createStageCrName(cdPipelineName, stageName string) string {
+// CreateStageCrName creates a full stageName for stage CR
+func CreateStageCrName(cdPipelineName, stageName string) string {
 	return fmt.Sprintf("%s-%s", cdPipelineName, stageName)
 }
 

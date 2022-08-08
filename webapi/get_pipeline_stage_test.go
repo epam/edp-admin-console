@@ -11,6 +11,7 @@ import (
 	"github.com/gavv/httpexpect/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"go.uber.org/zap"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -18,13 +19,11 @@ import (
 	"edp-admin-console/internal/config"
 	"edp-admin-console/internal/imagestream"
 	"edp-admin-console/k8s"
-	applog "edp-admin-console/service/logger"
 )
 
 const (
 	validCDPipelineName = "cd1"
 	namespace           = "ns"
-	firstStage          = "first"
 	unexpectedBody      = "unexpected body"
 )
 
@@ -56,9 +55,8 @@ func TestStagePipelineSuite(t *testing.T) {
 		AuthEnable: false,
 	}
 	h := NewHandlerEnv(WithClient(namespacedClient), WithConfig(conf))
-	logger := applog.GetLogger()
 	authHandler := HandlerAuthWithOption()
-	router := V2APIRouter(h, authHandler, logger)
+	router := V2APIRouter(h, authHandler, zap.NewNop())
 
 	s := &StagePipelineSuite{
 		Handler: h,
@@ -85,7 +83,7 @@ func (s *StagePipelineSuite) TestGetStagePipeline_StageNotFound() {
 }
 
 func (s *StagePipelineSuite) TestGetStagePipeline_ValidFirst() {
-	validFirstStageName := validCDPipelineName + "-" + firstStage
+	validFirstStageName := validCDPipelineName + "-" + "first-stage"
 	t := s.T()
 	ctx := context.Background()
 
@@ -140,13 +138,13 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidFirst() {
 
 	httpExpect := httpexpect.New(t, s.TestServer.URL)
 	response := httpExpect.
-		GET("/api/v2/edp/cd-pipeline/" + validCDPipelineName + "/stage/" + firstStage).
+		GET("/api/v2/edp/cd-pipeline/" + validCDPipelineName + "/stage/" + "first-stage").
 		Expect().
 		Status(http.StatusOK).
 		ContentType("application/json")
 
 	expectedBody := `
-{"name":"first",
+{"name":"first-stage",
 "cdPipeline":"cd1",
 "description":"description",
 "triggerType":"Manual",
@@ -155,7 +153,7 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidFirst() {
 	[{"name":"java11-cd1",
 	"branchName":"",
 	"inputIs":"java11-cd1-master",
-	"outputIs":"cd1-first-java11-cd1-verified"}],
+	"outputIs":"cd1-first-stage-java11-cd1-verified"}],
 "qualityGates":null,
 "jobProvisioning":"manual"}`
 
@@ -176,14 +174,12 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidFirst() {
 }
 
 func (s *StagePipelineSuite) TestGetStagePipeline_ValidSecond() {
-	secondStage := "second"
-	validSecondStageName := validCDPipelineName + "-" + secondStage
-	CISNameForSecondStage := "cd1-first-java11-cd1-verified"
 	t := s.T()
 	ctx := context.Background()
 	applicationToPromote := "java11-cd1"
 	inputDockerStreams := []string{"java11-cd1-master"}
-	validCDPipeline := cdPipeApi.CDPipeline{
+
+	CDPipeline := cdPipeApi.CDPipeline{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      validCDPipelineName,
 			Namespace: namespace,
@@ -193,13 +189,29 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidSecond() {
 			InputDockerStreams: inputDockerStreams,
 		},
 	}
-	validSecondStage := cdPipeApi.Stage{
+
+	firstStage := cdPipeApi.Stage{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:        validSecondStageName,
-			Namespace:   namespace,
-			Annotations: map[string]string{imagestream.PreviousStageNameAnnotationKey: firstStage},
+			Name:      imagestream.CreateStageCrName(CDPipeline.Name, "first-stage"),
+			Namespace: namespace,
 		},
 		Spec: cdPipeApi.StageSpec{
+			Name:            "first-stage",
+			CdPipeline:      validCDPipelineName,
+			Description:     "description",
+			JobProvisioning: "manual",
+			Order:           0,
+			TriggerType:     "Manual",
+		},
+	}
+
+	secondStage := cdPipeApi.Stage{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      imagestream.CreateStageCrName(CDPipeline.Name, "second-stage"),
+			Namespace: namespace,
+		},
+		Spec: cdPipeApi.StageSpec{
+			Name:            "second-stage",
 			CdPipeline:      validCDPipelineName,
 			Description:     "description",
 			JobProvisioning: "manual",
@@ -207,9 +219,20 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidSecond() {
 			TriggerType:     "Manual",
 		},
 	}
+
+	cisForFirstStage := codeBaseApi.CodebaseImageStream{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      imagestream.CreateCodebaseImageStreamCrName(CDPipeline.Name, firstStage.Spec.Name, applicationToPromote),
+			Namespace: namespace,
+		},
+		Spec: codeBaseApi.CodebaseImageStreamSpec{
+			Codebase: applicationToPromote,
+		},
+	}
+
 	cisForSecondStage := codeBaseApi.CodebaseImageStream{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      CISNameForSecondStage,
+			Name:      imagestream.CreateCodebaseImageStreamCrName(CDPipeline.Name, secondStage.Spec.Name, applicationToPromote),
 			Namespace: namespace,
 		},
 		Spec: codeBaseApi.CodebaseImageStreamSpec{
@@ -228,15 +251,23 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidSecond() {
 	}
 
 	fakeK8SClient := s.Handler.NamespacedClient
-	err := fakeK8SClient.Create(ctx, &validCDPipeline)
+	err := fakeK8SClient.Create(ctx, &CDPipeline)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = fakeK8SClient.Create(ctx, &validSecondStage)
+	err = fakeK8SClient.Create(ctx, &secondStage)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = fakeK8SClient.Create(ctx, &firstStage)
 	if err != nil {
 		t.Fatal(err)
 	}
 	err = fakeK8SClient.Create(ctx, &cisForSecondStage)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = fakeK8SClient.Create(ctx, &cisForFirstStage)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -247,13 +278,13 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidSecond() {
 
 	httpExpect := httpexpect.New(t, s.TestServer.URL)
 	response := httpExpect.
-		GET("/api/v2/edp/cd-pipeline/" + validCDPipelineName + "/stage/" + secondStage).
+		GET("/api/v2/edp/cd-pipeline/" + validCDPipelineName + "/stage/" + secondStage.Spec.Name).
 		Expect().
 		Status(http.StatusOK).
 		ContentType("application/json")
 
 	expectedBody := `
-{"name":"second",
+{"name":"second-stage",
 "cdPipeline":"cd1",
 "description":"description",
 "triggerType":"Manual",
@@ -261,21 +292,29 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidSecond() {
 "applications":
 	[{"name":"java11-cd1",
 	"branchName":"",
-	"inputIs":"cd1-first-java11-cd1-verified",
-	"outputIs":"cd1-second-java11-cd1-verified"}],
+	"inputIs":"cd1-first-stage-java11-cd1-verified",
+	"outputIs":"cd1-second-stage-java11-cd1-verified"}],
 "qualityGates":null,
 "jobProvisioning":"manual"}`
 	assert.JSONEq(t, expectedBody, response.Body().Raw(), unexpectedBody)
 
-	err = fakeK8SClient.Delete(ctx, &validCDPipeline)
+	err = fakeK8SClient.Delete(ctx, &CDPipeline)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = fakeK8SClient.Delete(ctx, &validSecondStage)
+	err = fakeK8SClient.Delete(ctx, &secondStage)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = fakeK8SClient.Delete(ctx, &firstStage)
 	if err != nil {
 		t.Fatal(err)
 	}
 	err = fakeK8SClient.Delete(ctx, &cisForSecondStage)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = fakeK8SClient.Delete(ctx, &cisForFirstStage)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -288,7 +327,7 @@ func (s *StagePipelineSuite) TestGetStagePipeline_ValidSecond() {
 
 func (s *StagePipelineSuite) TestGetStagePipeline_inputISNotFound() {
 	emptyInputISCDPipeName := "emptyInputIS"
-	emptyInputISStageName := emptyInputISCDPipeName + "-" + firstStage
+	emptyInputISStageName := emptyInputISCDPipeName + "-" + "first-stage"
 	t := s.T()
 	ctx := context.Background()
 	emptyInputISCDPipe := cdPipeApi.CDPipeline{
@@ -318,7 +357,7 @@ func (s *StagePipelineSuite) TestGetStagePipeline_inputISNotFound() {
 
 	httpExpect := httpexpect.New(t, s.TestServer.URL)
 	response := httpExpect.
-		GET("/api/v2/edp/cd-pipeline/" + emptyInputISCDPipeName + "/stage/" + firstStage).
+		GET("/api/v2/edp/cd-pipeline/" + emptyInputISCDPipeName + "/stage/" + "first-stage").
 		Expect().
 		Status(http.StatusNotFound)
 
@@ -337,7 +376,7 @@ func (s *StagePipelineSuite) TestGetStagePipeline_inputISNotFound() {
 
 func (s *StagePipelineSuite) TestGetStagePipeline_outputISNotFound() {
 	emptyOutputISCDPipeName := "emptyOutputIS"
-	emptyOutputISStageName := emptyOutputISCDPipeName + "-" + firstStage
+	emptyOutputISStageName := emptyOutputISCDPipeName + "-" + "first-stage"
 	t := s.T()
 	ctx := context.Background()
 	emptyOutputISCDPipe := cdPipeApi.CDPipeline{
@@ -372,7 +411,7 @@ func (s *StagePipelineSuite) TestGetStagePipeline_outputISNotFound() {
 
 	httpExpect := httpexpect.New(t, s.TestServer.URL)
 	response := httpExpect.
-		GET("/api/v2/edp/cd-pipeline/" + emptyOutputISCDPipeName + "/stage/" + firstStage).
+		GET("/api/v2/edp/cd-pipeline/" + emptyOutputISCDPipeName + "/stage/" + "first-stage").
 		Expect().
 		Status(http.StatusNotFound)
 

@@ -68,7 +68,6 @@ const (
 	cdPipelineKind                         = "CDPipeline"
 	dockerStreamsBeforeUpdateAnnotationKey = "deploy.edp.epam.com/docker-streams-before-update"
 	stagesKind                             = "stages"
-	previousStageNameAnnotationKey         = "deploy.edp.epam.com/previous-stage-name"
 )
 
 var log = logger.GetLogger()
@@ -606,9 +605,6 @@ func createCr(cdPipelineName string, stage command.CDStageCommand, previousStage
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-%s", cdPipelineName, stage.Name),
 			Namespace: context.Namespace,
-			Annotations: map[string]string{
-				previousStageNameAnnotationKey: previousStageName,
-			},
 		},
 		Spec: cdPipeApi.StageSpec{
 			Name:            stage.Name,
