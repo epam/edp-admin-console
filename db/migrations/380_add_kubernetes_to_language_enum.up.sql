@@ -1,1 +1,0 @@
-alter type "language" add value 'kubernetes';

@@ -87,26 +87,6 @@
                 <span class="form__radio-label-text">Container</span>
             </label>
         </div>
-        <div class="form__radio-btn-wrapper">
-            <input name="appLang" type="radio" class="form__radio-btn"
-                   id="appLang-Kubernetes" value="kubernetes"
-                   data-target=".formSubsection-kubernetes">
-            <label class="form__radio-label" for="appLang-Kubernetes">
-                <img class="form__radio-label-icon"
-                     src="{{ .BasePath }}/static/img/kubernetes-logo.png" alt="logo">
-                <span class="form__radio-label-text">Kubernetes</span>
-            </label>
-        </div>
-        <div class="form__radio-btn-wrapper">
-            <input name="appLang" type="radio" class="form__radio-btn"
-                   id="appLang-GitOps" value="gitops"
-                   data-target=".formSubsection-gitops">
-            <label class="form__radio-label" for="appLang-GitOps">
-                <img class="form__radio-label-icon"
-                     src="{{ .BasePath }}/static/img/gitops-logo.png" alt="logo">
-                <span class="form__radio-label-text">GitOps</span>
-            </label>
-        </div>
         {{end}}
 
         {{if eq .Type "application" }}

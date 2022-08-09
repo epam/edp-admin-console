@@ -1,1 +1,0 @@
-alter type "framework" add value 'argocd';

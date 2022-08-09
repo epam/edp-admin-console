@@ -104,26 +104,6 @@
             <option data-build-tool="kaniko">Kaniko</option>
         </select>
     </div>
-    <div class="js-form-subsection form-subsection formSubsection-kubernetes hide-element">
-        <label for="buildTool">Select Build Tool
-            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                  title="Select application build tool."></span>
-        </label>
-        <select class="form-control buildTool helm-build-tools" name="buildTool">
-            <option data-build-tool="helm">Helm</option>
-            <option data-build-tool="kustomize">Kustomize</option>
-        </select>
-    </div>
-    <div class="js-form-subsection form-subsection formSubsection-gitops hide-element">
-        <label for="buildTool">Select Build Tool
-            <span class="tooltip-icon" data-toggle="tooltip" data-placement="top"
-                  title="Select application build tool."></span>
-        </label>
-        <select class="form-control buildTool argocd-build-tools" name="buildTool">
-            <option data-build-tool="argocd">ArgoCD</option>
-            <option data-build-tool="flux">Flux</option>
-        </select>
-    </div>
     {{end}}
 
 
