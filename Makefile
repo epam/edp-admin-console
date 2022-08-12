@@ -16,11 +16,13 @@ override LDFLAGS += \
   -X ${PACKAGE}.version=${VERSION} \
   -X ${PACKAGE}.buildDate=${BUILD_DATE} \
   -X ${PACKAGE}.gitCommit=${GIT_COMMIT} \
-  -X ${PACKAGE}.kubectlVersion=${KUBECTL_VERSION}\
+  -X ${PACKAGE}.kubectlVersion=${KUBECTL_VERSION}
 
 ifneq (${GIT_TAG},)
 LDFLAGS += -X ${PACKAGE}.gitTag=${GIT_TAG}
 endif
+
+override GCFLAGS +=all=-trimpath=${CURRENT_DIR}
 
 .DEFAULT_GOAL:=help
 # set default shell
@@ -43,7 +45,7 @@ lint: ## Run go lint
 
 .PHONY: build
 build: clean ## build operator's binary
-	CGO_ENABLED=0 GOOS=${HOST_OS} GOARCH=${HOST_ARCH} go build -v -ldflags '${LDFLAGS}' -o ${DIST_DIR}/${BIN_NAME} ${CURRENT_DIR}/main.go
+	CGO_ENABLED=0 GOOS=${HOST_OS} GOARCH=${HOST_ARCH} go build -v -ldflags '${LDFLAGS}' -o ${DIST_DIR}/${BIN_NAME} -gcflags '${GCFLAGS}' ${CURRENT_DIR}/main.go
 
 .PHONY: clean
 clean:  ## clean up
