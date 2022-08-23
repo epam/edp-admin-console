@@ -1,4 +1,4 @@
-FROM alpine:3.16.1
+FROM alpine:3.16.2
 
 ENV USER_UID=1001 \
     USER_NAME=admin-console \
