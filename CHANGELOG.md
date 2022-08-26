@@ -1,9 +1,40 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="v2.13.0"></a>
+## [v2.13.0] - 2022-08-23
+### Features
+
+- Switch to V1 for rest of CDs [EPMDEDP-10079](https://jiraeu.epam.com/browse/EPMDEDP-10079)
+- Switch to use V1 apis of EDP components [EPMDEDP-10079](https://jiraeu.epam.com/browse/EPMDEDP-10079)
+- Add different build tools for Kubernetes and GitOps libraries [EPMDEDP-8257](https://jiraeu.epam.com/browse/EPMDEDP-8257)
+- Add Kubernetes and GitOps as a libraries [EPMDEDP-8257](https://jiraeu.epam.com/browse/EPMDEDP-8257)
+
+### Bug Fixes
+
+- Incorrect subsequent CDPipeline Stage creation in Headlamp [EPMDEDP-10327](https://jiraeu.epam.com/browse/EPMDEDP-10327)
+- Fix ArgoCD build tool name typo [EPMDEDP-8257](https://jiraeu.epam.com/browse/EPMDEDP-8257)
+
+### Code Refactoring
+
+- Remove status creation for CodebaseBranch [EPMDEDP-10122](https://jiraeu.epam.com/browse/EPMDEDP-10122)
+
 ### Routine
 
+- Upgrade go version to 1.18 [EPMDEDP-10110](https://jiraeu.epam.com/browse/EPMDEDP-10110)
+- Fix Jira Ticket pattern for changelog generator [EPMDEDP-10159](https://jiraeu.epam.com/browse/EPMDEDP-10159)
+- Update alpine base image to 3.16.2 version [EPMDEDP-10274](https://jiraeu.epam.com/browse/EPMDEDP-10274)
+- Update alpine base image version [EPMDEDP-10280](https://jiraeu.epam.com/browse/EPMDEDP-10280)
+- Change 'go get' to 'go install' for git-chglog [EPMDEDP-10337](https://jiraeu.epam.com/browse/EPMDEDP-10337)
+- Remove VERSION file [EPMDEDP-10387](https://jiraeu.epam.com/browse/EPMDEDP-10387)
+- Remove support Kubernetes and GitOps languages type [EPMDEDP-10397](https://jiraeu.epam.com/browse/EPMDEDP-10397)
+- Add gcflags for go build artifact [EPMDEDP-10411](https://jiraeu.epam.com/browse/EPMDEDP-10411)
 - Update current development version [EPMDEDP-8832](https://jiraeu.epam.com/browse/EPMDEDP-8832)
+
+### Documentation
+
+- Align README.md [EPMDEDP-10274](https://jiraeu.epam.com/browse/EPMDEDP-10274)
 
 
 <a name="v2.12.0"></a>
@@ -197,7 +228,8 @@ use gorilla's csrf implementation instead of beego's xsrf.
 - [EPMDEDP-3929] Add new action type to display in Action Log table
 
 
-[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.12.0...HEAD
+[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.13.0...HEAD
+[v2.13.0]: https://github.com/epam/edp-admin-console/compare/v2.12.0...v2.13.0
 [v2.12.0]: https://github.com/epam/edp-admin-console/compare/v2.11.5...v2.12.0
 [v2.11.5]: https://github.com/epam/edp-admin-console/compare/v2.11.4...v2.11.5
 [v2.11.4]: https://github.com/epam/edp-admin-console/compare/v2.11.3...v2.11.4
