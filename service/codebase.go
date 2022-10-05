@@ -114,12 +114,6 @@ func (s CodebaseService) CreateCodebase(codebase command.CreateCodebase) (*codeB
 		return &codeBaseApi.Codebase{}, err
 	}
 
-	p := setCodebaseBranchCr(codebase.Versioning.Type, codebase.Username, codebase.Versioning.StartFrom, codebase.DefaultBranch)
-
-	if _, err = s.BranchService.CreateCodebaseBranch(p, codebase.Name); err != nil {
-		clog.Error("an error has been occurred during the master branch creation", zap.Error(err))
-		return &codeBaseApi.Codebase{}, err
-	}
 	return result, nil
 }
 
@@ -393,21 +387,6 @@ func (s CodebaseService) deleteCodebase(name string) error {
 	}
 	clog.Debug("end executing codebase delete request", zap.String("codebase", name))
 	return nil
-}
-
-func setCodebaseBranchCr(vt string, username string, version *string, defaultBranch string) command.CreateCodebaseBranch {
-	if vt == consts.DefaultVersioningType {
-		return command.CreateCodebaseBranch{
-			Name:     defaultBranch,
-			Username: username,
-		}
-	}
-
-	return command.CreateCodebaseBranch{
-		Name:     defaultBranch,
-		Username: username,
-		Version:  version,
-	}
 }
 
 func (s *CodebaseService) Update(command command.UpdateCodebaseCommand) (*codeBaseApi.Codebase, error) {
