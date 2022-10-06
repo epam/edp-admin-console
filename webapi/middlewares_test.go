@@ -20,6 +20,8 @@ import (
 	"edp-admin-console/internal/config"
 )
 
+const TokenURL = "http://domain"
+
 func testContextWithLogger(t *testing.T) context.Context {
 	t.Helper()
 	logger, err := zap.NewDevelopment()

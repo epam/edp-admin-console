@@ -11,7 +11,7 @@ type SlaveService struct {
 	ISlaveRepository repository.ISlaveRepository
 }
 
-//GetAllSlaves gets all slave entities from DB
+// GetAllSlaves gets all slave entities from DB
 func (s SlaveService) GetAllSlaves() ([]*query.JenkinsSlave, error) {
 	log.Debug("Start fetching all available Slaves...")
 	jenkinsSlaves, err := s.ISlaveRepository.GetAllSlaves()

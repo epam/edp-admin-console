@@ -13,7 +13,7 @@ type JiraServer struct {
 	IJiraServer jiraserver.IJiraServer
 }
 
-//GetJiraServers gets all Jira Servers from DB
+// GetJiraServers gets all Jira Servers from DB
 func (s JiraServer) GetJiraServers() ([]*query.JiraServer, error) {
 	log.Debug("start fetching Jira servers from DB")
 	servers, err := s.IJiraServer.GetJiraServers()

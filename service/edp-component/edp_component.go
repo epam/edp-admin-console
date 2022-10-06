@@ -18,7 +18,7 @@ type EDPComponentService struct {
 	IEDPComponent ec.IEDPComponentRepository
 }
 
-//GetEDPComponent gets EDP component by type from DB
+// GetEDPComponent gets EDP component by type from DB
 func (s EDPComponentService) GetEDPComponent(componentType string) (*query.EDPComponent, error) {
 	log.Debug("start fetching EDP Component", zap.String("type", componentType))
 	c, err := s.IEDPComponent.GetEDPComponent(componentType)
@@ -35,7 +35,7 @@ func (s EDPComponentService) GetEDPComponent(componentType string) (*query.EDPCo
 	return c, nil
 }
 
-//GetEDPComponents gets all EDP components from DB
+// GetEDPComponents gets all EDP components from DB
 func (s EDPComponentService) GetEDPComponents() ([]*query.EDPComponent, error) {
 	log.Debug("start fetching EDP Components...")
 	c, err := s.IEDPComponent.GetEDPComponents()
