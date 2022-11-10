@@ -1,5 +1,8 @@
 [![codecov](https://codecov.io/gh/epam/edp-admin-console/branch/master/graph/badge.svg?token=U5VZEPF6VI)](https://codecov.io/gh/epam/edp-admin-console)
 
+|![](https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Warning.svg/156px-Warning.svg.png) | This admin-console is deprecated starting from EDP v2.13
+|---|---|
+
 # EDP Admin Console
 
 | :heavy_exclamation_mark: Please refer to [Admin Console user guide](https://epam.github.io/edp-install/user-guide/) to get the notion of the main concepts and guidelines. |
