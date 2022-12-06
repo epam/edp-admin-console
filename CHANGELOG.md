@@ -2,6 +2,24 @@
 ## [Unreleased]
 
 
+<a name="v2.14.0"></a>
+## [v2.14.0] - 2022-11-10
+### Features
+
+- Added a stub linter [EPMDEDP-10536](https://jiraeu.epam.com/browse/EPMDEDP-10536)
+- Move creation of codebasebranch for default branch to operator [EPMDEDP-10733](https://jiraeu.epam.com/browse/EPMDEDP-10733)
+
+### Code Refactoring
+
+- Disable V1 REST API and WebUI [EPMDEDP-10750](https://jiraeu.epam.com/browse/EPMDEDP-10750)
+
+### Routine
+
+- Update current development version [EPMDEDP-10274](https://jiraeu.epam.com/browse/EPMDEDP-10274)
+- Add git-chglog installation to Makefile [EPMDEDP-10482](https://jiraeu.epam.com/browse/EPMDEDP-10482)
+- Add deprecation warning [EPMDEDP-10761](https://jiraeu.epam.com/browse/EPMDEDP-10761)
+
+
 <a name="v2.13.0"></a>
 ## [v2.13.0] - 2022-08-26
 ### Features
@@ -228,7 +246,8 @@ use gorilla's csrf implementation instead of beego's xsrf.
 - [EPMDEDP-3929] Add new action type to display in Action Log table
 
 
-[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.13.0...HEAD
+[Unreleased]: https://github.com/epam/edp-admin-console/compare/v2.14.0...HEAD
+[v2.14.0]: https://github.com/epam/edp-admin-console/compare/v2.13.0...v2.14.0
 [v2.13.0]: https://github.com/epam/edp-admin-console/compare/v2.12.0...v2.13.0
 [v2.12.0]: https://github.com/epam/edp-admin-console/compare/v2.11.5...v2.12.0
 [v2.11.5]: https://github.com/epam/edp-admin-console/compare/v2.11.4...v2.11.5
