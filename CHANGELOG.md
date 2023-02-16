@@ -1,6 +1,11 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Routine
+
+- Update current development version [EPMDEDP-10610](https://jiraeu.epam.com/browse/EPMDEDP-10610)
+- Update git-chglog for edp-admin-console [EPMDEDP-11518](https://jiraeu.epam.com/browse/EPMDEDP-11518)
+
 
 <a name="v2.14.0"></a>
 ## [v2.14.0] - 2022-12-06
@@ -164,8 +169,8 @@ use gorilla's csrf implementation instead of beego's xsrf.
 - Update Makefile changelog target [EPMDEDP-8218](https://jiraeu.epam.com/browse/EPMDEDP-8218)
 - k8s namespaced client draft [EPMDEDP-8229](https://jiraeu.epam.com/browse/EPMDEDP-8229)
 - GetImageStreamFromStage implementation [EPMDEDP-8260](https://jiraeu.epam.com/browse/EPMDEDP-8260)
-- implemented logic to get input image stream for the next (non-first) stage [EPMDEDP-8262](https://jiraeu.epam.com/browse/EPMDEDP-8262)
 - reworked logic to get input image stream for the (non-first) stage [EPMDEDP-8262](https://jiraeu.epam.com/browse/EPMDEDP-8262)
+- implemented logic to get input image stream for the next (non-first) stage [EPMDEDP-8262](https://jiraeu.epam.com/browse/EPMDEDP-8262)
 - prepare chi-based v2 api route. [EPMDEDP-8264](https://jiraeu.epam.com/browse/EPMDEDP-8264)
 - handler preparation [EPMDEDP-8265](https://jiraeu.epam.com/browse/EPMDEDP-8265)
 - pipeline-stage handler [EPMDEDP-8265](https://jiraeu.epam.com/browse/EPMDEDP-8265)
