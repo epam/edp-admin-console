@@ -19,7 +19,6 @@ require (
 	github.com/gavv/httpexpect v2.0.0+incompatible
 	github.com/gavv/httpexpect/v2 v2.3.1
 	github.com/go-chi/chi/v5 v5.0.7
-	github.com/go-resty/resty/v2 v2.7.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/gorilla/csrf v1.7.1
@@ -128,13 +127,14 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
-	github.com/docker/docker v1.13.1 // indirect
+	github.com/docker/docker v20.10.24+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
+	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/pquerna/cachecontrol v0.0.0-20180517163645-1555304b9b35 // indirect
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
 	github.com/sirupsen/logrus v1.7.0 // indirect
