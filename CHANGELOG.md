@@ -5,6 +5,7 @@
 
 - Update current development version [EPMDEDP-10610](https://jiraeu.epam.com/browse/EPMDEDP-10610)
 - Update git-chglog for edp-admin-console [EPMDEDP-11518](https://jiraeu.epam.com/browse/EPMDEDP-11518)
+- Update current development version [EPMDEDP-11826](https://jiraeu.epam.com/browse/EPMDEDP-11826)
 - Upgrade alpine image version to 3.18.0 [EPMDEDP-12085](https://jiraeu.epam.com/browse/EPMDEDP-12085)
 
 
